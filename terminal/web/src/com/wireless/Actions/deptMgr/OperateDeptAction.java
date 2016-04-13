@@ -56,11 +56,11 @@ public class OperateDeptAction extends DispatchAction{
 			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				root = DataPaging.getPagingData(root, isPaging, start, limit);
+				root = DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit);
 			}
 			
 			jObject.setTotalProperty(root.size());
-			jObject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+			jObject.setRoot(DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

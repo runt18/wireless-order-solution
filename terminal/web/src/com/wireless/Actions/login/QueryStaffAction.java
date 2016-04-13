@@ -88,7 +88,7 @@ public class QueryStaffAction extends Action {
 				jObject.setTotalProperty(staffList.size());
 				
 				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-					staffList = DataPaging.getPagingData(staffList, isPaging, Integer.parseInt(start), Integer.parseInt(limit));
+					staffList = DataPaging.getPagingData(staffList, Boolean.parseBoolean(isPaging), Integer.parseInt(start), Integer.parseInt(limit));
 				}
 				jObject.setRoot(staffList);
 			}

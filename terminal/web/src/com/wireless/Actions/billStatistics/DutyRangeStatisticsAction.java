@@ -170,7 +170,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			final List<ShiftGeneral> list = ShiftGeneralDao.getByRange(staff, new ExtraCond(DateType.HISTORY).setRange(new DutyRange(onDuty, offDuty)));
 			if(list != null){
 				jObject.setTotalProperty(list.size());
-				jObject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
+				jObject.setRoot(DataPaging.getPagingData(list, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			
 		}catch(BusinessException | SQLException e){	

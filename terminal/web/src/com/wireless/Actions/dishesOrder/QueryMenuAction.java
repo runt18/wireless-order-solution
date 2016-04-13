@@ -101,7 +101,7 @@ public class QueryMenuAction extends DispatchAction {
 					root = new FoodList(result, Food.BY_ALIAS);
 				}
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			response.getWriter().print(jobject.toString());
 		}
@@ -135,7 +135,7 @@ public class QueryMenuAction extends DispatchAction {
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			response.getWriter().print(jobject.toString());
 		}
@@ -169,7 +169,7 @@ public class QueryMenuAction extends DispatchAction {
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			response.getWriter().print(jobject.toString());
 		}
@@ -203,7 +203,7 @@ public class QueryMenuAction extends DispatchAction {
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit));
 			}
 			response.getWriter().print(jobject.toString());
 		}

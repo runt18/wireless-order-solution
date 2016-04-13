@@ -306,7 +306,7 @@ public class OperateRestaurantAction extends DispatchAction {
 						
 					}
 					jObject.setTotalProperty(list.size());
-					result = DataPaging.getPagingData(result, isPaging, start, limit);
+					result = DataPaging.getPagingData(result, Boolean.parseBoolean(isPaging), start, limit);
 				}
 				jObject.setRoot(result);
 			}
