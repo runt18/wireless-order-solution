@@ -80,7 +80,7 @@ public class TestMaterialDept {
 		compare(materialDept, MaterialDepts.get(0));	
 		
 		//修改库存量
-		materialDept.plusStock(89);
+		materialDept.addStock(89);
 		MaterialDeptDao.updateMaterialDept(mStaff, materialDept);
 		
 		MaterialDept actual = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " +materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);

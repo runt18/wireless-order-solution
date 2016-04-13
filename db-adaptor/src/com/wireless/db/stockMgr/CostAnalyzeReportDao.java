@@ -191,7 +191,7 @@ public class CostAnalyzeReportDao {
 		String sql = "SELECT SUM(D.price * D.amount) AS money FROM " + Params.dbName + ".stock_action_detail as D " +
 		" JOIN " + Params.dbName + ".stock_action as S ON S.id = D.stock_action_id "+
 		" WHERE S.restaurant_id = " + term.getRestaurantId() +
-		" AND S.status IN ("+ StockAction.Status.AUDIT.getVal() +", "+ StockAction.Status.DELETE.getVal() +") " +
+		" AND S.status IN ("+ StockAction.Status.AUDIT.getVal() +", "+ StockAction.Status.RE_AUDIT.getVal() +") " +
 		(extraCond == null ? "" : extraCond) +
 		(orderClause == null ? "" : orderClause);
 		

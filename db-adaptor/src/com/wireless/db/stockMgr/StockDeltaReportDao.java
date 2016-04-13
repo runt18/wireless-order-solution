@@ -105,7 +105,7 @@ public class StockDeltaReportDao {
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
 						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
-						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
+						" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") "+
 						" AND (S.dept_in = " + dept  + " OR S.dept_out = " + dept + ")" + 
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
@@ -133,8 +133,8 @@ public class StockDeltaReportDao {
 					stockReport.setStockTakeMore(amount);
 				}else if(SubType.STOCK_OUT.getVal() == subType){
 					stockReport.setStockOut(amount);
-				}else if(SubType.USE_UP.getVal() == subType){
-					stockReport.setUseUp(amount);
+				}else if(SubType.CONSUMPTION.getVal() == subType){
+					stockReport.setConsumption(amount);
 				}else if(SubType.DAMAGE.getVal() == subType){
 					stockReport.setStockDamage(amount);
 				}else if(SubType.LESS.getVal() == subType){
@@ -159,7 +159,7 @@ public class StockDeltaReportDao {
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
-							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") "+
 							
 							" ORDER BY D.id DESC LIMIT 0,1";
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
@@ -193,7 +193,7 @@ public class StockDeltaReportDao {
 							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
-							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.DELETE.getVal() + ") "+
+							" AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") "+
 							" ORDER BY D.id DESC LIMIT 0,1";
 		
 					primeAmountCon.rs = primeAmountCon.stmt.executeQuery(primeAmount);
@@ -234,8 +234,8 @@ public class StockDeltaReportDao {
 					stockReport.setStockDamage(amount);
 				}else if(SubType.LESS.getVal() == subType){
 					stockReport.setStockTakeLess(amount);
-				}else if(SubType.USE_UP.getVal() == subType){
-					stockReport.setUseUp(amount);
+				}else if(SubType.CONSUMPTION.getVal() == subType){
+					stockReport.setConsumption(amount);
 				}else{
 					if(Integer.parseInt(dept) == deptIn){
 						stockReport.setStockInTransfer(stockReport.getStockInTransfer() + amount);

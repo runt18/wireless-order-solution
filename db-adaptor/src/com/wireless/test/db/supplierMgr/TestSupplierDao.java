@@ -30,7 +30,7 @@ public class TestSupplierDao {
 	
 	//期望值与真实值比较
 	private void compare(Supplier expected, Supplier actual){
-		assertEquals("supplierid", expected.getSupplierId(), actual.getSupplierId());
+		assertEquals("supplierid", expected.getId(), actual.getId());
 		assertEquals("restaurantid", expected.getRestaurantId(), actual.getRestaurantId());
 		assertEquals("name", expected.getName(), actual.getName());
 		assertEquals("tele", expected.getTele(), actual.getTele());
@@ -72,7 +72,7 @@ public class TestSupplierDao {
 		insupplier.setComment("good.");
 		
 		SupplierDao.update(mStaff, insupplier);
-	    actual = SupplierDao.getSupplierById(mStaff, insupplier.getSupplierId());
+	    actual = SupplierDao.getSupplierById(mStaff, insupplier.getId());
 		
 		compare(insupplier,actual);
 		
