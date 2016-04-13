@@ -13,13 +13,11 @@ public class StockReport implements Jsonable{
 	private float stockInTransfer;
 	private float stockTakeMore;
 	private float stockSpill;
-	private float stockInAmount;
 	private float stockOut;
 	private float stockOutTransfer;
 	private float stockTakeLess;
 	private float stockDamage;
 	private float useUp;
-	private float stockOutAmount;
 	private float finalAmount;
 	private float finalPrice;
 	private float finalMoney;
@@ -53,7 +51,7 @@ public class StockReport implements Jsonable{
 	public float getUseUp() {
 		return useUp;
 	}
-	public void setUseUp(float useUp) {
+	public void setConsumption(float useUp) {
 		this.useUp = useUp;
 	}
 	public void setStockIn(float stockIn) {
@@ -78,9 +76,6 @@ public class StockReport implements Jsonable{
 		this.stockSpill = stockSpill;
 	}
 
-	public void setStockInAmount(float stockInAmount) {
-		this.stockInAmount = stockInAmount;
-	}
 	public float getStockOut() {
 		return stockOut;
 	}
@@ -106,18 +101,18 @@ public class StockReport implements Jsonable{
 		this.stockDamage = stockDamage;
 	}
 
-	public void setStockOutAmount(float stockOutAmount) {
-		this.stockOutAmount = stockOutAmount;
-	}
 	public float getFinalAmount() {
 		return finalAmount;
 	}
+	
 	public void setFinalAmount(float finalAmount) {
 		this.finalAmount = finalAmount;
 	}
+	
 	public float getFinalPrice() {
 		return finalPrice;
 	}
+	
 	public void setFinalPrice(float finalPrice) {
 		this.finalPrice = finalPrice;
 	}
@@ -129,13 +124,13 @@ public class StockReport implements Jsonable{
 		//finalMoney = this.finalPrice * this.finalAmount;
 		return finalMoney;
 	}
+	
 	public float getStockInAmount() {
-		stockInAmount = this.stockIn + this.stockInTransfer + this.stockTakeMore + this.stockSpill;
-		return stockInAmount;
+		return this.stockIn + this.stockInTransfer + this.stockTakeMore + this.stockSpill;
 	}
+	
 	public float getStockOutAmount() {
-		stockOutAmount = this.stockOut + this.stockOutTransfer + this.stockTakeLess + this.stockDamage + this.useUp;
-		return stockOutAmount;
+		return this.stockOut + this.stockOutTransfer + this.stockTakeLess + this.stockDamage + this.useUp;
 	}
 
 	

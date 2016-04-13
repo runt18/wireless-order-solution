@@ -55,7 +55,7 @@ public class MemberOperation implements Jsonable {
 		RE_CONSUME(OperationCate.CONSUME_TYPE, 7, "反结账(消费)", "FJZ"),
 		RE_CONSUME_RESTORE(OperationCate.CONSUME_TYPE, 8, "反结账(退款)", "FJZTK"),
 		POINT_SUBSCRIBE(OperationCate.POINT_ADJUST_TYPE, 9, "关注赠送", "JF"),
-		POINT_RECOMMEND(OperationCate.POINT_ADJUST_TYPE, 9, "推荐赠送", "TJ");
+		POINT_RECOMMEND(OperationCate.POINT_ADJUST_TYPE, 10, "推荐赠送", "TJ");
 
 		private final OperationCate cate;
 		private final int value; //
