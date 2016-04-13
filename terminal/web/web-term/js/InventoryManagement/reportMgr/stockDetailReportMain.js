@@ -280,8 +280,8 @@ Ext.onReady(function(){
 	         {header:'单号', dataIndex:'oriStockId'},
 	         {header:'货品名称', dataIndex:'materialName', width:160},
 	         {header:'供应商', dataIndex:'supplier'},
-	         {header:'部门', dataIndex:'dept'},
-	         {header: '入货部门', dataIndex : 'stockInDept'},
+	         {header:'出库部门', dataIndex:'deptOut'},
+	         {header: '入库部门', dataIndex : 'deptIn'},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
 	         {header:'金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
@@ -302,8 +302,8 @@ Ext.onReady(function(){
 	         {name : 'oriStockId'},
 	         {name : 'supplier'},
 	         {name : 'materialName'},
-	         {name : 'dept'},
-	         {name : 'stockInDept'},
+	         {name : 'deptOut'},
+	         {name : 'deptIn'},
 	         {name : 'stockInSubType'},
 	         {name : 'stockInAmount'},
 	         {name : 'stockInMoney'},
@@ -319,9 +319,9 @@ Ext.onReady(function(){
 	var date = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 	
 	
-	//出货部门combo
-	var deptComb = new Ext.form.ComboBox({
-		id : 'deptComb_comboBox_stockDetailPeport',
+	//出库部门combo
+	var stockOutDeptComb = new Ext.form.ComboBox({
+		id : 'stockOutDeptComb_comboBox_stockDetailPeport',
 		forceSelection : true,
 		width : 110,
 		maxheight : 300,
@@ -366,7 +366,7 @@ Ext.onReady(function(){
 	
 	//入库部门combo
 	var stockInDeptComb = new Ext.form.ComboBox({
-		id : 'stockDeptComb_comboBox_stockDetailPeport',
+		id : 'stockInDeptComb_comboBox_stockDetailPeport',
 		forceSelection : true,
 		width : 110,
 		maxheight : 300,
@@ -435,17 +435,19 @@ Ext.onReady(function(){
 			id : 'stockDetail_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var sgs = stockDetailReportGrid.getStore();
-				sgs.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m');
-				sgs.baseParams['deptId'] = Ext.getCmp('deptComb_comboBox_stockDetailPeport').getStore().getCount() > 0 ? Ext.getCmp('deptComb_comboBox_stockDetailPeport').getValue() : '-1';
-				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
-				sgs.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
-				sgs.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
-				sgs.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
-				sgs.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
-				sgs.baseParams['supplier'] = Ext.getCmp('comboSearchSupplierForDetail').getValue();
-				//load两种加载方式,远程和本地
-				sgs.load({
+				var store = stockDetailReportGrid.getStore();
+				store.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m');
+				store.baseParams['deptOut'] = Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getStore().getCount() > 0 ? Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getValue() : '-1';
+				store.baseParams['deptIn'] = Ext.getCmp('stockInDeptComb_comboBox_stockDetailPeport').getValue();
+				store.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+				store.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
+				store.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
+				store.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
+				store.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
+				store.baseParams['supplier'] = Ext.getCmp('comboSearchSupplierForDetail').getValue();
+				//TODO
+				
+				stockDetailReportGrid.getStore().load({
 					params : {
 						start : 0,
 						limit : limitCount
@@ -457,13 +459,14 @@ Ext.onReady(function(){
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 //				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
-				var url = "../../{0}?dataSource={1}&beginDate={2}&deptId={3}&materialId={4}&materialCateId={5}&cateType={6}&stockType={7}&subType={8}&supplier={9}";
+				var url = "../../{0}?dataSource={1}&beginDate={2}&deptIn={3}&deptOut={4}&materialId={5}&materialCateId={6}&cateType={7}&stockType={8}&subType={9}&supplier={10}";
 				url = String.format(
 					url,
 					'ExportHistoryStatisticsToExecl.do',
 					'stockActionDetail',
 					Ext.getCmp('sdr_beginDate').getValue().format('Y-m'),
-					Ext.getCmp('deptComb_comboBox_stockDetailPeport').getValue(),
+					Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getValue(),
+					Ext.getCmp('stockInDeptComb_comboBox_stockDetailPeport').getValue(),
 					Ext.getCmp('materialId').getValue(),
 					Ext.getCmp('materialCate').getValue(),
 					Ext.getCmp('materialType').getValue(),
@@ -481,7 +484,7 @@ Ext.onReady(function(){
 		items : [{
 			xtype : 'label',
 			text : '出库部门:'
-		}, deptComb,{
+		}, stockOutDeptComb,{
 			xtype : 'label',
 			text : '入库部门:'
 		}, stockInDeptComb,{
@@ -706,6 +709,5 @@ Ext.onReady(function(){
 		}
 	});
    
-   deptComb.fireEvent('select');
-   
+   Ext.getCmp('stockDetail_btnSearch').handler();
 });

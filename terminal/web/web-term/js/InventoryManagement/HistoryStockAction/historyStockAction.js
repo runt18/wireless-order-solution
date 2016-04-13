@@ -1,251 +1,252 @@
+Ext.onReady(function(){
+	
 
-var stockActionHead = {
+	var stockActionHead = {
 
-	region : 'north',
-	height : 120,
-	frame : true,
-	items : [{
-		id : 'displayPanelForHistoryStockTitle',
-		height : 30,
-		bodyStyle : 'font-size:18px;text-align:center;',
-		html : '-----'
-	}, {
-		xtype : 'panel',
-		layout : 'column',
-		defaults : {
-			xtype : 'form',
-			layout : 'form',
-			style : 'width:218px;',
-			labelWidth : 60,
-			columnWidth : .25,
-			defaults : { width : 120 }
-		},
+		region : 'north',
+		height : 120,
+		frame : true,
 		items : [{
-			items : [{
-				xtype : 'hidden',
-				id : 'hideHistoryStockActionId'
-			}]
-		}, 
-		{
-			id : 'displayPanelForHistoryDeptIn',
-			items : [{
-				id : 'txtDeptInForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '收货仓',
-				disabled : true
-			}]
-		}, 
-		{
-			id : 'displayPanelForHistorySupplier',
-			items : [{
-				id : 'txtSupplierForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '供应商',
-				disabled : true
-			}]
+			id : 'displayPanelForHistoryStockTitle',
+			height : 30,
+			bodyStyle : 'font-size:18px;text-align:center;',
+			html : '-----'
 		}, {
-			id : 'displayPanelForHistoryDeptOut',
+			xtype : 'panel',
+			layout : 'column',
+			defaults : {
+				xtype : 'form',
+				layout : 'form',
+				style : 'width:218px;',
+				labelWidth : 60,
+				columnWidth : .25,
+				defaults : { width : 120 }
+			},
 			items : [{
-				id : 'txtDeptOutForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '出货仓',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				id : 'txtOriStockIdForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '原始单号',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				id : 'txtOriStockDateForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '货单日期',
-				disabled : true
-			}]
-		}, {
-			columnWidth : 1,
-			style : 'width:100%;',
-			items : [{
-				id : 'txtCommentForHistoryStockActionBasic',
-				xtype : 'textfield',
-				width : 774,
-				fieldLabel : '备注',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				id : 'txtApproverNameForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '审核人',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				id : 'dateApproverDateForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '审核日期',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				id : 'txtOperatorNameForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '制单人',
-				disabled : true
-			}]
-		}, {
-			items : [{
-				id : 'dateOperatorDateForHistoryStockActionBasic',
-				xtype : 'textfield',
-				fieldLabel : '制单日期',
-				disabled : true
+				items : [{
+					xtype : 'hidden',
+					id : 'hideHistoryStockActionId'
+				}]
+			}, 
+			{
+				id : 'displayPanelForHistoryDeptIn',
+				items : [{
+					id : 'txtDeptInForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '收货仓',
+					disabled : true
+				}]
+			}, 
+			{
+				id : 'displayPanelForHistorySupplier',
+				items : [{
+					id : 'txtSupplierForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '供应商',
+					disabled : true
+				}]
+			}, {
+				id : 'displayPanelForHistoryDeptOut',
+				items : [{
+					id : 'txtDeptOutForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '出货仓',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					id : 'txtOriStockIdForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '原始单号',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					id : 'txtOriStockDateForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '货单日期',
+					disabled : true
+				}]
+			}, {
+				columnWidth : 1,
+				style : 'width:100%;',
+				items : [{
+					id : 'txtCommentForHistoryStockActionBasic',
+					xtype : 'textfield',
+					width : 774,
+					fieldLabel : '备注',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					id : 'txtApproverNameForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '审核人',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					id : 'dateApproverDateForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '审核日期',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					id : 'txtOperatorNameForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '制单人',
+					disabled : true
+				}]
+			}, {
+				items : [{
+					id : 'dateOperatorDateForHistoryStockActionBasic',
+					xtype : 'textfield',
+					fieldLabel : '制单日期',
+					disabled : true
+				}]
 			}]
 		}]
-	}]
-};
+	};
 
-var stockActionPanelSouth = {
-		id : 'stockActionPanelSouth',
-		region : 'south',
+	var stockActionPanelSouth = {
+			id : 'stockActionPanelSouth',
+			region : 'south',
+			frame : true,
+			height : 37,
+			bodyStyle : 'font-size:18px;text-align:center;',
+			html : '总数量小计:<input id="txtHistoryTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+				'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtHistoryTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+				'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtHistoryActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
+	};
+
+	var cmStockDetail = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(),
+		{header: '货品名称', dataIndex: 'material.name', width: 200},
+		{header: '数量', dataIndex: 'amount', width: 200},
+		{header: '单价', dataIndex: 'price', width: 200},
+		{header: '总价', dataIndex: 'totalPrice', width: 200}
+	]);
+
+	var dsStockDetail = new Ext.data.Store({
+		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [
+		     {name : 'material.name'} ,
+		     {name : 'amount'},
+		     {name : 'price'},
+		     {name : 'totalPrice'}
+		])
+	});
+
+	var stockDetailGrid = new Ext.grid.GridPanel({
+		id : 'stockDetailGrid',
+		border : true,
+		region : 'center',
 		frame : true,
-		height : 37,
-		bodyStyle : 'font-size:18px;text-align:center;',
-		html : '总数量小计:<input id="txtHistoryTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtHistoryTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtHistoryActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
-};
+		cm : cmStockDetail,
+		store : dsStockDetail
+	});
 
-var cmStockDetail = new Ext.grid.ColumnModel([
-	new Ext.grid.RowNumberer(),
-	{header: '货品名称', dataIndex: 'material.name', width: 200},
-	{header: '数量', dataIndex: 'amount', width: 200},
-	{header: '单价', dataIndex: 'price', width: 200},
-	{header: '总价', dataIndex: 'totalPrice', width: 200}
-]);
+	var stockActionPanel = new Ext.Panel({
+		id : 'panelHistoryStockAction',
+		layout : 'border',
+		width : '100%',
+		items : [stockActionHead, stockDetailGrid, stockActionPanelSouth]
+		
+	});
 
-var dsStockDetail = new Ext.data.Store({
-	reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [
-	     {name : 'material.name'} ,
-	     {name : 'amount'},
-	     {name : 'price'},
-	     {name : 'totalPrice'}
-	])
-});
+	var stockActionWin = new Ext.Window({
+		title : '货单基础信息',
+		id : 'winHistoryStockAction',
+		width : 900,
+		height : 550,
+		modal : true,
+		closable : false,
+		resizable : false,
+	    layout : 'card',
+	    activeItem : 0,
+	    defaults : {
+	        border:false
+	    },
+	    items : [stockActionPanel],
+	    bbar : ['->', {
+	    	text : '取消',
+	    	iconCls : 'btn_cancel',
+	    	handler : function(){
+	    		stockActionWin.hide();
+	    		dsStockDetail.removeAll();
+	    	}
+	    }]
+	});
 
-var stockDetailGrid = new Ext.grid.GridPanel({
-	id : 'stockDetailGrid',
-	border : true,
-	region : 'center',
-	frame : true,
-	cm : cmStockDetail,
-	store : dsStockDetail
-});
-
-var stockActionPanel = new Ext.Panel({
-	id : 'panelHistoryStockAction',
-	layout : 'border',
-	width : '100%',
-	items : [stockActionHead, stockDetailGrid, stockActionPanelSouth]
-	
-});
-
-var stockActionWin = new Ext.Window({
-	title : '货单基础信息',
-	id : 'winHistoryStockAction',
-	width : 900,
-	height : 550,
-	modal : true,
-	closable : false,
-	resizable : false,
-    layout : 'card',
-    activeItem : 0,
-    defaults : {
-        border:false
-    },
-    items : [stockActionPanel],
-    bbar : ['->', {
-    	text : '取消',
-    	iconCls : 'btn_cancel',
-    	handler : function(){
-    		stockActionWin.hide();
-    		dsStockDetail.removeAll();
-    	}
-    }]
-});
-
-
-function showDetail(){
-	var txtStockIn = Ext.getCmp('displayPanelForHistoryDeptIn');
-	var txtStockOut = Ext.getCmp('displayPanelForHistoryDeptOut');
-	var txtSupplier = Ext.getCmp('displayPanelForHistorySupplier');
-	var titleDom = Ext.getCmp('displayPanelForHistoryStockTitle');
-	var sn = Ext.getCmp('historyHistoryStockActionGrid').getSelectionModel().getSelected();
-	
-	Ext.getCmp('txtDeptInForHistoryStockActionBasic').setValue(sn.data.deptIn.name);
-	Ext.getCmp('txtSupplierForHistoryStockActionBasic').setValue(sn.data.supplier.name);
-	Ext.getCmp('txtDeptOutForHistoryStockActionBasic').setValue(sn.data.deptOut.name) ;
-	Ext.getCmp('txtOriStockIdForHistoryStockActionBasic').setValue(sn.data.oriStockId);
-	Ext.getCmp('txtOriStockDateForHistoryStockActionBasic').setValue(sn.data.oriStockDateFormat);
-	Ext.getCmp('txtCommentForHistoryStockActionBasic').setValue(sn.data.comment);
-	Ext.getCmp('txtApproverNameForHistoryStockActionBasic').setValue(sn.data.approverName);
-	if(sn.data.statusValue !=1){
-		Ext.getCmp('dateApproverDateForHistoryStockActionBasic').setValue(sn.data.approverDateFormat);
-	}else{
-		Ext.getCmp('dateApproverDateForHistoryStockActionBasic').setValue();
-	}
-	Ext.getCmp('txtOperatorNameForHistoryStockActionBasic').setValue(sn.data.operatorName);
-	Ext.getCmp('dateOperatorDateForHistoryStockActionBasic').setValue(sn.data.birthDateFormat);
-
-	if(typeof sn.data.stockDetails != 'undefined' && sn.data.stockDetails.length > 0){
-		for ( var i = 0; i < sn.data.stockDetails.length; i++) {
-			var item = sn.data.stockDetails[i];
-			dsStockDetail.add(new StockDetailRecord({
-				'material.name' : item['materialName'],
-				amount : item['amount'],
-				price : item['price'],
-				totalPrice : item['amount'] * item['price']
-			}));
+	function showDetail(){
+		var txtStockIn = Ext.getCmp('displayPanelForHistoryDeptIn');
+		var txtStockOut = Ext.getCmp('displayPanelForHistoryDeptOut');
+		var txtSupplier = Ext.getCmp('displayPanelForHistorySupplier');
+		var titleDom = Ext.getCmp('displayPanelForHistoryStockTitle');
+		var sn = Ext.getCmp('historyHistoryStockActionGrid').getSelectionModel().getSelected();
+		
+		Ext.getCmp('txtDeptInForHistoryStockActionBasic').setValue(sn.data.deptIn.name);
+		Ext.getCmp('txtSupplierForHistoryStockActionBasic').setValue(sn.data.supplier.name);
+		Ext.getCmp('txtDeptOutForHistoryStockActionBasic').setValue(sn.data.deptOut.name) ;
+		Ext.getCmp('txtOriStockIdForHistoryStockActionBasic').setValue(sn.data.oriStockId);
+		Ext.getCmp('txtOriStockDateForHistoryStockActionBasic').setValue(sn.data.oriStockDateFormat);
+		Ext.getCmp('txtCommentForHistoryStockActionBasic').setValue(sn.data.comment);
+		Ext.getCmp('txtApproverNameForHistoryStockActionBasic').setValue(sn.data.approverName);
+		if(sn.data.statusValue != 1){
+			Ext.getCmp('dateApproverDateForHistoryStockActionBasic').setValue(sn.data.approverDateFormat);
+		}else{
+			Ext.getCmp('dateApproverDateForHistoryStockActionBasic').setValue();
 		}
+		Ext.getCmp('txtOperatorNameForHistoryStockActionBasic').setValue(sn.data.operatorName);
+		Ext.getCmp('dateOperatorDateForHistoryStockActionBasic').setValue(sn.data.birthDateFormat);
+
+		if(typeof sn.data.stockDetails != 'undefined' && sn.data.stockDetails.length > 0){
+			for ( var i = 0; i < sn.data.stockDetails.length; i++) {
+				var item = sn.data.stockDetails[i];
+				dsStockDetail.add(new StockDetailRecord({
+					'material.name' : item['materialName'],
+					amount : item['amount'],
+					price : item['price'],
+					totalPrice : item['amount'] * item['price']
+				}));
+			}
+		}
+		
+		if(sn.data.subTypeValue == 1){
+			txtStockIn.show();
+			txtStockOut.hide();
+			txtSupplier.show();
+		}else if(sn.data.subTypeValue == 2 || sn.data.subTypeValue ==5){
+			txtStockIn.show();
+			txtStockOut.show();
+			txtSupplier.hide();
+		}else if(sn.data.subTypeValue == 4){
+			txtStockIn.hide();
+			txtStockOut.show();
+			txtSupplier.show();
+		}else if(sn.data.subTypeValue == 3 || sn.data.subTypeValue == 7 || sn.data.subTypeValue == 10){
+			txtStockIn.show();
+			txtStockOut.hide();
+			txtSupplier.hide();
+		}else{
+			txtStockIn.hide();
+			txtStockOut.show();
+			txtSupplier.hide();
+		}
+		stockActionWin.show();
+		titleDom.body.update(sn.data.typeText + ' -- ' + sn.data.cateTypeText + sn.data.subTypeText + '单' + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>');
+		Ext.getDom('txtHistoryTotalAmount').value = sn.data.amount;
+		Ext.getDom('txtHistoryTotalPrice').value = sn.data.price;
+		Ext.getDom('txtHistoryActualPrice').value = sn.data.actualPrice;
 	}
+
+
+	var stockActionGrid;
+	var sBar;
+	var hideTopTBar;
+	//var date , maxDate;
+
 	
-	if(sn.data.subTypeValue == 1){
-		txtStockIn.show();
-		txtStockOut.hide();
-		txtSupplier.show();
-	}else if(sn.data.subTypeValue == 2 || sn.data.subTypeValue ==5){
-		txtStockIn.show();
-		txtStockOut.show();
-		txtSupplier.hide();
-	}else if(sn.data.subTypeValue == 4){
-		txtStockIn.hide();
-		txtStockOut.show();
-		txtSupplier.show();
-	}else if(sn.data.subTypeValue == 3 || sn.data.subTypeValue == 7){
-		txtStockIn.show();
-		txtStockOut.hide();
-		txtSupplier.hide();
-	}else{
-		txtStockIn.hide();
-		txtStockOut.show();
-		txtSupplier.hide();
-	}
-	stockActionWin.show();
-	titleDom.body.update(sn.data.typeText + ' -- ' + sn.data.cateTypeText + sn.data.subTypeText + '单' + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>');
-	Ext.getDom('txtHistoryTotalAmount').value = sn.data.amount;
-	Ext.getDom('txtHistoryTotalPrice').value = sn.data.price;
-	Ext.getDom('txtHistoryActualPrice').value = sn.data.actualPrice;
-}
-
-
-var stockActionGrid;
-var sBar;
-var hideTopTBar;
-//var date , maxDate;
-
-Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	function stockOperateRenderer(){
@@ -637,6 +638,9 @@ Ext.onReady(function(){
 		frame : true,
 		cm : cm,
 		store : ds,
+		loadMask : {
+			msg : '正在加载数据中...'
+		},
 		//autoExpandColumn : 'operation',
 		viewConfig : {
 			forceFit : true
@@ -755,15 +759,6 @@ Ext.onReady(function(){
 		
 	});
 	
-	ds.load({
-		params:{
-			start:0, 
-			limit:PAGE_LIME,
-			isPaging: 'true',
-			isHistory : 'true'
-		}
-	});
-	
 	
 	stockActionGrid.region = 'center';
 	new Ext.Panel({
@@ -788,5 +783,14 @@ Ext.onReady(function(){
 		$("div[id=stockActionPanelSouth]").eq(0).remove();
 		
 	}
+	
+	ds.load({
+		params:{
+			start:0, 
+			limit:PAGE_LIME,
+			isPaging: 'true',
+			isHistory : 'true'
+		}
+	});
 	
 });
