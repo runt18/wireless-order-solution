@@ -12,12 +12,10 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
-import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
@@ -206,38 +204,61 @@ public class StockReportDao {
 //		}
 			  
 		for(StockReport report : result){
-			final List<Department> depts = new ArrayList<>();
-			if(extraCond.deptId != -1){
-				depts.add(DepartmentDao.getById(dbCon, staff, extraCond.deptId));
-			}else{
-				depts.addAll(DepartmentDao.getDepartments4Inventory(dbCon, staff));
+			List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
+																					.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
+																					.setOriDate(null, extraCond.range.getOpeningFormat())
+																					.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
+			if(!primeDetail.isEmpty()){
+				//期初数量
+				report.setPrimeAmount(primeDetail.get(0).getRemaining());
+				//期初金额
+				report.setPrimeMoney(primeDetail.get(0).getRemaining() * report.getFinalPrice());
+			
 			}
-			for(Department deptIn : depts){
-				List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
-																		  .addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-																		  .setOriDate(null, extraCond.range.getOpeningFormat())
-																		  .setMaterial(report.getMaterial()) 
-																		  .setDeptIn(deptIn), " ORDER BY D.id DESC LIMIT 0, 1 ");
-				if(!primeDetail.isEmpty()){
-					//期初数量
-					report.setPrimeAmount(report.getPrimeAmount() + primeDetail.get(0).getRemaining());
-					//期初金额
-					report.setPrimeMoney(report.getPrimeMoney() + primeDetail.get(0).getRemaining() * report.getFinalPrice());
-				
-				}
-				
-				List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
-										.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-										.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
-										.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
-				
-				if(finalDetail.isEmpty()){
-					//期末数量
-					report.setFinalAmount(report.getFinalAmount() + finalDetail.get(0).getRemaining());
-					//期末金额
-					report.setFinalMoney(report.getFinalMoney() + finalDetail.get(0).getRemaining() * report.getFinalPrice());
-				}			
+			
+			List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
+																						.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
+																						.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
+																						.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
+			
+			if(!finalDetail.isEmpty()){
+				//期末数量
+				report.setFinalAmount(finalDetail.get(0).getRemaining());
+				//期末金额
+				report.setFinalMoney(finalDetail.get(0).getRemaining() * report.getFinalPrice());
 			}
+//			final List<Department> depts = new ArrayList<>();
+//			if(extraCond.deptId != -1){
+//				depts.add(DepartmentDao.getById(dbCon, staff, extraCond.deptId));
+//			}else{
+//				depts.addAll(DepartmentDao.getDepartments4Inventory(dbCon, staff));
+//			}
+//			for(Department deptIn : depts){
+//				List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
+//																		  .addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
+//																		  .setOriDate(null, extraCond.range.getOpeningFormat())
+//																		  .setMaterial(report.getMaterial()) 
+//																		  .setDeptIn(deptIn), " ORDER BY D.id DESC LIMIT 0, 1 ");
+//				if(!primeDetail.isEmpty()){
+//					//期初数量
+//					report.setPrimeAmount(report.getPrimeAmount() + primeDetail.get(0).getRemaining());
+//					//期初金额
+//					report.setPrimeMoney(report.getPrimeMoney() + primeDetail.get(0).getRemaining() * report.getFinalPrice());
+//				
+//				}
+//				
+//				List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
+//										.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
+//										.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
+//										.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
+//				
+//				if(finalDetail.isEmpty()){
+//					//期末数量
+//					report.setFinalAmount(report.getFinalAmount() + finalDetail.get(0).getRemaining());
+//					//期末金额
+//					report.setFinalMoney(report.getFinalMoney() + finalDetail.get(0).getRemaining() * report.getFinalPrice());
+//				}			
+//			}
 
 		}
 		

@@ -789,7 +789,7 @@ public class StockActionDao {
 						
 						if(stock.getSubType() == SubType.INIT){
 							//库存初始化时设置库存量
-							material.setStock(stockDetail.getAmount());
+							material.addStock(stockDetail.getAmount());
 						}else{
 							//入库单增加总库存
 							material.addStock(stockDetail.getAmount());		
