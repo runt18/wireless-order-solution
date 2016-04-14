@@ -14,7 +14,6 @@ public class StockDetailReport implements Jsonable {
 	private float totalStockInMoney;
 	private float totalStockOutAmount;
 	private float totalStockOutMoney;
-	private float totalRemaining;
 	
 	public StockDetailReport(StockAction stockAction, StockActionDetail stockActionDetail){
 		this.stockAction = stockAction;
@@ -61,10 +60,6 @@ public class StockDetailReport implements Jsonable {
 		this.totalStockOutMoney = totalStockOutMoney;
 	}
 
-	public void setTotalRemaining(float totalRemaining){
-		this.totalRemaining = totalRemaining;
-	}
-	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		
@@ -76,10 +71,10 @@ public class StockDetailReport implements Jsonable {
 			jm.putString("stockInSubType", "----");
 			jm.putFloat("stockInAmount", this.totalStockInAmount);
 			jm.putFloat("stockInMoney", this.totalStockInMoney);
-			jm.putString("stockOutSubType", "---");
+			jm.putString("stockOutSubType", "----");
 			jm.putFloat("stockOutAmount", this.totalStockOutAmount);
 			jm.putFloat("stockOutMoney", this.totalStockOutMoney);
-			jm.putFloat("remaining", this.totalRemaining);
+			jm.putString("remaining", "--");
 		}else{
 			jm.putString("date", DateUtil.formatToDate(this.stockAction.getOriStockDate()));
 			jm.putString("oriStockId", this.stockAction.getOriStockId());
