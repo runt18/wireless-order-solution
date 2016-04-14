@@ -80,7 +80,7 @@ public class QueryStockDetailReportAction extends Action{
 			jObject.setTotalProperty(result.size());
 
 			StockDetailReport summary = new StockDetailReport();
-			float totalStockInAmount = 0, totalStockInMoney = 0, totalStockOutAmount = 0, totalStockOutMoney = 0, totalRemaining = 0;
+			float totalStockInAmount = 0, totalStockInMoney = 0, totalStockOutAmount = 0, totalStockOutMoney = 0;
 			for (StockDetailReport s : result) {
 				if(s.getStockAction().getType() == StockAction.Type.STOCK_IN){
 					totalStockInAmount += s.getStockActionDetail().getAmount();
@@ -90,14 +90,12 @@ public class QueryStockDetailReportAction extends Action{
 					totalStockOutAmount += s.getStockActionDetail().getAmount();
 					totalStockOutMoney += s.getStockActionDetail().getAmount() * s.getStockActionDetail().getPrice();
 				}
-				totalRemaining += s.getStockActionDetail().getRemaining();
 			}
 			summary.setSummary(true);
 			summary.setTotalStockInAmount(totalStockInAmount);
 			summary.setTotalStockInMoney(totalStockInMoney);
 			summary.setTotalStockOutAmount(totalStockOutAmount);
 			summary.setTotalStockOutMoney(totalStockOutMoney);
-			summary.setTotalRemaining(totalRemaining);
 
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
