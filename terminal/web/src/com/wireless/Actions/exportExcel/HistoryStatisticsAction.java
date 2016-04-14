@@ -46,10 +46,10 @@ import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
+import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDeltaReportDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
-import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -63,6 +63,7 @@ import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.OperationCate;
@@ -82,7 +83,6 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockDetailReport;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
@@ -380,59 +380,56 @@ public class HistoryStatisticsAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward stockActionDetail(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward stockActionDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("进销存明细.xls".getBytes("GBK"), "ISO8859_1"));
 		
-		List<StockDetailReport> stockDetailReports = null;
-		
-		String pin = (String)request.getAttribute("pin");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		String beginDate = request.getParameter("beginDate");
-		String endDate = "";
-		String materialId = request.getParameter("materialId");
-		String materialCateId = request.getParameter("materialCateId");
-		String cateType = request.getParameter("cateType");
-		String deptId = request.getParameter("deptId");
-		String supplier = request.getParameter("supplier");
+		final String pin = (String)request.getAttribute("pin");
+		final String beginDate = request.getParameter("beginDate");
+		final String materialId = request.getParameter("materialId");
+		final String materialCateId = request.getParameter("materialCateId");
+		final String cateType = request.getParameter("cateType");
+		final String deptOut = request.getParameter("deptOut");
+		final String deptIn = request.getParameter("deptIn");
+		final String supplier = request.getParameter("supplier");
 		//String stockType = request.getParameter("stockType");
-		String subType = request.getParameter("subType");
+		final String subType = request.getParameter("subType");
 		
-		endDate = beginDate + "-31";
-		beginDate += "-01";
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		String extra = " AND S.ori_stock_date BETWEEN '" + beginDate + "' AND '" + endDate + " 23:59:59'";
+		final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond();
 		
-		if(materialId == null || materialId.isEmpty()){
-			materialId = "-1";
+		extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
+		
+		if(materialId != null && !materialId.isEmpty()){
+			extraCond.setMaterial(Integer.parseInt(materialId));
 		}
 		
 		if(materialCateId != null && !materialCateId.isEmpty()){
-			extra += " AND MC.cate_id = " + materialCateId;
+			extraCond.setMaterialCate(Integer.parseInt(materialCateId));
 		}
 		
 		if(cateType != null && !cateType.isEmpty() && !cateType.equals("-1")){
-			extra += " AND MC.type = " + cateType;
+			extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 		}
 		
 		if(subType != null && !subType.isEmpty()){
-			extra += " AND S.sub_type = " + subType;
+			extraCond.addSubType(StockAction.SubType.valueOf(Integer.parseInt(subType)));
 		}
-		
-		Supplier supplierBean = null; 
+			
 		if(supplier != null && !supplier.isEmpty() && !supplier.equals("-1")){
-			extra += " AND S.supplier_id = " + supplier;
-			supplierBean = SupplierDao.getSupplierById(staff, Integer.parseInt(supplier));
+			extraCond.setSupplier(Integer.parseInt(supplier));
 		}
 		
-		if(deptId.equals("-1")){
-			stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, null);
-		}else{
-			extra += " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
-			stockDetailReports = StockDetailReportDao.getStockDetailReportByDept(staff, Integer.parseInt(materialId), extra, null, Integer.parseInt(deptId));
+		if(deptIn != null && !deptIn.isEmpty()){
+			extraCond.setDeptIn(Integer.parseInt(deptIn));
 		}
+
+		if(deptOut != null && !deptOut.isEmpty()){
+			extraCond.setDeptOut(Integer.parseInt(deptOut));
+		}
+		
+		List<StockDetailReport> stockDetailReports = StockDetailReportDao.getByCond(staff, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("进销存明细");
@@ -469,7 +466,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("统计时间: " + beginDate + " 至 " + endDate + "         共: " + stockDetailReports.size() + " 条");
+		cell.setCellValue("统计时间: " + beginDate + "         共: " + stockDetailReports.size() + " 条");
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 11));
 		
@@ -477,11 +474,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		if(supplierBean != null){
-			cell.setCellValue("供应商: " + supplierBean.getName());
-		}else{
-			cell.setCellValue("供应商: " + "----");
-		}
+		//FIXME
+//		if(supplierBean != null){
+//			cell.setCellValue("供应商: " + supplierBean.getName());
+//		}else{
+//			cell.setCellValue("供应商: " + "----");
+//		}
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 11));
 		
@@ -504,6 +502,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("货品名称");
 		cell.setCellStyle(headerStyle);
 		
+		//TODO
 		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("部门");
 		cell.setCellStyle(headerStyle);
@@ -540,153 +539,108 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("操作人");
 		cell.setCellStyle(headerStyle);		
 		
-		if(stockDetailReports != null && stockDetailReports.size() > 0){
-			for(StockDetailReport item : stockDetailReports){
-				row = sheet.createRow(sheet.getLastRowNum() + 1);
-				row.setHeight((short) 350);
-				
-				// ***
-				cell = row.createCell(0);
-				cell.setCellValue(DateUtil.format(item.getDate(), DateUtil.Pattern.DATE));
+		for(StockDetailReport item : stockDetailReports){
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			// 日期
+			cell = row.createCell(0);
+			cell.setCellValue(DateUtil.format(item.getStockAction().getOriStockDate(), DateUtil.Pattern.DATE));
+			cell.setCellStyle(strStyle);
+			
+			// 原始单号
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(item.getStockAction().getOriStockId());
+			cell.setCellStyle(strStyle);
+			
+			// 货品名称
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(item.getStockActionDetail().getName());
+			cell.setCellStyle(strStyle);
+			
+			if(item.getStockAction().getType() == StockAction.Type.STOCK_IN){
+				//TODO 部门
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getStockAction().getDeptIn().getName());
 				cell.setCellStyle(strStyle);
 				
-				// ***
+				//入库类型
 				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getOriStockId());
+				cell.setCellValue(item.getStockAction().getSubType().getText());
 				cell.setCellStyle(strStyle);
 				
-				// ***
+				//入库数量
 				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getMaterialName());
-				cell.setCellStyle(strStyle);
-				
-				if(item.getStockActionSubType() == SubType.STOCK_IN || item.getStockActionSubType() == SubType.MORE || item.getStockActionSubType() == SubType.SPILL){
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getDeptIn());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionSubType().getText());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionAmount());
-					cell.setCellStyle(numStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.totalMoney());
-					cell.setCellStyle(numStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-				}else if(item.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getDeptOut() + " -> " + item.getDeptIn());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionSubType().getText());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionAmount());
-					cell.setCellStyle(numStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.totalMoney());
-					cell.setCellStyle(numStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-				}else if(item.getStockActionSubType() == SubType.STOCK_OUT_TRANSFER){
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getDeptOut() + " -> " + item.getDeptIn());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionSubType().getText());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionAmount());
-					cell.setCellStyle(numStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.totalMoney());
-					cell.setCellStyle(numStyle);
-
-				}
-				else{
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getDeptOut());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue("----");
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionSubType().getText());
-					cell.setCellStyle(strStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.getStockActionAmount());
-					cell.setCellStyle(numStyle);
-					
-					cell = row.createCell((int)row.getLastCellNum());
-					cell.setCellValue(item.totalMoney());
-					cell.setCellStyle(numStyle);
-				}				
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getRemaining());
+				cell.setCellValue(item.getStockActionDetail().getAmount());
 				cell.setCellStyle(numStyle);
 				
+				//入库金额 
 				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getOperater());
+				cell.setCellValue(item.getStockActionDetail().getAmount() * item.getStockActionDetail().getPrice());
+				cell.setCellStyle(numStyle);
+				
+				//出库类型
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue("----");
 				cell.setCellStyle(strStyle);
-			}
+				
+				//出库数量
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue("----");
+				cell.setCellStyle(strStyle);
+				
+				//出库金额
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue("----");
+				cell.setCellStyle(strStyle);
+				
+			}else if(item.getStockAction().getType() == StockAction.Type.STOCK_OUT){
+				
+				//TODO 部门
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getStockAction().getDeptOut().getName());
+				cell.setCellStyle(strStyle);
+				
+				//入库类型
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue("----");
+				cell.setCellStyle(strStyle);
+				
+				//入库数量
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue("----");
+				cell.setCellStyle(strStyle);
+				
+				//入库金额 
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue("----");
+				cell.setCellStyle(strStyle);
+				
+				//出库类型
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getStockAction().getSubType().getText());
+				cell.setCellStyle(strStyle);
+				
+				//出库数量
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getStockActionDetail().getAmount());
+				cell.setCellStyle(numStyle);
+				
+				//出库金额
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getStockActionDetail().getAmount() * item.getStockActionDetail().getPrice());
+				cell.setCellStyle(numStyle);
+			}				
+			
+			//结存数量
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(item.getStockActionDetail().getRemaining());
+			cell.setCellStyle(numStyle);
+			
+			//操作人
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(item.getStockAction().getApprover());
+			cell.setCellStyle(strStyle);
 		}
 		
         OutputStream os = response.getOutputStream();
