@@ -474,12 +474,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		//FIXME
-//		if(supplierBean != null){
-//			cell.setCellValue("供应商: " + supplierBean.getName());
-//		}else{
-//			cell.setCellValue("供应商: " + "----");
-//		}
+
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 11));
 		
@@ -502,9 +497,16 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("货品名称");
 		cell.setCellStyle(headerStyle);
 		
-		//TODO
 		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("部门");
+		cell.setCellValue("供应商");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("出库部门");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("入库部门");
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
@@ -530,7 +532,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("出库金额");
 		cell.setCellStyle(headerStyle);
-		
+
 		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("结存数量");
 		cell.setCellStyle(headerStyle);
@@ -558,8 +560,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellValue(item.getStockActionDetail().getName());
 			cell.setCellStyle(strStyle);
 			
+			//供应商
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(!item.getStockAction().getSupplier().getName().isEmpty() ? item.getStockAction().getSupplier().getName() : "----");
+			cell.setCellStyle(strStyle);
+			
 			if(item.getStockAction().getType() == StockAction.Type.STOCK_IN){
-				//TODO 部门
+				//出库部门
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(!item.getStockAction().getDeptOut().getName().isEmpty() ? item.getStockAction().getDeptOut().getName() : "----");
+				cell.setCellStyle(strStyle);
+				
+				//入库部门
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getStockAction().getDeptIn().getName());
 				cell.setCellStyle(strStyle);
@@ -596,9 +608,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 				
 			}else if(item.getStockAction().getType() == StockAction.Type.STOCK_OUT){
 				
-				//TODO 部门
+				//出库部门
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getStockAction().getDeptOut().getName());
+				cell.setCellStyle(strStyle);
+				
+				//入库部门
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(!item.getStockAction().getDeptIn().getName().isEmpty() ? item.getStockAction().getDeptIn().getName() : "----");
 				cell.setCellStyle(strStyle);
 				
 				//入库类型
@@ -630,6 +647,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getStockActionDetail().getAmount() * item.getStockActionDetail().getPrice());
 				cell.setCellStyle(numStyle);
+				
 			}				
 			
 			//结存数量

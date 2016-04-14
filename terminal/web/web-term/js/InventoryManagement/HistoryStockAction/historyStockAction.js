@@ -207,7 +207,7 @@ Ext.onReady(function(){
 					'material.name' : item['materialName'],
 					amount : item['amount'],
 					price : item['price'],
-					totalPrice : item['amount'] * item['price']
+					totalPrice : (item['amount'] * item['price']).toFixed(2)
 				}));
 			}
 		}
