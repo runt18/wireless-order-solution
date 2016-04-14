@@ -250,7 +250,7 @@ Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	function stockOperateRenderer(){
-		return '<a href="javascript:showDetail()">查看</a>&nbsp;&nbsp;&nbsp;';
+		return '<a href="javascript:void(0);" data-type="historyStockShower">查看</a>&nbsp;&nbsp;&nbsp;';
 	}
 	
 	function stockTypeRenderer(v, m, r, ri, ci, s){
@@ -791,6 +791,16 @@ Ext.onReady(function(){
 			isPaging: 'true',
 			isHistory : 'true'
 		}
+	});
+	
+	
+	//数据读取后操作中的查看
+	ds.on('load', function(){
+		Ext.query('[data-type=historyStockShower]').forEach(function(item, index){
+			item.onclick = function(){
+				showDetail();
+			}
+		});
 	});
 	
 });

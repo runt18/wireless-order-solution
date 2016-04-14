@@ -1,3 +1,4 @@
+Ext.onReady(function(){
 //-------------lib.js------------
 
 function NewDate(str) { 
@@ -885,33 +886,48 @@ function showCurrentMonth(){
 //--------------
 
 //---------------load
-
+//TODO
 function stockOperateRenderer(v, m, r, ri, ci, s){
 	if(r.get('statusValue') == 1){
 		if(r.get('subTypeValue') == 9){
-			return '<a href="javascript:updateStockActionHandler();">查看</a>';
+//			return '<a href="javascript:updateStockActionHandler();">查看</a>';
+			return '<a href="javascript:void(0);" data-type="showStockAction">查看</a>';
 		}else{
 			return ''
-			+ '<a href="javascript:exportExcel();">导出</a>'
+			+ '<a href="javascript:void(0);" data-type="exportExcelStockAction">导出</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:updateStockActionHandler();">修改</a>'
+			+ '<a href="javascript:void(0);" data-type="updateStockAtion">修改</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:auditStockActionHandler();">审核</a>'
+			+ '<a href="javascript:void(0);" data-type="auditStockActionHandler">审核</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:deleteStockActionHandler();">删除</a>';
+			+ '<a href="javascript:void(0)" data-type="deleteStockActionHandler">删除</a>';
+//			return ''
+//			+ '<a href="javascript:exportExcel();">导出</a>'
+//			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+//			+ '<a href="javascript:updateStockActionHandler();">修改</a>'
+//			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+//			+ '<a href="javascript:auditStockActionHandler();">审核</a>'
+//			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+//			+ '<a href="javascript:deleteStockActionHandler();">删除</a>';
 		}
 	}else if(r.get('statusValue') == 4){
 		return ''
-			+ '<a href="javascript:exportExcel();">导出</a>'
+			+ '<a href="javascript:void(0);" data-type="exportExcelStockAction">导出</a>'
 			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-			+ '<a href="javascript:updateStockActionHandler();">查看</a>';
+			+ '<a href="javascript:void(0);" data-type="showStockAction">查看</a>';
 	}else{
 		return ''
-		+ '<a href="javascript:isableToReAudit();">反审核</a>'
+		+ '<a href="javascript:void(0);" data-type="isableToReAudit">反审核</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:exportExcel();">导出</a>'
+		+ '<a href="javascript:void(0);" data-type="exportExcelStockAction">导出</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:updateStockActionHandler();">查看</a>';		
+		+ '<a href="javascript:void(0);" data-type="showStockAction">查看</a>';		
+//		return ''
+//		+ '<a href="javascript:isableToReAudit();">反审核</a>'
+//		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+//		+ '<a href="javascript:exportExcel();">导出</a>'
+//		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+//		+ '<a href="javascript:updateStockActionHandler();">查看</a>';	
 	}
 }
 
@@ -2333,7 +2349,7 @@ var btnLoginOut = new Ext.ux.ImageButton({
 	}
 });
 
-Ext.onReady(function(){
+
 	//
 	initControl();
 	getCurrentDay();
@@ -2365,5 +2381,72 @@ Ext.onReady(function(){
 	if($("div[id=stockActionTotalPrice]").length > 1){
 		$("div[id=stockActionTotalPrice]").eq(0).remove();
 	}
+	
+	var stockBasicGridStore = stockBasicGrid.getStore();
+	
+	stockBasicGridStore.on('load', function(){
+		var showStockActionArray = Ext.query('[data-type=showStockAction]');
+		var exportExcelStockActionArray = Ext.query('[data-type=exportExcelStockAction]');
+		var updateStockAtionArray = Ext.query('[data-type=updateStockAtion]');
+		var auditStockActionHandlerArray = Ext.query('[data-type=auditStockActionHandler]');
+		var deleteStockActionHandlerArray = Ext.query('[data-type=deleteStockActionHandler]');
+		var isableToReAuditArray = Ext.query('[data-type=isableToReAudit]');
+		
+		//查看
+		if(showStockActionArray.length > 0){
+			showStockActionArray.forEach(function(el, index){
+				el.onclick = function(){
+					updateStockActionHandler();
+				}
+			});
+		}
+		
+		//导出
+		if(exportExcelStockActionArray.length > 0){
+			exportExcelStockActionArray.forEach(function(el, index){
+				el.onclick = function(){
+					exportExcel();
+				}
+			});
+		}
+		
+		//修改
+		if(updateStockAtionArray.length > 0){
+			updateStockAtionArray.forEach(function(el, index){
+				el.onclick = function(){
+					updateStockActionHandler();
+				}
+			});
+		}
+		
+		
+		//审核
+		if(auditStockActionHandlerArray.length > 0){
+			auditStockActionHandlerArray.forEach(function(el, index){
+				el.onclick = function(){
+					auditStockActionHandler();
+				}
+			});
+		}
+		
+		
+		//反审核
+		if(isableToReAuditArray.length > 0){
+			isableToReAuditArray.forEach(function(el, index){
+				el.onclick = function(){
+					isableToReAudit();
+				}
+			});
+		}
+		
+		//删除
+		if(deleteStockActionHandlerArray.length > 0){
+			deleteStockActionHandlerArray.forEach(function(el, index){
+				el.onclick = function(){
+					deleteStockActionHandler();
+				}
+			});
+		}
+	});
 	
 });
