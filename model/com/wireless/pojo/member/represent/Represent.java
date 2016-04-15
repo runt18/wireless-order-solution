@@ -15,6 +15,7 @@ public class Represent implements Jsonable {
 		private float recommendMoney;
 		private int subscribePoint;
 		private float subscribeMoney;
+		private float commissionRate;
 		
 		public InsertBuilder setFinishDate(long finishDate){
 			this.finishDate = finishDate;
@@ -56,6 +57,15 @@ public class Represent implements Jsonable {
 			return this;
 		}
 		
+		public InsertBuilder setCommissionRate(float commissionRate){
+			if(commissionRate > 0 && commissionRate <= 1){
+				this.commissionRate = commissionRate;
+			}else{
+				throw new IllegalArgumentException("佣金比例只能在0到1之间");
+			}
+			return this;
+		}
+		
 		public Represent build(){
 			return new Represent(this);
 		}
@@ -71,6 +81,7 @@ public class Represent implements Jsonable {
 		private Float recommendMoney;
 		private Integer subscribePoint;
 		private Float subscribeMoney;
+		private Float commissionRate;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -153,6 +164,19 @@ public class Represent implements Jsonable {
 			return this.subscribeMoney != null;
 		}
 		
+		public boolean isCommissionRateChanged(){
+			return this.commissionRate != null;
+		}
+		
+		public UpdateBuilder setCommissionRate(float commissionRate){
+			if(commissionRate > 0 && commissionRate <= 1){
+				this.commissionRate = commissionRate;
+			}else{
+				throw new IllegalArgumentException("佣金比例只能在0到1之间");
+			}
+			return this;
+		}
+		
 		public Represent build(){
 			return new Represent(this);
 		}
@@ -167,7 +191,8 @@ public class Represent implements Jsonable {
 	private float recommentMoney;
 	private int subscribePoint;
 	private float subscribeMoney;
-
+	private float commissionRate;
+	
 	private Represent(UpdateBuilder builder){
 		this.id = builder.id;
 		this.finishDate = builder.finishDate;
@@ -178,6 +203,7 @@ public class Represent implements Jsonable {
 		this.recommentMoney = builder.recommendMoney;
 		this.subscribePoint = builder.subscribePoint;
 		this.subscribeMoney = builder.subscribeMoney;
+		this.commissionRate = builder.commissionRate != null ? builder.commissionRate.floatValue() : 0;
 	}
 	
 	private Represent(InsertBuilder builder){
@@ -189,6 +215,7 @@ public class Represent implements Jsonable {
 		this.recommentMoney = builder.recommendMoney;
 		this.subscribePoint = builder.subscribePoint;
 		this.subscribeMoney = builder.subscribeMoney;
+		this.commissionRate = builder.commissionRate;
 	}
 	
 	public Represent(int id){
@@ -280,6 +307,14 @@ public class Represent implements Jsonable {
 		this.subscribeMoney = subscribeMoney;
 	}
 	
+	public float getComissionRate(){
+		return this.commissionRate;
+	}
+	
+	public void setCommissionRate(float commissionRate){
+		this.commissionRate = commissionRate;
+	}
+	
 	@Override
 	public int hashCode(){
 		return this.id * 31 + 17;
@@ -315,6 +350,7 @@ public class Represent implements Jsonable {
 		jm.putInt("subscribePoint", this.subscribePoint);
 		jm.putFloat("recommendMoney", this.recommentMoney);
 		jm.putFloat("subscribeMoney", this.subscribeMoney);
+		jm.putFloat("commissionRate", this.commissionRate);
 		return jm;
 	}
 

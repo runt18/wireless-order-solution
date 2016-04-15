@@ -68,7 +68,7 @@ public class RepresentDao {
 		Represent represent = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".represent" +
-			  " (`restaurant_id`, `finish_date`, `title`, `slogon`, `body`, `recommend_point`, `recommend_money`, `subscribe_point`, `subscribe_money`) VALUES ( " +
+			  " (`restaurant_id`, `finish_date`, `title`, `slogon`, `body`, `recommend_point`, `recommend_money`, `subscribe_point`, `subscribe_money`, `commission_rate`) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  (represent.getFinishDate() != 0 ? "'" + DateUtil.format(represent.getFinishDate()) + "'" : " NULL ") + "," +
 			  "'" + represent.getTitle() + "'," +
@@ -77,7 +77,8 @@ public class RepresentDao {
 			  represent.getRecommendPoint() + "," +
 			  represent.getRecommentMoney() + "," +
 			  represent.getSubscribePoint() + "," +
-			  represent.getSubscribeMoney() + 
+			  represent.getSubscribeMoney() + "," +
+			  represent.getComissionRate() +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -140,6 +141,7 @@ public class RepresentDao {
 			  (builder.isSubcribePointChanged() ? " ,subscribe_point = " + represent.getSubscribePoint() : "") +
 			  (builder.isSubscribeMoneyChanged() ? " ,subscribe_money = " + represent.getSubscribeMoney() : "") +
 			  (builder.isTitleChanged() ? " ,title = '" + represent.getTitle() + "'" : "") +
+			  (builder.isCommissionRateChanged() ? " ,commission_rate = " + represent.getComissionRate() : "") +
 			  " WHERE id = " + represent.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("找到相应的【我要代言】");
@@ -199,6 +201,7 @@ public class RepresentDao {
 			represent.setRecommentMoney(dbCon.rs.getFloat("recommend_money"));
 			represent.setSubscribePoint(dbCon.rs.getInt("subscribe_point"));
 			represent.setSubscribeMoney(dbCon.rs.getFloat("subscribe_money"));
+			represent.setCommissionRate(dbCon.rs.getFloat("commission_rate"));
 			result.add(represent);
 		}
 		dbCon.rs.close();

@@ -39,23 +39,24 @@ public class OperateRepresentAction extends DispatchAction{
 		final String recommendMoney = request.getParameter("recommendMoney");
 		final String subscribePoint = request.getParameter("subscribePoint");
 		final String subscribeMoney = request.getParameter("subscribeMoney");
+		final String commissionRate = request.getParameter("commissionRate");
 		final JObject jObject = new JObject();
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final Represent.UpdateBuilder builder = new Represent.UpdateBuilder(Integer.parseInt(id));
 			
 			//标题
-			if(title != null && !title.isEmpty()){
+			if(title != null){
 				builder.setTitle(title);
 			}
 			
 			//body
-			if(body != null && !body.isEmpty()){
+			if(body != null){
 				builder.setBody(body);
 			}
 			
 			//宣传语
-			if(slogon != null && !slogon.isEmpty()){
+			if(slogon != null){
 				builder.setSlogon(slogon);
 			}
 			
@@ -82,6 +83,11 @@ public class OperateRepresentAction extends DispatchAction{
 			//关注金额
 			if(subscribeMoney != null && !subscribeMoney.isEmpty()){
 				builder.setSubscribeMoney(Float.parseFloat(subscribeMoney));
+			}
+			
+			//设置佣金比例
+			if(commissionRate != null && !commissionRate.isEmpty()){
+				builder.setCommissionRate(Float.parseFloat(commissionRate));
 			}
 			
 			RepresentDao.update(staff, builder);

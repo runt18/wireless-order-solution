@@ -434,6 +434,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private int id;
 	private int restaurantId;
 	private int branchId;
+	private float totalCommission;		// 佣金总额
 	private float totalConsumption;		// 消费总额
 	private int totalPoint;				// 累计积分
 	private float totalCharge;			// 累计充值额
@@ -468,6 +469,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private final List<Food> recommendFoods = new ArrayList<Food>();
 	//【我要代言】的粉丝数
 	private int fansAmount;
+	
 	
 	private Member(){
 		
@@ -666,6 +668,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		return mo;
 	}
 	
+	public MemberOperation commission(float comsumePrice) throws BusinessException{
+		return null;
+	}
+	
 	/**
 	 * Recommend the member in case of represent.
 	 * @param represent
@@ -779,6 +785,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		this.totalCharge += chargeMoney;
 		this.baseBalance += chargeMoney;
 		this.extraBalance += (accountMoney - chargeMoney);
+		
+		if(chargeType == ChargeType.COMMISSION){
+			this.totalCommission += (accountMoney - chargeMoney);
+		}
 		
 		mo.setDeltaBaseMoney(chargeMoney);
 		mo.setDeltaExtraMoney(accountMoney - chargeMoney);
@@ -1024,6 +1034,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putFloat("totalCharge", this.totalCharge);
 		jm.putInt("totalPoint", this.totalPoint);
 		jm.putFloat("totalConsumption", this.totalConsumption);
+		jm.putFloat("totalCommission", this.totalCommission);
 		jm.putInt("consumptionAmount", this.consumptionAmount);
 		jm.putString("lastConsumption", DateUtil.format(this.getLastConsumption()));
 		jm.putFloat("baseBalance", this.baseBalance);
@@ -1062,6 +1073,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
+	}
+	
+	public float getTotalCommission(){
+		return this.totalCommission;
+	}
+	
+	public void setTotalCommission(float totalCommission){
+		this.totalCommission = totalCommission;
 	}
 	
 	public float getTotalBalance(){

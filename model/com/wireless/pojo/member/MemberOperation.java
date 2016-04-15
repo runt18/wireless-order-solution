@@ -120,7 +120,8 @@ public class MemberOperation implements Jsonable {
 		CASH(1, "现金", "XJ"),
 		CREDIT_CARD(2, "刷卡", "SK"),
 		SUBSCRIBE(3, "关注赠送", "GZ"),
-		RECOMMEND(4, "推荐赠送", "TJ");
+		RECOMMEND(4, "推荐赠送", "TJ"),
+		COMMISSION(5, "佣金赠送", "YJ");
 
 		private final int value;
 		private final String name;
