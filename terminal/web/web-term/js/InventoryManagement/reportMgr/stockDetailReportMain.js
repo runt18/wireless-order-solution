@@ -266,7 +266,7 @@ Ext.onReady(function(){
 
 	var stockDetailReportTree;	
 	var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
-	var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
+	var stockOutDate = [[4, '退货'], [6, '报损'], [8, '盘亏'], [9, '消耗']];//, [5, '出库调拨']
 	var stock = [[-1, '全部'], [1, '入库'], [2, '出库']];
 	
 	

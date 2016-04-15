@@ -1029,7 +1029,7 @@ function IsNum(e) {
 } 
 function initControl(){
 	var stockInDate = [[-1, '全部'], [1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
-	var stockOutDate = [[-1, '全部'], [4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
+	var stockOutDate = [[-1, '全部'], [4, '退货'], [6, '报损'], [8, '盘亏'], [9, '消耗']];//, [5, '出库调拨']
 	
 	var stockBasicGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -1446,7 +1446,7 @@ function initControl(){
 		        		inputValue : [1,1,2],
 		        		name : 'radioStockOrderType',
 		        		hideLabel : true,
-		        		boxLabel : '商品调拨'
+		        		boxLabel : '商品调拨',
 		        	}, {
 		        		xtype : 'radio',
 		        		inputValue : [1,1,3],
@@ -1510,7 +1510,8 @@ function initControl(){
 		        		inputValue : [2,1,5],
 		        		name : 'radioStockOrderType',
 		        		hideLabel : true,
-		        		boxLabel : '商品调拨'
+		        		boxLabel : '商品调拨',
+		        		hidden : true
 		        	}, {
 		        		xtype : 'radio',
 		        		inputValue : [2,1,6],
@@ -1538,7 +1539,8 @@ function initControl(){
 		        		inputValue : [2,2,5],
 		        		name : 'radioStockOrderType',
 		        		hideLabel : true,
-		        		boxLabel : '原料调拨'
+		        		boxLabel : '原料调拨',
+		        		hidden : true
 		        	}, {
 		        		xtype : 'radio',
 		        		inputValue : [2,2,6],
