@@ -6,6 +6,7 @@ public class IncomeByFood {
 	private final Food mFood;					//某个菜品的信息
 	private final String mRestaurantName;		//某个菜品所属的门店
 	private final float mGiftPrice;				//某个菜品的赠送额
+	private final float mGiftAmount;			//某个菜品的赠送数量
 	private final float mDiscountPrice;			//某个菜品的折扣额
 	private final float mIncome;				//某个菜品的营业额
 	private final float mTasteIncome;			//某个菜品的口味金额
@@ -17,6 +18,7 @@ public class IncomeByFood {
 		this.mFood = null;
 		this.mRestaurantName = null;
 		this.mGiftPrice = 0;
+		this.mGiftAmount = 0;
 		this.mDiscountPrice = 0;
 		this.mIncome = 0;
 		this.mTasteIncome = 0;
@@ -25,10 +27,11 @@ public class IncomeByFood {
 		this.mCost = 0;
 	}
 	
-	public IncomeByFood(Food food, String restaurantName, float gift, float discount, float income, float tasteIncome, float saleAmount, float unitCost, float cost){
+	public IncomeByFood(Food food, String restaurantName, float gift, float giftAmount, float discount, float income, float tasteIncome, float saleAmount, float unitCost, float cost){
 		this.mFood = food;
 		this.mRestaurantName = restaurantName;
 		this.mGiftPrice = gift;
+		this.mGiftAmount = giftAmount;
 		this.mDiscountPrice = discount;
 		this.mIncome = income;
 		this.mTasteIncome = tasteIncome;
@@ -75,4 +78,9 @@ public class IncomeByFood {
 	public float getTasteIncome(){
 		return this.mTasteIncome;
 	}
+	
+	public float getGiftAmount(){
+		return this.mGiftAmount;
+	}
+	
 }

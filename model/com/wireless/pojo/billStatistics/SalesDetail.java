@@ -34,6 +34,7 @@ public class SalesDetail implements Jsonable{
 	private float tasteIncome;	//口味营业额
 	private float discount;		//折扣额
 	private float gifted;		//赠送额
+	private float giftedAmount;	//赠送数量
 	private float cost;			//成本
 	private float costRate;		//成本率
 	private float profit;		//毛利
@@ -109,6 +110,14 @@ public class SalesDetail implements Jsonable{
 		this.gifted = gifted;
 	}
 	
+	public float getGiftAmount(){
+		return this.giftedAmount;
+	}
+	
+	public void setGiftAmount(float giftAmount){
+		this.giftedAmount = giftAmount;
+	}
+	
 	public float getCost() {
 		return cost;
 	}
@@ -173,6 +182,7 @@ public class SalesDetail implements Jsonable{
 		jm.putFloat("tasteIncome", this.tasteIncome);
 		jm.putFloat("discount", this.discount);
 		jm.putFloat("gifted", this.gifted);
+		jm.putFloat("giftedAmount", this.giftedAmount);
 		jm.putFloat("couponed", this.gifted);
 		jm.putFloat("cost", this.cost);
 		jm.putFloat("costRate", this.costRate);

@@ -16,7 +16,7 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKACTION_AUDIT = build(7997, "操作失败, 审核失败, 此库单不存在.");
 	public static final ErrorCode STOCKACTION_UNAUDIT = build(7996, "操作失败, 新增盘点失败, 还有未审核的库存单.");
 	public static final ErrorCode STOCKACTION_CHECKING = build(7995, "操作失败, 正在盘点中, 不能审核库单.");
-	public static final ErrorCode STOCK_ACTION_NOT_EXIST = build(7994, "操作失败, 删除失败, 此库单不存在.");
+	public static final ErrorCode STOCK_ACTION_NOT_EXIST = build(7994, "操作失败, 此库单不存在.");
 	public static final ErrorCode STOCKACTION_UPDATE = build(7992, "操作失败, 修改失败, 此库单不存在.");
 	public static final ErrorCode STOCKACTION_CURRENTMONTH_UPDATE = build(7991, "操作失败, 月结失败, 还有未审核的库存单.");
 	public static final ErrorCode STOCKACTION_INSERT = build(7990, "操作失败, 添加失败, 正在盘点中,不能新增库单.");

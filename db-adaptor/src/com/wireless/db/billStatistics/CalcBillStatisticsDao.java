@@ -819,6 +819,7 @@ public class CalcBillStatisticsDao {
  			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
 			   " SUM(order_count) AS food_amount, " +
 			   " CASE WHEN OF.is_gift = 1 THEN ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+			   " CASE WHEN OF.is_gift = 1 THEN SUM(OF.order_count) ELSE 0 END AS food_gift_amount," +
 			   " ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
 			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN ($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
 					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN ($(unit_price) * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
@@ -1052,6 +1053,7 @@ public class CalcBillStatisticsDao {
 			  " MAX(TMP.dept_id) AS dept_id, MAX(TMP.kitchen_id) AS kitchen_id, " +
 			  " SUM(TMP.food_amount) AS food_amount, " +
 			  " ROUND(SUM(TMP.food_gift), 2) AS food_gift, " +
+			  " ROUND(SUM(TMP.food_gift_amount), 2) AS food_gift_amount, " +
 			  " ROUND(SUM(TMP.food_discount), 2) AS food_discount, " +
 			  " ROUND(SUM(TMP.food_income), 2) AS food_income, " +
 			  " ROUND(SUM(TMP.taste_income), 2) AS taste_income, " +
@@ -1092,6 +1094,7 @@ public class CalcBillStatisticsDao {
 			foodIncomes.add(new IncomeByFood(food,
 											 dbCon.rs.getString("restaurant_name"),
 											 dbCon.rs.getFloat("food_gift"),
+											 dbCon.rs.getFloat("food_gift_amount"),
 											 dbCon.rs.getFloat("food_discount"),
 											 dbCon.rs.getFloat("food_income"),
 											 dbCon.rs.getFloat("taste_income"),
