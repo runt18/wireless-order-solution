@@ -1320,7 +1320,6 @@ public class StockActionDao {
 			  " WHERE restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond == null ? "" : extraCond.setStaff(staff)) +
 			  (orderClause == null ? "" : orderClause);
-		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			StockAction stockAction = new StockAction(dbCon.rs.getInt("id"));

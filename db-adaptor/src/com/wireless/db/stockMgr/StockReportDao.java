@@ -227,38 +227,6 @@ public class StockReportDao {
 				//期末金额
 				report.setFinalMoney(finalDetail.get(0).getRemaining() * report.getFinalPrice());
 			}
-//			final List<Department> depts = new ArrayList<>();
-//			if(extraCond.deptId != -1){
-//				depts.add(DepartmentDao.getById(dbCon, staff, extraCond.deptId));
-//			}else{
-//				depts.addAll(DepartmentDao.getDepartments4Inventory(dbCon, staff));
-//			}
-//			for(Department deptIn : depts){
-//				List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
-//																		  .addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-//																		  .setOriDate(null, extraCond.range.getOpeningFormat())
-//																		  .setMaterial(report.getMaterial()) 
-//																		  .setDeptIn(deptIn), " ORDER BY D.id DESC LIMIT 0, 1 ");
-//				if(!primeDetail.isEmpty()){
-//					//期初数量
-//					report.setPrimeAmount(report.getPrimeAmount() + primeDetail.get(0).getRemaining());
-//					//期初金额
-//					report.setPrimeMoney(report.getPrimeMoney() + primeDetail.get(0).getRemaining() * report.getFinalPrice());
-//				
-//				}
-//				
-//				List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
-//										.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-//										.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
-//										.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
-//				
-//				if(finalDetail.isEmpty()){
-//					//期末数量
-//					report.setFinalAmount(report.getFinalAmount() + finalDetail.get(0).getRemaining());
-//					//期末金额
-//					report.setFinalMoney(report.getFinalMoney() + finalDetail.get(0).getRemaining() * report.getFinalPrice());
-//				}			
-//			}
 
 		}
 		

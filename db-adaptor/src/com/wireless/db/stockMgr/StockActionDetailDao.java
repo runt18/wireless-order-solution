@@ -303,9 +303,9 @@ public class StockActionDetailDao {
 			  " FROM " + Params.dbName + ".stock_action_detail D " +
 			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
 			  " WHERE 1 = 1 " +
+			  " AND S.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond == null ? "" : extraCond.setStaff(staff).toString()) +
 			  (orderClause == null ? "" : orderClause);
-		
 		final List<StockActionDetail> result = new ArrayList<StockActionDetail>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
