@@ -345,6 +345,7 @@ public class SaleDetailsDao {
 				detail.setResturant(foodIncome.getRestaurant());
 				detail.setDiscount(foodIncome.getDiscount());
 				detail.setGifted(foodIncome.getGift());
+				detail.setGiftAmount(foodIncome.getGiftAmount());
 				detail.setIncome(foodIncome.getIncome());
 				detail.setTasteIncome(foodIncome.getTasteIncome());
 				detail.setSalesAmount(foodIncome.getSaleAmount());
