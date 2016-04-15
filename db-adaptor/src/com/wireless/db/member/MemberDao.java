@@ -39,6 +39,7 @@ import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.member.represent.Represent;
+import com.wireless.pojo.member.represent.RepresentChain;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -1718,6 +1719,23 @@ public class MemberDao {
 					 " ,point = " + member.getPoint() +
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
+
+		//获取关系链
+		final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
+		if(!recommends.isEmpty()){
+			
+			//获取推荐人
+			Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
+			
+			//获取门店的佣金比例
+			float commissionRate = RepresentDao.getByCond(dbCon, staff, null).get(0).getComissionRate();
+			
+			//计算出佣金充额
+			float commission = consumePrice * commissionRate;
+			
+			//为推荐人充值佣金 
+			charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION);
+		}
 		
 		return mo;
 	}
@@ -1914,7 +1932,7 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statements
 	 */
 	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType) throws BusinessException, SQLException{
-		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHARGE)){
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHARGE) && chargeType != ChargeType.COMMISSION){
 			throw new BusinessException(StaffError.MEMBER_CHARGE_NOT_ALLOW);
 		}
 		
@@ -1932,9 +1950,11 @@ public class MemberDao {
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
-					 " base_balance = " + member.getBaseBalance() + ", " +
-					 " extra_balance = " + member.getExtraBalance() + "," + 
-					 " total_charge = " + member.getTotalCharge() + 
+					 " member_id = member_id " +
+					 " ,base_balance = " + member.getBaseBalance() + 
+					 " ,extra_balance = " + member.getExtraBalance()  + 
+					 " ,total_charge = " + member.getTotalCharge() + 
+					 (chargeType == ChargeType.COMMISSION ? " ,total_commission = " + member.getTotalCommission() : "") +
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
