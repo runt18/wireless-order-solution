@@ -69,7 +69,6 @@ $(function(){
 	orderMsg = {};
 	//加载账单数据
 	function refreshOrderData(){
-		//console.log(getcookie(document.domain + '_printers').split(','));
 		Util.LM.show();
 		$.ajax({
 			url : "../QueryOrderByCalc.do",
@@ -77,7 +76,6 @@ $(function(){
 			data : {
 				tableID : pm.table.id,
 				orderID : orderMsg ? orderMsg.id : '',
-				customNum : pm.table.customNum,
 				orientedDisplay : getcookie(document.domain + '_printers')				//显示客显
 			},
 			success : function(jr, status, xhr){
@@ -121,12 +119,15 @@ $(function(){
 	
 	//显示账单信息
 	function loadOrderBasicMsg(){
+		
 		//显示左边价钱
 		document.getElementById("totalPrice").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
 		document.getElementById("actualPrice_td_payment").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
 		document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
 		document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
 		document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
+		document.getElementById("customNumForUO").innerHTML = orderMsg.customNum;
+		
 		if(orderMsg.categoryValue != 4 && orderMsg.cancelPrice > 0){
 			$('#spanSeeCancelFoodAmount_label_tableSelect').show();	
 			$('#lab_replaceCancelBtn').hide();
