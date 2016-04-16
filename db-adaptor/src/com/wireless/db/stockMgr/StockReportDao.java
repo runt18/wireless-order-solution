@@ -122,11 +122,12 @@ public class StockReportDao {
 		
 		sql = " SELECT D.material_id, MAX(D.name) AS material_name, MAX(M.price) AS material_price " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount, 0)) AS stock_in " +
-			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + " , D.amount, 0)) AS stock_in_transfer " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_in = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_in_transfer " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_out = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_out_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.SPILL.getVal() + " , D.amount, 0)) AS stock_spill " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.MORE.getVal() + " , D.amount, 0)) AS stock_take_more " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount, 0)) AS stock_out " +
-			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT_TRANSFER.getVal() + " , D.amount, 0)) AS stock_out_transfer " +
+			  //" ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT_TRANSFER.getVal() + " , D.amount, 0)) AS stock_out_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.DAMAGE.getVal() + " , D.amount, 0)) AS stock_damage " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.LESS.getVal() + " , D.amount, 0)) AS stock_take_less " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount, 0)) AS stock_consumption " +
@@ -136,6 +137,7 @@ public class StockReportDao {
  			  " JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
 			  " WHERE 1 = 1 " +
 			  " AND S.restaurant_id = " + staff.getRestaurantId() +
+			  " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ")" +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " GROUP BY D.material_id ";
 		
@@ -207,25 +209,48 @@ public class StockReportDao {
 			List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																					.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
 																					.setOriDate(null, extraCond.range.getOpeningFormat())
-																					.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
+																					.setMaterial(report.getMaterial())
+																					.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
 			if(!primeDetail.isEmpty()){
+				float primeAmount = 0;
+				if(extraCond.deptId == -1){
+					primeAmount = primeDetail.get(0).getRemaining();
+				}else{
+					StockAction primeStock = StockActionDao.getById(dbCon, staff, primeDetail.get(0).getStockActionId());
+					if(primeStock.getDeptIn().getId() == extraCond.deptId){
+						primeAmount = primeDetail.get(0).getDeptInRemaining();
+					}else if(primeStock.getDeptOut().getId() == extraCond.deptId){
+						primeAmount = primeDetail.get(0).getDeptOutRemaining();
+					}
+				}
 				//期初数量
-				report.setPrimeAmount(primeDetail.get(0).getRemaining());
-				//期初金额
-				report.setPrimeMoney(primeDetail.get(0).getRemaining() * report.getFinalPrice());
-			
+				report.setPrimeAmount(primeAmount);
+				//期末金额
+				report.setPrimeMoney(primeAmount * report.getFinalPrice());
 			}
 			
 			List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																						.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
 																						.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
-																						.setMaterial(report.getMaterial()), " ORDER BY D.id DESC LIMIT 0, 1 ");
+																						.setMaterial(report.getMaterial())
+																						.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
 			
 			if(!finalDetail.isEmpty()){
+				float finalAmount = 0;
+				if(extraCond.deptId == -1){
+					finalAmount = finalDetail.get(0).getRemaining();
+				}else{
+					StockAction primeStock = StockActionDao.getById(dbCon, staff, finalDetail.get(0).getStockActionId());
+					if(primeStock.getDeptIn().getId() == extraCond.deptId){
+						finalAmount = finalDetail.get(0).getDeptInRemaining();
+					}else if(primeStock.getDeptOut().getId() == extraCond.deptId){
+						finalAmount = finalDetail.get(0).getDeptOutRemaining();
+					}
+				}
 				//期末数量
-				report.setFinalAmount(finalDetail.get(0).getRemaining());
+				report.setFinalAmount(finalAmount);
 				//期末金额
-				report.setFinalMoney(finalDetail.get(0).getRemaining() * report.getFinalPrice());
+				report.setFinalMoney(finalAmount * report.getFinalPrice());
 			}
 
 		}
