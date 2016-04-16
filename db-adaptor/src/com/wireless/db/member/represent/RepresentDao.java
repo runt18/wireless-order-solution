@@ -7,8 +7,10 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.member.represent.Represent;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
@@ -68,12 +70,12 @@ public class RepresentDao {
 		Represent represent = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".represent" +
-			  " (`restaurant_id`, `finish_date`, `title`, `slogon`, `body`, `recommend_point`, `recommend_money`, `subscribe_point`, `subscribe_money`, `commission_rate`) VALUES ( " +
+			  " (`restaurant_id`, `finish_date`, `title`, `slogon`, `oss_image_id`, `recommend_point`, `recommend_money`, `subscribe_point`, `subscribe_money`, `commission_rate`) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  (represent.getFinishDate() != 0 ? "'" + DateUtil.format(represent.getFinishDate()) + "'" : " NULL ") + "," +
 			  "'" + represent.getTitle() + "'," +
 			  "'" + represent.getSlogon() + "'," +
-			  "'" + represent.getBody() + "'," +
+			  (builder.hasImage() ? represent.getImage().getId() : " NULL ") + "," +
 			  represent.getRecommendPoint() + "," +
 			  represent.getRecommentMoney() + "," +
 			  represent.getSubscribePoint() + "," +
@@ -130,10 +132,27 @@ public class RepresentDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, Represent.UpdateBuilder builder) throws SQLException, BusinessException{
 		Represent represent = builder.build();
+		
 		String sql;
+		if(builder.isImageChanged()){
+			//Delete the original oss image.
+			sql = " SELECT oss_image_id FROM " + Params.dbName + ".represent WHERE id = " + represent.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getInt("oss_image_id") != 0){
+					try{
+						OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(dbCon.rs.getInt("oss_image_id")));
+					}catch(SQLException | BusinessException ignored){
+						ignored.printStackTrace();
+					}
+				}
+			}
+			dbCon.rs.close();
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".represent SET " +
 			  " id = id " +
-			  (builder.isBodyChanged() ? " ,body = '" + represent.getBody() + "'" : "") +
+			  (builder.isImageChanged() ? " ,oss_image_id = " + represent.getImage().getId() : "") +
 			  (builder.isFinishDateChanged() ? " ,finish_date = '" + DateUtil.format(represent.getFinishDate()) + "'" : "") +
 			  (builder.isRecommendMoneyChanged() ? " ,recommend_money = " + represent.getRecommentMoney() : "") +
 			  (builder.isRecommendPointChanged() ? " ,recommend_point = " + represent.getRecommendPoint() : "") +
@@ -146,6 +165,8 @@ public class RepresentDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("找到相应的【我要代言】");
 		}
+		
+
 	}
 	
 	/**
@@ -194,7 +215,6 @@ public class RepresentDao {
 			if(dbCon.rs.getTimestamp("finish_date") != null){
 				represent.setFinishDate(dbCon.rs.getTimestamp("finish_date").getTime());
 			}
-			represent.setBody(dbCon.rs.getString("body"));
 			represent.setTitle(dbCon.rs.getString("title"));
 			represent.setSlogon(dbCon.rs.getString("slogon"));
 			represent.setRecommendPoint(dbCon.rs.getInt("recommend_point"));
@@ -202,9 +222,24 @@ public class RepresentDao {
 			represent.setSubscribePoint(dbCon.rs.getInt("subscribe_point"));
 			represent.setSubscribeMoney(dbCon.rs.getFloat("subscribe_money"));
 			represent.setCommissionRate(dbCon.rs.getFloat("commission_rate"));
+			if(dbCon.rs.getInt("oss_image_id") != 0){
+				represent.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
+			}
 			result.add(represent);
 		}
 		dbCon.rs.close();
+		
+		//Get the oss image to each represent.
+		for(Represent represent : result){
+			if(represent.hasImage()){
+				try {
+					represent.setImage(OssImageDao.getById(dbCon, staff, represent.getImage().getId()));
+				} catch (BusinessException e) {
+					e.printStackTrace();
+					represent.setImage(null);
+				}
+			}
+		}
 		return result;
 	}
 	
@@ -243,6 +278,13 @@ public class RepresentDao {
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		int amount = 0;
 		for(Represent represent : getByCond(dbCon, staff, extraCond)){
+			if(represent.hasImage()){
+				try {
+					OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(represent.getImage().getId()));
+				} catch (BusinessException | SQLException ignored) {
+					ignored.printStackTrace();
+				}
+			}
 			String sql = " DELETE FROM " + Params.dbName + ".represent WHERE id = " + represent.getId();
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				amount++;
