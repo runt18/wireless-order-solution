@@ -245,6 +245,307 @@ WirelessOrder.FoodList = function(source){
 	};
 })();
 
+WirelessOrder.Taste = function(taste){
+	
+	if(taste instanceof WirelessOrder.Taste){
+		return taste;
+	}else{
+		var _instance = $.extend(true, {}, taste);
+		
+		//判断计算方式是否用价钱
+		_instance.isCalcByPrice = function(){
+			return _instance.calcValue == WirelessOrder.Taste.CalcType.BY_PRICE.val;
+		}
+		
+		//判断taste是否相同
+		_instance.isTasteMatch = function(taste){
+		
+		}
+		
+		return _instance;
+	}
+};
+
+WirelessOrder.Taste.CalcType = {
+	BY_PRICE : {val : 0, name : "按价格"},
+	BY_RATE : {val : 1, name : "按比例"}
+}
+
+WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
+	var _instance;
+	
+	if(tasteGroup){
+		_instance = $.extend(true, {}, tasteGroup);
+	}else{
+		_instance = {};
+		_instance.normalTaste = { 
+			name : '',
+			price : 0			
+		};
+		
+		_instance.normalTasteContent = [];
+	}
+	
+	_instance.addTaste = function(taste){
+		//是否有相同的taste
+		var duplicated = false;
+		_instance.normalTasteContent.forEach(function(eachTaste, index){
+			if(eachTaste.id === taste.id){
+				duplicated = true;
+			}
+		});
+		
+		if(duplicated){
+			return false;
+		}else{
+			_instance.normalTasteContent.push(new WirelessOrder.Taste(taste));
+			return true;
+		}
+	};
+	
+	_instance.removeTaste = function(taste){
+		_instance.normalTasteContent.forEach(function(eachTaste, index){
+			if(eachTaste.id === taste.id){
+				_instance.normalTasteContent.splice(index, 1);
+			}
+		});
+	}
+	
+	//保存口味组
+	_instance.setTastes = function(tastes){
+		_instance.normalTasteContent = [];
+		tastes.forEach(function(eachTaste, index){
+			_instance.addTaste(eachTaste);
+		});
+	};
+	
+	//判断taste是否有普通口味
+	_instance.hasNormalTaste = function(){
+		return typeof _instance.normalTasteContent !== 'undefined' && _instance.normalTasteContent.length > 0;
+	};
+	
+	
+	_instance.getPrice = function(){
+		//获取到口味组的价格	
+		var tastePrice = 0;
+		
+		if(_instance.hasNormalTaste()){
+			_instance.normalTasteContent.forEach(function(eachTaste, index){
+				tastePrice += eachTaste.isCalcByPrice() ? eachTaste.price : (attchedFood.unitPrice * eachTaste.rate);
+			});
+		}
+		
+		if(_instance.hasTmpTaste()){
+			tastePrice += getTmpTastePrice();
+		}
+		
+		return tastePrice;
+
+	};
+	
+	_instance.getPref = function(){
+		// 获取到拼接后的口味名称  xx, xx
+		
+		
+		if(_instance.normalTasteContent.length > 0){
+			var normalTasteName = '';
+			_instance.normalTasteContent.forEach(function(eachTaste, index){
+				if(normalTasteName == ''){
+					normalTasteName += eachTaste.name;
+				}else{
+					normalTasteName += ',' + eachTaste.name;
+				}
+			});
+			return normalTasteName + (_instance.hasTmpTaste() ? "," + getTmpTastePref() : '');
+		}else{
+			if(_instance.hasTmpTaste()){
+				return getTmpTastePref();
+			}else{
+				return '';
+			}
+		}
+	};
+	
+	
+	_instance.hasTmpTaste = function(){
+		return typeof _instance.tmpTaste !== 'undefined';
+	};
+	
+	function getTmpTastePref(){
+		if(_instance.hasTmpTaste()){
+			return _instance.tmpTaste.name;
+		}else{
+			return "";
+		}
+	}
+	
+	function getTmpTastePrice(){
+		if(_instance.hasTmpTaste()){
+			return parseInt(_instance.tmpTaste.price);
+		}else{
+			return 0;
+		}
+	}
+	
+	//设置临时口味
+	_instance.setTmpTaste = function(name, price){
+		if((typeof name == 'undefined' || name == '' || name.length == 0 ) && (typeof price == 'undefined' || price == '' || price == 0)){
+			delete _instance.tmpTaste;
+		}else{
+			_instance.tmpTaste = {
+				name : name ? name : '',
+				price : price ? price : 0 
+			};
+		}
+	}
+	
+	
+	function isNormalMatch(tasteGroup){
+		if(_instance.hasNormalTaste() && tasteGroup.hasNormalTaste()){
+			if(_instance.normalTasteContent.length === tasteGroup.normalTasteContent.length){
+				//将自身tasteGroup的id放入数组
+				var eachTastes = [];
+				_instance.normalTasteContent.forEach(function(eachTaste, index){
+					eachTastes.push(eachTaste.id);
+				});
+				
+				//将传回来的tasteGroup的id放入数组
+				var eachTasteGroupTastes = [];
+				tasteGroup.normalTasteContent.forEach(function(eachTaste, index){
+					 eachTasteGroupTastes.push(eachTaste.id);
+				});
+				
+				//排序两个数组,按升序
+				eachTastes.sort(function(a, b){return a-b;});
+				eachTasteGroupTastes.sort(function(a, b){return a-b;});
+				
+				//比对两个数组是否相等
+				for(var i = 0; i > eachTastes.length; i++){
+					if(eachTastes[i].id !== eachTasteGroupTastes[i].id){
+						return false;
+					}
+				}
+				
+				return true;
+			}else{
+				return false;				
+			}
+		}else if(!_instance.hasNormalTaste() && !tasteGroup.hasNormalTaste()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	function isTmpMatch(tasteGroup){
+		if(_instance.hasTmpTaste() && tasteGroup.hasTmpTaste()){
+			return (_instance.tmpTaste.name === tasteGroup.tmpTaste.name) && (_instance.tmpTaste.price === tasteGroup.tmpTaste.price);
+		}else if(!_instance.hasTmpTaste() && !tasteGroup.hasTmpTaste()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	//判断口味组是否相同
+	_instance.equals = function(tasteGroup){
+		return isNormalMatch(tasteGroup) && isTmpMatch(tasteGroup);
+	}
+	
+	
+	return _instance;
+};
+
+
+WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
+	
+	var _instance = $.extend(true, {}, comboFood);
+	
+	_instance.addTaste = function(taste){
+		if(typeof _instance.tasteGroup === 'undefined'){
+			_instance.tasteGroup = new WirelessOrder.TasteGroup();
+		}
+		
+		_instance.tasteGroup.addTaste(taste);
+		parentFood.addTaste(taste);
+	}
+	
+	
+	_instance.removeTaste = function(taste){
+		//清空主菜的口味
+		if(parentFood){
+			if(parentFood.hasTasteGroup()){
+				parentFood.removeTaste(taste);
+			}
+		}
+		
+		if(typeof _instance.tasteGroup === 'undefined'){
+			return false;
+		}else{
+			_instance.tasteGroup.removeTaste(taste);
+			return true;
+		}
+		
+	}
+	
+	_instance.setFoodUnit = function(unit){
+		this.foodUnit = unit;
+	}
+	
+	//是否有单位
+	_instance.hasFoodUnit = function(){
+		return typeof _instance.foodUnit != 'undefined';
+	}
+	
+	//是否有临时口味
+	_instance.hasTempTaste = function(){
+		if(typeof _instance.tasteGroup === 'undefined'){
+		   _instance.tasteGroup = new WirelessOrder.TasteGroup();
+		}
+		
+		return _instance.tasteGroup.hasTmpTaste();
+	}
+	
+	
+	//添加临时口味
+	_instance.setTastes = function(tastes){
+		if(typeof _instance.tasteGroup === 'undefined'){
+		   _instance.tasteGroup = new WirelessOrder.TasteGroup();
+		}
+		
+		_instance.tasteGroup.setTastes(tastes);
+		 
+		tastes.forEach(function(eachTaste, index){
+			parentFood.addTaste(eachTaste);
+		});
+	}
+	
+	_instance.hasTasteGroup = function(){
+		return typeof _instance.tasteGroup !== 'undefined'; 
+	}
+	
+	_instance.getTastePref = function(){
+		if(this.hasTasteGroup()){
+			return this.tasteGroup.getPref();
+		}else{
+			return '';
+		}
+		
+	}
+	
+	
+	_instance.setTempTaste = function(name, price){
+		if(typeof _instance.tasteGroup === 'undefined'){
+			//创建tasteGroup
+			_instance.tasteGroup = new WirelessOrder.TasteGroup(null, _orderFood);
+		}
+		
+		_instance.tasteGroup.setTmpTaste(name, price);
+	}
+	
+	
+	return _instance;
+};
 
 WirelessOrder.OrderFood = function(food, isTemporary){
 	
@@ -299,6 +600,41 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		return typeof this.isGift === 'boolean' && this.isGift;
 	};
 	
+	
+	_orderFood.addTaste = function(taste){
+		if(!_orderFood.isTemporary){
+			if(typeof _orderFood.tasteGroup === 'undefined'){
+				//创建tasteGroup
+				_orderFood.tasteGroup = new WirelessOrder.TasteGroup(null, _orderFood);
+			}
+			
+			//判断taste是否经过wirelessOrder.Taste包装,如果不是,就要重新进行包装
+			_orderFood.tasteGroup.addTaste(taste);
+		}		
+	}
+	
+	_orderFood.removeTaste = function(taste){
+		if(typeof _orderFood.tasteGroup === 'undefined'){
+			return false;
+		}else{
+			//判断taste是否经过wirelessOrder.Taste包装,如果不是,就要重新进行包装
+			_orderFood.tasteGroup.removeTaste(taste);
+			return true;
+		}
+		
+		
+	}
+	
+	//加入口味组
+	_orderFood.setTastes = function(tastes){
+		if(typeof _orderFood.tasteGroup === 'undefined'){
+			//创建tasteGroup
+			_orderFood.tasteGroup = new WirelessOrder.TasteGroup(null, _orderFood);
+		}
+		
+		_orderFood.tasteGroup.setTastes(tastes);
+	}
+	
 	//设置是否赠送
 	_orderFood.setGift = function(onOff, loginStaff){
 		if(typeof onOff === 'boolean'){
@@ -316,6 +652,81 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 	_orderFood.isTemp = function(){
 		return typeof this.isTemporary === 'boolean' && this.isTemporary;
 	};
+	
+	//是否有临时口味
+	_orderFood.hasTempTaste = function(){
+		if(typeof _orderFood.tasteGroup === 'undefined'){
+		   _orderFood.tasteGroup = new WirelessOrder.TasteGroup();
+		}
+		
+		return _orderFood.tasteGroup.hasTmpTaste();
+	}
+	
+	//添加临时口味
+	_orderFood.setTempTaste = function(name, price){
+		if(typeof _orderFood.tasteGroup === 'undefined'){
+			//创建tasteGroup
+			_orderFood.tasteGroup = new WirelessOrder.TasteGroup(null, _orderFood);
+		}
+		
+		_orderFood.tasteGroup.setTmpTaste(name, price);
+	}
+	
+	
+	_orderFood.getPrice = function(){
+		if(_orderFood.isWeight()){
+			return _orderFood.unitPrice * _orderFood.count + (_orderFood.hasTasteGroup() ? _orderFood.tasteGroup.getPrice() : 0);
+		}else{
+			
+		 	return _orderFood.count * (_orderFood.unitPrice + (_orderFood.hasTasteGroup() ? _orderFood.tasteGroup.getPrice() : 0));
+		}
+	};
+	
+	_orderFood.hasTasteGroup = function(){
+		return typeof _orderFood.tasteGroup !== 'undefined';
+	}
+	
+	_orderFood.getTasteGroup = function(){
+		if(_orderFood.hasTasteGroup()){
+			return _orderFood.tasteGroup;
+		}else{
+			return null;
+		}
+	}
+	
+	function isUnitMatch(food){
+		if(_orderFood.isUnit() && food.isUnit()){
+			return _orderFood.foodUnit.id === food.foodUnit.id;
+		}else if(!_orderFood.isUnit() && !food.isUnit()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	function isTgMatch(food){
+		if(_orderFood.hasTasteGroup() && food.hasTasteGroup()){
+			return _orderFood.tasteGroup.equals(food.tasteGroup);
+		}else if(!_orderFood.hasTasteGroup() && !food.hasTasteGroup()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	_orderFood.equals = function(food){
+		if(_orderFood.isGifted() !== food.isGifted()){
+			return false;
+		}else if(_orderFood.isTemp() !== food.isTemp()){
+			return false;
+		}else if(_orderFood.isTemp() && food.isTemp()){
+			return _orderFood.name === food.name && _orderFood.price === food.price;
+		}else if(!_orderFood.isTemp() && !food.isTemp()){ 
+			return _orderFood.id === food.id &&	isTgMatch(food) && isUnitMatch(food);
+		}else{
+			return true;
+		}
+	}
 	
 	//-------------初始化------------------------
 
@@ -383,6 +794,7 @@ WirelessOrder.Order = function(){
 		return this.length == 0;
 	}
 
+	
 	//增加菜品
 	_orderFoods.add = function(food){
 		
@@ -390,13 +802,9 @@ WirelessOrder.Order = function(){
 
 		var index = -1;
 		for(var i = 0; i < _orderFoods.length; i++){
-			//对比是否同一个菜
-			if(_orderFoods[i].id == foodData.id){
-				//再对比口味 & 赠送属性 & 单位 & 时价
-				if(_orderFoods[i].tasteGroup.normalTasteContent.length == 0 && !_orderFoods[i].isGift && !_orderFoods[i].foodUnit && !_orderFoods[i].isAllowGift()){
-					index = i;
-					break;				
-				}
+			if(_orderFoods[i].equals(foodData)){
+				index = i;
+				break;	
 			}
 		}
 		
@@ -409,13 +817,13 @@ WirelessOrder.Order = function(){
 			
 		}else{
 
-			foodData.tasteGroup = {
-				tastePref : '无口味',
-				price : 0,
-				normalTasteContent : []
-			};
 			//生成唯一标示
 			foodData.unique = new Date().getTime();
+			
+			var multiPrice = WirelessOrder.foods.getById(foodData.id).multiUnitPrice;
+			if(!foodData.hasFoodUnit() && multiPrice.length > 0){
+				foodData.setFoodUnit(multiPrice[0]);	
+			}
 			
 			//是否为套菜
 			foodData.combo = [];
@@ -434,14 +842,19 @@ WirelessOrder.Order = function(){
 							//组合子菜给套菜
 							for (var j = 0; j < rt.root.length; j++) {
 								
-								foodData.combo.push({
-									comboFood : rt.root[j],
-									tasteGroup : {
-										normalTasteContent : [],
-										tastePref : ''
-									}
-								});
+								foodData.combo.push(new WirelessOrder.ComboOrderFood({
+									comboFood : rt.root[j]
+								}, foodData));
+								
 							}
+							
+							foodData.combo.forEach(function(e){
+								var multiPrice = WirelessOrder.foods.getById(e.comboFood.id).multiUnitPrice;
+								if(!e.hasFoodUnit() && multiPrice.length > 0){
+									e.setFoodUnit(multiPrice[0]);	
+								}
+							});
+							
 						}
 					},
 					error : function(request, status, err){
@@ -449,6 +862,8 @@ WirelessOrder.Order = function(){
 					}
 				}); 
 			}		
+			
+			
 			
 			_orderFoods.push(foodData);
 			//将改变的菜品置为选中状态
@@ -471,7 +886,7 @@ WirelessOrder.Order = function(){
 			count : 0,		//数量
 			kitchen : 0		//分厨
 		}
-		this.push(new WirelessOrder.OrderFood({
+		_orderFoods.push(new WirelessOrder.OrderFood({
 			unique : new Date().getTime(),
 			id : (new Date().getTime() + '').substring(5, 9),
 			alias : (new Date().getTime() + '').substring(5, 9),
@@ -480,15 +895,23 @@ WirelessOrder.Order = function(){
 			unitPrice : c.price,
 			kitchen : {
 				id : c.kitchen
-			},
-			tasteGroup : {
-				tastePref : '无口味',
-				price : 0,
-				normalTasteContent : []
 			}
 		}, true));
-		this.select(-1);
+		_orderFoods.select(-1);
 	};
+	
+	_orderFoods.addAllTaste = function(taste){
+		for(var i = 0; i < _orderFoods.length; i++){
+			_orderFoods[i].addTaste(taste);	
+		}
+	}
+	
+	_orderFoods.removeAllTaste = function(taste){
+		for(var i = 0; i < _orderFoods.length; i++){
+			_orderFoods[i].removeTaste(taste);	
+		}
+	}
+	
 	
 	return _orderFoods;
 };

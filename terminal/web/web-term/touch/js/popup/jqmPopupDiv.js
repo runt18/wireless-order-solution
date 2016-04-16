@@ -7,7 +7,8 @@
 		var _o = o || {
 			loadUrl : null,		//加载内容的URL
 			content : null,		//直接的加载内容
-			pageInit : null		//内容加载后的callback
+			pageInit : null, 	//内容加载后的callback
+			isShadow : null	
 		}
 		
 		function _init(body){
@@ -19,24 +20,31 @@
 				}
 				_popupDivId = root.attr('id');
 				
-				var shadow = $('<div/>')
-				shadow.attr('id', 'divShadow-' + new Date().getTime())
-				_shadowId = shadow.attr('id');
-				shadow.css({
-					'z-index' : '1101',
-					'width' : '100%',
-					'height' : '100%',
-					'opacity' : '0',
-					'position' : 'absolute',
-					'top'  : '0',
-					'left' : '0',
-					'background' : '#DDD'
-				});
-				//把消息框加入指定page底部
-				$.mobile.activePage.append(root).append(shadow);
-				//刷新div
+				
+				if(_o.isShadow != 'no' && typeof _o.isShadow == 'undefined'){
+					var shadow = $('<div/>')
+					shadow.attr('id', 'divShadow-' + new Date().getTime())
+					_shadowId = shadow.attr('id');
+					shadow.css({
+						'z-index' : '1101',
+						'width' : '100%',
+						'height' : '100%',
+						'opacity' : '0',
+						'position' : 'absolute',
+						'top'  : '0',
+						'left' : '0',
+						'background' : '#DDD'
+					});
+					
+					$.mobile.activePage.append(root).append(shadow);//刷新div
+					shadow.trigger('create').trigger('refresh');
+					
+				}else{
+					$.mobile.activePage.append(root);
+				}
 				root.trigger('create').trigger('refresh');
-				shadow.trigger('create').trigger('refresh');
+				
+				
 				
 				if(_o.pageInit){
 					_o.pageInit($('#' + _popupDivId));
@@ -83,7 +91,7 @@
 			$('#' + _popupDivId).remove();
 			$('#' + _shadowId).remove();
 			if(afterClose && typeof afterClose == 'function'){
-				afterClose($('#' + popupDivId));
+				afterClose($('#' + _popupDivId));
 			}
 			_popupDivId = null;
 		}
