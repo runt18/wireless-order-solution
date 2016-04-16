@@ -31,6 +31,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.member.MemberLevel;
 import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.member.represent.RepresentChain;
 import com.wireless.pojo.promotion.Coupon;
@@ -41,6 +42,81 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
+	
+	/**
+	 * 获取5条最新佣金记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward commissionDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final String fid = request.getParameter("fid");
+		final String oid = request.getParameter("oid");
+		final JObject jObject = new JObject();
+		
+		try {
+			final Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+			
+			MemberOperationDao.ExtraCond extraCondToday = new MemberOperationDao.ExtraCond(DateType.TODAY).setChargeType(ChargeType.COMMISSION).addMember(MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()));
+		
+			MemberOperationDao.ExtraCond extraCondHistory = new MemberOperationDao.ExtraCond(DateType.HISTORY).setChargeType(ChargeType.COMMISSION).addMember(MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()));
+		
+			List<MemberOperation> result = MemberOperationDao.getByCond(staff, extraCondToday, " ORDER BY MO.id DESC LIMIT 5 ");
+			
+			for(MemberOperation operation : result){
+				int orderId = 0;
+				if(!operation.getComment().isEmpty()){
+					orderId = Integer.parseInt(operation.getComment().split(",")[0].split(":")[1]);
+				}
+				if(orderId != 0){
+					List<MemberOperation> fansConsumption = MemberOperationDao.getByCond(staff, new MemberOperationDao.ExtraCond(DateType.TODAY).setOrder(orderId), null);
+					if(!fansConsumption.isEmpty()){
+						operation.setMember(fansConsumption.get(0).getMember());
+					}
+				}
+			}
+			
+			
+			//当单日记录不足5条 查看历史记录
+			if(result.size() < 5){
+				List<MemberOperation> historyResult = MemberOperationDao.getByCond(staff, extraCondHistory, " ORDER BY MO.id DESC LIMIT 5 ");
+				
+				for(MemberOperation operation : historyResult){
+					int orderId = 0;
+					if(!operation.getComment().isEmpty()){
+						orderId = Integer.parseInt(operation.getComment().split(",")[0].split(":")[1]);
+					}
+					if(orderId != 0){
+						List<MemberOperation> fansConsumption = MemberOperationDao.getByCond(staff, new MemberOperationDao.ExtraCond(DateType.HISTORY)
+																													.addOperationType(MemberOperation.OperationType.CONSUME)
+																													.setOrder(orderId), null);
+						if(!fansConsumption.isEmpty()){
+							operation.setMember(fansConsumption.get(0).getMember());
+						}
+					}
+				}
+				
+				result.addAll(historyResult);
+			}
+			
+			if(result.size() > 5){
+				result = result.subList(0, 4);
+			}
+			
+			
+			jObject.setRoot(result);
+		} catch (BusinessException | SQLException e) {
+			e.printStackTrace();
+			jObject.initTip(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		
+		return null;
+	}
 	
 	/**
 	 *  近期5条代言记录

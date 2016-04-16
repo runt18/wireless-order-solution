@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -17,6 +18,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class WxOperateRestaurantAction extends DispatchAction {
 	
@@ -86,6 +88,35 @@ public class WxOperateRestaurantAction extends DispatchAction {
 		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
 			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * 获取餐厅的代言设置
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward representActive(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String fid = request.getParameter("fid");
+		final JObject jObject = new JObject();
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+			
+			final RepresentDao.ExtraCond extraCond = new RepresentDao.ExtraCond();
+			
+			jObject.setRoot(RepresentDao.getByCond(staff, extraCond));
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
 		}finally{
 			response.getWriter().print(jObject.toString());
 		}

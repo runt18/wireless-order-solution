@@ -58,6 +58,7 @@ $(function(){
 					$('#bind_div_member').hide();
 					
 					$('#fansAmount_span_member').html(data.other.member.fansAmount);
+					$('#totalCommission_span_member').html(data.other.member.totalCommission);
 					$('#divMemberRecommendHistory').css('display', 'block');
 				}else if(data.other.status == 1){
 					//手机号码未绑定状态
@@ -508,9 +509,13 @@ $(function(){
 		showRecommendDetail();
 	});
 	
+	//佣金记录
+	$('#totalCommission_li_member').click(function(){
+		$('#commissionDetail_div_member').fadeToggle();
+		showCommissionDetail();
+	});
+	
 	function showRecommendDetail(){
-		var mainView = $('recommendDetails_div_member');
-		var tbody = mainView.find('table > tbody');
 		Util.lm.show();
 		$.ajax({
 			url : '../../WXQueryMemberOperation.do',
@@ -523,25 +528,32 @@ $(function(){
 			datatype : 'josn',
 			success : function(data, status, res){
 				Util.lm.hide();
-				var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
-									'<td style="width:39%;text-align: center;line-height:20px;">{subscribeDate}</td>' + 
-									'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
-									'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
-									'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
-								'</tr>';
-				
-				var html = [], temp = null;
-				for(var i = 0; i < data.root.length; i++){
-					temp = data.root[i];
-					html.push(template.format({
-						subscribeDate : temp.subscribeDate,
-						subscribeMember : temp.subscribeMember,
-						recommendMoney : temp.recommendMoney,
-						recommendPoint : temp.recommendPoint
-					}));
+				if(data.success){
+
+					if(data.root.length > 0){
+						var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+						'<td style="width:39%;text-align: center;line-height:20px;">{subscribeDate}</td>' + 
+						'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
+						'</tr>';
+
+						var html = [], temp = null;
+						for(var i = 0; i < data.root.length; i++){
+							temp = data.root[i];
+							html.push(template.format({
+								subscribeDate : temp.subscribeDate,
+								subscribeMember : temp.subscribeMember,
+								recommendMoney : temp.recommendMoney,
+								recommendPoint : temp.recommendPoint
+							}));
+						}
+
+						$('#table_recommendDetails').find('tbody')[0].innerHTML = html.join('');
+					}
+				}else{
+					Util.dialog.show({msg : '读取记录失败'});
 				}
-				
-				$('#table_recommendDetails').find('tbody')[0].innerHTML = html.join('');
 			},
 			error : function(req, status, error){
 				Util.lm.hide();
@@ -550,10 +562,51 @@ $(function(){
 		});
 	}
 	
+	function showCommissionDetail(){
+		var tobdy = $('#tableCommissionDetails_table_member').find('tbody')[0];
+		Util.lm.show();
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'commissionDetail',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			datatype : 'json',
+			success : function(data, status, res){
+				Util.lm.hide();
+				if(data.success){
+					var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+					'<td style="width:39%;text-align: center;line-height:20px;">{operateDateFormat}</td>' + 
+					'<td style="width:30%;text-align:center;line-height:30px;">{consumeMemberName}</td>' +
+					'<td style="width:20%;text-align:center;line-height:30px;">{deltaTotalMoney}元</td>' +
+					'</tr>';
+					
+					var html = [], temp = null;
+					for(var i = 0; i < data.root.length; i++){
+						temp = data.root[i];
+						html.push(template.format({
+							operateDateFormat : temp.operateDateFormat,
+							consumeMemberName : temp.member.name,
+							deltaTotalMoney : temp.deltaTotalMoney,
+						}));
+					}
+					
+					tobdy.innerHTML = html.join('');
+				}
+			},
+			error : function(res, status, err){
+				Util.lm.hide();
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			}
+		});
+	}
 	
-	 //自助点餐
-	  $('#pickOrderFood_a_member').click(function(){
-		  Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
-	  });
+	
+	//自助点餐
+	$('#pickOrderFood_a_member').click(function(){
+		Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
+	});
 	
 });

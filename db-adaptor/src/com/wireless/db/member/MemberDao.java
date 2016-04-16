@@ -167,7 +167,6 @@ public class MemberDao {
 			this.ages.addAll(memberCond.getAges());
 			this.minFansAmount = memberCond.getMinFansAmount();
 			this.maxFansAmount = memberCond.getMaxFansAmount();
-			
 		}
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
@@ -846,6 +845,7 @@ public class MemberDao {
 			  " M.tele, M.mobile, M.age, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
 			  " M.referrer, M.referrer_id, " +
 			  " M.wx_order_amount, " +
+			  " M.total_commission, " +
 			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point, " +
 			  " WM.weixin_card " +
 			  " FROM " + Params.dbName + ".member M " +
@@ -881,6 +881,7 @@ public class MemberDao {
 			member.setTele(dbCon.rs.getString("tele"));
 			member.setMobile(dbCon.rs.getString("mobile"));
 			member.setAge(Member.Age.valueOf(dbCon.rs.getInt("age")));
+			member.setTotalCommission(dbCon.rs.getFloat("total_commission"));
 			ts = dbCon.rs.getTimestamp("birthday");
 			if(ts != null){
 				member.setBirthday(ts.getTime());
@@ -1734,7 +1735,7 @@ public class MemberDao {
 			float commission = consumePrice * commissionRate;
 			
 			//为推荐人充值佣金 
-			charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION);
+			charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
 		}
 		
 		return mo;
@@ -1932,6 +1933,35 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statements
 	 */
 	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType) throws BusinessException, SQLException{
+		return charge(dbCon, staff, memberId, chargeMoney, accountMoney, chargeType, null);
+	}
+
+		
+	/**
+	 * Perform the charge operation to a member account.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action 
+	 * @param memberId
+	 * 			the id of member account to be charged.
+	 * @param chargeMoney
+	 * 			the amount of charge money
+	 * @param accountMoney
+	 * 			the amount of account money
+	 * @param chargeType
+	 * 			the charge type referred to {@link Member.ChargeType}
+	 * @param comment
+	 * 			the charge comment
+	 * @return the member operation to this charge.
+	 * @throws BusinessException
+	 * 			throws if cases below
+	 * 			<li>the member id to perform charge does NOT exit
+	 * 			<li>the staff does NOT contains the charge privilege 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType, String comment) throws BusinessException, SQLException{
 		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHARGE) && chargeType != ChargeType.COMMISSION){
 			throw new BusinessException(StaffError.MEMBER_CHARGE_NOT_ALLOW);
 		}
@@ -1944,6 +1974,9 @@ public class MemberDao {
 		
 		//Perform the charge operation and get the related member operation.
 		MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
+		if(comment != null){
+			mo.setComment("账单号:" + comment + ",消费人:" + getById(staff, Integer.parseInt(comment)).getName());
+		}
 		
 		//Insert the member operation to this charge operation.
 		MemberOperationDao.insert(dbCon, staff, mo);

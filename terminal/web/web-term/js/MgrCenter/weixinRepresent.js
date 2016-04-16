@@ -142,8 +142,6 @@ Ext.onReady(function(){
  				weixinRepresent_uploadMask.hide();
  			}, 2000);
 
- 			
- 			
  		}
  	});
  	
@@ -160,6 +158,7 @@ Ext.onReady(function(){
  	});
  	
  	var form = new Ext.form.FormPanel({
+ 		id : 'imgForm_form_weixinRepresent',
  		columnWidth : 0.6,
  		labelWidth : 60,
  		layout : 'column',
@@ -325,18 +324,20 @@ Ext.onReady(function(){
 		columnWidth: 0.5,
 		id : 'foodMultiPrice_column_weixin',
 		layout : 'column',
-		title : '显示面板',
 		width : 400,
 		frame : true,
 		defaults : {
 			layout : 'form'
 		},
 		items : [{
+			id : 'representPosterShower_panel_weixinRepresent',
 			xtype : 'panel',
-			width : '300',
 			frame : true,
+			width : '388',
 			style : {
-			}
+				'margin' : '8% 18%'
+			},
+			html : '<div style="height:100%;width:100%;" id="posterContainer_div_weixinRepresent"></div>'
 		}]
 	
  	});
@@ -366,7 +367,7 @@ Ext.onReady(function(){
         			var params = {};
         			params.id = _representId;
         			params.title = Ext.getCmp('activeTitle_panel_weixinRepresent').getValue();
-        			params.body = '';
+        			params.body = Ext.getDom(imgFile.getId()).value ? Ext.getDom(imgFile.getId()).value : '';
         			params.slogon = Ext.getCmp('detail_textarea_weixinRepresent').getValue();
         			params.finishDate = Ext.getCmp('endingDate_datefield_weixinRepresent').getValue();
         			
@@ -431,14 +432,27 @@ Ext.onReady(function(){
  	initRepresentMsg();
 	
 	new Ext.Panel({
-		renderTo : 'deputySet_div_weixinDeputyMgr',
-		width : parseInt(Ext.getDom('deputySet_div_weixinDeputyMgr').parentElement.style.width.replace(/px/g, '')),
-		height : parseInt(Ext.getDom('deputySet_div_weixinDeputyMgr').parentElement.style.height.replace(/px/g, '')),
+		renderTo : 'representConfig_div_weixinRepresent',
+		width : parseInt(Ext.getDom('representConfig_div_weixinRepresent').parentElement.style.width.replace(/px/g, '')),
+		height : parseInt(Ext.getDom('representConfig_div_weixinRepresent').parentElement.style.height.replace(/px/g, '')),
 		layout : 'border',
         items : [centerPanel]
 	});
 	
 	settingPanel.setHeight(centerPanel.getHeight());
 	viewPanel.setHeight(centerPanel.getHeight());
+	Ext.getCmp('representPosterShower_panel_weixinRepresent').setHeight(500);
 	
+	var host = null;
+	if(window.location.hostName == 'e-tones.net'){
+		host = 'wx.e-tones.net'
+	}else if(window.location.hostName == 'ts.e-tones.net'){
+		host = 'ts.e-tones.net';
+	}else if(window.location.hostName == 'localhost'){
+		host = 'localhost:8080'
+	}else{
+		host = window.location.hostName;
+	}
+	
+	$('#posterContainer_div_weixinRepresent').load(host + '/wx-term/weixin/order/representCard.html');
 });
