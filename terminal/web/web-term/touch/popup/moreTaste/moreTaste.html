@@ -1,0 +1,41 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+
+	<div class="ui-overlay-shadow ui-corner-all" align="center" style="display: block;position: absolute; z-index: 1102;left: 25%;top:15%;width: 45%;">
+	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="height:50px;">
+	    	<!-- 口味组 -->
+	    	<div id="tasteGroupCmp_div_moreTaste" data-role="controlgroup" data-type="horizontal" >
+	    			<!-- 文字外的div是为了不让字出现省略号... -->
+<!-- 				<a onclick="chooseTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						口味1<br>￥10
+					</div>
+				</a> -->
+			</div>	
+	    </div>
+	    <!-- 口味列表 -->
+    	<div id="tastesCmp_div_moreTaste" class="ui-bar ui-bar-c" style="height:300px;" align="left">
+
+    	</div>
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom ui-footer ui-bar-b" style="height: 48px;">
+			<div class="bottomTastesBar">
+				<div style="float: left;margin-left: 20px;">已选口味 : </div>
+				<div id="chooseTaste_div_moreTaste" style="float: left;color: green;font-weight: bold;"></div>
+				<div id="tastePagingDesc_div_moreTaste" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>				
+				
+			</div>	
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" >
+				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" id="close_a_moreTaste">关闭</a>
+				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" id="previousPage_a_moreTaste">上一页</a>
+				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" id="nextPage_a_moreTaste">下一页</a>
+			 </div>
+	    </div>
+	</div>	
+
+
+
+
+
+</body>

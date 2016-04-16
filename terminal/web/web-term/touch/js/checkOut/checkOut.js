@@ -1080,6 +1080,7 @@ uo.saveForUO = function(){
 uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c.orderFoods;
 	if(orderFoods.length > 0){
+		var orderDataModel = {};
 		orderDataModel.tableID = uo.table.id;
 		orderDataModel.customNum = uo.customNum;
 		orderDataModel.orderFoods = orderFoods;
