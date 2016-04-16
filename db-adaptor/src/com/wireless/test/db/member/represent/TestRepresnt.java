@@ -52,6 +52,7 @@ public class TestRepresnt {
 			final float recommendMoney = 10;
 			final int subscribePoint = 200;
 			final float subscribeMoney = 20;
+			final float commissionRange = (float) 0.3;
 			Represent.UpdateBuilder updateBuilder = new Represent.UpdateBuilder(id)
 																 .setTitle("我要代言")
 																 .setSlogon("我要代言宣传语")
@@ -60,7 +61,8 @@ public class TestRepresnt {
 																 .setRecommendPoint(recommendPoint)
 																 .setSubscribeMoney(subscribeMoney)
 																 .setSubscribePoint(subscribePoint)
-																 .setBody("我要代言body");
+																 .setBody("我要代言body")
+																 .setCommissionRate(commissionRange);
 			RepresentDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
@@ -171,7 +173,7 @@ public class TestRepresnt {
 			Assert.assertTrue("subscriber date to represent chain", Math.abs(System.currentTimeMillis() - actualChain.getSubscribeDate()) < 5000);
 			
 			//int fansAmount = RepresentChainDao.getByCond(mStaff, new RepresentChainDao.ExtraCond().setReferrerId(referrer.getId()).setOnlyAmount(true)).size();
-			Assert.assertEquals("fans to represent chain", referrer.getFansAmount(), actualReferrer.getFansAmount());
+			Assert.assertEquals("fans to represent chain", referrer.getFansAmount() + 1, actualReferrer.getFansAmount());
 			
 		}finally{
 			//Delete the represent chain.
@@ -190,5 +192,6 @@ public class TestRepresnt {
 		Assert.assertEquals("recommend point", expected.getRecommendPoint(), actual.getRecommendPoint());
 		Assert.assertEquals("subscribe money", expected.getSubscribeMoney(), actual.getSubscribeMoney(), 0.01);
 		Assert.assertEquals("subscribe point", expected.getSubscribePoint(), actual.getSubscribePoint());
+		Assert.assertEquals("commission range", expected.getComissionRate(), actual.getComissionRate(), 0.01);
 	}
 }
