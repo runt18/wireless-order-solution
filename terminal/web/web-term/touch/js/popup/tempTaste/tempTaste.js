@@ -16,13 +16,13 @@ define(function(require, exports, modele){
 				_self = self;
 				
 				initTempTaste();
-							
+				
 				//保存按钮
 				self.find('[id="saveTempTaste_a_tempTaste"]').click(function(){
 					var name = self.find('[id="tempTasteName_input_tempTaste"]').val();
 					var price = self.find('[id="tempTastePrice_input_tempTaste"]').val();
 					
-					_tempTastePopup.close();
+					thiz.close();
 					param.confirm(param.selectedFood, name, price);
 				});	
 				
@@ -61,6 +61,7 @@ define(function(require, exports, modele){
 				HandWritingAttacher.instance().attach(_self.find('[id="tempTasteName_input_tempTaste"]')[0]);
 				NumKeyBoardAttacher.instance().attach(_self.find('[id="tempTastePrice_input_tempTaste"]')[0]);	
 			});
+				
 			
 			if(afterOpen && typeof afterOpen == 'function'){
 				afterOpen();
@@ -68,10 +69,9 @@ define(function(require, exports, modele){
 		}
 		
 		this.close = function(afterClose, timeout){
-			_tempTastePopup.close(function(){
-				HandWritingAttacher.instance().detach(_self.find('[id="tempTasteName_input_tempTaste"]')[0]);
-				NumKeyBoardAttacher.instance().detach(_self.find('[id="tempTastePrice_input_tempTaste"]')[0]);
-			});
+			HandWritingAttacher.instance().detach(_self.find('[id="tempTasteName_input_tempTaste"]')[0]);
+			NumKeyBoardAttacher.instance().detach(_self.find('[id="tempTastePrice_input_tempTaste"]')[0]);
+			_tempTastePopup.close();
 			
 			if(afterClose &&　typeof afterClose == 'function'){
 				if(timeout){
