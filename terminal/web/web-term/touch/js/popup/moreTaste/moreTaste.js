@@ -18,6 +18,7 @@ define(function(require, exports, module){
 				
 				_self = self;
 				
+				
 				//取消按钮
 				self.find('[id="close_a_moreTaste"]').click(function(){
 					thiz.close();				
@@ -183,14 +184,18 @@ define(function(require, exports, module){
 								price :  item.taste.calcValue == 1 ? ( item.taste.rate * 100) + '%' : ('￥'+  item.taste.price),
 								theme : theme
 							});
-						}
-					});
-					
-					_tastePaging.data(chooseTaste);
-					
-					//口味的点击事件
-					_self.find('[id="tastesCmp_div_moreTaste"] a').each(function(index, element){
-						element.onclick = function(){
+						},
+						itemClick : function(index, item){
+							var element = null;
+							
+							for(var i = 0; i < _self.find('[id="tastesCmp_div_moreTaste"] a').length; i++){
+								if($(_self.find('[id="tastesCmp_div_moreTaste"] a')[i]).attr('data-value') == item.taste.id){
+									element = _self.find('[id="tastesCmp_div_moreTaste"] a')[i]; 
+									break;
+								}
+							}
+							
+							
 							
 							if($(element).attr('data-theme') == 'e'){
 								$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
@@ -228,9 +233,10 @@ define(function(require, exports, module){
 								
 							}
 							$(element).buttonMarkup( "refresh" );
-							
 						}
 					});
+					
+					_tastePaging.data(chooseTaste);
 				}
 			});
 			
