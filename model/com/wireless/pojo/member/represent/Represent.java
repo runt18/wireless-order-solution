@@ -2,6 +2,7 @@ package com.wireless.pojo.member.represent;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.util.DateUtil;
 
 public class Represent implements Jsonable {
@@ -10,12 +11,21 @@ public class Represent implements Jsonable {
 		private long finishDate;
 		private String title;
 		private String slogon;
-		private String body;
 		private int recommendPoint;
 		private float recommendMoney;
 		private int subscribePoint;
 		private float subscribeMoney;
 		private float commissionRate;
+		private int imageId;
+		
+		public InsertBuilder setImage(int imageId){
+			this.imageId = imageId;
+			return this;
+		}
+		
+		public boolean hasImage(){
+			return this.imageId != 0;
+		}
 		
 		public InsertBuilder setFinishDate(long finishDate){
 			this.finishDate = finishDate;
@@ -29,11 +39,6 @@ public class Represent implements Jsonable {
 		
 		public InsertBuilder setSlogon(String slogon){
 			this.slogon = slogon;
-			return this;
-		}
-		
-		public InsertBuilder setBody(String body){
-			this.body = body;
 			return this;
 		}
 		
@@ -82,9 +87,19 @@ public class Represent implements Jsonable {
 		private Integer subscribePoint;
 		private Float subscribeMoney;
 		private Float commissionRate;
+		private int imageId;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setImage(int imageId){
+			this.imageId = imageId;
+			return this;
+		}
+		
+		public boolean isImageChanged(){
+			return this.imageId != 0;
 		}
 		
 		public UpdateBuilder setFinishDate(String finishDate){
@@ -186,7 +201,7 @@ public class Represent implements Jsonable {
 	private long finishDate;
 	private String title;
 	private String slogon;
-	private String body;
+	private OssImage ossImage;
 	private int recommendPoint;
 	private float recommentMoney;
 	private int subscribePoint;
@@ -198,24 +213,28 @@ public class Represent implements Jsonable {
 		this.finishDate = builder.finishDate;
 		this.title = builder.title;
 		this.slogon = builder.slogon;
-		this.body = builder.body;
 		this.recommendPoint = builder.recommendPoint;
 		this.recommentMoney = builder.recommendMoney;
 		this.subscribePoint = builder.subscribePoint;
 		this.subscribeMoney = builder.subscribeMoney;
 		this.commissionRate = builder.commissionRate != null ? builder.commissionRate.floatValue() : 0;
+		if(builder.isImageChanged()){
+			this.ossImage = new OssImage(builder.imageId);
+		}
 	}
 	
 	private Represent(InsertBuilder builder){
 		this.finishDate = builder.finishDate;
 		this.title = builder.title;
 		this.slogon = builder.slogon;
-		this.body = builder.body;
 		this.recommendPoint = builder.recommendPoint;
 		this.recommentMoney = builder.recommendMoney;
 		this.subscribePoint = builder.subscribePoint;
 		this.subscribeMoney = builder.subscribeMoney;
 		this.commissionRate = builder.commissionRate;
+		if(builder.hasImage()){
+			this.ossImage = new OssImage(builder.imageId);
+		}
 	}
 	
 	public Represent(int id){
@@ -228,6 +247,18 @@ public class Represent implements Jsonable {
 	
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public void setImage(OssImage image){
+		this.ossImage = image;
+	}
+	
+	public OssImage getImage(){
+		return this.ossImage;
+	}
+	
+	public boolean hasImage(){
+		return this.ossImage != null;
 	}
 	
 	public long getFinishDate() {
@@ -262,17 +293,6 @@ public class Represent implements Jsonable {
 	
 	public void setSlogon(String slogon) {
 		this.slogon = slogon;
-	}
-	
-	public String getBody() {
-		if(this.body == null){
-			return "";
-		}
-		return body;
-	}
-	
-	public void setBody(String body) {
-		this.body = body;
 	}
 	
 	public int getRecommendPoint() {
@@ -345,12 +365,12 @@ public class Represent implements Jsonable {
 		jm.putString("title", this.title);
 		jm.putString("slogon", this.slogon);
 		jm.putLong("finishDate", this.finishDate);
-		jm.putString("body", this.body);
 		jm.putInt("reconmendPoint", this.recommendPoint);
 		jm.putInt("subscribePoint", this.subscribePoint);
 		jm.putFloat("recommendMoney", this.recommentMoney);
 		jm.putFloat("subscribeMoney", this.subscribeMoney);
 		jm.putFloat("commissionRate", this.commissionRate);
+		jm.putJsonable("image", this.ossImage, 0);
 		return jm;
 	}
 

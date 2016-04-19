@@ -26,6 +26,7 @@ public class StockActionDetailDao {
 		private List<StockAction.SubType> subTypes = new ArrayList<StockAction.SubType>();	//库单操作子类型
 		private List<StockAction.Status> status = new ArrayList<StockAction.Status>();		//库单状态
 		private int stockActionId;							//库单Id
+		public int deptId = -1;								//出入库部门		
 		private int deptIn = -1;							//入库部门
 		private int deptOut = -1;							//出库部门
 		private int materialCateId;							//商品或原料类型
@@ -78,6 +79,16 @@ public class StockActionDetailDao {
 
 		public ExtraCond setMaterialCateType(MaterialCate.Type type){
 			this.materialCateType = type;
+			return this;
+		}
+		
+		public ExtraCond setDept(Department dept){
+			this.deptId = dept.getId();
+			return this;
+		}
+		
+		public ExtraCond setDept(int deptId){
+			this.deptId = deptId;
 			return this;
 		}
 		
@@ -148,6 +159,10 @@ public class StockActionDetailDao {
 			
 			if(stockActionId != 0){
 				extraCond.append(" AND D.stock_action_id = " + stockActionId);
+			}
+			
+			if(deptId != -1){
+				extraCond.append(" AND (S.dept_in = " + deptId + " OR S.dept_out = " + deptId + ")");
 			}
 			
 			if(deptIn != -1){

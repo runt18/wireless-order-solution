@@ -2,6 +2,7 @@ Ext.onReady(function(){
 	
 	var  _representId;
 	var centerPanel;
+	var _ossId; 		//阿里云文件存放id
 	function initRepresentMsg(){
 		Ext.Ajax.request({
 			url : '../../OperateRepresent.do',
@@ -11,6 +12,8 @@ Ext.onReady(function(){
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
+					//TODO
+					console.log(jr);
 					_representId = jr.root[0].id;
 					Ext.getCmp('activeTitle_panel_weixinRepresent').setValue(jr.root[0].title);
 	    			Ext.getCmp('detail_textarea_weixinRepresent').setValue(jr.root[0].slogon);
@@ -52,7 +55,7 @@ Ext.onReady(function(){
 				}
 			},
 			failure : function(res, opt){
-				
+				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
 			}
 		});
 	}
@@ -97,7 +100,7 @@ Ext.onReady(function(){
  		columnWidth : 0.3,
  		autoEl : {
  			tag : 'img',
- 			title : '优惠卷图片预览'
+ 			title : '代言图片预览'
  		}
  	});
  	
@@ -111,6 +114,7 @@ Ext.onReady(function(){
  			}
  		},
  		handler : function(e){
+ 			
  			var check = true;
  			var img = '';
  			if(Ext.isIE){
@@ -137,17 +141,34 @@ Ext.onReady(function(){
  				return;
  			}
  			weixinRepresent_uploadMask.show();
-// 			 
- 			setTimeout(function(){
- 				weixinRepresent_uploadMask.hide();
- 			}, 2000);
+ 		
+ 			Ext.Ajax.request({
+        		url : '../../OperateImage.do?dataSource=upload&ossType=12',  //ossType 阿里云放置图片的文件夹的值
+ 				isUpload : true,
+ 				form : form.getForm().getEl(),
+ 	   			success : function(response, options){
+ 	   				weixinRepresent_uploadMask.hide();
+ 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+ 	   				if(jr.success){
+ 	   					_ossId = jr.root[0].imageId;
+ 	   				}else{
+ 	   					Ext.ux.showMsg(jr);
+ 	   					Ext.getCmp('couponTypeBox').setImg();
+ 	   				}
 
+ 	   				
+ 	   			},
+ 	   			failure : function(response, options){
+ 	   				coupon_uploadMask.hide();
+ 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+ 	   			}
+        	});
+ 			
  		}
  	});
  	
- 	
- 	//TODO
- 	var imgFile = Ext.ux.plugins.createImageFile({
+ 	var imgFile;
+ 	imgFile = Ext.ux.plugins.createImageFile({
  		id : 'representTypeBox',
  		img : reprensentPicBox,
  		width : 100,
@@ -357,7 +378,6 @@ Ext.onReady(function(){
         	},
        		 items : [settingPanel, viewPanel]  
         }],
-        //TODO
         buttons : [{
         	id : 'saveRepresentActive_button_weixinRepresent',
         	xtype : 'button',
@@ -367,7 +387,7 @@ Ext.onReady(function(){
         			var params = {};
         			params.id = _representId;
         			params.title = Ext.getCmp('activeTitle_panel_weixinRepresent').getValue();
-        			params.body = Ext.getDom(imgFile.getId()).value ? Ext.getDom(imgFile.getId()).value : '';
+        			params.imageId = _ossId ? _ossId : null;
         			params.slogon = Ext.getCmp('detail_textarea_weixinRepresent').getValue();
         			params.finishDate = Ext.getCmp('endingDate_datefield_weixinRepresent').getValue();
         			
@@ -444,15 +464,52 @@ Ext.onReady(function(){
 	Ext.getCmp('representPosterShower_panel_weixinRepresent').setHeight(500);
 	
 	var host = null;
-	if(window.location.hostName == 'e-tones.net'){
+	if(window.location.hostname == 'e-tones.net'){
 		host = 'wx.e-tones.net'
-	}else if(window.location.hostName == 'ts.e-tones.net'){
+	}else if(window.location.hostname == 'ts.e-tones.net'){
 		host = 'ts.e-tones.net';
-	}else if(window.location.hostName == 'localhost'){
+	}else if(window.location.hostname == 'localhost'){
 		host = 'localhost:8080'
 	}else{
-		host = window.location.hostName;
+		host = window.location.hostname;
 	}
 	
-	$('#posterContainer_div_weixinRepresent').load(host + '/wx-term/weixin/order/representCard.html');
+	$('#posterContainer_div_weixinRepresent').load('http://' + host + '/wx-term/weixin/order/representCard.html', function(res, status, xhr){
+		var title, imageUrl, desc; 
+		if(status == 'success'){
+			Ext.Ajax.request({
+				url : '../../OperateRepresent.do',
+				params : {
+					dataSource : 'getByCond'
+				},
+				success : function(data, opt){
+					var jr = Ext.decode(data.responseText);
+					if(jr.success){
+						title = jr.root[0].title;
+						imageUrl = jr.root[0].image.image;
+						desc = jr.root[0].slogon;
+						
+//						$(res).find('[id=background_div_representCard]').css({
+////							'background-image' : 'url(\"' + imageUrl + '\")'
+//							'background' : 'red'
+//						});
+//						$(res).trigger('refresh');
+						var container = $(res).find('div')[0].parentNode;
+						$(container).click(function(){
+							console.log('container');
+						});
+						$(container).css({
+							'background' : 'red'
+						});
+						$(container).find('h1').css({
+							'color' : '#000'
+						});
+					}
+				},
+				failure : function(req, opt){
+					Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+				}
+			});
+		}
+	});
 });

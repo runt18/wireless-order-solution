@@ -340,6 +340,7 @@ public class OssImage implements Jsonable, Parcelable{
 		BILL_BOARD(9, "BillBoard", 300, null, "公告信息"),
 		WX_REPLY(10, "WxAction", 300, null, "微信图文回复大图"),
 		WX_REPLY_S(11, "WxAction", 300, null, "微信图文回复小图"),
+		WX_REPRESENT(12, "WxRepresent", 300, null, "微信我要代言"),
 		THUMB_NAIL(100, "thumbnail", 100, null, "缩略图");
 		
 		private final int val;
