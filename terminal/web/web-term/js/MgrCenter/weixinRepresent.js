@@ -12,8 +12,6 @@ Ext.onReady(function(){
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					//TODO
-					console.log(jr);
 					_representId = jr.root[0].id;
 					Ext.getCmp('activeTitle_panel_weixinRepresent').setValue(jr.root[0].title);
 	    			Ext.getCmp('detail_textarea_weixinRepresent').setValue(jr.root[0].slogon);
@@ -227,7 +225,6 @@ Ext.onReady(function(){
 					'margin-left' : '34px'
 				},
 				frame : true,
-				//TODO
 				items : [form,reprensentPicBox,{
 						xtype : 'label',
 						style : 'width : 130px;',
@@ -476,6 +473,8 @@ Ext.onReady(function(){
 	
 	$('#posterContainer_div_weixinRepresent').load('http://' + host + '/wx-term/weixin/order/representCard.html', function(res, status, xhr){
 		var title, imageUrl, desc; 
+		var height = $('#posterContainer_div_weixinRepresent').height();
+		var width = $('#posterContainer_div_weixinRepresent').width();
 		if(status == 'success'){
 			Ext.Ajax.request({
 				url : '../../OperateRepresent.do',
@@ -494,16 +493,22 @@ Ext.onReady(function(){
 //							'background' : 'red'
 //						});
 //						$(res).trigger('refresh');
-						var container = $(res).find('div')[0].parentNode;
-						$(container).click(function(){
-							console.log('container');
+						$('#qrCode_div_representCard').css({
+							'height' : '150px',
+							'width' : '144px',
+							'background' : '#fff'
 						});
-						$(container).css({
-							'background' : 'red'
+						
+						$('#background_div_representCard').css({
+							'background-image' : 'url("' + imageUrl + '")',
+							'height' : height,
+							'width' : width
 						});
-						$(container).find('h1').css({
-							'color' : '#000'
-						});
+						
+						$('#title_h1_representCard').html(title);
+						$('#title_h1_representCard').css('font-size', '34px');
+						$('#descrition_p_representCard').html(desc);
+						$('#descrition_p_representCard').css('font-size', '26px');
 					}
 				},
 				failure : function(req, opt){
