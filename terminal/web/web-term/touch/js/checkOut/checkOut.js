@@ -1318,7 +1318,8 @@ $(function(){
 					$.post('../OperateTable.do', {
 						dataSource : 'transTable',
 						oldTableId : sourceTable.id,
-						newTableId : destTable.id
+						newTableId : destTable.id,
+						orientedPrinter : getcookie(document.domain + '_printers')
 					},function(data){
 						Util.LM.hide();
 						if(data.success){
