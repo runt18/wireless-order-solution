@@ -149,15 +149,58 @@ Ext.onReady(function(){
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
 	
+	//部门combo
+	var deptComb = new Ext.form.ComboBox({
+		id : 'deptComb_comboBox_deltaReportMain',
+		forceSelection : true,
+		width : 110,
+		maxheight : 300,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../OperateDept.do',
+					params: { 
+				    	dataSource : 'getByCond',
+				    	inventory : true
+				    }, 
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			},
+			select : function(){
+				//TODO
+				Ext.getCmp('btnSearch').handler();	
+			}
+			
+		}
+	});
+	
 	var deltaReportBar = new Ext.Toolbar({
 		items : [
  		{
-			xtype : 'tbtext',
-			text : String.format(
-				Ext.ux.txtFormat.typeName,
-				'部门','dept','全部部门'
-			)
-		},
+			xtype : 'label',
+			text : '部门:'
+		}, deptComb,
 		{ xtype:'tbtext', text:'日期:'},
 		{
 			xtype : 'datefield',
@@ -181,10 +224,9 @@ Ext.onReady(function(){
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
 				var sgs = deltaReportGrid.getStore();
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
-				sgs.baseParams['deptId'] = !sn ? '-1' : sn.attributes.deptID;
+				sgs.baseParams['deptId'] = Ext.getCmp('deptComb_comboBox_deltaReportMain').getStore().getCount() > 0 ? Ext.getCmp('deptComb_comboBox_deltaReportMain').getValue() : '-1';
 				sgs.baseParams['cateType'] = Ext.getCmp('comboMaterialType').getValue();
 				sgs.baseParams['cateId'] = Ext.getCmp('drm_comboMaterialCate').getValue();
 				sgs.baseParams['materialId'] = Ext.getCmp('drm_comboMaterial').getValue();
@@ -200,15 +242,14 @@ Ext.onReady(function(){
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
-				var sn = deltaReportDeptTree.getSelectionModel().getSelectedNode();
 				
 				var url = "../../{0}?dataSource={1}&beginDate={2}&deptId={3}&materialId={4}&cateId={5}&cateType={6}";
 				url = String.format(
 					url,
-					'ExportHistoryStatisticsToExecl.do',
+					'http://www.agpad.com/update/.do',
 					'detailReport',
 					Ext.getCmp('dr_beginDate').getValue().format('Y-m'),
-					!sn ? "-1" : sn.attributes.deptID,
+					Ext.getCmp('deptComb_comboBox_deltaReportMain').getValue(),
 					Ext.getCmp('drm_comboMaterial').getValue(),
 					Ext.getCmp('drm_comboMaterialCate').getValue(),
 					Ext.getCmp('comboMaterialType').getValue()
@@ -219,7 +260,6 @@ Ext.onReady(function(){
 		]
 	});
 	
-	
 	var deltaReportGrid = createGridPanel(
 			'',
 			'货品列表',
@@ -228,14 +268,16 @@ Ext.onReady(function(){
 			'../../QueryDeltaReport.do',
 			[
 				[true, false, false, false], 
-				['品项名称', 'material.name', 130],
-				['初期数量', 'primeAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
-				['入库总数', 'stockInTotal',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['出库总数', 'stockOutTotal',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['期末数量', 'endAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['理论消耗', 'expectAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['实际消耗', 'actualAmount',80,'right', 'Ext.ux.txtFormat.gridDou'],
-				['差异数', 'deltaAmount',80,'right', 'Ext.ux.txtFormat.gridDou']
+				['品项名称', 'materialName', 130],
+				['初期数量', 'primeAmount',,'right', Ext.ux.txtFormat.gridDou],
+				['入库总数', 'stockInTotal',80,'right', Ext.ux.txtFormat.gridDou],
+				['出库总数', 'stockOutTotal',80,'right', Ext.ux.txtFormat.gridDou],
+				['期末数量', 'finalAmount',80,'right', Ext.ux.txtFormat.gridDou],
+				['实际消耗', 'actualConsumption',80,'right', Ext.ux.txtFormat.gridDou],
+				['理论消耗', 'expectConsumption',80,'right', Ext.ux.txtFormat.gridDou],
+				['差异数', 'deltaAmount',80,'right', function(v){
+					return v >= 0 ? '<span style="color:green;font-weight:bold;font-size:16px;">' + v.toFixed(2) + '</span>' : '<span style="color:red;font-weight:bold;font-size:16px;">' + v.toFixed(2) + '</span>';
+				}]
 			],
 			deltaReportRecord.getKeys(),
 			[['isPaging', true]],
@@ -248,73 +290,73 @@ Ext.onReady(function(){
 		Ext.getCmp('btnSearch').handler();
 	});	
 	
-	deltaReportDeptTree = new Ext.tree.TreePanel({
-		title : '部门信息',
-		id : 'deltaReportDeptTree',   
-		region : 'west',
-		width : 170,
-		border : false,
-		rootVisible : true,
-		autoScroll : true,
-		frame : true,
-		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryDeptTree.do?time=' + new Date(),
-			baseParams : {
-				restaurantID : restaurantID,
-				warehouse : true
-			}
-		}),
-		root : new Ext.tree.AsyncTreeNode({
-			expanded : true,
-			text : '全部部门',
-	        leaf : false,
-	        border : true,
-	        deptID : '-1',
-	        listeners : {
-	        	load : function(){
-	        		var treeRoot = deltaReportDeptTree.getRootNode().childNodes;
-	        		if(treeRoot.length > 0){
-	        			deptData = [];
-	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
-	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
-	    						deltaReportDeptTree.getRootNode().removeChild(treeRoot[i]);
-	    					}
-	    				}
-	        		}else{
-	        			deltaReportDeptTree.getRootNode().getUI().hide();
-	        			Ext.Msg.show({
-	        				title : '提示',
-	        				msg : '加载部门信息失败.',
-	        				buttons : Ext.MessageBox.OK
-	        			});
-	        		}
-	        	}
-	        }
-		}),
-		listeners : {
-			click : function(e){
-				Ext.getDom('dept').innerHTML = e.text;
-				Ext.getCmp('btnSearch').handler();
-			}
-		},
-		tbar :	[
-		     '->',
-		     {
-				text : '刷新',
-				iconCls : 'btn_refresh',
-				handler : function(){
-					deltaReportDeptTree.getRootNode().reload();
-				}
-			}
-		 ]
-	});
+//	deltaReportDeptTree = new Ext.tree.TreePanel({
+//		title : '部门信息',
+//		id : 'deltaReportDeptTree',   
+//		region : 'west',
+//		width : 170,
+//		border : false,
+//		rootVisible : true,
+//		autoScroll : true,
+//		frame : true,
+//		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
+//		loader : new Ext.tree.TreeLoader({
+//			dataUrl : '../../QueryDeptTree.do?time=' + new Date(),
+//			baseParams : {
+//				restaurantID : restaurantID,
+//				warehouse : true
+//			}
+//		}),
+//		root : new Ext.tree.AsyncTreeNode({
+//			expanded : true,
+//			text : '全部部门',
+//	        leaf : false,
+//	        border : true,
+//	        deptID : '-1',
+//	        listeners : {
+//	        	load : function(){
+//	        		var treeRoot = deltaReportDeptTree.getRootNode().childNodes;
+//	        		if(treeRoot.length > 0){
+//	        			deptData = [];
+//	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
+//	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
+//	    						deltaReportDeptTree.getRootNode().removeChild(treeRoot[i]);
+//	    					}
+//	    				}
+//	        		}else{
+//	        			deltaReportDeptTree.getRootNode().getUI().hide();
+//	        			Ext.Msg.show({
+//	        				title : '提示',
+//	        				msg : '加载部门信息失败.',
+//	        				buttons : Ext.MessageBox.OK
+//	        			});
+//	        		}
+//	        	}
+//	        }
+//		}),
+//		listeners : {
+//			click : function(e){
+//				Ext.getDom('dept').innerHTML = e.text;
+//				Ext.getCmp('btnSearch').handler();
+//			}
+//		},
+//		tbar :	[
+//		     '->',
+//		     {
+//				text : '刷新',
+//				iconCls : 'btn_refresh',
+//				handler : function(){
+//					deltaReportDeptTree.getRootNode().reload();
+//				}
+//			}
+//		 ]
+//	});
 	
 	new Ext.Panel({
 		renderTo : 'divDeltaReport',
 		height : parseInt(Ext.getDom('divDeltaReport').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		items : [deltaReportDeptTree, deltaReportGrid],
+		items : [deltaReportGrid],
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,

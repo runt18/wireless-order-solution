@@ -185,7 +185,6 @@ public class TestRepresnt {
 	private void compare(Represent expected, Represent actual){
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("finish date", DateUtil.format(expected.getFinishDate()), DateUtil.format(actual.getFinishDate()));
-		Assert.assertEquals("body", expected.getBody(), actual.getBody());
 		Assert.assertEquals("title", expected.getTitle(), actual.getTitle());
 		Assert.assertEquals("slogon", expected.getSlogon(), actual.getSlogon());
 		Assert.assertEquals("recommend money", expected.getRecommentMoney(), actual.getRecommentMoney(), 0.01);

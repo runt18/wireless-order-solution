@@ -16,8 +16,15 @@ Ext.onReady(function(){
 
 	
 	var rid = restaurantID;
-//	var basePath = "http://localhost:8080";
-	var basePath = 'http://wx.e-tones.net';
+	//FIXME
+	var basePath;
+	if(window.location.hostname == 'e-tones.net'){
+		basePath = 'wx.e-tones.net';
+	}else if(window.location.hostname == 'ts.e-tones.net'){
+		basePath = 'ts.e-tones.net';
+	}else if(window.location.hostname == 'localhost'){
+		basePath = 'http://localhost:8080'
+	}
 	//关键字点击的标识符 	
 	var isKeyword = false;
 	

@@ -38,7 +38,7 @@ ss.entry = function(){
 	ss.init();
 	
 	//更新沽清菜 & 限量沽清菜
-	of.updataSelloutFoods();
+	ss.updataSelloutFoods();
 	
 	ss.initDeptContent();
 	
@@ -64,6 +64,59 @@ ss.entry = function(){
 	}, 500);
 	
 };
+
+/**
+ * 每次入点菜界面时更新沽清菜品
+ */
+ss.updataSelloutFoods = function(){
+	Util.LM.show();
+	$.ajax({
+		url : '../QueryMenu.do',
+		type : 'post',
+		async:false,
+		dataType : 'json',
+		data : {
+			dataSource : 'stopAndLimit'
+		},
+		success : function(result, status, xhr){
+			if(result.success){
+				var stopFoods = result.root;
+				for (var j = 0; j < WirelessOrder.foods.length; j++) {
+					//先把菜品全部变为不停售的, 因为可能之前是停售的, 现在不停售了
+					WirelessOrder.foods[j].status &= ~(1 << 2);
+					for (var i = 0; i < stopFoods.length; i++) {
+						if(WirelessOrder.foods[j].id == stopFoods[i].id){
+							if(stopFoods[i].foodLimitRemain == 0){
+								WirelessOrder.foods[j].status |= (1 << 2);
+							}
+							
+							//更新限量沽清剩余
+							if((WirelessOrder.foods[j].status & 1 << 10) != 0 || stopFoods[i].foodLimitAmount > 0){
+								//设置菜品为限量沽清属性
+								WirelessOrder.foods[j].status |= (1 << 10);
+								WirelessOrder.foods[j].foodLimitAmount = stopFoods[i].foodLimitAmount;
+								WirelessOrder.foods[j].foodLimitRemain = stopFoods[i].foodLimitRemain;
+							}
+							break;
+						}
+					}
+				}
+				Util.LM.hide();
+			}else{
+				Util.LM.hide();
+			}
+		},
+		error : function(request, status, err){
+			Util.LM.hide();
+			Util.msg.alert({
+				renderTo : 'orderFoodMgr',
+				msg : '更新出错, 请联系客服'
+			});
+		}
+	}); 
+};
+
+
 
 /**
  * 返回餐台界面

@@ -1,0 +1,267 @@
+define(function(require, exports, module){
+	function MoreTastePopup(param){
+		param = param || {
+			selectedFood : selectedFood,               				   //选中的菜品	
+			postTasteClick : function(taste, selectedFood){},          //点击口味的回调事件
+			postTasteCancel : function(taste, selectedFood){}          //取消点击口味的回调事件
+		}
+	
+		var _moreTastePopup = null;
+		var _self  = null;
+		var thiz = this;
+		var _tastePaging = null;
+		var _allTastes = [];
+		_moreTastePopup = new JqmPopupDiv({
+			loadUrl : './popup/moreTaste/moreTaste.html',
+			pageInit : function(self){
+				initTastesGroups();
+				
+				_self = self;
+				
+				//取消按钮
+				self.find('[id="close_a_moreTaste"]').click(function(){
+					thiz.close();				
+				});
+				
+				//上一页
+				self.find('[id="previousPage_a_moreTaste"]').click(function(){
+					_tastePaging.prev();
+				});
+					
+				//下一页
+				self.find('[id="nextPage_a_moreTaste"]').click(function(){
+					_tastePaging.next();
+				});
+				
+			}
+			
+		});
+		
+		this.open = function(afterOpen){
+			_moreTastePopup.open();
+		}
+	
+		this.close = function(afterClose, timeout){
+			_moreTastePopup.close();
+		}
+		
+		function initTastesGroups(){
+			$.ajax({
+				url : '../QueryMenu.do',
+				type : 'post',
+				data : {
+					dataSource : 'tastes'
+				},
+				success : function(result, status, xhr){
+					if(result.success){
+						var tastes = result;
+						var tastesGroups = null;
+						var data = [];
+						if(tastes.root.length > 0){
+							data.push({
+								id : tastes.root[0].taste.cateValue,
+								name : tastes.root[0].taste.cateText,
+								items : []
+							});
+						}
+						
+						var has = true, temp = {};
+						for(var i = 0; i < tastes.root.length; i++){
+							
+							_allTastes.push(tastes.root[i]);
+							
+							has = false;
+							for(var k = 0; k < data.length; k++){
+								if(tastes.root[i].taste.cateValue == data[k].id){
+									data[k].items.push(tastes.root[i]);
+									has = true;
+									break;
+								}
+							}
+							if(!has){
+								temp = {
+									id : tastes.root[i].taste.cateValue,
+									name : tastes.root[i].taste.cateText,
+									items : []
+								};
+								temp.items.push(tastes.root[i]);
+								data.push(temp);
+							}
+						}	
+						
+						tastesGroups = data;
+						
+						ininTasteMenu(tastesGroups);
+					}else{
+						Util.msg.tip(result.msg);
+					}
+				}
+			});
+		}
+		
+		//初始化口味组
+		function ininTasteMenu(tastesGroups, start){
+			var start;
+			
+			if(start){
+				start = start;
+			}else{
+				var start = 0;
+			}
+			var pageLimit = tastesGroups.length > 7 ? 6 : 7;
+			//口味组
+			var tasteGroupCmpTemplet = '<a data-role="button" data-inline="true" class="tastePopTopBtn" data-value={id} data-index={index} data-theme="{theme}" data-type="tastesGroupsCmp">{name}</a>';
+			var limit = tastesGroups.length >= start + pageLimit ? pageLimit : pageLimit - (start + pageLimit - tastesGroups.length);
+			
+			var html = [];
+			
+			if(tastesGroups.length > 0){
+				for(var i = 0; i < limit; i++){
+					html.push(tasteGroupCmpTemplet.format({
+						index : i,
+						id : tastesGroups[start + i].id,
+						name : tastesGroups[start + i].name,
+						theme : start + i == 0 ? "e" : "b"
+					}));
+				}
+			}
+			
+			if(tastesGroups.length > 7){
+				html.push('<a data-type="prePage_a_moreTaste" onclick="tasteGroupGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage">L</a>' +
+				'<a data-type="next_a_moreTaste" onclick="tasteGroupGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage">R</a>');
+			}
+			
+			_self.find('[id="tasteGroupCmp_div_moreTaste"]').html(html.join('')).trigger('create');
+			
+		
+			
+			//口味组的点击事件
+			_self.find('[data-type="tastesGroupsCmp"]').each(function(index, element){
+				element.onclick = function(){
+						
+					if($(element).attr('data-theme') == "e"){
+						$(element).attr('data-theme', 'e').addClass('ui-btn-up-e');
+					}else{
+						_self.find('[data-type="tastesGroupsCmp"]').attr('data-theme', 'b').removeClass('ui-btn-up-e').addClass('ui-btn-up-b');
+						$(element).attr('data-theme', 'e').addClass('ui-btn-up-e');
+					}
+					
+					
+					var chooseTaste = null;
+					
+					for(var i = 0; i < tastesGroups.length; i++){
+						if(tastesGroups[i].id === parseInt($(element).attr('data-value'))){
+							chooseTaste = tastesGroups[i].items;
+						}
+					}
+					
+					//口味列表
+					var tasteCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
+					_tastePaging = new WirelessOrder.Padding({
+						renderTo : $('#tastesCmp_div_moreTaste'),
+						displayTo : $('#tastePagingDesc_div_moreTaste'),
+						itemLook : function(index, item){
+							var theme = "c";
+							
+							if(param.selectedFood){
+								if(param.selectedFood.hasTasteGroup()){
+									if(param.selectedFood.tasteGroup.hasNormalTaste()){
+										for(var i = 0; i < param.selectedFood.tasteGroup.normalTasteContent.length; i++){
+											if(item.taste.id == param.selectedFood.tasteGroup.normalTasteContent[i].id){
+												theme = "e";
+												break;
+											}
+										}								
+									}
+								}
+							}
+							
+							return tasteCmpTemplet.format({
+								index : index,
+								id : item.taste.id,
+								name : item.taste.name,
+								price :  item.taste.calcValue == 1 ? ( item.taste.rate * 100) + '%' : ('￥'+  item.taste.price),
+								theme : theme
+							});
+						}
+					});
+					
+					_tastePaging.data(chooseTaste);
+					
+					//口味的点击事件
+					_self.find('[id="tastesCmp_div_moreTaste"] a').each(function(index, element){
+						element.onclick = function(){
+							
+							if($(element).attr('data-theme') == 'e'){
+								$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
+								
+								for(var i = 0; i < _allTastes.length; i++){
+									if(parseInt($(element).attr('data-value')) === _allTastes[i].taste.id){
+										if(param.selectedFood){
+											if(param.postTasteCancel && typeof param.postTasteClick == 'function'){
+												param.postTasteCancel(_allTastes[i].taste, param.selectedFood);	
+											}
+										}else{
+											if(param.postTasteCancel && typeof param.postTasteCancel == 'function'){
+												param.postTasteCancel(_allTastes[i].taste, null);	
+											}									
+										}
+									}
+								}
+								
+							}else{
+								$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
+								
+								for(var i = 0; i < _allTastes.length; i++){
+									if(parseInt($(element).attr('data-value')) === _allTastes[i].taste.id){
+										if(param.selectedFood){
+											if(param.postTasteClick && typeof param.postTasteClick == 'function'){
+												param.postTasteClick(_allTastes[i].taste, param.selectedFood);	
+											}
+										}else{
+											if(param.postTasteClick && typeof param.postTasteClick == 'function'){
+												param.postTasteClick(_allTastes[i].taste, null);	
+											}									
+										}
+									}
+								}
+								
+							}
+							$(element).buttonMarkup( "refresh" );
+							
+						}
+					});
+				}
+			});
+			
+			_self.find('[data-type="tastesGroupsCmp"]')[0].click();
+			
+			
+			//下一页
+			_self.find('[data-type="next_a_moreTaste"]').click(function(){
+				start += pageLimit;
+				if(start > tastesGroups.length){
+					start -= pageLimit;
+					return;
+				}
+				ininTasteMenu(tastesGroups, start);
+			});
+			
+			//上一页
+			_self.find('[data-type="prePage_a_moreTaste"]').click(function(){
+				start -= pageLimit;
+				if(start < 0){
+					start += pageLimit;
+					return;
+				}
+				ininTasteMenu(tastesGroups, start);
+			});
+		}
+		
+	
+	}
+	
+	exports.newInstance = function(param){
+		return new MoreTastePopup(param);
+	}
+}) 

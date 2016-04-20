@@ -223,11 +223,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(3, 3500);
 		sheet.setColumnWidth(4, 3500);
 		sheet.setColumnWidth(5, 3500);
-		sheet.setColumnWidth(6, 3000);
-		sheet.setColumnWidth(7, 3000);
-		sheet.setColumnWidth(8, 3000);
-		sheet.setColumnWidth(9, 3000);
-		sheet.setColumnWidth(10, 3000);
 		
 		// 报表头
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 10));
@@ -282,84 +277,49 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("赠送数量");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("赠送额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("成本");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("成本率");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("毛利");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("毛利率");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("均价");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("单位成本");
-		cell.setCellStyle(headerStyle);
 		
 		if(saleDetails != null && saleDetails.size() > 0){
 			for(SalesDetail item : saleDetails){
 				row = sheet.createRow(sheet.getLastRowNum() + 1);
 				row.setHeight((short) 350);
 				
-				// ***
+				// 名称***
 				cell = row.createCell(0);
 				cell.setCellValue(item.getFood().getName());
 				cell.setCellStyle(strStyle);
 				
-				// ***
+				// 销量***
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getSalesAmount());
 				cell.setCellStyle(normalNumStyle);
 				
-				// ***
+				// 营业额***
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getIncome());
 				cell.setCellStyle(numStyle);
 				
+				//折扣额
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getDiscount());
 				cell.setCellStyle(numStyle);
 				
+				//赠送数量
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getGiftAmount());
+				cell.setCellStyle(numStyle);
+				
+				//赠送额
 				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getGifted());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getCost());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getCostRate());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getProfit());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getProfitRate());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getAvgPrice());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getAvgCost());
-				cell.setCellStyle(numStyle);
 			}
 		}
 		
