@@ -59,6 +59,7 @@ define(function(require, exports, modele){
 		this.open = function(afterOpen){
 			_tempTastePopup.open(function(){
 				HandWritingAttacher.instance().attach(_self.find('[id="tempTasteName_input_tempTaste"]')[0]);
+				_self.find('[id="tempTasteName_input_tempTaste"]').focus();
 				NumKeyBoardAttacher.instance().attach(_self.find('[id="tempTastePrice_input_tempTaste"]')[0]);	
 			});
 			

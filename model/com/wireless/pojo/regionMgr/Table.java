@@ -1,6 +1,7 @@
 package com.wireless.pojo.regionMgr;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.wireless.exception.BusinessException;
@@ -8,6 +9,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 
@@ -44,6 +46,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public static class TransferBuilder implements Parcelable{
 		private Table srcTbl;
 		private Table destTbl;
+		private final List<Printer> printers = new ArrayList<Printer>();
 		
 		private TransferBuilder(){
 			
@@ -62,6 +65,15 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 			return this.destTbl;
 		}
 
+		public TransferBuilder addPrinter(int printerId){
+			this.printers.add(new Printer(printerId));
+			return this;
+		}
+
+		public List<Printer> getPrinters(){
+			return Collections.unmodifiableList(this.printers);
+		}
+		
 		@Override
 		public void writeToParcel(Parcel dest, int flag) {
 			dest.writeParcel(srcTbl, Table.TABLE_PARCELABLE_SIMPLE);
