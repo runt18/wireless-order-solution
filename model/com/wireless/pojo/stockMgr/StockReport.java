@@ -7,25 +7,65 @@ import com.wireless.pojo.inventoryMgr.Material;
 public class StockReport implements Jsonable{
 
 	private Material material = new Material();
-	private float primeAmount;
-	private float primeMoney;
-	private float stockIn;
-	private float stockInTransfer;
-	private float stockTakeMore;
-	private float stockSpill;
-	private float stockOut;
-	private float stockOutTransfer;
-	private float stockTakeLess;
-	private float stockDamage;
-	private float useUp;
-	private float finalAmount;
-	private float finalPrice;
-	private float finalMoney;
-
-
+	private float primeAmount;		//期初数量
+	private float primeMoney;		//期初金额
+	private float stockIn;			//入库采购
+	private float stockInTransfer;	//入库调拨
+	private float stockTakeMore;	//盘盈
+	private float stockSpill;		//入库报溢
+	private float stockOut;			//出库退货
+	private float stockOutTransfer; //出库调拨
+	private float stockTakeLess;	//盘亏
+	private float stockDamage;		//出库报损
+	private float consumption;		//消耗
+	private float finalAmount;		//期末数量
+	private float finalPrice;		//参考成本
+	private float finalMoney;		//期末金额
+	
 	public Material getMaterial() {
 		return material;
 	}
+	
+	/**
+	 * 消耗差异(理论消耗{@link #getExpectConsumption} - 实际消耗{@link #getActualConsumption})
+	 * @return
+	 */
+	public float getDeltaAmount() {
+		return this.getExpectConsumption() - this.getActualConsumption();
+	}
+	
+	/**
+	 * 出库总计 (出库退货 + 出库调拨), 用于【消耗差异表】
+	 * @return
+	 */
+	public float getStockOutTotal() {
+		return this.stockOut + this.stockOutTransfer;
+	}
+	
+	/**
+	 * 入库总计 (入库采购 + 入库调拨), 用于【消耗差异表】
+	 * @return
+	 */
+	public float getStockInTotal() {
+		return this.stockIn + this.stockInTransfer;
+	}
+	
+	/**
+	 * 理论消耗(消耗单)
+	 * @return
+	 */
+	public float getExpectConsumption() {
+		return this.consumption;
+	}
+	
+	/**
+	 * 实际消耗 (期初数量 + 入库采购  + 入库调拨 - 出库退货 - 出库调拨 - 期末数量)
+	 * @return
+	 */
+	public float getActualConsumption() {
+		return this.primeAmount + this.stockIn + this.stockInTransfer - this.stockOut - this.stockOutTransfer - this.finalAmount; 
+	}
+	
 	public void setMaterial(Material material) {
 		this.material = material;
 	}
@@ -49,10 +89,10 @@ public class StockReport implements Jsonable{
 	}
 	
 	public float getUseUp() {
-		return useUp;
+		return consumption;
 	}
 	public void setConsumption(float useUp) {
-		this.useUp = useUp;
+		this.consumption = useUp;
 	}
 	public void setStockIn(float stockIn) {
 		this.stockIn = stockIn;
@@ -130,7 +170,7 @@ public class StockReport implements Jsonable{
 	}
 	
 	public float getStockOutAmount() {
-		return this.stockOut + this.stockOutTransfer + this.stockTakeLess + this.stockDamage + this.useUp;
+		return this.stockOut + this.stockOutTransfer + this.stockTakeLess + this.stockDamage + this.consumption;
 	}
 
 	
@@ -177,6 +217,11 @@ public class StockReport implements Jsonable{
 		jm.putFloat("finalPrice", this.getFinalPrice());
 		jm.putFloat("finalMoney", this.getFinalMoney());
 		jm.putFloat("primeMoney", this.getPrimeMoney());
+		jm.putFloat("actualConsumption", this.getActualConsumption());
+		jm.putFloat("expectConsumption", this.getExpectConsumption());
+		jm.putFloat("stockInTotal", this.getStockInTotal());
+		jm.putFloat("stockOutTotal", this.getStockOutTotal());
+		jm.putFloat("deltaAmount", this.getDeltaAmount());
 		return jm;
 	}
 	@Override

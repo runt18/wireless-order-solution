@@ -38,6 +38,8 @@ public class StockDeltaReportDao {
 		
 	}
 	
+	
+	//first use
 	public static List<StockTakeDetail> deltaReport(Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -47,7 +49,7 @@ public class StockDeltaReportDao {
 			dbCon.disconnect();
 		}
 	}
-	
+	//second
 	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		float actualFinalAmount;
 		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
@@ -72,7 +74,7 @@ public class StockDeltaReportDao {
 			//理论消耗(销售量)
 			float expectAmount = stockReport.getUseUp();
 			stockTakeDetail.setExpectAmount(expectAmount);
-			//实际消耗(期初+入库-出库-期末)	
+			//实际消耗(期初+入库-出库-期末)	          (期初 + 入库量 + 入库调拨 - 出库量 - 出库调拨 - 期末数)
 			float actualAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - actualFinalAmount;
 			stockTakeDetail.setActualAmount(actualAmount);
 			//差异(理论-实际)

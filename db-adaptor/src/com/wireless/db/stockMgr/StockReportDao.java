@@ -170,6 +170,7 @@ public class StockReportDao {
 			report.setStockTakeLess(dbCon.rs.getFloat("stock_take_less"));
 			//出库消耗
 			report.setConsumption(dbCon.rs.getFloat("stock_consumption"));
+			
 			result.add(report);
 			
 		}
@@ -225,7 +226,7 @@ public class StockReportDao {
 				}
 				//期初数量
 				report.setPrimeAmount(primeAmount);
-				//期末金额
+				//期初金额
 				report.setPrimeMoney(primeAmount * report.getFinalPrice());
 			}
 			
@@ -240,10 +241,10 @@ public class StockReportDao {
 				if(extraCond.deptId == -1){
 					finalAmount = finalDetail.get(0).getRemaining();
 				}else{
-					StockAction primeStock = StockActionDao.getById(dbCon, staff, finalDetail.get(0).getStockActionId());
-					if(primeStock.getDeptIn().getId() == extraCond.deptId){
+					StockAction finalStock = StockActionDao.getById(dbCon, staff, finalDetail.get(0).getStockActionId());
+					if(finalStock.getDeptIn().getId() == extraCond.deptId){
 						finalAmount = finalDetail.get(0).getDeptInRemaining();
-					}else if(primeStock.getDeptOut().getId() == extraCond.deptId){
+					}else if(finalStock.getDeptOut().getId() == extraCond.deptId){
 						finalAmount = finalDetail.get(0).getDeptOutRemaining();
 					}
 				}
@@ -252,7 +253,6 @@ public class StockReportDao {
 				//期末金额
 				report.setFinalMoney(finalAmount * report.getFinalPrice());
 			}
-
 		}
 		
 		return result;
@@ -346,6 +346,7 @@ public class StockReportDao {
 					endAmountCon.rs = endAmountCon.stmt.executeQuery(endAmount);
 					
 					if(endAmountCon.rs.next()){
+						//FIXME remaining to finalAmount
 						stockReport.setFinalAmount(endAmountCon.rs.getFloat("remaining"));
 						stockReport.setFinalMoney((float)Math.round((endAmountCon.rs.getFloat("remaining") * finalPrice) * 100) / 100);
 					}
