@@ -126,7 +126,7 @@ $(function(){
 		document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
 		document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
 		document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
-		document.getElementById("customNumForUO").innerHTML = orderMsg.customNum;
+		document.getElementById("orderCustomNum").innerHTML = orderMsg.customNum;
 		
 		if(orderMsg.categoryValue != 4 && orderMsg.cancelPrice > 0){
 			$('#spanSeeCancelFoodAmount_label_tableSelect').show();	
