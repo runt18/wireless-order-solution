@@ -18,6 +18,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.util.DataPaging;
 
 public class QueryDeltaReportAction extends Action{
 
@@ -35,8 +36,6 @@ public class QueryDeltaReportAction extends Action{
 		final JObject jObject = new JObject();
 		
 		try{
-//			String extra = "";
-//			String orderClause = "LIMIT " + start +", " + limit;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<StockReport> deltaReports = new ArrayList<StockReport>();
 			StockReportDao.ExtraCond extraCond = new StockReportDao.ExtraCond();
@@ -63,39 +62,11 @@ public class QueryDeltaReportAction extends Action{
 			
 			deltaReports = StockReportDao.getByCond(staff, extraCond);
 			
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//			if(beginDate == null){
-//				
-//				//默认使用当前时间实时查询
-//				Calendar c = Calendar.getInstance();
-//				beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
-//				
-//				endDate = sdf.format(new Date());
-//				
-//			}else{
-//				endDate = beginDate + "-31";
-//				beginDate += "-01";
-//				
-//			}
-//			if(cateType != null){
-//				if(!cateType.trim().isEmpty()){
-//					extra += " AND MC.type = " + cateType;
-//				}
-//				if(!cateId.trim().isEmpty()){
-//					extra += " AND M.cate_id = " + cateId;
-//				}
-//				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
-//					extra += " AND M.material_id = " + materialId;
-//				}
-//			}
-//			if(deptId == null){
-//				deptId = "-1";
-//			}
-//
-//			int count = StockDeltaReportDao.deltaReportCount(staff, beginDate, endDate, deptId, extra);
-//
-//			deltaReports = StockDeltaReportDao.deltaReport(staff, beginDate, endDate, deptId, extra, orderClause);
-//			jobject.setTotalProperty(count);
+			if(!start.isEmpty() && !limit.isEmpty()){
+				deltaReports = DataPaging.getPagingData(deltaReports, true, start, limit);
+			}
+			
+			jObject.setTotalProperty(deltaReports.size());
 			jObject.setRoot(deltaReports);
 		}catch(BusinessException e){
 			e.printStackTrace();
