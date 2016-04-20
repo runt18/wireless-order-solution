@@ -47,7 +47,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
-import com.wireless.db.stockMgr.StockDeltaReportDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
@@ -645,50 +644,39 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("消耗差异表.xls".getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = (String)request.getAttribute("pin");
-		String beginDate = request.getParameter("beginDate");
+		final String pin = (String)request.getAttribute("pin");
+		final String beginDate = request.getParameter("beginDate");
 		//表头统计时间
-		String date = beginDate;
-		String endDate = "";
-		String materialId = request.getParameter("materialId");
-		String cateType = request.getParameter("cateType");
-		String cateId = request.getParameter("cateId");
-		String deptId = request.getParameter("deptId");
+		final String date = beginDate;
+		final String materialId = request.getParameter("materialId");
+		final String cateType = request.getParameter("cateType");
+		final String cateId = request.getParameter("cateId");
+		final String deptId = request.getParameter("deptId");
+		List<StockReport> deltaReports = new ArrayList<StockReport>();
+		StockReportDao.ExtraCond extraCond = new StockReportDao.ExtraCond();
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		String extra = "";
-		List<StockTakeDetail> deltaReports = new ArrayList<StockTakeDetail>();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		if(beginDate == null){
-			
-			//默认使用当前时间实时查询
-			Calendar c = Calendar.getInstance();
-			beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
-			
-			endDate = sdf.format(new Date());
-			
-		}else{
-			endDate = beginDate + "-31";
-			beginDate += "-01";
-			
+
+		if(beginDate != null && !beginDate.isEmpty()){
+			extraCond.setRange(beginDate);
 		}
-		if(cateType != null){
-			if(!cateType.trim().isEmpty()){
-				extra += " AND MC.type = " + cateType;
-			}
-			if(!cateId.trim().isEmpty()){
-				extra += " AND M.cate_id = " + cateId;
-			}
-			if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
-				extra += " AND M.material_id = " + materialId;
-			}
+		
+		if(materialId != null && !materialId.isEmpty()){
+			extraCond.setMaterialCate(Integer.valueOf(materialId));
 		}
-		if(deptId == null){
-			deptId = "-1";
+		
+		if(cateType != null && !cateType.isEmpty()){
+			extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.valueOf(cateType)));
+		}
+		
+		if(cateId != null && !cateId.isEmpty()){
+			extraCond.setMaterialCate(Integer.valueOf(cateId));
+		}
+		
+		if(Integer.valueOf(deptId) >= 0){
+			extraCond.setDept(Integer.valueOf(deptId));
 		}
 
-		int count = StockDeltaReportDao.deltaReportCount(staff, beginDate, endDate, deptId, extra);
-
-		deltaReports = StockDeltaReportDao.deltaReport(staff, beginDate, endDate, deptId, extra, null);
+		deltaReports = StockReportDao.getByCond(staff, extraCond);
 		
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -722,7 +710,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("日期: " + date +"         共: " + count + " 条");
+		cell.setCellValue("日期: " + date +"         共: " + deltaReports.size() + " 条");
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -738,71 +726,76 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("品项名称");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("期初数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("入库总数");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("出库总数");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("期末数量");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("理论消耗");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("实际消耗");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell(row.getLastCellNum());
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("理论消耗");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("差异数");
 		cell.setCellStyle(headerStyle);
 		
 		if(deltaReports != null && deltaReports.size() > 0){
-			for(StockTakeDetail item : deltaReports){
+			for(StockReport item : deltaReports){
 				row = sheet.createRow(sheet.getLastRowNum() + 1);
 				row.setHeight((short) 350);
 				
-				// ***
+				// 品项名称
 				cell = row.createCell(0);
 				cell.setCellValue(item.getMaterial().getName());
 				cell.setCellStyle(strStyle);
 				
-				// ***
-				cell = row.createCell(row.getLastCellNum());
+				// 期初数量
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getPrimeAmount());
 				cell.setCellStyle(normalNumStyle);
 				
-				// ***
-				cell = row.createCell(row.getLastCellNum());
+				// 入库总量
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getStockInTotal());
 				cell.setCellStyle(normalNumStyle);
-			
-				cell = row.createCell(row.getLastCellNum());
+				
+				//出库总量
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getStockOutTotal());
 				cell.setCellStyle(normalNumStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getEndAmount());
+				//期末数量
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getFinalAmount());
 				cell.setCellStyle(normalNumStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getExpectAmount());
+				//实际消耗
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getActualConsumption());
 				cell.setCellStyle(normalNumStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getActualAmount());
+				//理论消耗
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getExpectConsumption());
 				cell.setCellStyle(normalNumStyle);
 				
-				cell = row.createCell(row.getLastCellNum());
+				//差异数
+				cell = row.createCell((int)row.getLastCellNum());
 				cell.setCellValue(item.getDeltaAmount());
 				cell.setCellStyle(normalNumStyle);
 				
