@@ -864,7 +864,6 @@ function submitRepaidOrderMain(_c){
 	orderPanel.buttons[1].setDisabled(true);
 	orderPanel.buttons[5].setDisabled(true);
 	
-	var orderDataModel = {};
 	orderDataModel.tableAlias = _c.grid.order.table.alias;
 	orderDataModel.customNum = _c.grid.order['customNum'];
 	orderDataModel.orderFoods = _c.grid.order.orderFoods;
@@ -990,7 +989,6 @@ function submitRepaidOrderHandler(_c){
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	
-	var orderDataModel = {};
 	orderDataModel.tableID = tableDate.id;
 	orderDataModel.customNum = 1;
 	orderDataModel.orderFoods = (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods);

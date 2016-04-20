@@ -453,9 +453,13 @@ $(function(){
 	         ['销量', 'salesAmount', '', 'right', Ext.ux.txtFormat.gridDou], 
 	         ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
 	         ['口味总额', 'tasteIncome', '', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou],
-	         ['赠送数量', 'giftedAmount', null, 'right', Ext.ux.txtFormat.gridDou],
-	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou]
+	         ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
+	         ['单位成本', 'avgCost','', 'right', Ext.ux.txtFormat.gridDou],
+	         ['成本', 'cost', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['成本率', 'costRate', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou]
 			//['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 			],
 			SalesSubStatRecord.getKeys().concat(['food', 'food.name', 'restaurant']),
@@ -487,7 +491,15 @@ $(function(){
 					sumRow.style.color = 'green';
 				}
 				//单位成本
-//				orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 7).innerHTML = '--';
+				orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 7).innerHTML = '--';
+				//成本
+				//orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 8).innerHTML = '--';
+				//成本率
+				orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 9).innerHTML = '--';
+				//毛利
+				//orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 10).innerHTML = '--';
+				//毛利率
+				orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 11).innerHTML = '--';
 			}
 		});
 		orderFoodStatPanel = new Ext.Panel({

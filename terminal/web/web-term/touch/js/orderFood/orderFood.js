@@ -941,8 +941,7 @@ $(function(){
 					var tmpTaste = null;
 					tmpTaste = tempTaste.newInstance({
 						selectedFood : of.selectedOrderFood,
-						confirm : function(selectedFood, name, price){
-							of.selectedOrderFood.setTempTaste(name, price);
+						confirm : function(){
 							initNewFoodContent();	
 						}
 					})

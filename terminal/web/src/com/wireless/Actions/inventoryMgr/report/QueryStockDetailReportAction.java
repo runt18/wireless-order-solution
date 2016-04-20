@@ -44,7 +44,7 @@ public class QueryStockDetailReportAction extends Action{
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond().addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT);
+			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond();
 			
 			extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
 			

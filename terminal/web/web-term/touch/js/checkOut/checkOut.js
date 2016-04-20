@@ -257,7 +257,7 @@ uo.showOrder = function(){
 			});
 		}
 	});	
-	uo.showNorthForUpdateOrder();
+	uo.showNorthForUpdateOrder();	
 };
 
 /**
@@ -1060,7 +1060,6 @@ uo.saveForUO = function(){
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
 		Util.msg.tip('账单没有修改，不能提交');
 	}else{
-		uo.order.customNum = uo.customNum;
 		var uoFood = uo.order.orderFoods;
 		for(var x = 0; x < uoFood.length; x++){
 			for(var y = 0; y < uoCancelFoods.length; y++){
@@ -1081,7 +1080,6 @@ uo.saveForUO = function(){
 uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c.orderFoods;
 	if(orderFoods.length > 0){
-		var orderDataModel = {};
 		orderDataModel.tableID = uo.table.id;
 		orderDataModel.customNum = uo.customNum;
 		orderDataModel.orderFoods = orderFoods;
@@ -1195,6 +1193,25 @@ uo.cancelForUO = function(){
 	uoFood = [];
 	uo.back();
 	
+	//判断页面信息是否有改动
+//	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
+//		uoCancelFoods = [];
+//		uoFood = [];
+//		uo.back();
+//	}else{
+//		Util.msg.alert({
+//			title : '重要',
+//			msg : '账单信息已修改，“确定”将不保存这些改动，是否确定？',
+//			buttons : 'YESBACK',
+//			fn : function(btn){
+//				if(btn == 'yes'){
+//					uoCancelFoods = [];
+//					uoFood = [];
+//					uo.back();
+//				}
+//			}
+//		});
+//	}
 };
 
 
@@ -1265,6 +1282,38 @@ $(function(){
 				//打开会员读取Popup
 				memberReadPopup.open();
 			});
+//			var memberReadPopup = null;
+//			memberReadPopup = new MemberReadPopup({
+//				confirm : function(member, discount, pricePlan){
+//					Util.LM.show();
+//					
+//					$.post('../OperateDiscount.do', {
+//						dataSource : 'setDiscount',
+//						orderId : uo.order.id,
+//						memberId : member.id,
+//						discountId : discount.id,
+//						pricePlan : pricePlan.id
+//						
+//					}, function(data){
+//						Util.LM.hide();
+//						if(data.success){
+//							
+//							//异步刷新账单
+//							initOrderData({order : uo.order});
+//							
+//							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+//							
+//							//关闭会员读取Popup
+//							memberReadPopup.close();
+//							
+//						}else{
+//							Util.msg.tip('使用会员失败</br>' + data.msg);					
+//						}
+//					}, 'json');		
+//				}
+//			});
+//			//打开会员读取Popup
+//			memberReadPopup.open();
 		});
 		
 		//转台
@@ -1289,8 +1338,7 @@ $(function(){
 					$.post('../OperateTable.do', {
 						dataSource : 'transTable',
 						oldTableId : sourceTable.id,
-						newTableId : destTable.id,
-						orientedPrinter : getcookie(document.domain + '_printers')
+						newTableId : destTable.id
 					},function(data){
 						Util.LM.hide();
 						if(data.success){

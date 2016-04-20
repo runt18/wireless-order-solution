@@ -83,8 +83,8 @@ public class StockDetailReport implements Jsonable {
 			
 			if(this.stockAction.getType() == StockAction.Type.STOCK_IN){
 				
-				jm.putString("deptIn",	(this.stockAction.getDeptIn().getName().length() != 0 && this.stockAction.getDeptIn().getName() != null ? this.stockAction.getDeptIn().getName() : "----"));
-				jm.putString("deptOut",	(this.stockAction.getDeptOut().getName().length() != 0 && this.stockAction.getDeptOut().getName() != null ? this.stockAction.getDeptOut().getName() : "----"));
+				jm.putString("deptIn",	(!this.stockAction.getDeptIn().getName().isEmpty() && this.stockAction.getDeptIn().getName() != null ? this.stockAction.getDeptIn().getName() : "----"));
+				jm.putString("deptOut",	(!this.stockAction.getDeptOut().getName().isEmpty() && this.stockAction.getDeptOut().getName() != null ? this.stockAction.getDeptOut().getName() : "----"));
 				jm.putString("stockInSubType", this.stockAction.getSubType().getText());
 				jm.putFloat("stockInAmount", this.stockActionDetail.getAmount());
 				jm.putFloat("stockInMoney", this.stockActionDetail.getAmount() * this.stockActionDetail.getPrice());
@@ -93,8 +93,8 @@ public class StockDetailReport implements Jsonable {
 				jm.putString("stockOutMoney", "----");
 				
 			}else if(this.stockAction.getType() == StockAction.Type.STOCK_OUT){
-				jm.putString("deptIn",	(this.stockAction.getDeptIn().getName().length() != 0 && this.stockAction.getDeptIn().getName() != null ? this.stockAction.getDeptIn().getName() : "----"));
-				jm.putString("deptOut", (this.stockAction.getDeptOut().getName().length() != 0 && this.stockAction.getDeptOut().getName() != null ? this.stockAction.getDeptOut().getName() : "----"));
+				jm.putString("deptIn",	(!this.stockAction.getDeptIn().getName().isEmpty() && this.stockAction.getDeptIn().getName() != null ? this.stockAction.getDeptIn().getName() : "----"));
+				jm.putString("deptOut", (!this.stockAction.getDeptOut().getName().isEmpty() && this.stockAction.getDeptOut().getName() != null ? this.stockAction.getDeptOut().getName() : "----"));
 				jm.putString("stockInSubType", "----");
 				jm.putString("stockInAmount", "----");
 				jm.putString("stockInMoney", "----");
@@ -104,8 +104,8 @@ public class StockDetailReport implements Jsonable {
 				
 			}else{
 
-				jm.putString("deptOut",	(this.stockAction.getDeptOut().getName().length() != 0 && this.stockAction.getDeptOut().getName() != null ? this.stockAction.getDeptOut().getName() : "----"));
-				jm.putString("deptIn",	(this.stockAction.getDeptIn().getName().length() != 0 && this.stockAction.getDeptIn().getName() != null ? this.stockAction.getDeptIn().getName() : "----"));
+				jm.putString("deptOut",	(!this.stockAction.getDeptOut().getName().isEmpty() && this.stockAction.getDeptOut().getName() != null ? this.stockAction.getDeptOut().getName() : "----"));
+				jm.putString("deptIn",	(!this.stockAction.getDeptIn().getName().isEmpty() && this.stockAction.getDeptIn().getName() != null ? this.stockAction.getDeptIn().getName() : "----"));
 				jm.putString("stockInSubType", "----");
 				jm.putString("stockInAmount", "----");
 				jm.putString("stockInMoney", "----");

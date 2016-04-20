@@ -32,7 +32,7 @@ public class OperateRepresentAction extends DispatchAction{
 		final String pin = (String)request.getAttribute("pin");
 		final String id = request.getParameter("id");
 		final String title = request.getParameter("title");
-		final String body = request.getParameter("body");
+		final String imageId = request.getParameter("imageId");
 		final String slogon = request.getParameter("slogon");
 		final String finishDate = request.getParameter("finishDate");
 		final String recommendPoint = request.getParameter("recommendPoint");
@@ -50,9 +50,9 @@ public class OperateRepresentAction extends DispatchAction{
 				builder.setTitle(title);
 			}
 			
-			//body
-			if(body != null){
-				builder.setBody(body);
+			//imageId
+			if(imageId != null){
+				builder.setImage(Integer.parseInt(imageId));
 			}
 			
 			//宣传语

@@ -4,7 +4,7 @@ define(function(require, exports, module){
 	function MemberReadPopup(param){
 		
 		param = param || {
-			confirm : function(member, discount, pricePlan){}	//会员读取后的确定事件
+			confirm : function(member, discount, pricePlan){},	//会员读取后的确定事件
 		};
 		
 		var _self = this;

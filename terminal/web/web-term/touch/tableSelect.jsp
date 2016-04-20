@@ -58,10 +58,7 @@
 			'patchWxCard' : './js/popup/member/patchWxCard',
 			'perfectMemberMsg' : './js/popup/member/perfect',
 			'issueCoupon' : './js/popup/coupon/issuePopup',
-			'useCoupon' : './js/popup/coupon/usePopup',
-			'taste' : './js/popup/taste/taste',
-			'tempTaste' : './js/popup/tempTaste/tempTaste',
-			'moreTastes' : './js/popup/moreTaste/moreTaste'
+			'useCoupon' : './js/popup/coupon/usePopup'
 		}
 	});
 </script>
@@ -699,6 +696,7 @@
 		     <!-- 点菜更多操作 -->
 			<div data-role="popup" id="orderFoodOtherOperateCmp" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:130px;" data-theme="b">
+		        	<li class="tempFoodKitchen" id="updateUnit_li_orderFood"><a>修改单位</a></li>	
 		        	<li class="tempFoodKitchen" id="updatePrice_li_orderFood"><a>修改时价</a></li>
 		            <li class="tempFoodKitchen" id="allFoodTaste_li_orderFood"><a >全单口味</a></li>
 		            <li class="tempFoodKitchen" id="allFoodHangUp_li_orderFood"><a>全单叫起</a></li>
@@ -753,8 +751,78 @@
 	            <li id="orderPre_li_orderFood" class="tempFoodKitchen"><a >先送</a></li>       	     
 	        </ul>
 		</div>
+		
+		 
 		 
 	</div>
+	
+	<div id="orderFoodTasteCmp" data-role="popup" data-theme="c" data-dismissible="false" style="width:820px;" class="ui-corner-all" align="center">
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
+	    	<!-- 口味组 -->
+	    	<div id="tasteGroupCmp" data-role="controlgroup" data-type="horizontal" >
+	    			<!-- 文字外的div是为了不让字出现省略号... -->
+<!-- 				<a onclick="chooseTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						口味1<br>￥10
+					</div>
+				</a> -->
+			</div>	
+	    </div>
+	    <!-- 口味列表 -->
+    	<div id="tastesCmp" class="ui-bar ui-bar-c" style="height:300px;" align="left">
+
+    	</div>
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 48px;">
+			<div class="bottomTastesBar">
+				<div style="float: left;margin-left: 20px;">已选口味 : </div>
+				<div id="divDescForChooseTaste" style="float: left;color: green;font-weight: bold;"></div>
+				<div id="tastePagingDesc" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>				
+				
+			</div>	
+			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" >
+			 	 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="of.ot.saveOrderFoodTaste()">确定</a>
+				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="of.ot.back()">取消</a>
+				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="tasteCmpPrePage()">上一页</a>
+				 <a  data-role="button" data-inline="true" class="tastePopTopBtn" onclick="tasteCmpNextPage()">下一页</a>
+			 </div>
+	    </div>
+	</div>	 
+	
+	<!-- 套菜点菜 -->
+	<div id="divComboFoodFloat" class="ui-overlay-shadow ui-corner-all commonTasteFloat" >
+		<div data-role="header" data-theme="b" class="ui-corner-top" style="height: 50px">
+    		<div id="comboFoodsGroupCmp" data-role="controlgroup" style="float: left;margin-left: 5px;">
+    		
+    		</div>
+        	<div style="float: right">
+  				<a onclick="closeComboFoodTasteUnit()" data-role="button" data-corners="false" class="popupWinCloseBtn4comboFood">X</a>      		
+        	</div>			 
+			 
+	    </div>
+	    
+	    <div data-role="collapsible" data-mini="true" id="collapsibleComboFoodTaste" >
+	    	<h3>常用口味</h3>
+			<div id="divComboFoodTastes">
+<!-- 				<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						口味1<br>￥10
+					</div>
+				</a> -->
+			</div> 
+	    </div>
+	    <div data-role="collapsible" data-mini="true" id="collapsibleComboFoodMultiPrice">
+	        <h3>选择单位</h3>
+	        <div id="divComboFoodMultiPrices">
+<!-- 				<a onclick="" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						¥45/例
+					</div>
+				</a> -->
+			</div> 
+	    </div>
+	    
+	</div>		
+	
 	
 	<!-- 拼音搜索 -->
 	<div id="orderPinyinCmp" class="ui-overlay-shadow ui-corner-all pinyinWindow" > 		
@@ -777,6 +845,46 @@
 		<div id="handWritingPanel_th_orderFood" class="handWritingPanel"></div>
 	</div>		
 	
+	
+	
+		
+	
+	<div id="addTempTasteCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:500px;display: none;background-color: white;" align="center">
+	<!-- <div id="addTempTasteCmp" data-role="popup"  data-theme="c" data-dismissible="false" style="min-width:550px;" class="ui-corner-all" align="center"> -->
+	    <div data-role="header" data-theme="b" class="ui-corner-top">
+	        <h1>添加临时口味</h1>
+	    </div>
+	    <table style="width:80%;">
+	    	<tr>
+	    		<td style="width:40px;"><label for="tempTasteName">名称:</label></td> 
+	    		<td>
+	    			<input id="tempTasteName" type="text" placeholder="填写临时口味名称" data-type="txt" class="countInputStyle">
+	    		</td>
+	    		<td>
+					<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
+					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempTasteName')">D</a>
+					</div>		    		
+	    		</td>
+	    	</tr>
+	    	<tr>
+	    		<td style="width:40px;"><label for="tempTastePrice">价格:</label></td>
+	    		<td>
+					<input id="tempTastePrice" type="text" placeholder="填写临时口味价钱"  class="countInputStyle" data-type="num">    			
+	    		</td>
+	    		<td>
+					<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:inherit;">
+					    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="deleteSingleWord('tempTastePrice')">D</a>
+					</div>	    		
+	    		</td>
+	    	</tr>	    	
+	    </table>
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom">
+			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="saveTempTaste_a_orderFood">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="closeTempTaste_a_orderFood">取消</a>		 
+			 </div>
+	    </div>			
+	</div>	
 	<!-- <div class="ui-popup-screen in" id="addTempFoodCmp-screen" style="display: none;"></div> -->
 	<div id="addTempFoodCmp" class="ui-overlay-shadow ui-corner-all" style="z-index: 1102;position: absolute; top: 100px; left: 50%; margin: -100px 0px 0px -250px;min-width:400px;display: none;background-color: white;" align="center">
 	    <div data-role="header" data-theme="b" class="ui-corner-top">
@@ -836,7 +944,40 @@
 	    </div>			
 	</div>
 	
-
+	<!-- 动态口味组件 -->
+	<div id="divFoodTasteFloat" class="ui-overlay-shadow ui-corner-all commonTasteFloat" >
+		<div  data-role="header" data-theme="b" class="ui-corner-top" style="height: 35px">
+    		<div id="txtChooosedFoodName" style="float: left;line-height: 35px;margin-left: 10px;"></div>
+        	<div style="float: right">
+  				<a onclick="closeFoodCommonTaste()" data-role="button" data-corners="false" class="popupWinCloseBtn">X</a>      		
+        	</div>			 
+			 
+	    </div>
+	    
+	    <div data-role="collapsible" data-mini="true" id="collapsibleCommonTaste" >
+	    	<h3>常用口味</h3>
+			<div id="divFloatFoodTastes">
+<!-- 				<a onclick="chooseOrderFoodCommonTaste({event: this, id: 2})" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						口味1<br>￥10
+					</div>
+				</a> -->
+			</div> 
+	    </div>
+	    <div data-role="collapsible" data-mini="true" id="collapsibleMultiPrice">
+	        <h3>选择单位</h3>
+	        <div id="divFloatFoodMultiPrices">
+<!-- 				<a onclick="" data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index=0 data-value=2 data-theme="c">
+					<div>
+						¥45/例
+					</div>
+				</a> -->
+			</div> 
+	    </div>
+	    
+	    
+ 	
+	</div>	
 </div>
 <!-- end 点菜界面-->
 

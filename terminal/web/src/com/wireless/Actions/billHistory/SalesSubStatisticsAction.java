@@ -175,10 +175,9 @@ public class SalesSubStatisticsAction extends Action {
 					summary.setTasteIncome(summary.getTasteIncome() + tp.getTasteIncome());
 					summary.setDiscount(summary.getDiscount() + tp.getDiscount());
 					summary.setGifted(summary.getGifted() + tp.getGifted());
-					summary.setGiftAmount(summary.getGiftAmount() + tp.getGiftAmount());
 					summary.setCost(summary.getCost() + tp.getCost());
 					summary.setProfit(summary.getProfit() + tp.getProfit());
-					summary.setSalesAmount(summary.getSalesAmount() + tp.getSalesAmount());			
+					summary.setSalesAmount(summary.getSalesAmount() + tp.getSalesAmount());				
 				}
 				if(summary.getIncome() != 0.00){
 					summary.setProfitRate(summary.getProfit() / summary.getIncome());

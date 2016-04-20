@@ -370,6 +370,7 @@ public class Represent implements Jsonable {
 		jm.putFloat("recommendMoney", this.recommentMoney);
 		jm.putFloat("subscribeMoney", this.subscribeMoney);
 		jm.putFloat("commissionRate", this.commissionRate);
+		jm.putJsonable("image", this.ossImage, 0);
 		return jm;
 	}
 

@@ -389,7 +389,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	
 	//设置临时口味
 	_instance.setTmpTaste = function(name, price){
-		if((typeof name == 'undefined' || name == null || name.length == 0 ) && (typeof price == 'undefined' || price == '' || price == 0)){
+		if((typeof name == 'undefined' || name == '' || name.length == 0 ) && (typeof price == 'undefined' || price == '' || price == 0)){
 			delete _instance.tmpTaste;
 		}else{
 			_instance.tmpTaste = {

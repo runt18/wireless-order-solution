@@ -494,7 +494,7 @@ html { overflow-y: hidden;}
 	常用口味动态窗口
 */
 .commonTasteFloat{
-	z-index: 1102;
+	z-index: 2;
 	position: absolute; 
 	/* top: 130px;  */
 	bottom : 48.5%;

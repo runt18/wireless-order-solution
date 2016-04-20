@@ -124,36 +124,80 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 	</div>
 	
 	<div id="divMemberRecommendHistory" class="main-box">
-	<ul class="m-b-list">
-		<li id="recommendAmount_li_member" class="box-horizontal none-line">
-			<div >粉丝数: <span id="fansAmount_span_member" style="color:#FF4500;">0</span>&nbsp;人</div>
-			<div class="event">代言记录&nbsp;&gt;</div>
-		</li>
-		<li>
-			<div id="recommendDetails_div_member" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
-				<table id="table_recommendDetails" class="d-list" >
-					<thead>
-						<tr class="d-list-title">
-							<td style="width:39%;text-align: center;">关注时间</td>
-							<td style="width:20%;text-align:center;">粉丝名</td>
-							<td style="width:20%;text-align:center">金额</td>
-							<td style="width:20%;text-align:center">积分</td>
-						</tr>
-					</thead>
-					
-					<tbody>
-						<!--tr>
-							<td style="width:39%;text-align: center;line-height:20px;">1993-12-10 10:12:30</td>
-							<td style="width:20%;text-align:center;line-height:20px;">zhijian</td>
-							<td style="width:20%;text-align:center;line-height:20px;">99元</td>
-							<td style="width:20%;text-align:center;line-height:20px;">99分</td>
-						</tr-->
-					</tbody>
-					
-				</table>
-			</div>
-		</li>
-	</ul>
+		<ul class="m-b-list">
+			<li id="recommendAmount_li_member" class="box-horizontal none-line">
+				<div >粉丝数: <span id="fansAmount_span_member" style="color:#FF4500;">0</span>&nbsp;人</div>
+				<div class="event">代言记录&nbsp;&gt;</div>
+			</li>
+			<li>
+				<div id="recommendDetails_div_member" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
+					<table id="table_recommendDetails" class="d-list" >
+						<thead>
+							<tr class="d-list-title">
+								<td style="width:39%;text-align: center;">关注时间</td>
+								<td style="width:20%;text-align:center;">粉丝名</td>
+								<td style="width:20%;text-align:center">金额</td>
+								<td style="width:20%;text-align:center">积分</td>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<!--tr>
+								<td style="width:39%;text-align: center;line-height:20px;">1993-12-10 10:12:30</td>
+								<td style="width:20%;text-align:center;line-height:20px;">zhijian</td>
+								<td style="width:20%;text-align:center;line-height:20px;">99元</td>
+								<td style="width:20%;text-align:center;line-height:20px;">99分</td>
+							</tr-->
+							
+							<tr class="d-list-title">
+								<td colspan="4" style="text-align:center;font-weight:bold;color:#666;">暂无记录</td>
+							</tr>
+						</tbody>
+						
+					</table>
+				</div>
+			</li>
+		</ul>
+	</div>
+	
+	
+	<div id="divMemberCommissionHistory" class="main-box">
+		<ul class="m-b-list">
+			<li id="totalCommission_li_member" class="box-horizontal none-line">
+				<div >总佣金数: <span id="totalCommission_span_member" style="color:#FF4500;">0</span>&nbsp;元</div>
+				<div class="event">佣金记录&nbsp;&gt;</div>
+			</li>
+			<li>
+				<div id="commissionDetail_div_member" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
+					<table id="tableCommissionDetails_table_member" class="d-list" >
+						<thead>
+							<tr class="d-list-title">
+								<td style="width:39%;text-align: center;">消费时间</td>
+								<td style="width:30%;text-align:center;">消费人</td>
+								<td style="width:20%;text-align:center;">佣金额</td>
+							</tr>
+						</thead>
+						
+						<tbody>
+							<!--tr>
+								<td style="width:39%;text-align: center;line-height:20px;">1993-12-10 10:12:30</td>
+								<td style="width:20%;text-align:center;line-height:20px;">zhijian</td>
+								<td style="width:20%;text-align:center;line-height:20px;">99元</td>
+								<td style="width:20%;text-align:center;line-height:20px;">99分</td>
+							</tr-->
+							
+							<tr class="d-list-title">
+								<td colspan="3" style="text-align:center;font-weight:bold;color:#666;">暂无记录</td>
+								<!--td style="width:39%;text-align: center;line-height:20px;">1993-12-10 10:12:30</td>
+								<td style="width:30%;text-align:center;line-height:20px;">zhijian</td>
+								<td style="width:20%;text-align:center;line-height:20px;">99元</td-->
+							</tr>
+						</tbody>
+						
+					</table>
+				</div>
+			</li>
+		</ul>
 	</div>
 	
 	<div id="divMemberPointContent" class="main-box">

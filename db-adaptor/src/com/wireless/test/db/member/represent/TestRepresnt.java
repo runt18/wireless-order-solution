@@ -1,10 +1,6 @@
 package com.wireless.test.db.member.represent;
 
 import java.beans.PropertyVetoException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -15,19 +11,15 @@ import org.junit.Test;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.represent.RepresentChainDao;
 import com.wireless.db.member.represent.RepresentDao;
-import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.OssImageError;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.member.represent.RepresentChain;
-import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
-import com.wireless.test.db.oss.TestOssImage;
 
 public class TestRepresnt {
 	private static Staff mStaff;
@@ -42,12 +34,10 @@ public class TestRepresnt {
 	}
 	
 	@Test
-	public void testRepresent() throws SQLException, BusinessException, FileNotFoundException, IOException{
+	public void testRepresent() throws SQLException, BusinessException{
 		int id = 0;
-		int ossImageId = 0;
+		
 		try{
-			//--------Test to create a promotion-----------
-			
 			//Test to insert a new represent
 			Represent.InsertBuilder insertBuilder = new Represent.InsertBuilder();
 			id = RepresentDao.insert(mStaff, insertBuilder);
@@ -58,14 +48,11 @@ public class TestRepresnt {
 			compare(expected, actual);
 			
 			//Test to update the represent
-			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
-			
-			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_REPRESENT).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
-
 			final int recommendPoint = 100;
 			final float recommendMoney = 10;
 			final int subscribePoint = 200;
 			final float subscribeMoney = 20;
+			final float commissionRange = (float) 0.3;
 			Represent.UpdateBuilder updateBuilder = new Represent.UpdateBuilder(id)
 																 .setTitle("我要代言")
 																 .setSlogon("我要代言宣传语")
@@ -75,7 +62,7 @@ public class TestRepresnt {
 																 .setSubscribeMoney(subscribeMoney)
 																 .setSubscribePoint(subscribePoint)
 																 .setBody("我要代言body")
-																 .setImage(ossImageId);
+																 .setCommissionRate(commissionRange);
 			RepresentDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
@@ -88,14 +75,6 @@ public class TestRepresnt {
 			if(id != 0){
 				RepresentDao.deleteByCond(mStaff, new RepresentDao.ExtraCond().setId(id));
 				Assert.assertTrue("failed to delete the represent", RepresentDao.getByCond(mStaff, new RepresentDao.ExtraCond().setId(id)).isEmpty());
-				if(ossImageId != 0){
-					try{
-						OssImageDao.getById(mStaff, ossImageId);
-						Assert.assertTrue("failed to delete oss image", false);
-					}catch(BusinessException e){
-						Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e.getErrCode());
-					}
-				}
 			}
 		}
 	}
@@ -194,7 +173,7 @@ public class TestRepresnt {
 			Assert.assertTrue("subscriber date to represent chain", Math.abs(System.currentTimeMillis() - actualChain.getSubscribeDate()) < 5000);
 			
 			//int fansAmount = RepresentChainDao.getByCond(mStaff, new RepresentChainDao.ExtraCond().setReferrerId(referrer.getId()).setOnlyAmount(true)).size();
-			Assert.assertEquals("fans to represent chain", referrer.getFansAmount(), actualReferrer.getFansAmount());
+			Assert.assertEquals("fans to represent chain", referrer.getFansAmount() + 1, actualReferrer.getFansAmount());
 			
 		}finally{
 			//Delete the represent chain.
@@ -203,18 +182,16 @@ public class TestRepresnt {
 
 	}
 	
-	private void compare(Represent expected, Represent actual) throws SQLException, BusinessException{
+	private void compare(Represent expected, Represent actual){
 		Assert.assertEquals("id", expected.getId(), actual.getId());
 		Assert.assertEquals("finish date", DateUtil.format(expected.getFinishDate()), DateUtil.format(actual.getFinishDate()));
+		Assert.assertEquals("body", expected.getBody(), actual.getBody());
 		Assert.assertEquals("title", expected.getTitle(), actual.getTitle());
 		Assert.assertEquals("slogon", expected.getSlogon(), actual.getSlogon());
 		Assert.assertEquals("recommend money", expected.getRecommentMoney(), actual.getRecommentMoney(), 0.01);
 		Assert.assertEquals("recommend point", expected.getRecommendPoint(), actual.getRecommendPoint());
 		Assert.assertEquals("subscribe money", expected.getSubscribeMoney(), actual.getSubscribeMoney(), 0.01);
 		Assert.assertEquals("subscribe point", expected.getSubscribePoint(), actual.getSubscribePoint());
-		if(expected.hasImage()){
-			Assert.assertEquals("image", OssImageDao.getById(mStaff, expected.getImage().getId()).getImage(), actual.getImage().getImage());
-		}
-		System.out.println(actual.getImage().getObjectKey());
+		Assert.assertEquals("commission range", expected.getComissionRate(), actual.getComissionRate(), 0.01);
 	}
 }
