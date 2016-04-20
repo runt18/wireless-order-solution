@@ -7,6 +7,13 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
+-- Add the field 'min_fans_amount' & 'max_fans_amount' to table 'member_cond'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_cond` 
+ADD COLUMN `min_fans_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `raw`,
+ADD COLUMN `max_fans_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `min_fans_amount`;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`represent`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`represent` ;
@@ -17,16 +24,16 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`represent` (
   `finish_date` DATETIME NULL COMMENT '',
   `title` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
   `slogon` VARCHAR(45) NULL DEFAULT NULL COMMENT '',
-  `body` VARCHAR(500) NULL COMMENT '',
+  `oss_image_id` INT NULL DEFAULT NULL COMMENT '',
   `recommend_point` INT NULL DEFAULT NULL COMMENT '',
   `recommend_money` FLOAT NULL DEFAULT NULL COMMENT '',
   `subscribe_point` INT NULL DEFAULT NULL COMMENT '',
   `subscribe_money` FLOAT NULL DEFAULT NULL COMMENT '',
+  `commission_rate` FLOAT NULL COMMENT '',
   PRIMARY KEY (`id`)  COMMENT '',
   INDEX `ix_restaurant_id` (`restaurant_id` ASC)  COMMENT '')
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`represent_chain`
@@ -59,6 +66,12 @@ DEFAULT CHARACTER SET = utf8;
 INSERT INTO `wireless_order_db`.`represent`
 (`restaurant_id`)
 SELECT id FROM `wireless_order_db`.`restaurant` WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Add the field 'total_commission' to table 'member'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member` 
+ADD COLUMN `total_commission` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `used_point`;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
