@@ -52,6 +52,8 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String maxCharge = request.getParameter("memberCondMaxCharge");
 		final String minFansAmount = request.getParameter("minFansAmount");
 		final String maxFansAmount = request.getParameter("maxFansAmount");
+		final String minCommissionAmount = request.getParameter("minCommissionAmount");
+		final String maxCommissionAmount = request.getParameter("maxCommissionAmount");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -75,6 +77,12 @@ public class OperateMemberCondAction extends DispatchAction{
 			if(minFansAmount != null && !minFansAmount.isEmpty() && maxFansAmount != null && !maxFansAmount.isEmpty()){
 				builder.setMinFansAmount(Integer.valueOf(minFansAmount));
 				builder.setMaxFansAmount(Integer.valueOf(maxFansAmount));
+			}
+			
+			//设置佣金总额
+			if(minCommissionAmount != null && !minCommissionAmount.isEmpty() && maxCommissionAmount != null && !maxCommissionAmount.isEmpty()){
+				builder.setMinCommissionAmount(Float.valueOf(minCommissionAmount));
+				builder.setMaxCommissionAmount(Float.valueOf(maxCommissionAmount));
 			}
 			
 			//会员类型
@@ -168,6 +176,8 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String maxCharge = request.getParameter("memberCondMaxCharge");
 		final String minFansAmount = request.getParameter("minFansAmount");
 		final String maxFansAmount = request.getParameter("maxFansAmount");
+		final String minCommissionAmount = request.getParameter("minCommissionAmount");
+		final String maxCommissionAmount = request.getParameter("maxCommissionAmount");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -247,6 +257,11 @@ public class OperateMemberCondAction extends DispatchAction{
 			//充值金额
 			if(minCharge != null && !minCharge.isEmpty() && maxCharge != null && !maxCharge.isEmpty()){
 				builder.setCharge(Float.parseFloat(minCharge), Float.parseFloat(maxCharge));
+			}
+			
+			//佣金总额
+			if(minCommissionAmount != null && !minCommissionAmount.isEmpty() && maxCommissionAmount != null && !maxCommissionAmount.isEmpty()){
+				builder.setCommissionRange(Float.valueOf(minCommissionAmount), Float.valueOf(maxCommissionAmount));
 			}
 			
 			MemberCondDao.update(staff, builder);

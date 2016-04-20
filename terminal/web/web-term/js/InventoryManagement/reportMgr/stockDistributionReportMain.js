@@ -265,9 +265,9 @@ Ext.onReady(function(){
 				} 
 			},*/
 			{
-			text : '搜索',
+			text : '刷新',
 			id : 'btnStockDistributionSearch',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var deptID = '';
 					

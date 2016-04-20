@@ -76,7 +76,7 @@ public class MemberCondDao {
 		sql = " INSERT INTO " + Params.dbName + ".member_cond" +
 			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date" +
 			  " ,min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance, min_last_consumption, max_last_consumption " +
-			  " ,min_charge, max_charge, sex, age, raw, min_fans_amount, max_fans_amount " + 
+			  " ,min_charge, max_charge, sex, age, raw, min_fans_amount, max_fans_amount, min_commission_amount, max_commission_amount " + 
 			  " ) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + cond.getName() + "'" + "," +
@@ -98,7 +98,9 @@ public class MemberCondDao {
 			  (!cond.getAges().isEmpty() ? "'" + cond.getAgesString() + "'" : " NULL ") + "," +
 			  (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL ") + "," +
 			  cond.getMinFansAmount() + "," + 
-			  cond.getMaxFansAmount() +
+			  cond.getMaxFansAmount() + "," + 
+			  cond.getMinCommissionAmount() + "," +
+			  cond.getMaxCommissionAmount() +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -168,6 +170,8 @@ public class MemberCondDao {
 			  (builder.isRawChanged() ? " ,raw = " + (cond.hasRaw() ? (cond.isRaw() ? "1" : "0") : " NULL"): "") +
 			  (builder.isFansChanged() ? " ,min_fans_amount = " + cond.getMinFansAmount() : "") +
 			  (builder.isFansChanged() ? " ,max_fans_amount = " + cond.getMaxFansAmount() : "") +
+			  (builder.isCommissionChanged() ? ",min_commission_amount = " + cond.getMinCommissionAmount() : "") +
+			  (builder.isCommissionChanged() ? ",max_commission_amount = " + cond.getMaxCommissionAmount() : "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -306,6 +310,8 @@ public class MemberCondDao {
 			memberCond.setMaxCharge(dbCon.rs.getFloat("max_charge"));
 			memberCond.setMaxFansAmount(dbCon.rs.getInt("max_fans_amount"));
 			memberCond.setMinFansAmount(dbCon.rs.getInt("min_fans_amount"));
+			memberCond.setMinCommissionAmount(dbCon.rs.getFloat("min_commission_amount"));
+			memberCond.setMaxCommissionAmount(dbCon.rs.getFloat("max_commission_amount"));
 			if(dbCon.rs.getInt("cond_sex") >= 0){
 				memberCond.setSex(Member.Sex.valueOf(dbCon.rs.getInt("sex")));
 			}

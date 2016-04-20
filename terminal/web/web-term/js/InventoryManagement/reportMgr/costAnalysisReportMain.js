@@ -52,9 +52,9 @@ Ext.onReady(function(){
             format: 'Y-m'
             //editable: false
 		},'->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearch',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var gs = costAnalyzeGrid.getStore();
 				gs.baseParams['beginDate'] = Ext.getCmp('car_beginDate').getValue().format('Y-m');

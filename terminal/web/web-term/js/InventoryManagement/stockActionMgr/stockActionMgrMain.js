@@ -120,6 +120,8 @@ function stockTaskNavHandler(e){
 					var oriStockDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
 					var comment = Ext.getCmp('txtCommentForStockActionBasic');
 					var actualPrice = Ext.getDom('txtActualPrice');
+					var stockTypeList = stockTaskNavWin.stockType.split(',');
+					var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
 					var detail = '';
 					if(!oriStockDate.getValue()){
 						if(oriStockDate.isValid()){
@@ -132,8 +134,10 @@ function stockTaskNavHandler(e){
 						return;
 					}
 					
-					var stockTypeList = stockTaskNavWin.stockType.split(',');
-					var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
+					if(stockSubType == 2){
+						console.log(1);
+					}
+					
 					if(stockType == 1){
 						if(stockSubType == 1){
 							if(!deptIn.isValid() || !supplier.isValid()){
@@ -269,6 +273,7 @@ function stockTaskNavHandler(e){
 					supplierDom.hide();
 					
 					deptOutDom.show();
+					Ext.getCmp('comboDeptOutForStockActionBasic').setValue(252);
 					if(document.getElementById('displayPanelForDeptOut')){
 						document.getElementById('displayPanelForDeptOut').style.display = 'block';
 					}
@@ -1259,9 +1264,9 @@ function initControl(){
 				//location.reload(false);
 			}
 		}, {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearchForStockBasicMsg',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(e){
 				var st = Ext.getCmp('comboSearchForStockType');
 				var cate = Ext.getCmp('sam_comboSearchForCateType');
@@ -1446,7 +1451,7 @@ function initControl(){
 		        		inputValue : [1,1,2],
 		        		name : 'radioStockOrderType',
 		        		hideLabel : true,
-		        		boxLabel : '商品调拨',
+		        		boxLabel : '商品调拨'
 		        	}, {
 		        		xtype : 'radio',
 		        		inputValue : [1,1,3],

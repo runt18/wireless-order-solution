@@ -357,9 +357,9 @@ Ext.onReady(function(){
 	    	hidden : true
 	    },
 	    '->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearch',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var sgs = supplierGrid.getStore();
 				sgs.baseParams['name'] = Ext.getCmp('findName').getValue();

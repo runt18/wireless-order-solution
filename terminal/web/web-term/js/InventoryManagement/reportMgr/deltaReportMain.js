@@ -217,9 +217,9 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '货品:'},
 		sDelta_materialComb,
 		'->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearch',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var sgs = deltaReportGrid.getStore();
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
