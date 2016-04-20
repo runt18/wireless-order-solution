@@ -380,8 +380,8 @@ $(function(){
 		if(foodPaging == null){
 			//菜品列表
 			var foodCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="food-style" data-index={dataIndex} data-value={id}>' +
-									'<div style="height: 70px;">{name}<br>￥{unitPrice}' +
-										'<div class="food-status-font {commonStatus}">' +
+									'<div style="height: 75%;">{name}<br>￥{unitPrice}' +
+										'<div class="food-status-font {commonStatus} style="height:25%;" >' +
 											'<font color="orange">{weigh}</font>' +
 											'<font color="blue">{currPrice}</font>' +
 											'<font color="FireBrick">{sellout}</font>' +

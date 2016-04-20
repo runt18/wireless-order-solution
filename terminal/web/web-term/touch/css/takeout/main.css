@@ -331,12 +331,13 @@ html { overflow-y: hidden;}
 	padding: initial;
 	text-align: left;
 	white-space: initial;
+	height:100%;
 }
 
 /*菜品显示特性字*/
 .food-status-font{
 	/* position:absolute; */
-	right:0;bottom:0;font-size:20px;
+	font-size:20px;
 }
 
 /*限量沽清*/
