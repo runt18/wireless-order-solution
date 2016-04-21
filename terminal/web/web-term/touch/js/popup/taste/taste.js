@@ -107,7 +107,7 @@ define(function(require, exports, module){
 				var start = 0;
 			}
 			
-			var foodGroupsLimit =  foodGroups.length > 7 ? 6 : 7;
+			var foodGroupsLimit =  foodGroups.length > 6 ? 5 : 6;
 			var limit = foodGroups.length >= start + foodGroupsLimit ? foodGroupsLimit :  foodGroupsLimit - (start + foodGroupsLimit - foodGroups.length);
 			
 			var html = [];
@@ -128,7 +128,7 @@ define(function(require, exports, module){
 				}
 			}
 			
-			if(foodGroups.length > 7){
+			if(foodGroups.length > 5){
 				html.push('<a id="previousPage_a_taste" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage">L</a>' +
 				'<a id="nextPage_a_taste" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage">R</a>');
 			}

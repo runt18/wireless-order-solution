@@ -627,7 +627,7 @@ html { overflow-y: hidden;}
 /*套菜组选择*/
 .comboFoodPopTopBtn{
 	margin-left: 2px !important;
-	width : 110px;
+	width : 90px;
 }
 .comboFoodPopTopBtn > span{
 	font-size: 15px !important;
