@@ -168,9 +168,9 @@ function initMaterialControl(){
 			xtype : 'textfield',
 			width : 100
 		}, '->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearchInitMaterial',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				if(isInit){
 					var sn = init_materialCateTree.getSelectionModel().getSelectedNode();

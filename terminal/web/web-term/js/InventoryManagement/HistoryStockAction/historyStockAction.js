@@ -653,9 +653,9 @@ Ext.onReady(function(){
 				     {xtype : 'textfield', id : 'oriStockId', width: 120},
 				     '->',
 				     {
-				    	 text : '搜索',
+				    	 text : '刷新',
 				    	 id : 'btnHistoryStockSearch',
-				    	 iconCls : 'btn_search',
+				    	 iconCls : 'btn_refresh',
 				    	 handler : function(e){
 				    		 var beginDate = Ext.getCmp('beginDate');
 				    		 var endDate = Ext.getCmp('endDate');

@@ -31,9 +31,21 @@ public class MemberCond implements Jsonable{
 		private boolean isRaw;
 		private int minFansAmount;
 		private int maxFansAmount;
+		private float minCommissionAmount;
+		private float maxCommissionAmount;
 		
 		public InsertBuilder(String name){
 			this.name = name;
+		}
+		
+		public InsertBuilder setMinCommissionAmount(float minCommissionAmount){
+			this.minCommissionAmount = minCommissionAmount;
+			return this;
+		}
+		
+		public InsertBuilder setMaxCommissionAmount(float maxComissionAmount){
+			this.maxCommissionAmount = maxComissionAmount;
+			return this;
 		}
 		
 		public InsertBuilder setLastConsumption(int min, int max){
@@ -153,9 +165,24 @@ public class MemberCond implements Jsonable{
 		private Boolean isRaw;
 		private Integer minFansAmount;
 		private Integer maxFansAmount;
+		private Float minCommissionAmount;
+		private Float maxCommissionAmount;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setCommissionRange(float min, float max){
+			if(max > 0 && max < min){
+				throw new IllegalArgumentException("最大佣金总额不能小雨最少佣金总额");
+			}
+			this.minCommissionAmount = min;
+			this.maxCommissionAmount = max;
+			return this;
+		}
+		
+		public boolean isCommissionChanged(){
+			return this.minCommissionAmount != null || this.maxCommissionAmount != null;
 		}
 		
 		public UpdateBuilder setFansRange(int min, int max){
@@ -376,6 +403,8 @@ public class MemberCond implements Jsonable{
 	private float maxCharge;
 	private int minFansAmount;
 	private int maxFansAmount;
+	private float minCommissionAmount;
+	private float maxCommissionAmount;
 	private Boolean isRaw;
 	
 	private MemberCond(UpdateBuilder builder){
@@ -396,6 +425,8 @@ public class MemberCond implements Jsonable{
 		setMaxCharge(builder.maxCharge != null ? builder.maxCharge : 0);
 		setMinFansAmount(builder.minFansAmount != null ? builder.minFansAmount : 0);
 		setMaxFansAmount(builder.maxFansAmount != null ? builder.maxFansAmount : 0);
+		setMinCommissionAmount(builder.minCommissionAmount != null ? builder.minCommissionAmount : 0);
+		setMaxCommissionAmount(builder.maxCommissionAmount != null ? builder.maxCommissionAmount : 0);
 		setSex(builder.sex);
 		setAges(builder.ages);
 		if(builder.isRaw != null){
@@ -423,11 +454,28 @@ public class MemberCond implements Jsonable{
 		setRaw(builder.isRaw);
 		setMinFansAmount(builder.minFansAmount);
 		setMaxFansAmount(builder.maxFansAmount);
-		
+		setMinCommissionAmount(builder.minCommissionAmount);
+		setMaxCommissionAmount(builder.maxCommissionAmount);
 	}
 	
 	public MemberCond(int id){
 		this.id = id;
+	}
+	
+	public void setMaxCommissionAmount(float max){
+		this.maxCommissionAmount = max;
+	}
+	
+	public float getMaxCommissionAmount(){
+		return this.maxCommissionAmount;
+	}
+	
+	public void setMinCommissionAmount(float min){
+		this.minCommissionAmount = min;
+	}
+	
+	public float getMinCommissionAmount(){
+		return this.minCommissionAmount;
 	}
 	
 	public void setMaxFansAmount(int max){
@@ -686,6 +734,9 @@ public class MemberCond implements Jsonable{
 			jm.putString("ageText", ageText.toString());
 			jm.putString("age", this.getAgesString());
 		}
+		
+		jm.putFloat("minCommissionAmount", this.minCommissionAmount);
+		jm.putFloat("maxCommissionAmount", this.maxCommissionAmount);
 		return jm;
 	}
 

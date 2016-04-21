@@ -179,9 +179,9 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '货品:'},
 		saleMaterial_materialComb,
 		'->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'saleMaterial_btnSearch',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				
 				if(!saleMaterial_materialComb.isValid()){

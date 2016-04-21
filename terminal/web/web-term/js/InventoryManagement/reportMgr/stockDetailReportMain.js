@@ -431,9 +431,9 @@ Ext.onReady(function(){
 		materialComb,
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		'->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'stockDetail_btnSearch',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var store = stockDetailReportGrid.getStore();
 				store.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m');

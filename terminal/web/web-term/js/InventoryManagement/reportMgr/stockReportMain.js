@@ -212,9 +212,9 @@ Ext.onReady(function(){
 		{ xtype:'tbtext', text:'部门:'},
 		deptComb,
 		'->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'search_btn_stockReport',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var cateType = '', cateId = '', materialId = '';
 				var sgs = stockReportGrid.getStore();

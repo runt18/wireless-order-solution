@@ -688,9 +688,9 @@ function initControl(){
 			id : 'txtSearchForMaterialName',
 			width : 100
 		}, '->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearchMaterial',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var sn = materialCateTree.getSelectionModel().getSelectedNode();
 				var name = Ext.getCmp('txtSearchForMaterialName');
@@ -834,9 +834,9 @@ var material_selectGoodTbar = new Ext.Toolbar({
 			id : 'material_goodName'
 		},'->',	 
 	{
-		text : '搜索',
+		text : '刷新',
 		id : 'material_btnSearchGood',
-		iconCls : 'btn_search',
+		iconCls : 'btn_refresh',
 		handler : function(){
 			var goodType = Ext.getCmp('material_goodCombo');
 			

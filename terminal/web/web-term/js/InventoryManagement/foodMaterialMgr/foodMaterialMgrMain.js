@@ -187,9 +187,9 @@ function initControl(){
 				}
 			}
 		}, '->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearchFood',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				var foodName = Ext.getCmp('txtFoodNameForSearch');
 				var node = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
@@ -360,9 +360,9 @@ function initControl(){
 				text : '&nbsp;&nbsp;'
 			}, '->',
 			{
-				text : '搜索',
+				text : '刷新',
 				id : 'btnSearchFoodMaterial',
-				iconCls : 'btn_search',
+				iconCls : 'btn_refresh',
 				handler : function(){
 					materialBasicGrid.getStore().load({
 						params : {restaurantID : restaurantID, name : Ext.getCmp('txtmaterialNameForSearch').getValue()}

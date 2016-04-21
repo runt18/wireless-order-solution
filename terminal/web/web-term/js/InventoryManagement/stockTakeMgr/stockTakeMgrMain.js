@@ -454,9 +454,9 @@ function initGrid(){
 	var stockTakeGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : ['->', {
-			text : '搜索',
+			text : '刷新',
 			id : 'btnSearchForStockTake',
-			iconCls : 'btn_search',
+			iconCls : 'btn_refresh',
 			handler : function(){
 				
 				var gs = stockTakeGrid.getStore();

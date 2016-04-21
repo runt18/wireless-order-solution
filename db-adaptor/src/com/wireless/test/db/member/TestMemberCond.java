@@ -45,7 +45,9 @@ public class TestMemberCond {
 																   .setCharge(5,  10)
 																   .setRaw(false)
 																   .setMinFansAmount(10)
-																   .setMaxFansAmount(20);
+																   .setMaxFansAmount(20)
+																   .setMinCommissionAmount(10)
+																   .setMaxCommissionAmount(20);
 			id = MemberCondDao.insert(mStaff, insertBuilder);
 			
 			MemberCond expected = insertBuilder.build();
@@ -146,5 +148,7 @@ public class TestMemberCond {
 		Assert.assertEquals("member condition raw", expected.isRaw(), actual.isRaw());
 		Assert.assertEquals("member condition minFansAmount", expected.getMinFansAmount(), actual.getMinFansAmount());
 		Assert.assertEquals("member condition maxFansAmount", expected.getMaxFansAmount(), actual.getMaxFansAmount());
+		Assert.assertEquals("member condition minCommissionAmount", expected.getMinCommissionAmount(), actual.getMinCommissionAmount(), 0.01);
+		Assert.assertEquals("member condition maxCommissionAmount", expected.getMaxCommissionAmount(), actual.getMaxCommissionAmount(), 0.01);
 	}
 }

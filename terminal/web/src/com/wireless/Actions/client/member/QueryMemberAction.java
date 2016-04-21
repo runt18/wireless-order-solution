@@ -126,6 +126,10 @@ public class QueryMemberAction extends DispatchAction {
 		final String minTotalMemberCost = request.getParameter("MinTotalMemberCost");
 		final String consumptionMinAmount = request.getParameter("consumptionMinAmount");
 		final String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
+		final String minFansAmount = request.getParameter("minFansAmount");
+		final String maxFansAmount = request.getParameter("maxFansAmount");
+		final String minCommissionAmount = request.getParameter("minCommissionAmount");
+		final String maxCommissionAmount = request.getParameter("maxCommissionAmount");
 		final String beginDate = request.getParameter("beginDate");
 		final String endDate = request.getParameter("endDate");
 		final String referrer = request.getParameter("referrer");
@@ -199,6 +203,14 @@ public class QueryMemberAction extends DispatchAction {
 				
 				if(branchId != null && !branchId.isEmpty()){
 					extraCond.setBranch(Integer.parseInt(branchId));
+				}
+				
+				if(minFansAmount != null && !minFansAmount.isEmpty() && maxFansAmount != null && !maxFansAmount.isEmpty()){
+					extraCond.setFansRange(Integer.valueOf(minFansAmount), Integer.valueOf(maxFansAmount));
+				}
+				
+				if(minCommissionAmount != null && !minCommissionAmount.isEmpty() && maxCommissionAmount != null && !maxCommissionAmount.isEmpty()){
+					extraCond.setCommissionRange(Float.valueOf(minCommissionAmount), Float.valueOf(maxCommissionAmount));
 				}
 				
 			}
@@ -488,6 +500,10 @@ public class QueryMemberAction extends DispatchAction {
 		final String memberCondMaxBalance = request.getParameter("memberCondMaxBalance");
 		final String memberCondBeginDate = request.getParameter("memberCondBeginDate");
 		final String memberCondEndDate = request.getParameter("memberCondEndDate");
+		final String memberCondMinFansAmount =request.getParameter("memberCondMinFansAmount");
+		final String memberCondMaxFansAmount =request.getParameter("memberCondMaxFansAmount");
+		final String memberCondMinCommission = request.getParameter("memberCondMinCommission");
+		final String memebrCondMaxCommission = request.getParameter("memberCondMaxCommission");
 		
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -531,6 +547,24 @@ public class QueryMemberAction extends DispatchAction {
 				memberCond.setMinBalance(minBalance);
 				memberCond.setMinConsumeAmount(minAmount);
 				memberCond.setMinConsumeMoney(minConsume);
+				
+				//粉丝数
+				if(memberCondMinFansAmount != null && !memberCondMinFansAmount.isEmpty()){
+					memberCond.setMinFansAmount(Integer.valueOf(memberCondMinFansAmount));
+				}
+				
+				if(memberCondMaxFansAmount != null && !memberCondMaxFansAmount.isEmpty()){
+					memberCond.setMaxFansAmount(Integer.valueOf(memberCondMaxFansAmount));
+				}
+				
+				//佣金总额
+				if(memberCondMinCommission != null && !memberCondMinCommission.isEmpty()){
+					memberCond.setMinCommissionAmount(Float.valueOf(memberCondMinCommission));
+				}
+				
+				if(memebrCondMaxCommission != null && !memebrCondMaxCommission.isEmpty()){
+					memberCond.setMaxCommissionAmount(Float.valueOf(memebrCondMaxCommission));
+				}
 			}
 			
 			

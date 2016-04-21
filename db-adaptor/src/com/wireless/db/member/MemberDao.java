@@ -145,6 +145,8 @@ public class MemberDao {
 		private Boolean isRaw;
 		private int minFansAmount;
 		private int maxFansAmount;
+		private float minCommissionAmount;
+		private float maxCommissionAmount;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -167,6 +169,8 @@ public class MemberDao {
 			this.ages.addAll(memberCond.getAges());
 			this.minFansAmount = memberCond.getMinFansAmount();
 			this.maxFansAmount = memberCond.getMaxFansAmount();
+			this.minCommissionAmount = memberCond.getMinCommissionAmount();
+			this.maxCommissionAmount = memberCond.getMaxCommissionAmount();
 		}
 		
 		public ExtraCond(ReqQueryMember.ExtraCond extraCond){
@@ -386,6 +390,12 @@ public class MemberDao {
 			return this;
 		}
 		
+		public ExtraCond setCommissionRange(float min, float max){
+			this.minCommissionAmount = min;
+			this.maxCommissionAmount = max;
+			return this;
+		}
+		
 		private String cond4Card(String card){
 			if(card != null){
 				String cardExcludeZero = card.replaceFirst("^(0+)", "");
@@ -574,6 +584,17 @@ public class MemberDao {
 					extraCond.append(" AND M.member_id IN (" + sql +")");
 				}
 				
+			}
+			
+			//设置佣金总额
+			if(minCommissionAmount > 0 || maxCommissionAmount > 0){
+				if(minCommissionAmount > 0 && maxCommissionAmount > 0){
+					extraCond.append(" AND M.total_commission BETWEEN " + minCommissionAmount + " AND " + maxCommissionAmount);
+				}else if (minCommissionAmount > 0 && maxCommissionAmount == 0){
+					extraCond.append(" AND M.total_commission >= " + minCommissionAmount);
+				}else if(minCommissionAmount == 0 && maxCommissionAmount > 0){
+					extraCond.append(" AND M.total_commission <= " + maxCommissionAmount);
+				}
 			}
 			
 			return extraCond.toString();

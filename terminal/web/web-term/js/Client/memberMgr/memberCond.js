@@ -96,6 +96,12 @@
 		
 		gs.baseParams['memberCondMinCharge'] = Ext.getCmp('memberMinCharge_numberField_memberCond').getValue();
 		gs.baseParams['memberCondMaxCharge'] = Ext.getCmp('memberMaxCharge_numberField_memberCond').getValue();
+		
+		gs.baseParams['memberCondMaxFansAmount'] = Ext.getCmp('showFansAmountMax_numberfield_memberCond').getValue();
+		gs.baseParams['memberCondMinFansAmount'] = Ext.getCmp('showFansAmountMin_numberfield_memberCond').getValue();
+		
+		gs.baseParams['memberCondMinCommission'] = Ext.getCmp('showCommissionMin_numberfield_memberCond').getValue();
+		gs.baseParams['memberCondMaxCommission'] = Ext.getCmp('showCommissionMax_numberfield_memberCond').getValue();
 			
 		if(c && c.searchByCond){
 			gs.baseParams['memberCondId'] = c.searchByCond;
@@ -469,7 +475,6 @@
 		    			return;
 		    		}
 		    		
-		    		queryMembersByCond({searchByCond:e.id});
 		    		Ext.getDom('memberCondName').innerHTML = e.text;
 		    		
 		    		clickTree = e.text;
@@ -508,6 +513,23 @@
 		    		    		}
 		    		    		Ext.getCmp('showFansAmountMax_numberfield_memberCond').setValue(maxFansAmount > 0 ? maxFansAmount : '');
 		    		    		Ext.getCmp('showFansAmountMin_numberfield_memberCond').setValue(minFansAmount > 0 ? minFansAmount : '');
+		    		    		Ext.getCmp('showFansAmountConfig_combo_memberCond').fireEvent('select');
+		    		    		
+		    		    		var maxCommissionAmount = jr.root[0].maxCommissionAmount;
+		    		    		var minCommissionAmount = jr.root[0].minCommissionAmount;
+		    		    		if(maxCommissionAmount > 0 && minCommissionAmount > 0){
+		    		    			Ext.getCmp('showCommissionConfig_combo_memberCond').setValue('between');
+		    		    		}else if(maxCommissionAmount > 0 && minCommissionAmount <= 0){
+		    		    			Ext.getCmp('showCommissionConfig_combo_memberCond').setValue('max');
+		    		    		}else if(maxCommissionAmount <= 0 && minCommissionAmount > 0){
+		    		    			Ext.getCmp('showCommissionConfig_combo_memberCond').setValue('min');
+		    		    		}else{
+		    		    			Ext.getCmp('showCommissionConfig_combo_memberCond').setValue('null');
+		    		    		}
+		    		    		Ext.getCmp('showCommissionMax_numberfield_memberCond').setValue(maxCommissionAmount > 0 ? maxCommissionAmount : '');
+		    		    		Ext.getCmp('showCommissionMin_numberfield_memberCond').setValue(minCommissionAmount > 0 ? minCommissionAmount : '');
+		    		    		
+		    		    		Ext.getCmp('showCommissionConfig_combo_memberCond').fireEvent('select');
 		    		    		
 		    		    		if(typeof jr.root[0].isRaw == 'undefined'){
 		    		    			Ext.getDom('isBind_tbtext_memberCond').innerHTML  = '无设定';
@@ -598,6 +620,8 @@
 	    		    			
 			    				//会员类型
 			    				Ext.getCmp('memberType_combo_memberCond').setValue(jr.root[0].memberType ? jr.root[0].memberType : -1);
+			    				
+			    				queryMembersByCond({searchByCond:e.id});
 		    				}else{
 		    					Ext.ux.showMsg(jr);
 		    				}
@@ -632,7 +656,7 @@
 		});
 		var member_dateCombo = Ext.ux.createDateCombo({
 			width : 75,
-			disabled : true,
+			disabled : false,
 			data : [[3, '近一个月'], [12, '近二个月'], [4, '近三个月'], [9, '近半年']],
 			beginDate : member_beginDate,
 			endDate : member_endDate
@@ -954,6 +978,62 @@
 					id : 'maxBalance_numField_memberCond',
 					disabled : true,
 					width : 50
+				},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+				{
+					xtype : 'label',
+					text : '佣金总额:'
+				},
+				{	
+					xtype : 'combo',
+					store : new Ext.data.SimpleStore({
+						fields : ['value', 'text'],
+						data : [['max', '小于'], ['min', '大于'], ['between', '介于'], ['null', '无设定']]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					id : 'showCommissionConfig_combo_memberCond',
+					disabled : true,
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					width: 80,
+					listeners : {
+						select : function(){
+							if(Ext.getCmp('showCommissionConfig_combo_memberCond').getValue() == 'null'){
+								Ext.getCmp('showCommissionMin_numberfield_memberCond').hide();
+								Ext.getCmp('showCommissionMax_numberfield_memberCond').hide();
+								Ext.getCmp('showCommissionLabel_label_memberCond').hide();
+							}else if(Ext.getCmp('fansAmount_combo_memberCond').getValue() == 'min'){
+								Ext.getCmp('showCommissionMin_numberfield_memberCond').show();
+								Ext.getCmp('showCommissionMax_numberfield_memberCond').hide();
+								Ext.getCmp('showCommissionLabel_label_memberCond').hide();
+							}else if(Ext.getCmp('showCommissionConfig_combo_memberCond').getValue() == 'max'){
+								Ext.getCmp('showCommissionMin_numberfield_memberCond').hide();
+								Ext.getCmp('showCommissionMax_numberfield_memberCond').show();
+								Ext.getCmp('showCommissionLabel_label_memberCond').hide();
+							}else{
+								Ext.getCmp('showCommissionMin_numberfield_memberCond').show();
+								Ext.getCmp('showCommissionMax_numberfield_memberCond').show();
+								Ext.getCmp('showCommissionLabel_label_memberCond').show();
+							}
+						}					
+					}
+				},
+				{
+					id : 'showCommissionMin_numberfield_memberCond',
+					xtype : 'numberfield',
+					width: 50,
+					disabled : true
+				},{
+					xtype : 'label',
+					text : '-',
+					id : 'showCommissionLabel_label_memberCond'
+				},{
+					id : 'showCommissionMax_numberfield_memberCond',
+					xtype : 'numberfield',
+					width : 50,
+					disabled : true
 				}]
 			
 		});	
@@ -1024,7 +1104,7 @@
 						xtype : 'label',
 						text : '粉丝数:'
 					},
-					{	//TODO
+					{	
 						xtype : 'combo',
 						store : new Ext.data.SimpleStore({
 							fields : ['value', 'text'],
@@ -1037,7 +1117,28 @@
 						typeAhead : true,
 						mode : 'local',
 						triggerAction : 'all',
-						width: 80
+						width: 80,
+						listeners : {
+						select : function(){
+							if(Ext.getCmp('showFansAmountConfig_combo_memberCond').getValue() == 'null'){
+								Ext.getCmp('showFansAmountMin_numberfield_memberCond').hide();
+								Ext.getCmp('showFansAmountMax_numberfield_memberCond').hide();
+								Ext.getCmp('showFansAmountLabel_label_memberCond').hide();
+							}else if(Ext.getCmp('showFansAmountConfig_combo_memberCond').getValue() == 'min'){
+								Ext.getCmp('showFansAmountMin_numberfield_memberCond').show();
+								Ext.getCmp('showFansAmountMax_numberfield_memberCond').hide();
+								Ext.getCmp('showFansAmountLabel_label_memberCond').hide();
+							}else if(Ext.getCmp('showFansAmountConfig_combo_memberCond').getValue() == 'max'){
+								Ext.getCmp('showFansAmountMin_numberfield_memberCond').hide();
+								Ext.getCmp('showFansAmountMax_numberfield_memberCond').show();
+								Ext.getCmp('showFansAmountLabel_label_memberCond').hide();
+							}else{
+								Ext.getCmp('showFansAmountMin_numberfield_memberCond').show();
+								Ext.getCmp('showFansAmountMax_numberfield_memberCond').show();
+								Ext.getCmp('showFansAmountLabel_label_memberCond').show();
+							}
+						}					
+					}
 					},
 					{
 						id : 'showFansAmountMin_numberfield_memberCond',
@@ -1046,7 +1147,8 @@
 						disabled : true
 					},{
 						xtype : 'label',
-						text : '-'
+						text : '-',
+						id : 'showFansAmountLabel_label_memberCond'
 					},{
 						id : 'showFansAmountMax_numberfield_memberCond',
 						xtype : 'numberfield',
@@ -1089,7 +1191,7 @@
 		memberCondBasicGrid.loadMask = { msg : '数据加载中，请稍等...' };
 		
 		memberCondBasicGrid.on('rowdblclick', function(e){
-			updateMemberHandler();
+//			updateMemberHandler();
 		});
 		
 		memberCondBasicGrid.keys = [{
@@ -1106,6 +1208,8 @@
  * @param data
  */
 	function showMemberCondWin(data){
+		memberCondWin.show();
+		
 		data = data || {};
 		//修改时候显示会员原来设置的条件
 		Ext.getCmp('condId_hidden_memberCond').setValue(data.id);
@@ -1131,6 +1235,20 @@
 		Ext.getCmp('fansAmount_combo_memberCond').fireEvent('select');
 		Ext.getCmp('fansAmountMin_numberField_memberCond').setValue(data.minFansAmount > 0 ? data.minFansAmount : '');
 		Ext.getCmp('fansAmountMax_numberField_memberCond').setValue(data.maxFansAmount > 0 ? data.maxFansAmount : '');
+		
+		//佣金总额
+		if(data.maxCommissionAmount > 0 && data.minCommissionAmount > 0){
+			Ext.getCmp('commissionAmount_combo_memberCond').setValue('between');
+		}else if(data.maxCommissionAmount > 0 && data.minCommissionAmount <= 0){
+			Ext.getCmp('commissionAmount_combo_memberCond').setValue('max');
+		}else if(data.maxCommissionAmount <= 0 && data.minCommissionAmount > 0){
+			Ext.getCmp('commissionAmount_combo_memberCond').setValue('min');
+		}else{
+			Ext.getCmp('commissionAmount_combo_memberCond').setValue('null');
+		}
+		Ext.getCmp('commissionAmount_combo_memberCond').fireEvent('select');
+		Ext.getCmp('commissionAmountMin_numberField_memberCond').setValue(data.minCommissionAmount > 0 ? data.minCommissionAmount : '');
+		Ext.getCmp('commissionAmountMax_numberField_memberCond').setValue(data.maxCommissionAmount > 0 ? data.maxCommissionAmount : '');
 		
 		if(data.rangeType == null){
 			Ext.getCmp('memberCondDateRegion').setValue(null);
@@ -1259,7 +1377,6 @@
 			Ext.getCmp('memberCondEndDate').disable();	
 		}
 		
-		memberCondWin.show();
 		Ext.getCmp('txtMemberCondName').focus(true, 100);
 		
 	}
@@ -1532,6 +1649,78 @@
 			columnWidth : 0.3,
 			xtype : 'numberfield',
 			id : 'fansAmountMax_numberField_memberCond'
+		},{
+			columnWidth : 1,
+			style :'margin-bottom:5px;',
+			border : false		
+		}, {
+			columnWidth : 0.2,
+			xtype : 'label',
+			text : '佣金总额:'
+		},{
+			columnWidth : 0.2,
+			id : 'commissionAmount_combo_memberCond',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text']
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					thiz.store.loadData([['min', '大于'], ['max', '小于'], ['between', '介于'], ['null', '无设定']]);
+					thiz.setValue('null');
+					thiz.fireEvent('select');
+				},
+				select : function(){
+					if(Ext.getCmp('commissionAmount_combo_memberCond').getValue() == 'null'){
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').show();
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').show();
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').disable();
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').disable();
+						Ext.getCmp('commissionAmount_label_memberCond').show();
+					}else if(Ext.getCmp('commissionAmount_combo_memberCond').getValue() == 'min'){
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').enable();
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').show();
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').hide();
+						Ext.getCmp('commissionAmount_label_memberCond').hide();
+					}else if(Ext.getCmp('commissionAmount_combo_memberCond').getValue() == 'max'){
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').enable();
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').hide();
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').show();
+						Ext.getCmp('commissionAmount_label_memberCond').hide();
+					}else{
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').enable();
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').enable();
+						Ext.getCmp('commissionAmountMin_numberField_memberCond').show();
+						Ext.getCmp('commissionAmountMax_numberField_memberCond').show();
+						Ext.getCmp('commissionAmount_label_memberCond').show();
+					}
+					
+					Ext.getCmp('commissionAmountMin_numberField_memberCond').setValue('');
+					Ext.getCmp('commissionAmountMax_numberField_memberCond').setValue('');
+					
+				}
+			}
+		},{
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'commissionAmountMin_numberField_memberCond'
+		},{
+			xtype : 'label',
+			text : '~',
+			id : 'commissionAmount_label_memberCond'
+		},{
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'commissionAmountMax_numberField_memberCond'
 		},{
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
@@ -1812,6 +2001,24 @@
 					maxCharge = 0;
 				}
 				
+				var commissionConfig = Ext.getCmp('commissionAmount_combo_memberCond').getValue();
+				var minCommissionAmount = Ext.getCmp('commissionAmountMin_numberField_memberCond').getValue();
+				var maxCommissionAmount = Ext.getCmp('commissionAmountMax_numberField_memberCond').getValue();
+				var minCommission;
+				var maxCommission;
+				if(commissionConfig == 'min'){
+					minCommission = minFansAmount;
+					maxCommission = 0;
+				}else if(commissionConfig == 'max'){
+					minCommission = 0;
+					maxCommission = maxFansAmount;
+				}else if(commissionConfig == 'between'){
+					minCommission = minCommissionAmount;
+					maxCommission = maxCommissionAmount;
+				}else{
+					minCommission = 0;
+					maxCommission = 0;
+				}
 				
 				
 				var minCost4CondWin = Ext.getCmp('minCost4CondWin').getValue();
@@ -1870,6 +2077,9 @@
 				}else if(setFansConfig == 'between'){
 					fansMinData = minFansAmount;
 					fansMaxData = maxFansAmount;
+				}else{
+					fansMinDate = 0;
+					fansMaxData = 0;
 				}
 				
 				
@@ -1951,7 +2161,9 @@
 						memberCondMaxCharge : maxCharge,
 						isRaw : isRaw,
 						minFansAmount : fansMinData,
-						maxFansAmount : fansMaxData
+						maxFansAmount : fansMaxData,
+						minCommissionAmount : minCommission,
+						maxCommissionAmount : maxCommission
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);
