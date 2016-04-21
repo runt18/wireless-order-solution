@@ -102,6 +102,7 @@ Ext.onReady(function(){
 	
 	//优惠券类型的选择
 	var coupon = new Ext.form.ComboBox({
+		id : 'coupon_combo_couponStatistics',
 		readOnly : false,
 		forceSelection : true,
 		width : 103,

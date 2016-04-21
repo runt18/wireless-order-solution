@@ -92,6 +92,14 @@ Ext.ux.initTimeBar = function(c){
 				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
 			]
 		});
+	}else if(c.tbarType == 2){//只返回日期栏
+		timeBar = [
+				{xtype:'tbtext',text:'&nbsp;日期:'}, c.dateCombo, 
+			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
+			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+				];
+	
 	}else{ //返回包含时间工具栏的数组用于拼接
 		timeBar = [
 				{xtype:'tbtext',text:'日期:'}, c.dateCombo, 
