@@ -250,11 +250,17 @@ function repaid_initNorthPanel(){
 						if(thiz.getValue() == 100){
 							if(Ext.getCmp('repaid_mixedPayTypePanel').hasCheckbox){
 								Ext.getCmp('repaid_mixedPayTypePanel').show();
+								Ext.getCmp('repaid_mixedPayTypePanel2').show();
 							}else{
+								dishesOrderNorthPanel.setHeight(82);
+								dishesOrderNorthPanel.doLayout();
 								initPaytypeCheckboxs();
 							}
 						}else{
 							Ext.getCmp('repaid_mixedPayTypePanel').hide();
+							Ext.getCmp('repaid_mixedPayTypePanel2').hide();
+							dishesOrderNorthPanel.setHeight(62);
+							dishesOrderNorthPanel.doLayout();
 						}
 					}
 				}				
@@ -262,6 +268,12 @@ function repaid_initNorthPanel(){
 		},  {
 			columnWidth : 0.7,
 			id : 'repaid_mixedPayTypePanel',
+			items : []
+		}, {
+			columnWidth : 1
+		}, {
+			columnWidth : .7,
+			id : 'repaid_mixedPayTypePanel2',
 			items : []
 		}]
 	});
@@ -332,7 +344,7 @@ function memberRepaid(){
 		});
 	}
 	bindMemberWin.show();
-}
+}	
 
 function initPaytypeCheckboxs(){
 	for (var i = 0; i < repaid_payType.length; i++) {
@@ -347,65 +359,130 @@ function initPaytypeCheckboxs(){
 				html : '&nbsp;'
 			});				
 		}
-		Ext.getCmp('repaid_mixedPayTypePanel').add({
-			width : (repaid_payType[i].name.length * 25),
- 	    	xtype : 'checkbox',
- 	    	id : checkBoxId,
- 	    	inputValue : repaid_payType[i].id,
- 	    	relativePrice : numberfieldId,
- 	    	boxLabel : repaid_payType[i].name + ':',
- 	    	listeners : {
- 	    		check : function(checkbox, checked){
- 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
-					if(checked){
-						payMoneyCalc[checkbox.relativePrice] = true;
-						
-	 	    			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
-	 	    			for(var pay in payMoneyCalc){
-	 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
-	 	    					mixedPayMoney -= payMoneyCalc[pay];
-	 	    				}
+		
+		if(i >= 4){
+			Ext.getCmp('repaid_mixedPayTypePanel2').add({
+				width : (repaid_payType[i].name.length * 25),
+	 	    	xtype : 'checkbox',
+	 	    	id : checkBoxId,
+	 	    	inputValue : repaid_payType[i].id,
+	 	    	relativePrice : numberfieldId,
+	 	    	boxLabel : repaid_payType[i].name + ':',
+	 	    	listeners : {
+	 	    		check : function(checkbox, checked){
+	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
+						if(checked){
+							payMoneyCalc[checkbox.relativePrice] = true;
+							
+		 	    			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
+		 	    			for(var pay in payMoneyCalc){
+		 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
+		 	    					mixedPayMoney -= payMoneyCalc[pay];
+		 	    				}
+		 	    			}
+		 	    			numForAlias.setValue(mixedPayMoney < 0? 0 : mixedPayMoney);							
+							
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}else{
+							payMoneyCalc[checkbox.relativePrice] = false;
+							
+							numForAlias.disable();
+							numForAlias.setValue();		
+							numForAlias.clearInvalid();
+						}
+					},
+					//解决第一次点击无效
+					focus : function(thiz){
+						var numForAlias = Ext.getCmp(thiz.relativePrice);
+						if(document.getElementById(thiz.id).checked){
+							numForAlias.disable();
+						}else{
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}
+					}
+	 	    	}
+		 	});				
+			 	
+			Ext.getCmp('repaid_mixedPayTypePanel2').add({
+				xtype : 'numberfield',
+				id : numberfieldId,
+				disabled : true,
+				width : 70,
+				minValue : 0,
+	 	    	listeners : {
+	 	    		blur : function(thiz){
+	 	    			if(thiz.getValue()){
+	 	    				payMoneyCalc[thiz.id] = thiz.getValue();
 	 	    			}
-	 	    			numForAlias.setValue(mixedPayMoney < 0? 0 : mixedPayMoney);							
-						
-						numForAlias.enable();
-						numForAlias.focus(true, 100);
-					}else{
-						payMoneyCalc[checkbox.relativePrice] = false;
-						
-						numForAlias.disable();
-						numForAlias.setValue();		
-						numForAlias.clearInvalid();
+	 	    		}
+	 	    	}
+			});			 	
+		}else{
+			Ext.getCmp('repaid_mixedPayTypePanel').add({
+				width : (repaid_payType[i].name.length * 25),
+	 	    	xtype : 'checkbox',
+	 	    	id : checkBoxId,
+	 	    	inputValue : repaid_payType[i].id,
+	 	    	relativePrice : numberfieldId,
+	 	    	boxLabel : repaid_payType[i].name + ':',
+	 	    	listeners : {
+	 	    		check : function(checkbox, checked){
+	 	    			var numForAlias = Ext.getCmp(checkbox.relativePrice);
+						if(checked){
+							payMoneyCalc[checkbox.relativePrice] = true;
+							
+		 	    			var mixedPayMoney = primaryOrderData.other.order.actualPrice;
+		 	    			for(var pay in payMoneyCalc){
+		 	    				if(typeof payMoneyCalc[pay] != 'boolean'){
+		 	    					mixedPayMoney -= payMoneyCalc[pay];
+		 	    				}
+		 	    			}
+		 	    			numForAlias.setValue(mixedPayMoney < 0? 0 : mixedPayMoney);							
+							
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}else{
+							payMoneyCalc[checkbox.relativePrice] = false;
+							
+							numForAlias.disable();
+							numForAlias.setValue();		
+							numForAlias.clearInvalid();
+						}
+					},
+					//解决第一次点击无效
+					focus : function(thiz){
+						var numForAlias = Ext.getCmp(thiz.relativePrice);
+						if(document.getElementById(thiz.id).checked){
+							numForAlias.disable();
+						}else{
+							numForAlias.enable();
+							numForAlias.focus(true, 100);
+						}
 					}
-				},
-				//解决第一次点击无效
-				focus : function(thiz){
-					var numForAlias = Ext.getCmp(thiz.relativePrice);
-					if(document.getElementById(thiz.id).checked){
-						numForAlias.disable();
-					}else{
-						numForAlias.enable();
-						numForAlias.focus(true, 100);
-					}
-				}
- 	    	}
-	 	});				
-	 	
-		Ext.getCmp('repaid_mixedPayTypePanel').add({
-			xtype : 'numberfield',
-			id : numberfieldId,
-			disabled : true,
-			width : 70,
-			minValue : 0,
- 	    	listeners : {
- 	    		blur : function(thiz){
- 	    			if(thiz.getValue()){
- 	    				payMoneyCalc[thiz.id] = thiz.getValue();
- 	    			}
- 	    		}
- 	    	}
-		});			 	
+	 	    	}
+		 	});				
+		 	
+			Ext.getCmp('repaid_mixedPayTypePanel').add({
+				xtype : 'numberfield',
+				id : numberfieldId,
+				disabled : true,
+				width : 70,
+				minValue : 0,
+	 	    	listeners : {
+	 	    		blur : function(thiz){
+	 	    			if(thiz.getValue()){
+	 	    				payMoneyCalc[thiz.id] = thiz.getValue();
+	 	    			}
+	 	    		}
+	 	    	}
+			});			 	
+		}
 	}
+		
+	Ext.getCmp('repaid_mixedPayTypePanel2').doLayout();
+	Ext.getCmp('repaid_mixedPayTypePanel2').hasCheckbox = true;
 	Ext.getCmp('repaid_mixedPayTypePanel').doLayout();
 	Ext.getCmp('repaid_mixedPayTypePanel').hasCheckbox = true;
 }
