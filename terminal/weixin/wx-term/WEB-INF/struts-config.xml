@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/WxOperateRepresent"
+			type="com.wireless.Actions.weixin.represent.WxOperateRepresentAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/WxNotifyMember"
 			type="com.wireless.Actions.weixin.query.WxNotifyMemberAction" scope="request"
 			parameter="dataSource">
@@ -104,8 +108,8 @@
 			parameter="dataSource">
 		</action>
 		<action path="/WxOperateWaiter"
-			type="com.wireless.Actions.weixin.waiter.WxOperateWaiterAction" scope="request"
-			parameter="dataSource">
+			type="com.wireless.Actions.weixin.waiter.WxOperateWaiterAction"
+			scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
