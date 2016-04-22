@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.QuerySellOutTask;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
 import com.wireless.pojo.menuMgr.DepartmentTree;
@@ -89,6 +91,9 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private TextView mCurrentPageText;
 	private EditText mSearchEditText;
 	private OnTextListChangedListener mOnTextListChangeListener;
+	private DepartmentTree mDeptTree; 
+	//更新估清菜品Task
+	private QuerySellOutTask sellOutTask;
 	
 	protected int mCurrentPosition;
 
@@ -102,7 +107,7 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View layout = inflater.inflate(R.layout.fragment_text_list, null);
+		View layout = inflater.inflate(R.layout.fragment_text_list, container, false);
 		
 		Bundle args = getArguments();
 		
@@ -113,7 +118,8 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 //    	}
 		//notifyDataSetChanged(srcFoods);		
 		DepartmentTreeParcel deptTreeParcel = args.getParcelable(DepartmentTreeParcel.KEY_VALUE);
-		notifyDataSetChanged(deptTreeParcel.asDeptTree());
+		this.mDeptTree = deptTreeParcel.asDeptTree();
+		notifyDataSetChanged(mDeptTree);
 		
     	mViewPager = (ViewPager) layout.findViewById(R.id.viewPager_TextListFgm);
         mViewPager.setOffscreenPageLimit(0);
@@ -123,6 +129,42 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 			@Override
 			public void onPageSelected(int position) {
 				if(mCurrentPosition != position){
+					
+					//更新估清菜品的状态
+					if(sellOutTask == null || sellOutTask.getStatus() == AsyncTask.Status.FINISHED){
+						sellOutTask = new QuerySellOutTask(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods) {
+							
+							@Override
+							public void onSuccess(List<Food> sellOutFoods) {
+								List<Food> foods = mDeptTree.asFoodList();
+								for(Food f : foods){
+									f.setSellOut(false);
+									f.setLimit(false);
+									f.setLimitAmount(0);
+									f.setLimitRemaing(0);
+								}
+								
+								for(Food sellOut : sellOutFoods){
+									int index = foods.indexOf(sellOut);
+									if(index >= 0){
+										foods.get(index).setStatus(sellOut.getStatus());
+										foods.get(index).setStatus(sellOut.getStatus());
+										if(foods.get(index).isLimit()){
+											foods.get(index).setLimitAmount(sellOut.getLimitAmount());
+											foods.get(index).setLimitRemaing(sellOut.getLimitRemaing());
+										}
+									}
+								}
+							}
+							
+							@Override
+							public void onFail(BusinessException arg0) {
+								
+							}
+						};
+						sellOutTask.execute();
+					}
+					
 					refreshDisplay(position);
 					mCurrentPosition = position;
 					

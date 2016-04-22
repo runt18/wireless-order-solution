@@ -432,15 +432,15 @@ public class MainActivity extends Activity
 			if(mCurrentView != VIEW_TEXT_LIST){
 				
 				if(textFgm == null){
-					//过滤已沽清的菜品
-					List<Food> foods = new ArrayList<Food>();
-					for(Food f : WirelessOrder.foodMenu.foods){
-						if(!f.isSellOut()){
-							foods.add(f);
-						}
-					}
+//					//过滤已沽清的菜品
+//					List<Food> foods = new ArrayList<Food>();
+//					for(Food f : WirelessOrder.foodMenu.foods){
+//						if(!f.isSellOut()){
+//							foods.add(f);
+//						}
+//					}
 					//创建TextListFragment的实例
-					textFgm = TextListFragment.newInstance(new FoodList(foods).asDeptTree());
+					textFgm = TextListFragment.newInstance(new FoodList(WirelessOrder.foodMenu.foods).asDeptTree());
 					getFragmentManager().beginTransaction().add(R.id.frameLayout_main_viewPager_container, textFgm, TAG_TEXT_LIST_FRAGMENT).commit();
 					
 				}else{

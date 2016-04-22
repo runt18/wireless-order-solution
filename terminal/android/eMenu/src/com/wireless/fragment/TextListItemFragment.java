@@ -109,7 +109,7 @@ public class TextListItemFragment extends ListFragment {
 	 * 设置高亮的菜品，将对应的list项高亮
 	 * @param food
 	 */
-	public void setHighLightedByFood(Food food){
+	void setHighLightedByFood(Food food){
 		getListView().requestFocusFromTouch();
 		
 		SubListAdapter adapter = (SubListAdapter) this.getListAdapter();
@@ -169,8 +169,7 @@ class SubListAdapter extends BaseAdapter{
 			if(i >= rightList.size()){
 				mItems.add(new ListItem(leftList.get(i)));
 			}else{
-				mItems.add(new ListItem(leftList.get(i),
-									    rightList.get(i)));
+				mItems.add(new ListItem(leftList.get(i), rightList.get(i)));
 			}
 		}
 		this.mImageFetcher = fetcher;
@@ -203,6 +202,12 @@ class SubListAdapter extends BaseAdapter{
 				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText("多单位");
 			}else{
 				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price1)).setText(NumericUtil.float2String2(leftFood.getPrice()));
+			}
+			//是否停售
+			if(leftFood.isSellOut()){
+				layout.findViewById(R.id.imageView_sellOut_foodListFgm_subItem_left).setVisibility(View.VISIBLE);
+			}else{
+				layout.findViewById(R.id.imageView_sellOut_foodListFgm_subItem_left).setVisibility(View.GONE);
 			}
 			//点菜按钮
 			Button addBtnLeft = (Button)layout.findViewById(R.id.button_foodListFgm_item_subItem_add1);
@@ -263,6 +268,14 @@ class SubListAdapter extends BaseAdapter{
 			}else{
 				((TextView)layout.findViewById(R.id.textView_foodListFgm_item_subItem_price2)).setText(NumericUtil.float2String2(foodRight.getPrice()));
 			}
+			
+			//是否停售
+			if(foodRight.isSellOut()){
+				layout.findViewById(R.id.imageView_sellOut_foodListFgm_subItem_right).setVisibility(View.VISIBLE);
+			}else{
+				layout.findViewById(R.id.imageView_sellOut_foodListFgm_subItem_right).setVisibility(View.GONE);
+			}
+			
 			Button addBtnRight  = (Button) layout.findViewById(R.id.button_foodListFgm_item_subItem_add2);
 			addBtnRight.setOnClickListener(new OnClickListener() {
 				@Override

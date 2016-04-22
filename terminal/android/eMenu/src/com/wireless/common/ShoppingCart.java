@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -14,6 +11,9 @@ import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 
 public final class ShoppingCart {
 	
@@ -203,6 +203,12 @@ public final class ShoppingCart {
 			throw new BusinessException("您还未设置服务员，暂时不能提交");
 		}else if(!hasOrder()){
 			throw new BusinessException("您还未点菜，暂时不能提交");
+		}else if(hasNewOrder()){
+			for(OrderFood newFood : mNewOrder.getOrderFoods()){
+				if(newFood.asFood().isSellOut()){
+					throw new BusinessException("【" + newFood.asFood().getName() + "】已经估清，请删除后再提交");
+				}
+			}
 		}
 	}
 	
@@ -284,9 +290,15 @@ public final class ShoppingCart {
 	 * @param fooodToAdd
 	 *            要添加的菜品
 	 * @throws BusinessException
-	 * 				throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
+	 * 				throws if any cases below
+	 *  			<li>order amount of the added food exceed MAX_ORDER_AMOUNT
+	 *  			<li>the food to add has been sold out
 	 */
 	public void addFood(OrderFood foodToAdd) throws BusinessException{
+		if(foodToAdd.asFood().isSellOut()){
+			throw new BusinessException("对不起，" + foodToAdd.asFood().getName() + "已经售完!!!");
+		}
+		
 		if(mNewOrder == null){
 			mNewOrder = new Order();
 		}
@@ -406,6 +418,7 @@ public final class ShoppingCart {
 		mDestTable = table;
 		if(table != null){
 			new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, new Table.Builder(table.getId())){
+				
 				@Override
 				public void onSuccess(Order order){
 					setOriOrder(order);

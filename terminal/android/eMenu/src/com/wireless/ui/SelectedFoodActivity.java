@@ -6,6 +6,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wireless.common.ShoppingCart;
+import com.wireless.common.ShoppingCart.OnCartChangedListener;
+import com.wireless.common.ShoppingCart.OnCommitListener;
+import com.wireless.common.ShoppingCart.OnPayListener;
+import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
+import com.wireless.fragment.PickTasteFragment;
+import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
+import com.wireless.ordermenu.R;
+import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.util.SearchFoodHandler;
+import com.wireless.util.SearchFoodHandler.OnFoodAddListener;
+import com.wireless.util.imgFetcher.ImageFetcher;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -32,26 +53,6 @@ import android.widget.ImageView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.wireless.common.ShoppingCart;
-import com.wireless.common.ShoppingCart.OnCartChangedListener;
-import com.wireless.common.ShoppingCart.OnCommitListener;
-import com.wireless.common.ShoppingCart.OnPayListener;
-import com.wireless.common.WirelessOrder;
-import com.wireless.exception.BusinessException;
-import com.wireless.exception.FrontBusinessError;
-import com.wireless.fragment.PickTasteFragment;
-import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
-import com.wireless.ordermenu.R;
-import com.wireless.parcel.OrderFoodParcel;
-import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.staffMgr.Privilege;
-import com.wireless.pojo.util.NumericUtil;
-import com.wireless.util.SearchFoodHandler;
-import com.wireless.util.SearchFoodHandler.OnFoodAddListener;
-import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class SelectedFoodActivity extends Activity 
 								  implements OnCartChangedListener, OnTasteChangeListener, OnFoodAddListener {
@@ -312,7 +313,7 @@ public class SelectedFoodActivity extends Activity
 				if(convertView != null){
 					layout = convertView;
 				}else{
-					layout = getLayoutInflater().inflate(R.layout.picked_food_list_item, null);
+					layout = getLayoutInflater().inflate(R.layout.picked_food_list_item, parent, false);
 				}
 				
 				layout.setTag(map);
@@ -569,22 +570,56 @@ public class SelectedFoodActivity extends Activity
 
 									@Override
 									public void onPrePay(Order orderToPay) {
-										mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "正在暂结" + orderToPay.getDestTbl().getAliasId() + "号账单信息...请稍候");
+										mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this, "", "正在暂结" + orderToPay.getDestTbl().getAliasId() + "号账单信息...请稍候");
 									}
 									
 									@Override
 									public void onSuccess(Order orderToPay) {
 										mProgressDialog.dismiss();
-										new AlertDialog.Builder(SelectedFoodActivity.this)
+										final AlertDialog alertDialog = new AlertDialog.Builder(SelectedFoodActivity.this)
 											.setTitle("提示")
 											.setMessage(orderToPay.getDestTbl().getName() + "结账成功，请等待服务员结账...")
-											.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+											.setNegativeButton("点击重新开始点菜", null)
+											.setCancelable(false)
+											.create();
+											alertDialog.show();
+											alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
 												@Override
-												public void onClick(DialogInterface dialog,	int which){
-													onBackPressed();
+												public void onClick(View v){
+													//TODO
+													if(ShoppingCart.instance().hasTable()){
+														new com.wireless.lib.task.QueryTableStatusTask(WirelessOrder.loginStaff, new Table.Builder(ShoppingCart.instance().getDestTable().getId())){
+															
+															private ProgressDialog mProgressDialog;
+															
+															@Override
+															public void onPreExecute(){
+																mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this, "", "正在检查餐台状态...请稍候");
+															}
+															
+															@Override
+															public void onSuccess(Table table){
+																if(table.isIdle()){
+																	alertDialog.dismiss();
+																	onBackPressed();
+																}else{
+																	Toast.makeText(SelectedFoodActivity.this, "对不起，此餐台还未开台，不能点菜", Toast.LENGTH_SHORT).show();
+																}
+																mProgressDialog.dismiss();
+															}
+															
+															@Override
+															public void onFail(BusinessException e){
+																Toast.makeText(SelectedFoodActivity.this, "对不起，此餐台还未开台，不能点菜", Toast.LENGTH_SHORT).show();
+																mProgressDialog.dismiss();
+															}
+															
+														}.execute();
+														
+													}
 												}
-											})
-											.show();
+											});
+											
 									}
 
 									@Override
@@ -612,10 +647,10 @@ public class SelectedFoodActivity extends Activity
 		((Button) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(final View v) {		
-				if(ShoppingCart.instance().getNewFoods().size() == 0){
-					Toast.makeText(SelectedFoodActivity.this, "您还没有点菜", Toast.LENGTH_SHORT).show();
-					return;
-				}
+//				if(ShoppingCart.instance().getNewFoods().size() == 0){
+//					Toast.makeText(SelectedFoodActivity.this, "您还没有点菜", Toast.LENGTH_SHORT).show();
+//					return;
+//				}
 				new AlertDialog.Builder(SelectedFoodActivity.this).setTitle("请确定下单")
 				   .setMessage("新点菜" + ShoppingCart.instance().getNewFoods().size() + "个，小计" + ShoppingCart.instance().getNewPrice() + "元，确定下单？")
 				   .setNeutralButton("确定", new DialogInterface.OnClickListener() {
@@ -735,7 +770,7 @@ public class SelectedFoodActivity extends Activity
 			final OrderFood selectedFood = orderFoodParcel.asOrderFood();
 			
 			// 删除数量默认为此菜品的点菜数量
-			View view = LayoutInflater.from(getActivity()).inflate(R.layout.delete_count_dialog, null);
+			View view = LayoutInflater.from(getActivity()).inflate(R.layout.delete_count_dialog, null, false);
 			final EditText countEdtTxt = (EditText) view.findViewById(R.id.editText_count_deleteCount_dialog);
 			countEdtTxt.setText(NumericUtil.float2String2(selectedFood.getCount()));
 			countEdtTxt.selectAll();

@@ -3,6 +3,19 @@ package com.wireless.fragment;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import com.wireless.common.Params;
+import com.wireless.common.ShoppingCart;
+import com.wireless.common.ShoppingCart.OnCartChangedListener;
+import com.wireless.common.ShoppingCart.OnStaffChangedListener;
+import com.wireless.common.ShoppingCart.OnTableChangedListener;
+import com.wireless.ordermenu.R;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.ui.MainActivity;
+import com.wireless.ui.SelectedFoodActivity;
+import com.wireless.util.OptionDialogFragment;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -20,19 +33,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.wireless.common.Params;
-import com.wireless.common.ShoppingCart;
-import com.wireless.common.ShoppingCart.OnCartChangedListener;
-import com.wireless.common.ShoppingCart.OnStaffChangedListener;
-import com.wireless.common.ShoppingCart.OnTableChangedListener;
-import com.wireless.ordermenu.R;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.ui.MainActivity;
-import com.wireless.ui.SelectedFoodActivity;
-import com.wireless.util.OptionDialogFragment;
 
 /**
  * this fragment contains a dialog to setting table and staff
@@ -92,9 +92,9 @@ public class OptionBarFragment extends Fragment
 			
 			//BBar显示已点菜的数量
 			if(ShoppingCart.instance().hasOrder()){
-				selectedFoodBtn.setText("" + ShoppingCart.instance().getAllAmount());
+				selectedFoodBtn.setText(Integer.toString(ShoppingCart.instance().getAllAmount()));
 			}else{
-				selectedFoodBtn.setText("" + 0);
+				selectedFoodBtn.setText("0");
 			}
 			
 			//BBar显示服务员姓名
@@ -222,9 +222,20 @@ public class OptionBarFragment extends Fragment
 		((Button) getActivity().findViewById(R.id.button_pickedFood_bottomBar)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				if(!(activity instanceof SelectedFoodActivity) && ShoppingCart.instance().hasOrder()){
-					Intent intent = new Intent(activity,SelectedFoodActivity.class);
-					activity.startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
+				if(!(activity instanceof SelectedFoodActivity)){
+					if(ShoppingCart.instance().hasNewOrder()){
+						Intent intent = new Intent(activity, SelectedFoodActivity.class);
+						activity.startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
+						
+					}else if(ShoppingCart.instance().hasTable()){
+						ShoppingCart.instance().setDestTable(ShoppingCart.instance().getDestTable());
+						if(ShoppingCart.instance().hasOriOrder()){
+							Intent intent = new Intent(activity, SelectedFoodActivity.class);
+							activity.startActivityForResult(intent, MainActivity.MAIN_ACTIVITY_RES_CODE);
+						}else{
+							Toast.makeText(getActivity(), "对不起，餐台还没开台，不能下单", Toast.LENGTH_SHORT).show();
+						}
+					}
 				}
 			}
 		});

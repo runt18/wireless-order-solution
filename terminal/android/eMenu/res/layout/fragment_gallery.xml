@@ -22,18 +22,6 @@
         android:clickable="false"
         android:descendantFocusability="afterDescendants" >
 
-        <!--
-        <ImageButton
-            android:id="@+id/imageButton_current_galleryFgm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/imageButton_rec_galleryFgm"
-            android:background="@null"
-            android:src="@drawable/current_btn_selector"
-            android:visibility="invisible" />
-        -->
-
         <AutoCompleteTextView
             android:id="@+id/editText_galleryFgm"
             android:layout_width="wrap_content"
@@ -50,7 +38,6 @@
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textSize="@dimen/text_size_m" >
-
         </AutoCompleteTextView>
 
         <ImageButton
@@ -62,24 +49,14 @@
             android:layout_marginRight="70dp"
             android:background="@null"
             android:src="@drawable/amplify_btn_selector" />
-        <!--
-        <ImageView
-            android:id="@+id/imageView_galleryFgm_giftSignal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/editText_galleryFgm"
-            android:layout_toEndOf="@+id/imageView_galleryFgm_hotSignal"
-            android:src="@drawable/gift_signal"
-            android:visibility="gone" />
-        -->
 
         <Button
             android:id="@+id/button_galleryFgm_clear"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:layout_alignEnd="@+id/editText_galleryFgm"
+            android:layout_alignParentTop="true"
             android:background="@drawable/delete_all_selector" />
 
         <Button
@@ -106,6 +83,14 @@
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/imageView_galleryFgm_hotSmall"
             android:src="@drawable/rec_signal_small" />
+
+        <ImageView
+            android:id="@+id/imageView_galleryFgm_sellOutSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/imageView_galleryFgm_recSmall"
+            android:src="@drawable/sell_out_signal" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -177,7 +162,6 @@
             android:text="菜品详情"
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_l" />
-
     </RelativeLayout>
 
     <TextView

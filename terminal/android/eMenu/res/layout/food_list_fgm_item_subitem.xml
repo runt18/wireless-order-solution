@@ -8,7 +8,7 @@
         android:id="@+id/imageView_foodListFgm_item_subItem1"
         android:layout_width="64dp"
         android:layout_height="43dp"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:src="@drawable/null_pic_small" />
 
@@ -17,16 +17,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageView_foodListFgm_item_subItem1"
+        android:layout_toEndOf="@+id/imageView_foodListFgm_item_subItem1"
         android:text="名"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="@dimen/text_size_l" />
+
+    <ImageView
+        android:id="@+id/imageView_sellOut_foodListFgm_subItem_left"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/imageView_foodListFgm_item_subItem1"
+        android:background="@drawable/sell_out_signal" />
 
     <TextView
         android:id="@+id/textView_combo_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView_foodListFgm_item_subItem_name1"
+        android:layout_alignStart="@+id/textView_foodListFgm_item_subItem_name1"
         android:layout_below="@+id/textView_foodListFgm_item_subItem_name1"
         android:text="价格：" />
 
@@ -36,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/textView_combo_name"
         android:layout_alignBottom="@+id/textView_combo_name"
-        android:layout_toRightOf="@+id/textView_combo_name"
+        android:layout_toEndOf="@+id/textView_combo_name"
         android:text="00"
         android:textColor="@color/red_orange" />
 
@@ -46,16 +55,16 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textView_foodListFgm_item_subItem_name1"
         android:layout_centerHorizontal="true"
-        android:layout_toLeftOf="@+id/view1"
+        android:layout_toStartOf="@+id/view1"
         android:background="@drawable/main_search_list_add_selector" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout_TextListItemFgm_subItem2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignTop="@+id/imageView_foodListFgm_item_subItem1"
-        android:layout_toRightOf="@+id/view1" >
+        android:layout_toEndOf="@+id/view1" >
 
         <ImageView
             android:id="@+id/imageView_foodListFgm_item_subItem2"
@@ -70,16 +79,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imageView_foodListFgm_item_subItem2"
+            android:layout_toEndOf="@+id/imageView_foodListFgm_item_subItem2"
             android:text="名"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="@dimen/text_size_l" />
+
+        <ImageView
+            android:id="@+id/imageView_sellOut_foodListFgm_subItem_right"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/imageView_foodListFgm_item_subItem2"
+            android:background="@drawable/sell_out_signal" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/textView_foodListFgm_item_subItem_name2"
+            android:layout_alignStart="@+id/textView_foodListFgm_item_subItem_name2"
             android:layout_below="@+id/textView_foodListFgm_item_subItem_name2"
             android:text="价格：" />
 
@@ -89,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/textView2"
             android:layout_alignBottom="@+id/textView2"
-            android:layout_toRightOf="@+id/textView2"
+            android:layout_toEndOf="@+id/textView2"
             android:text="00"
             android:textColor="@color/red_orange" />
 
@@ -97,8 +115,8 @@
             android:id="@+id/button_foodListFgm_item_subItem_add2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="false"
             android:layout_alignParentTop="true"
             android:background="@drawable/main_search_list_add_selector" />
     </RelativeLayout>
@@ -107,7 +125,7 @@
         android:id="@+id/view1"
         android:layout_width="16dp"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:background="@color/blue"
