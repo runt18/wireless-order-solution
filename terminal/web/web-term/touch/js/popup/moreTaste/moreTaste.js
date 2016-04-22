@@ -18,6 +18,12 @@ define(function(require, exports, module){
 				
 				_self = self;
 				
+				if(document.body.clientWidth < 1200){
+					$(_self).css('left', '11%');
+				}else{
+					$(_self).css('left', '25%');
+				}
+				
 				//取消按钮
 				self.find('[id="close_a_moreTaste"]').click(function(){
 					thiz.close();				
@@ -127,8 +133,8 @@ define(function(require, exports, module){
 			}
 			
 			if(tastesGroups.length > 7){
-				html.push('<a data-type="prePage_a_moreTaste" onclick="tasteGroupGetPreviousPage()" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage">L</a>' +
-				'<a data-type="next_a_moreTaste" onclick="tasteGroupGetNextPage()" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage">R</a>');
+				html.push('<a data-type="prePage_a_moreTaste" data-role="button" data-icon="arrow-l" data-iconpos="notext" data-inline="true" class="tasteGroupPage">L</a>' +
+				'<a data-type="next_a_moreTaste" data-role="button" data-icon="arrow-r" data-iconpos="notext" data-inline="true" class="tasteGroupPage">R</a>');
 			}
 			
 			_self.find('[id="tasteGroupCmp_div_moreTaste"]').html(html.join('')).trigger('create');

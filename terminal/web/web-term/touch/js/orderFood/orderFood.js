@@ -140,7 +140,7 @@ $(function(){
 				id : e.id,
 				name : e.name,
 				count : e.count,
-				unitPrice : e.getPrice().toFixed(2),
+				unitPrice : e.unitPrice.toFixed(2),
 				totalPrice : e.getPrice().toFixed(2),
 				foodStatus : foodStatus.join('，'),
 				isGift : typeof e.isGift == 'boolean' && e.isGift ? 'forFree' : 'false',
@@ -914,11 +914,13 @@ $(function(){
 		
 		//点菜页面的下一页
 		$('#getNextPage_a_orderFood').click(function(){
+			closePopTastePopup();
 			foodPaging.next();
 		});
 		
 		//点菜页面的上一页
 		$('#getPrevious_a_orderFood').click(function(){
+			closePopTastePopup();
 			foodPaging.prev();
 		});
 		
@@ -1783,20 +1785,21 @@ $(function(){
 			}
 			
 		
-			seajs.use('taste', function(taste){
-			
-			popTastePopup = taste.newInstance({
-				selectedFood : of.selectedOrderFood,
-				postTasteChanged : function(){
-					initNewFoodContent();
-				},
-				postUnitClick : function(){
-					initNewFoodContent();
-				}
-			});
-				popTastePopup.open();
-			});
-	
+			if(of.selectedOrderFood.popTastes.length > 0){
+				seajs.use('taste', function(taste){
+				
+				popTastePopup = taste.newInstance({
+					selectedFood : of.selectedOrderFood,
+					postTasteChanged : function(){
+						initNewFoodContent();
+					},
+					postUnitClick : function(){
+						initNewFoodContent();
+					}
+				});
+					popTastePopup.open();
+				});
+			}
 			
 			//判断拼音键盘是否显示来清空
 			if($("#orderPinyinCmp").is(":visible")){

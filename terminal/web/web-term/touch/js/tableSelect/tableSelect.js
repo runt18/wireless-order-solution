@@ -1171,6 +1171,8 @@ $(function(){
 
 	//更新菜品列表
 	function initFoodData(){
+		
+		
 		//加载菜品列表
 		$.ajax({
 			url : '../QueryMenu.do',
