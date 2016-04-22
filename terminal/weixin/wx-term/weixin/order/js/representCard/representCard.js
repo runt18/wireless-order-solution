@@ -39,18 +39,23 @@ $(function(){
 				}
 			},
 			error : function(req, status, err){
-				console.log(err);
+//				console.log(err);
 			}
 		});
 	}
 	
 	function showPoster(data){
-		var backgroundHeight = $(window).height();
-		var backgroundWidth = $(window).width();
+		var containerHeight = $(window).height();
+		var containerWidth = $(window).width();
+		
+		$('#container_div_representCard').css({
+			'height' : containerHeight,
+			'width' : containerWidth
+		});
 		
 		$('#background_div_representCard').css({
-			'height' : backgroundHeight,
-			'width' : backgroundWidth,
+			'height' : '75%',
+			'width' : '100%',
 //			'background-color' : 'red',
 			'position' : 'relative',
 			'left' : '0px',
@@ -78,11 +83,14 @@ $(function(){
 		//二维码
 		var qrCode = $('#qrCode_div_representCard');
 		qrCode.css({
-			'width' : '550px',
+			'width' : '38%',
 			'position' : 'absolute',
 			'left' : '0px',
-			'bottom' : '0px'
+			'bottom' : '0px',
+			'border-right' : '1px solid #666',
+			'padding' : '0 64px'
 		});
+		
 //		
 //		
 //		//活动标题
