@@ -11,6 +11,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -34,7 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
+import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.QuerySellOutTask;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.DepartmentTreeParcel;
 import com.wireless.parcel.FoodParcel;
@@ -117,54 +120,34 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		}
 		
 		private void updateFoodStatus(View fgmView){
+			fgmView.findViewById(R.id.imageView_galleryFgm_sellOutSmall).setVisibility(View.GONE);
 			fgmView.findViewById(R.id.imageButton_special_galleryFgm).setVisibility(View.GONE);
 			fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal).setVisibility(View.GONE);
 			fgmView.findViewById(R.id.imageView_galleryFgm_recSignal).setVisibility(View.GONE);
 			fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
 			fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
 			
-			final int SPE_SIGNAL = 100;
-			final int HOT_SIGNAL = 102;
-			final int REC_SIGNAL = 103;
-			
-			List<Integer> status = new ArrayList<Integer>();
+			if(mFragment.get().mCurFood.isSellOut()){
+				fgmView.findViewById(R.id.imageView_galleryFgm_sellOutSmall).setVisibility(View.VISIBLE);
+			}else{
+				fgmView.findViewById(R.id.imageView_galleryFgm_sellOutSmall).setVisibility(View.GONE);
+			}
 			if(mFragment.get().mCurFood.isSpecial()){
-				status.add(SPE_SIGNAL);
+				(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
+			}else{
+				(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.GONE);
 			}
 			if(mFragment.get().mCurFood.isHot()){
-				status.add(HOT_SIGNAL);
+				fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
+			}else{
+				fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.GONE);
 			}
 			if(mFragment.get().mCurFood.isRecommend()){
-				status.add(REC_SIGNAL);
+				fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
+			}else{
+				fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.GONE);
 			}
-			
-			for(int i = 0; i < status.size(); i++) {
-				Integer sign = status.get(i);
-				if(i == 0){
-					switch(sign){
-						case SPE_SIGNAL:
-							(fgmView.findViewById(R.id.imageButton_special_galleryFgm)).setVisibility(View.VISIBLE);
-							break;
-						case HOT_SIGNAL:
-							(fgmView.findViewById(R.id.imageView_galleryFgm_hotSignal)).setVisibility(View.VISIBLE);
-							break;
-						case REC_SIGNAL:
-							(fgmView.findViewById(R.id.imageView_galleryFgm_recSignal)).setVisibility(View.VISIBLE);
-							break;
-					}
-				} else {
-					switch(sign){
-						case SPE_SIGNAL:
-							break;
-						case HOT_SIGNAL:
-							fgmView.findViewById(R.id.imageView_galleryFgm_hotSmall).setVisibility(View.VISIBLE);
-							break;
-						case REC_SIGNAL:
-							fgmView.findViewById(R.id.imageView_galleryFgm_recSmall).setVisibility(View.VISIBLE);
-							break;
-					}
-				}
-			}
+
 		}
 	}
 	
@@ -202,11 +185,8 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	//当前位置
 	private int mCurrentPosition = 0;
 	
-	//"厨房 - 首张图片位置"的键值对
-	//private HashMap<PKitchen, Integer> mFoodPosByKitchenMap = new HashMap<PKitchen, Integer>();
-	
-	//"菜品 - 首张图片位置"的键值对
-	//private HashMap<Food, Integer> mFoodPos = new HashMap<Food, Integer>();
+	//更新估清菜品Task
+	private QuerySellOutTask sellOutTask;
 	
 	public static interface OnGalleryChangedListener{
 		/**
@@ -288,6 +268,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 	 */
 	public void setPosByKitchen(Kitchen kitchen){
 		int pos = 0;
+		
 		for(Food f : mFoods){
 			if(f.getKitchen().equals(kitchen)){
 				setPosition(pos);
@@ -510,6 +491,40 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 			@Override
 			public void onPageSelected(int position) {
 				
+				//更新估清菜品的状态
+				if(sellOutTask == null || sellOutTask.getStatus() == AsyncTask.Status.FINISHED){
+					sellOutTask = new QuerySellOutTask(WirelessOrder.loginStaff, WirelessOrder.foods) {
+						
+						@Override
+						public void onSuccess(List<Food> sellOutFoods) {
+							for(Food f : mFoods){
+								f.setSellOut(false);
+								f.setLimit(false);
+								f.setLimitAmount(0);
+								f.setLimitRemaing(0);
+							}
+							
+							for(Food sellOut : sellOutFoods){
+								int index = mFoods.indexOf(sellOut);
+								if(index >= 0){
+									mFoods.get(index).setStatus(sellOut.getStatus());
+									mFoods.get(index).setStatus(sellOut.getStatus());
+									if(mFoods.get(index).isLimit()){
+										mFoods.get(index).setLimitAmount(sellOut.getLimitAmount());
+										mFoods.get(index).setLimitRemaing(sellOut.getLimitRemaing());
+									}
+								}
+							}
+						}
+						
+						@Override
+						public void onFail(BusinessException arg0) {
+							
+						}
+					};
+					sellOutTask.execute();
+				}
+				
 				mCurrentPosition = position;
 
 				mCurFood = mFoods.get(position);
@@ -664,9 +679,7 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		mCurrentPosition = 0;
 		if(!mFoods.isEmpty()){
 			mCurFood = mFoods.get(0);
-			if(!mFoods.isEmpty()){
-				setPosition(0);
-			}
+			setPosition(0);
 		}
 	}
 	

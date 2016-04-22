@@ -40,8 +40,7 @@ public class ThumbnailItemFragment extends ListFragment {
 //	private View mThePickedView;
 //	private boolean mIsLeft = true;
 
-	public static ThumbnailItemFragment newInstance(List<Food> srcFoods,
-			String parentTag) {
+	public static ThumbnailItemFragment newInstance(List<Food> srcFoods, String parentTag) {
 		ThumbnailItemFragment fgm = new ThumbnailItemFragment();
 		Bundle args = new Bundle();
 
@@ -81,11 +80,11 @@ public class ThumbnailItemFragment extends ListFragment {
 
 		if (mParentFragment != null) {
 
-			List<FoodParcel> foodParcels = args
-					.getParcelableArrayList(FoodParcel.KEY_VALUE);
+			List<FoodParcel> foodParcels = args.getParcelableArrayList(FoodParcel.KEY_VALUE);
 			int middleCount = foodParcels.size() / 2;
-			if (foodParcels.size() % 2 != 0)
+			if (foodParcels.size() % 2 != 0){
 				middleCount++;
+			}
 
 			List<Food> leftList = new ArrayList<Food>();
 			List<Food> rightList = new ArrayList<Food>();
@@ -195,6 +194,12 @@ public class ThumbnailItemFragment extends ListFragment {
 				foodImage.setScaleType(ScaleType.CENTER_CROP);
 				mParentFragment.getImageFetcher().loadImage(leftFood.getImage().getImage(), foodImage);
 
+				if(leftFood.isSellOut()){
+					layout.findViewById(R.id.imageView_sellOut_thumbnailFgm_item_add1).setVisibility(View.VISIBLE);
+				}else{
+					layout.findViewById(R.id.imageView_sellOut_thumbnailFgm_item_add1).setVisibility(View.GONE);
+				}
+				
 				// 点菜按钮
 				Button addBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add1);
 				addBtn.setOnClickListener(new OnClickListener(){
@@ -254,12 +259,18 @@ public class ThumbnailItemFragment extends ListFragment {
 			final Food rightFood = mItems.get(position).right;
 
 			if (rightFood != null) {
-				layout.findViewById(R.id.relativeLayout2).setVisibility(View.VISIBLE);
+				layout.findViewById(R.id.relativeLayout_thumbnailFgm_item_foodImg2).setVisibility(View.VISIBLE);
 				// 显示菜品图片
 				ImageView rightFoodImgView = (ImageView) layout.findViewById(R.id.imageView_thumbnailFgm_item_foodImg2);
 				rightFoodImgView.setScaleType(ScaleType.CENTER_CROP);
 				mParentFragment.getImageFetcher().loadImage(rightFood.getImage().getImage(), rightFoodImgView);
 
+				if(leftFood.isSellOut()){
+					layout.findViewById(R.id.imageView_sellOut_thumbnailFgm_item_add2).setVisibility(View.VISIBLE);
+				}else{
+					layout.findViewById(R.id.imageView_sellOut_thumbnailFgm_item_add2).setVisibility(View.GONE);
+				}
+				
 				// 点菜按钮
 				Button rightAddBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add2);
 				rightAddBtn.setOnClickListener(new OnClickListener(){
@@ -293,7 +304,7 @@ public class ThumbnailItemFragment extends ListFragment {
 				refreshDisplay(rightFood, layout, false);
 				
 			} else {
-				layout.findViewById(R.id.relativeLayout2).setVisibility(View.GONE);
+				layout.findViewById(R.id.relativeLayout_thumbnailFgm_item_foodImg2).setVisibility(View.GONE);
 			}
 
 			return layout;

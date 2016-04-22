@@ -223,7 +223,8 @@ public class StartupActivity extends Activity {
 			Iterator<Food> iter = foods.iterator();
 			while(iter.hasNext()){
 				Food f = iter.next();
-				if(!f.hasImage() || f.isSellOut()){
+				//if(!f.hasImage() || f.isSellOut()){
+				if(!f.hasImage()){
 					iter.remove();
 				}
 			}

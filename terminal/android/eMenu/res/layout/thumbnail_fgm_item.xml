@@ -12,27 +12,27 @@
         android:background="@color/blue" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
+        android:id="@+id/relativeLayout_relativeLayout_thumbnailFgm_item_foodImg1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="30dp"
-        android:layout_toLeftOf="@+id/view1"
+        android:layout_marginEnd="30dp"
+        android:layout_toStartOf="@+id/view1"
         android:background="@drawable/picture_frame" >
 
         <ImageView
             android:id="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:layout_width="304dp"
             android:layout_height="171dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg1"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:background="@drawable/gray_bg" >
         </RelativeLayout>
 
@@ -40,10 +40,10 @@
             android:id="@+id/textView_thumbnailFgm_item_foodName1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@+id/textView_thumbnailFgm_item_price1"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@+id/textView_thumbnailFgm_item_price1"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/imageView_thumbnailFgm_item_foodImg1"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:background="@drawable/main_search_list_add_selector" />
 
         <Button
@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/button_thumbnailFgm_item_add1"
             android:layout_alignBottom="@+id/button_thumbnailFgm_item_add1"
-            android:layout_toLeftOf="@+id/button_thumbnailFgm_item_add1"
+            android:layout_toStartOf="@+id/button_thumbnailFgm_item_add1"
             android:background="@drawable/detail_small_selector"
             android:textColor="@color/white" />
 
@@ -77,9 +77,9 @@
             android:id="@+id/textView_thumbnailFgm_item_price1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@+id/textView_combo_name"
+            android:layout_alignParentStart="false"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@+id/textView_combo_name"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -92,7 +92,7 @@
             android:id="@+id/textView_combo_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -106,8 +106,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/button_thumbnailFgm_item_add1"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:layout_alignParentTop="false"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:shadowColor="@color/black"
             android:shadowDx="1"
             android:shadowDy="1"
@@ -116,30 +116,39 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/orange"
             android:textSize="40sp" />
+
+        <ImageView
+            android:id="@+id/imageView_sellOut_thumbnailFgm_item_add1"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView_thumbnailFgm_item_foodImg1"
+            android:layout_alignStart="@+id/imageView_thumbnailFgm_item_foodImg1"
+            android:background="@drawable/sell_out_signal" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relativeLayout2"
+        android:id="@+id/relativeLayout_thumbnailFgm_item_foodImg2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="30dp"
-        android:layout_toRightOf="@+id/view1"
+        android:layout_marginStart="30dp"
+        android:layout_toEndOf="@+id/view1"
         android:background="@drawable/picture_frame" >
 
         <ImageView
             android:id="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:layout_width="304dp"
             android:layout_height="171dp"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg2"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:background="@drawable/gray_bg" >
         </RelativeLayout>
 
@@ -147,10 +156,10 @@
             android:id="@+id/textView_thumbnailFgm_item_foodName2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@+id/textView_thumbnailFgm_item_price2"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@+id/textView_thumbnailFgm_item_price2"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -166,7 +175,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/imageView_thumbnailFgm_item_foodImg2"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:background="@drawable/main_search_list_add_selector" />
 
         <Button
@@ -176,7 +185,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/button_thumbnailFgm_item_add2"
             android:layout_alignBottom="@+id/button_thumbnailFgm_item_add2"
-            android:layout_toLeftOf="@+id/button_thumbnailFgm_item_add2"
+            android:layout_toStartOf="@+id/button_thumbnailFgm_item_add2"
             android:background="@drawable/detail_small_selector"
             android:textColor="@color/white" />
 
@@ -184,9 +193,9 @@
             android:id="@+id/textView_thumbnailFgm_item_price2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
-            android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@+id/textView2"
+            android:layout_alignParentStart="false"
+            android:layout_marginStart="10dp"
+            android:layout_toStartOf="@+id/textView2"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -199,7 +208,7 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:shadowColor="@color/black"
             android:shadowDx="2"
             android:shadowDy="2"
@@ -213,8 +222,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/button_thumbnailFgm_item_add2"
+            android:layout_alignEnd="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:layout_alignParentTop="false"
-            android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:shadowColor="@color/black"
             android:shadowDx="1"
             android:shadowDy="1"
@@ -223,6 +232,15 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/orange"
             android:textSize="40sp" />
+
+        <ImageView
+            android:id="@+id/imageView_sellOut_thumbnailFgm_item_add2"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/imageView_thumbnailFgm_item_foodImg2"
+            android:layout_alignStart="@+id/imageView_thumbnailFgm_item_foodImg2"
+            android:background="@drawable/sell_out_signal" />
     </RelativeLayout>
 
 </RelativeLayout>

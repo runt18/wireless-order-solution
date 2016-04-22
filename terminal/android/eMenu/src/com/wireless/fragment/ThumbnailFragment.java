@@ -3,8 +3,23 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.QuerySellOutTask;
+import com.wireless.ordermenu.R;
+import com.wireless.parcel.DepartmentTreeParcel;
+import com.wireless.pojo.menuMgr.DepartmentTree;
+import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
+import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.util.SearchFoodHandler;
+import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
+import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
+import com.wireless.util.imgFetcher.ImageFetcher;
+
 import android.app.Fragment;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,17 +31,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.wireless.ordermenu.R;
-import com.wireless.parcel.DepartmentTreeParcel;
-import com.wireless.pojo.menuMgr.DepartmentTree;
-import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
-import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.util.SearchFoodHandler;
-import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
-import com.wireless.util.imgFetcher.ImageCache.ImageCacheParams;
-import com.wireless.util.imgFetcher.ImageFetcher;
 
 /**
  * this fragment is the main fragment of thumbnail display method, 
@@ -81,6 +85,9 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	
 	private OnThumbnailChangedListener mThumbnailChangedListener;
 	
+	//更新估清菜品Task
+	private QuerySellOutTask sellOutTask;
+	
 //	List<Entry<List<OrderFood>, OrderFood>> mGroupedFoods = new ArrayList<Entry<List<OrderFood>, OrderFood>>();
 	protected SearchFoodHandler mSearchHandler;
 	
@@ -129,7 +136,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.thumbnail_fragment, null);
+		final View view = inflater.inflate(R.layout.thumbnail_fragment, container, false);
 		
 		Bundle bundle = getArguments();
 		
@@ -147,6 +154,47 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 			
 			@Override
 			public void onPageSelected(int position) {
+				
+				//更新估清菜品的状态
+				if(sellOutTask == null || sellOutTask.getStatus() == AsyncTask.Status.FINISHED){
+					sellOutTask = new QuerySellOutTask(WirelessOrder.loginStaff, WirelessOrder.foods) {
+						
+						@Override
+						public void onSuccess(List<Food> sellOutFoods) {
+							for(ThumbnailPager pager : mThumbPagers){
+								for(Food f : pager.getFoods()){
+									f.setSellOut(false);
+									f.setLimit(false);
+									f.setLimitAmount(0);
+									f.setLimitRemaing(0);
+								}
+							}
+							
+							for(Food sellOut : sellOutFoods){
+								for(ThumbnailPager pager : mThumbPagers){
+									for(Food f : pager.getFoods()){
+										if(f.getFoodId() == sellOut.getFoodId()){
+											f.setStatus(sellOut.getStatus());
+											f.setStatus(sellOut.getStatus());
+											if(f.isLimit()){
+												f.setLimitAmount(sellOut.getLimitAmount());
+												f.setLimitRemaing(sellOut.getLimitRemaing());
+											}
+											break;
+										}
+									}
+								}
+							}
+						}
+						
+						@Override
+						public void onFail(BusinessException arg0) {
+							
+						}
+					};
+					sellOutTask.execute();
+				}
+				
 				mCurrentPos = position;
 				if(mThumbnailChangedListener != null){
 					mThumbnailChangedListener.onThumbnailChanged(mThumbPagers.get(position).getFoods(), mThumbPagers.get(position).getCaptainFood(), position);
@@ -163,8 +211,9 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), 0);
 				
-				if(!mSearchEditText.getText().toString().equals(""))
+				if(!mSearchEditText.getText().toString().equals("")){
 					mSearchEditText.setText("");
+				}
 				
 				if(state == ViewPager.SCROLL_STATE_DRAGGING){
 					mImageFetcher.setPauseWork(true);
@@ -294,10 +343,11 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		for(ThumbnailPager pager : mThumbPagers){
 			if(pager.getCaptainFood().getKitchen().equals(kitchen)){
 				setPosition(pageNo);
-				return;
+				break;
 			}
 			pageNo++;
 		}
+		
 	}
 	
 	/**
@@ -332,7 +382,7 @@ public class ThumbnailFragment extends Fragment implements OnSearchItemClickList
 		}
 		else {
 			Toast toast = Toast.makeText(getActivity(), "此菜暂无图片可展示", Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.TOP | Gravity.RIGHT, 230, 100);
+			toast.setGravity(Gravity.TOP | Gravity.END, 230, 100);
 			toast.show();
 		}
 	}
