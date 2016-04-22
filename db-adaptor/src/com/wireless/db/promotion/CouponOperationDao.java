@@ -228,7 +228,7 @@ public class CouponOperationDao {
 		sql = " INSERT INTO " + Params.dbName + ".coupon_operation " +
 			  " (restaurant_id, branch_id, coupon_id, coupon_name, coupon_price, operate, associate_id, operate_date, operate_staff, operate_staff_id, member_id, member_name, comment) VALUES( " +
 			  (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) + "," +
-			  (staff.isBranch() ? staff.getRestaurantId() : "NULL") + "," +
+			  staff.getRestaurantId() + "," +
 			  coupon.getId() + "," +
 			  "'" + coupon.getName() + "'," +
 			  coupon.getPrice() + "," +
