@@ -1785,9 +1785,8 @@ $(function(){
 			}
 			
 		
-			if(of.selectedOrderFood.popTastes.length > 0){
-				seajs.use('taste', function(taste){
-				
+			seajs.use('taste', function(taste){
+			
 				popTastePopup = taste.newInstance({
 					selectedFood : of.selectedOrderFood,
 					postTasteChanged : function(){
@@ -1797,9 +1796,8 @@ $(function(){
 						initNewFoodContent();
 					}
 				});
-					popTastePopup.open();
-				});
-			}
+				popTastePopup.open();
+			});
 			
 			//判断拼音键盘是否显示来清空
 			if($("#orderPinyinCmp").is(":visible")){

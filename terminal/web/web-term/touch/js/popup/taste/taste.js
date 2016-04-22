@@ -56,8 +56,6 @@ define(function(require, exports, module){
 		
 		//加载菜品信息
 		function initFood(){
-			_selectedFood.popTastes.forEach(function(popTasteId, index){
-			})
 			$.post('../QueryFoodTaste.do', {foodID : _selectedFood.id}, function(jr){
 				if(jr.success){
 					var commonTastes = jr.root;
