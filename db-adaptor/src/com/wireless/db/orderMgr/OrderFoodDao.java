@@ -834,7 +834,7 @@ public class OrderFoodDao {
 				  of.getCount() + ", " + 
 				  of.getFoodPrice() + ", " + 
 				  of.asFood().getCommission() + ", " +
-				  "'" + of.getName() + "', " + 
+				  "'" + of.getName().trim() + "', " + 
 				  of.asFood().getStatus() + ", " +
 				  (of.hasFoodUnit() ? of.getFoodUnit().getId() : " NULL ") + "," +
 				  (of.hasFoodUnit() ? "'" + of.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
