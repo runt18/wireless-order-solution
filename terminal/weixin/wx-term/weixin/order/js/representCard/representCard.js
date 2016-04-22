@@ -20,6 +20,28 @@ $(function(){
 				console.log('error');
 			}
 		});
+		
+		//请求生成的二维码
+		$.ajax({
+			url : '../../WxOperateRepresent.do',
+			type : 'post',
+			data : {
+				dataSource : 'qrCode',
+				fid : Util.mp.fid,
+				oid : Util.mp.oid
+			},
+			datatype : 'json',
+			success : function(data, status, req){
+				if(data.success){
+					$("#qrCode_div_representCard").css("background", "url('http://qr.liantu.com/api.php?text=" + data.msg + "') no-repeat");
+				}else{
+					alert(data.msg);
+				}
+			},
+			error : function(req, status, err){
+				console.log('error');
+			}
+		});
 	}
 	
 	function showPoster(data){
@@ -34,7 +56,8 @@ $(function(){
 			'left' : '0px',
 			'right' : '0px',
 			'padding-top' : '5%',
-			'background-image' : 'url("' + data.root[0].image.image + '")',
+			//FIXME
+			'background-image' : 'url("' + (data.root[0].image ? data.root[0].image.image : '') + '")',
 			'background-size' : '100% 100%'
 		});
 //
@@ -58,7 +81,7 @@ $(function(){
 		qrCode.css({
 			'height' : '520px',
 			'width' : '550px',
-			'background' : 'url("images/qrCode.jpg")',
+			//'background' : 'url("images/qrCode.jpg")',
 			'background-size' : '100% 100%',
 			'position' : 'absolute',
 			'left' : '0px',
