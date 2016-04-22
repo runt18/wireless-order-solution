@@ -1,6 +1,16 @@
 package com.wireless.Actions.weixin;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,8 +29,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.ImageIcon;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.marker.weixin.HandleMessageAdapter;
@@ -32,6 +50,7 @@ import org.marker.weixin.msg.Msg4Head.MsgType;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.session.WxSession;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.alibaba.fastjson.JSON;
@@ -39,6 +58,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.book.BookDao;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -53,6 +73,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
@@ -142,6 +163,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_SCANNING;
 	private final String WEIXIN_SCANNING_RESULT;
 	private final String WEIXIN_WAITER;
+	private final String WEIXIN_REPRESENT;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_BOOK_ICON;
@@ -162,7 +184,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		MEMBER_EVENT_KEY("member_event_key", "我的会员卡"),
 		ORDER_EVENT_KEY("order_event_key", "我的订单"),
 		MY_QRCODE_EVENT_KEY("my_qrcode_event_key", "我的二维码"),
-		SCAN_EVENT_KEY("scan_event_key", "扫一扫");
+		SCAN_EVENT_KEY("scan_event_key", "扫一扫"),
+		I_WANT_REPRESENT("i_want_represent", "我要代言");
 		
 		EventKey(String val, String desc){
 			this.val = val;
@@ -198,6 +221,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_SCANNING = root + "/weixin/order/scan.html";
 		this.WEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
 		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
+		//TODO
+		this.WEIXIN_REPRESENT = root + "/weixin/order/representCard.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_BOOK_ICON = root + "/weixin/order/images/icon_book.jpg";
@@ -352,7 +377,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					}
 	
 				}else{
-					//TODO 扫描带参二维码，进入微信店小二
+					//扫描带参二维码
 					processQrCode(msg);
 
 				}				
@@ -361,7 +386,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				//WeixinMemberDao.cancel(msg.getFromUserName(), msg.getToUserName());
 				
 			}else if(msg.getEvent() == Event.SCAN){
-				//TODO 扫描带参二维码,进入微信店小二
+				//扫描带参二维码
 				processQrCode(msg);
 				
 			}else if(msg.getEvent() == Event.CLICK){
@@ -518,14 +543,27 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					}
 					
 				}else if(msg.getEventKey().equals(EventKey.SCAN_EVENT_KEY.val)){
+					//我的二维码
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
+					
+				}else if(msg.getEventKey().equals(EventKey.I_WANT_REPRESENT.val)){
+					//TODO 我要代言
+					final Represent represent = RepresentDao.getByCond(staff, null).get(0);
+					final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+					String title = represent.getTitle().isEmpty() ? "我要代言" : represent.getTitle();
+					String desc = ("【代言规则】：成功将代言海报中【$(restaurant)】的二维码分享给您的好友，好友扫描此二维码成为您的粉丝，" +
+								  "即可获得$(recommend_money)元的充值赠额和$(recommend_point)的赠送积分。" +
+								  "\r\n点击去分享代言海报>>>>>")
+								  .replace("$(restaurant)", restaurant.getName())
+								  .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
+								  .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, desc, picUrl, createUrl(msg, WEIXIN_REPRESENT))));
 					
 				}else{
 					
 					Msg msg4Action = new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, Integer.parseInt(msg.getEventKey()))).toMsg();
 					session.callback(appendUrlParam(msg, msg4Action));
 					
-					//wecha_id={wechat_id}
 				}
 				
 			}else if(msg.getEvent() == Event.SCAN_WAIT_MSG){
@@ -585,6 +623,32 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			session.callback(new Msg4ImageText(msg).addItem(
 					new Data4Item("微信店小二(" + RestaurantDao.getById(branchId).getName() + ")", desc.toString(), picUrl,
 								  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
+			
+		}else if(qrParam.type == QrCodeType.REPRESENT){
+			//扫描【我要代言】的带参二维码，生成推荐关系链
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final Member referrer = MemberDao.getById(staff, Integer.parseInt(msg.getEventKey().substring(1)));
+			final Member subscriber = MemberDao.getByWxSerial(staff, msg.getFromUserName());
+			final Represent represent = RepresentDao.getByCond(staff, null).get(0);
+			
+			MemberDao.chain(staff, new Member.ChainBuilder(subscriber, referrer));
+
+			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			final String picUrl;
+			if(wxRestaurant.hasWeixinLogo()){
+				picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
+			}else{
+				picUrl = "";
+			}
+			String desc = ("通过$(referrer)的推荐，您已成为$(restaurant)的会员，并获得$(recommend_money)的充值赠额和$(recommend_point)的赠送积分。" +
+						  "\r\n" +
+					      "点击去会员中心查看详情>>>>")
+					      .replace("$(referrer)", referrer.getName())
+					      .replace("$(restaurant)", RestaurantDao.getById(rid).getName())
+					      .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
+					      .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
+			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("关注有礼", desc, picUrl, createUrl(msg, WEIXIN_MEMBER))));
 		}
 	}
 	
@@ -689,5 +753,143 @@ public class WxHandleMessage extends HandleMessageAdapter {
     		dbCon.disconnect();
     	}
     }
+    
+    public static void main(String[] args) throws Exception {
+        //1.jpg是你的 主图片的路径
+        //InputStream is = new FileInputStream("1.jpg");
+
+        //通过JPEG图象流创建JPEG数据流解码器
+        //JPEGImageDecoder jpegDecoder = JPEGCodec.createJPEGDecoder(is);
+
+        //解码当前JPEG数据流，返回BufferedImage对象
+        //BufferedImage buffImg = jpegDecoder.decodeAsBufferedImage();
+        BufferedImage buffImg = ImageIO.read(new File("d:\\waiterTimeoutPhoto.jpg"));
+        //得到画笔对象
+        Graphics g = buffImg.getGraphics();
+
+        //创建你要附加的图象。
+
+        //2.jpg是你的小图片的路径
+        ImageIcon imgIcon = new ImageIcon("d:\\qrcode.jpg");
+
+        //得到Image对象。
+        Image img = imgIcon.getImage();
+
+        //将小图片绘到大图片上。
+        //5,300 .表示你的小图片在大图片上的位置。
+        g.drawImage(img, 5, buffImg.getHeight() - imgIcon.getIconHeight(), null);
+
+        //设置颜色。
+        g.setColor(Color.BLACK);
+       
+        //最后一个参数用来设置字体的大小
+        Font f = new Font("宋体",Font.BOLD,30);
+
+        g.setFont(f);
+
+        //10,20 表示这段文字在图片上的位置(x,y) .第一个是你设置的内容。
+        //g.drawImage(ImageIO.read(new File("d:\\qrcode.jpg")), 10, 100, 100, 100, null);
+        //g.drawString("默哀555555。。。。。。。",10,30);
+
+        g.dispose();
+
+        FileOutputStream os = new FileOutputStream("union.jpg");
+
+        //创键编码器，用于编码内存中的图象数据。
+        //JPEGImageEncoder en = JPEGCodec.createJPEGEncoder(os);
+        //en.encode(buffImg);
+        saveAsJPEG(100, buffImg, 1f, os);
+
+        //is.close();
+        os.close();
+        
+//        createImage("中华人民共和国",new Font("宋体",Font.BOLD,18),new File("d:/a.png"));
+//        createImage("中华人民",new Font("黑体",Font.BOLD,30),new File("d:/a1.png"));
+//        createImage("中华人民共和国",new Font("黑体",Font.PLAIN,24),new File("d:/a2.png"));
+    }
+    
+    
+    /** 
+     * 以JPEG编码保存图片 
+     * @param dpi  分辨率 
+     * @param image_to_save  要处理的图像图片 
+     * @param JPEGcompression  压缩比 
+     * @param fos 文件输出流 
+     * @throws IOException 
+     */  
+    public static void saveAsJPEG(Integer dpi ,BufferedImage image_to_save, float JPEGcompression, FileOutputStream fos) throws IOException {  
+            
+        //useful documentation at http://docs.oracle.com/javase/7/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html  
+        //useful example program at http://johnbokma.com/java/obtaining-image-metadata.html to output JPEG data  
+        
+        //old jpeg class  
+        //com.sun.image.codec.jpeg.JPEGImageEncoder jpegEncoder  =  com.sun.image.codec.jpeg.JPEGCodec.createJPEGEncoder(fos);  
+        //com.sun.image.codec.jpeg.JPEGEncodeParam jpegEncodeParam  =  jpegEncoder.getDefaultJPEGEncodeParam(image_to_save);  
+        
+        // Image writer  
+//      JPEGImageWriter imageWriter = (JPEGImageWriter) ImageIO.getImageWritersBySuffix("jpeg").next();  
+        ImageWriter imageWriter  =   ImageIO.getImageWritersBySuffix("jpg").next();  
+        ImageOutputStream ios  =  ImageIO.createImageOutputStream(fos);  
+        imageWriter.setOutput(ios);  
+        //and metadata  
+        IIOMetadata imageMetaData  =  imageWriter.getDefaultImageMetadata(new ImageTypeSpecifier(image_to_save), null);  
+           
+           
+        if(dpi !=  null && !dpi.equals("")){  
+               
+             //old metadata  
+            //jpegEncodeParam.setDensityUnit(com.sun.image.codec.jpeg.JPEGEncodeParam.DENSITY_UNIT_DOTS_INCH);  
+            //jpegEncodeParam.setXDensity(dpi);  
+            //jpegEncodeParam.setYDensity(dpi);  
+        
+            //new metadata  
+            Element tree  =  (Element) imageMetaData.getAsTree("javax_imageio_jpeg_image_1.0");  
+            Element jfif  =  (Element)tree.getElementsByTagName("app0JFIF").item(0);  
+            jfif.setAttribute("Xdensity", Integer.toString(dpi) );  
+            jfif.setAttribute("Ydensity", Integer.toString(dpi));  
+               
+        }  
+        
+        
+        if(JPEGcompression >= 0 && JPEGcompression <= 1f){  
+        
+            //old compression  
+            //jpegEncodeParam.setQuality(JPEGcompression,false);  
+        
+            // new Compression  
+            JPEGImageWriteParam jpegParams  =  (JPEGImageWriteParam) imageWriter.getDefaultWriteParam();  
+            jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);  
+            jpegParams.setCompressionQuality(JPEGcompression);  
+        
+        }  
+        
+        //old write and clean  
+        //jpegEncoder.encode(image_to_save, jpegEncodeParam);  
+        
+        //new Write and clean up  
+        imageWriter.write(imageMetaData, new IIOImage(image_to_save, null, null), null);  
+        ios.close();  
+        imageWriter.dispose();  
+        
+    }  
+	//根据str,font的样式以及输出文件目录
+	public static void createImage(String str, Font font, File outFile) throws Exception{
+		//获取font的样式应用在str上的整个矩形
+		Rectangle2D r = font.getStringBounds(str, new FontRenderContext(AffineTransform.getScaleInstance(1, 1),false,false));
+		int unitHeight = (int)Math.floor(r.getHeight());//获取单个字符的高度
+		//获取整个str用了font样式的宽度这里用四舍五入后+1保证宽度绝对能容纳这个字符串作为图片的宽度
+		int width = (int)Math.round(r.getWidth())+1;
+		int height = unitHeight+3;//把单个字符的高度+3保证高度绝对能容纳字符串作为图片的高度
+		//创建图片
+		BufferedImage image = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
+		Graphics g=image.getGraphics();
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, width, height);//先用白色填充整张图片,也就是背景
+		g.setColor(Color.black);//在换成黑色
+		g.setFont(font);//设置画笔字体
+		g.drawString(str, 0, font.getSize());//画出字符串
+		g.dispose();
+		ImageIO.write(image, "png", outFile);//输出png图片
+	}
     
 }

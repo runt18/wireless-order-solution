@@ -15,7 +15,6 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberDao.MemberRank;
-import com.wireless.db.member.MemberTypeDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.promotion.CouponDao;
