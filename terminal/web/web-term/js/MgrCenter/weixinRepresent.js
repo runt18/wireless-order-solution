@@ -473,7 +473,7 @@ Ext.onReady(function(){
 	
 	$('#posterContainer_div_weixinRepresent').load('http://' + host + '/wx-term/weixin/order/representCard.html', function(res, status, xhr){
 		var title, imageUrl, desc; 
-		var height = $('#posterContainer_div_weixinRepresent').height();
+		var height = $('#posterContainer_div_weixinRepresent').height() - 20;
 		var width = $('#posterContainer_div_weixinRepresent').width();
 		if(status == 'success'){
 			Ext.Ajax.request({
@@ -485,7 +485,6 @@ Ext.onReady(function(){
 					var jr = Ext.decode(data.responseText);
 					if(jr.success){
 						title = jr.root[0].title;
-						imageUrl = jr.root[0].image ? jr.root[0].image : '';
 						desc = jr.root[0].slogon;
 						
 //						$(res).find('[id=background_div_representCard]').css({
@@ -494,13 +493,16 @@ Ext.onReady(function(){
 //						});
 //						$(res).trigger('refresh');
 						$('#qrCode_div_representCard').css({
-							'height' : '150px',
 							'width' : '144px',
-							'background' : '#fff'
+							'position' : 'absolute',
+							'left' : '0',
+							'bottom' : '0'
 						});
 						
+						$('#qrCode_div_representCard').attr('src', '../../images/qrCode.jpg');
+						
 						$('#background_div_representCard').css({
-							'background-image' : 'url("' + imageUrl + '")',
+							'background-image' : 'url("' + (jr.root[0].image.image ? jr.root[0].image.image : 'http://digie-image-test.oss.aliyuncs.com/WxRepresent/40/20160416154639937.jpg') + '")',
 							'height' : height,
 							'width' : width
 						});

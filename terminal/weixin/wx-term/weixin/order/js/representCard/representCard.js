@@ -33,13 +33,13 @@ $(function(){
 			datatype : 'json',
 			success : function(data, status, req){
 				if(data.success){
-					$("#qrCode_div_representCard").css("background", "url('http://qr.liantu.com/api.php?text=" + data.msg + "') no-repeat");
+					$("#qrCode_div_representCard").attr("src", "http://qr.liantu.com/api.php?text=" + data.msg );
 				}else{
 					alert(data.msg);
 				}
 			},
 			error : function(req, status, err){
-				console.log('error');
+				console.log(err);
 			}
 		});
 	}
@@ -56,8 +56,7 @@ $(function(){
 			'left' : '0px',
 			'right' : '0px',
 			'padding-top' : '5%',
-			//FIXME
-			'background-image' : 'url("' + (data.root[0].image ? data.root[0].image.image : '') + '")',
+			'background-image' : 'url("' + (data.root[0].image ? data.root[0].image.image : 'http://digie-image-test.oss.aliyuncs.com/WxRepresent/40/20160416154639937.jpg') + '")',
 			'background-size' : '100% 100%'
 		});
 //
@@ -79,10 +78,7 @@ $(function(){
 		//二维码
 		var qrCode = $('#qrCode_div_representCard');
 		qrCode.css({
-			'height' : '520px',
 			'width' : '550px',
-			//'background' : 'url("images/qrCode.jpg")',
-			'background-size' : '100% 100%',
 			'position' : 'absolute',
 			'left' : '0px',
 			'bottom' : '0px'
