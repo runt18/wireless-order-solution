@@ -212,7 +212,7 @@ Ext.onReady(function(){
 			xtype : 'panel',
 			layout : 'column',
 			style : {
-				'margin-top' : '10px',
+				'margin-top' : '10px'
 			},
 			items : [{
 				xtype : 'label',
@@ -485,7 +485,7 @@ Ext.onReady(function(){
 					var jr = Ext.decode(data.responseText);
 					if(jr.success){
 						title = jr.root[0].title;
-						imageUrl = jr.root[0].image.image;
+						imageUrl = jr.root[0].image ? jr.root[0].image : '';
 						desc = jr.root[0].slogon;
 						
 //						$(res).find('[id=background_div_representCard]').css({

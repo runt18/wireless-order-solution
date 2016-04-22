@@ -19,11 +19,13 @@ Ext.onReady(function(){
 	//FIXME
 	var basePath;
 	if(window.location.hostname == 'e-tones.net'){
-		basePath = 'wx.e-tones.net';
+		basePath = 'http://wx.e-tones.net';
 	}else if(window.location.hostname == 'ts.e-tones.net'){
-		basePath = 'ts.e-tones.net';
+		basePath = 'http://ts.e-tones.net';
 	}else if(window.location.hostname == 'localhost'){
 		basePath = 'http://localhost:8080'
+	}else{
+		basePath = 'http://' + window.location.hostname;
 	}
 	//关键字点击的标识符 	
 	var isKeyword = false;
