@@ -182,7 +182,7 @@ $(function(){
 		
 		if(!hasFoods){
 			$('#tips_span_waiter').css({
-				'margin' : '40% 0px',
+				'margin' : '40% 0px'
 			});
 		}
 	}
@@ -224,7 +224,7 @@ $(function(){
 						dataType : 'json',
 						data : {
 							dataSource : 'getByCond',
-							sessionId : Util.mp.params.sessionId,
+							sessionId : Util.mp.params.sessionId
 						},
 
 						success : function(data, status, xhr){

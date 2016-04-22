@@ -589,7 +589,7 @@ $(function(){
 						html.push(template.format({
 							operateDateFormat : temp.operateDateFormat,
 							consumeMemberName : temp.member.name,
-							deltaTotalMoney : temp.deltaTotalMoney,
+							deltaTotalMoney : temp.deltaTotalMoney
 						}));
 					}
 					
