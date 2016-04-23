@@ -3,13 +3,13 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<host>192.168.33.100</host> 
+	<host>localhost</host> 
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
 	<user>root</user>
 	<!-- password to the db account -->
-	<pwd>HelloZ315</pwd>
+	<pwd>root</pwd>
 	<!-- the port listened on socket for terminal -->
     <listen>55555</listen>
 	<!-- the backup server -->

@@ -1138,6 +1138,12 @@ Ext.onReady(function(){
 						disabled : true
 					}]
 				},{
+					items : [{
+						id : 'commissionAmount_tbtext_memberMgrMain',
+						fieldLabel : '佣金总额',
+						disabled : true
+					}]
+				}, {
 					columnWidth : 1,
 					items : [{
 						id : 'cm_txtMemberContactAddress',
@@ -1225,7 +1231,7 @@ Ext.onReady(function(){
 			memberBasicWin = new Ext.Window({
 				title : '&nbsp;',
 				width : 660,
-				height : Ext.isIE ? 280 : 235,
+				height : Ext.isIE ? 295 : 260,
 				modal : true,
 				resizable : false,
 				closable : false,
@@ -1402,6 +1408,7 @@ Ext.onReady(function(){
 		var usedPoint = Ext.getCmp('cm_numberUserPoint');
 		var referrer = Ext.getCmp('memberReferrer_numfield_mmm');
 		var fansAmount = Ext.getCmp('fansAmount_tbtext_memberMgrMain');
+		var commissionAmount = Ext.getCmp('commissionAmount_tbtext_memberMgrMain');
 		
 		var branchBelong = Ext.getCmp('branch_tbtext_memberMgrMain');
 		firstCharge.setValue();
@@ -1437,6 +1444,7 @@ Ext.onReady(function(){
 				datatype : 'json',
 				success : function(data, status, req){
 					fansAmount.setValue(data.root[0].fansAmount);
+					commissionAmount.setValue(data.root[0].totalCommission);
 				},
 				error : function(req, status, err){
 					alert(err.msg);

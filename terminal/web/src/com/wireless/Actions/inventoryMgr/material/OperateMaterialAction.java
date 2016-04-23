@@ -37,16 +37,19 @@ public class OperateMaterialAction extends DispatchAction {
 		
 		
 		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String restaurantID = (String) request.getAttribute("restaurantID");
+		final String name = request.getParameter("name");
+		final String cateId = request.getParameter("cateId");
+		final String price = request.getParameter("price");
+		final String alarmAmount = request.getParameter("alarmAmount");
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String restaurantID = (String) request.getAttribute("restaurantID");
-			String name = request.getParameter("name");
-			String cateId = request.getParameter("cateId");
-			String price = request.getParameter("price");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Material m = new Material(Integer.valueOf(restaurantID), name, Integer.valueOf(cateId), staff.getName(), Material.Status.NORMAL.getValue());
 			m.setPrice(Float.valueOf(price));
+			m.setAlarmAmount(Integer.valueOf(alarmAmount));
+			
 			MaterialDao.insert(m);
 			jobject.initTip(true, "操作成功, 已添加新原料信息.");
 		}catch(BusinessException e){

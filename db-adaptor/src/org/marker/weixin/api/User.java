@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 
+import com.alibaba.fastjson.JSONObject;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.DateUtil;
 
 public class User implements Jsonable{
 	private boolean subscribe;
@@ -20,6 +22,7 @@ public class User implements Jsonable{
 	private long subscribeTime;
 	private String unionId;
 	private String remark;
+	private int sex;
 	
 	public static User newInstance(Token token, String openId) throws ClientProtocolException, IOException{
 		return JObject.parse(JSON_CREATOR, 0, BaseAPI.doGet("https://api.weixin.qq.com/cgi-bin/user/info?access_token=" + token.getAccessToken() + "&openid=" + openId + "&lang=zh_CN"));
@@ -27,7 +30,22 @@ public class User implements Jsonable{
 	
 	public Status remark(Token token, String content) throws ClientProtocolException, IOException{
 		setRemark(content);
-		return BaseAPI.doPost("https://api.weixin.qq.com/cgi-bin/user/info/updateremark?access_token=" + token.getAccessToken(), this, JSONABLE_4_REMAKE);
+		return BaseAPI.doPost("https://api.weixin.qq.com/cgi-bin/user/info/updateremark?access_token=" + token.getAccessToken(), new Jsonable(){
+
+			@Override
+			public JsonMap toJsonMap(int flag) {
+				JsonMap jm = new JsonMap();
+				jm.putString(Key4Json.OPEN_ID.key, openId);
+				jm.putString(Key4Json.REMARK.key, remark);
+				return jm;
+			}
+
+			@Override
+			public void fromJsonMap(JsonMap jm, int flag) {
+				
+			}
+			
+		}, 0);
 	}
 	
 	public User(String openId){
@@ -151,15 +169,29 @@ public class User implements Jsonable{
 		return this.remark;
 	}
 	
-	private final static int JSONABLE_4_REMAKE = 1;
+	public String getSex(){
+		if(this.sex == 1){
+			return "男";
+		}else if(this.sex == 2){
+			return "女";
+		}else{
+			return "未知";
+		}
+	}
 	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		if(flag == JSONABLE_4_REMAKE){
-			jm.putString(Key4Json.OPEN_ID.key, openId);
-			jm.putString(Key4Json.REMARK.key, remark);
-		}
+		jm.putString(Key4Json.OPEN_ID.key, openId);
+		jm.putString(Key4Json.REMARK.key, remark);
+		jm.putBoolean(Key4Json.SUBSCRIBE.key, this.subscribe);
+		jm.putString(Key4Json.SUBSCRIBE_TIME.key, DateUtil.format(this.subscribeTime, DateUtil.Pattern.TIME));
+		jm.putString(Key4Json.NICK_NAME.key, this.nickName);
+		jm.putString(Key4Json.LANGUAGE.key, this.language);
+		jm.putString(Key4Json.CITY.key, this.city);
+		jm.putString(Key4Json.PROVINCE.key, this.province);
+		jm.putString(Key4Json.HEAD_IMG_URL.key, this.headImgUrl);
+		jm.putString(Key4Json.SEX.key, this.getSex());
 		return jm;
 	}
 
@@ -198,6 +230,7 @@ public class User implements Jsonable{
 		setHeadImgUrl(jsonMap.getString(Key4Json.HEAD_IMG_URL.key));
 		setSubscribeTime(jsonMap.getLong(Key4Json.SUBSCRIBE_TIME.key));
 		setUnionId(jsonMap.getString(Key4Json.UNION_ID.key));
+		this.sex = jsonMap.getInt(Key4Json.SEX.key);
 	}
 	
 	public static Jsonable.Creator<User> JSON_CREATOR = new Jsonable.Creator<User>() {
@@ -213,11 +246,11 @@ public class User implements Jsonable{
 	}
 	
 	public static void main(String[] args) throws IOException{
-		String appId = "wxa7b4687daedda86f";
-		String appSecret = "4322fbf1c4bba4cccd90424e2e16306b";
-		String openId = "o1BLgjro6_G7ZtjKUi74MZujP0bU";
+		String appId = "wx49b3278a8728ff76";
+		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+		String openId = "oM02Tjjl18I8pkJ2HNDrxF--yszo";
 		Token token = Token.newInstance(appId, appSecret);
-		System.out.println(User.newInstance(token, openId));
+		System.out.println(JSONObject.toJSON(User.newInstance(token, openId).toJsonMap(0)));
 		System.out.println(new User(openId).remark(token, "小肥蛇"));
 	}
 }
