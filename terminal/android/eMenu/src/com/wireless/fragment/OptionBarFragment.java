@@ -91,8 +91,8 @@ public class OptionBarFragment extends Fragment
 			}
 			
 			//BBar显示已点菜的数量
-			if(ShoppingCart.instance().hasOrder()){
-				selectedFoodBtn.setText(Integer.toString(ShoppingCart.instance().getAllAmount()));
+			if(ShoppingCart.instance().hasNewOrder()){
+				selectedFoodBtn.setText(Integer.toString(ShoppingCart.instance().getNewAmount()));
 			}else{
 				selectedFoodBtn.setText("0");
 			}

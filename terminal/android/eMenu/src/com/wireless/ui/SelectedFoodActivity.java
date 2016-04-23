@@ -599,11 +599,19 @@ public class SelectedFoodActivity extends Activity
 															
 															@Override
 															public void onSuccess(Table table){
+//																if(table.isIdle()){
+//																	Toast.makeText(SelectedFoodActivity.this, "对不起，此餐台还未开台，不能点菜", Toast.LENGTH_SHORT).show();
+//																}else if(table.isTempPaid()){
+//																	Toast.makeText(SelectedFoodActivity.this, "对不起，此餐台还未结账，不能点菜", Toast.LENGTH_SHORT).show();
+//																}else{
+//																	alertDialog.dismiss();
+//																	onBackPressed();
+//																}
 																if(table.isIdle()){
 																	alertDialog.dismiss();
 																	onBackPressed();
 																}else{
-																	Toast.makeText(SelectedFoodActivity.this, "对不起，此餐台还未开台，不能点菜", Toast.LENGTH_SHORT).show();
+																	Toast.makeText(SelectedFoodActivity.this, "对不起，此餐台还未结账，不能点菜", Toast.LENGTH_SHORT).show();
 																}
 																mProgressDialog.dismiss();
 															}
