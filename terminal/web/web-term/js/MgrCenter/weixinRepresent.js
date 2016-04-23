@@ -15,14 +15,20 @@ Ext.onReady(function(){
 					_representId = jr.root[0].id;
 					Ext.getCmp('activeTitle_panel_weixinRepresent').setValue(jr.root[0].title);
 	    			Ext.getCmp('detail_textarea_weixinRepresent').setValue(jr.root[0].slogon);
-	    			Ext.getCmp('endingDate_datefield_weixinRepresent').setValue(jr.root[0].finish.format('Y-m-d'));
+	    			Ext.getCmp('endingDate_datefield_weixinRepresent').setValue(jr.root[0].finish);
 	    			
 	    			Ext.getCmp('representerPoint_textfield_weixinRepresent').setValue(jr.root[0].reconmendPoint);
 	    			Ext.getCmp('representerExtraBalance_textfield_weixinRepresent').setValue(jr.root[0].recommendMoney);
 	    			Ext.getCmp('appenderPoint_textfield_weixinRepresent').setValue(jr.root[0].subscribePoint);
 	    			Ext.getCmp('appenderExtraBalance_textfield_weixinRepresent').setValue(jr.root[0].subscribeMoney);
 	    			
-	    			Ext.getCmp('commissionRange_numfield_weixinRepresent').setValue(jr.root[0].commissionRate ? (jr.root[0].commissionRate * 100).toFixed(2) : 0);
+	    			Ext.getCmp('commissionRange_numfield_weixinRepresent').setValue(jr.root[0].commissionRate ? (jr.root[0].commissionRate * 100).toFixed(2) : '');
+	    			
+	    			if(jr.root[0].commissionRate){
+	    				Ext.getCmp('commissionRange_numfield_weixinRepresent').enable();
+	    			}else{
+	    				Ext.getCmp('commissionRange_numfield_weixinRepresent').disable();
+	    			}
 	    			
 	    			var progressText = jr.root[0].isProgress ? '<span style="color:green;font-weight:bold;display:inline-block;margin-right:10px;">进行中</span>' : '<span style="color:red;font-weight:bold;display:inline-block;margin-right:10px;">已结束</span>'
 	    			var activeTitle = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">活动名称：' + jr.root[0].title + '</span>';
@@ -46,9 +52,8 @@ Ext.onReady(function(){
 	    			}else{
 	    				Ext.getCmp('extraBalance_fieldset_weixinRepresent').expand();
 	    			}
-//	    			var isChooseGivePoint = !Ext.getCmp('memberPoint_fieldset_weixinRepresent').collapsed;
-//	    			var isChooseGiveMoney = !Ext.getCmp('extraBalance_fieldset_weixinRepresent').collapsed;
-				}else{
+
+	    		}else{
 					Ext.MessageBox.alert('温磬提示', '数据读取失败');
 				}
 			},
@@ -70,21 +75,6 @@ Ext.onReady(function(){
 		minValue : new Date(),
 		columnWidth : 0.4
 	});
- 	
-// 	xtype : 'container',
-//	columnWidth : 0.24,
-//	style : {
-//		'margin-left' : '20px'
-//	},
-//	items : [{
-//		xtype : 'label',
-//		text : '活动结束时间设置',
-//		style : {
-//			'margin' : '10px',
-//			'line-height' : '30px'
-//		}
-//	},endingDate]
- 	
  	
  	var weixinRepresent_uploadMask = new Ext.LoadMask(document.body, {
  		msg : '正在上传图片...'
@@ -207,7 +197,6 @@ Ext.onReady(function(){
 				'width' : '380px',
 				'margin-top' : '10px'
 			}
-//			allowBlank : false
 		},{
 			xtype : 'panel',
 			layout : 'column',
@@ -259,6 +248,19 @@ Ext.onReady(function(){
 				xtype : 'label',
 				html : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 			}, {
+				id : 'checkCommission_checkbox_weixinRepresent',
+				xtype : 'checkbox',
+				listeners : {
+					'check' : function(thiz){
+						if(thiz.checked){
+							Ext.getCmp('commissionRange_numfield_weixinRepresent').enable();
+						}else{
+							Ext.getCmp('commissionRange_numfield_weixinRepresent').disable();
+							Ext.getCmp('commissionRange_numfield_weixinRepresent').setValue('');
+						}
+					}
+				}
+			},{
 				xtype : 'label',
 				text : '佣金比例:'
 			}, {
@@ -284,9 +286,6 @@ Ext.onReady(function(){
 			checkboxToggle : true,
 			checkboxName : 'memberPoint_checkBox_weixinRepresent',
 			layout : 'column',
-//			style : {
-//				'height' : '100px'
-//			},
 			items : [{
 				xtype : 'label',
 				text : '推荐人积分:',
@@ -408,7 +407,6 @@ Ext.onReady(function(){
         			
         			params.dataSource = 'update';
         			
-//        			weixinRepresent_uploadMask.show();
         			Ext.Ajax.request({
         				url : '../../OperateRepresent.do',
         				params : params,
@@ -432,15 +430,7 @@ Ext.onReady(function(){
         	text : '预览',
         	listeners : {
         		click : function(){
-//        			initRepresentMsg();
-        		}
-        	}
-        }, {
-        	xtype : 'button',
-        	text : '重置',
-        	listeners : {
-        		click : function(){
-        			initRepresentMsg();
+        			loadPost();
         		}
         	}
         }]
@@ -460,70 +450,69 @@ Ext.onReady(function(){
 	viewPanel.setHeight(centerPanel.getHeight());
 	Ext.getCmp('representPosterShower_panel_weixinRepresent').setHeight(500);
 	
-	var host = null;
-	if(window.location.hostname == 'e-tones.net'){
-		host = 'wx.e-tones.net'
-	}else if(window.location.hostname == 'ts.e-tones.net'){
-		host = 'ts.e-tones.net';
-	}else if(window.location.hostname == 'localhost'){
-		host = 'localhost:8080'
-	}else{
-		host = window.location.hostname;
-	}
 	
-	$('#posterContainer_div_weixinRepresent').load('http://' + host + '/wx-term/weixin/order/representCard.html', function(res, status, xhr){
-		var title, imageUrl, desc; 
-		var height = $('#posterContainer_div_weixinRepresent').height() - 20;
-		var width = $('#posterContainer_div_weixinRepresent').width();
-		
-		if(status == 'success'){
-			Ext.Ajax.request({
-				url : '../../OperateRepresent.do',
-				params : {
-					dataSource : 'getByCond'
-				},
-				success : function(data, opt){
-					var jr = Ext.decode(data.responseText);
-					if(jr.success){
-						title = jr.root[0].title;
-						desc = jr.root[0].slogon;
-						
-//						$(res).find('[id=background_div_representCard]').css({
-////							'background-image' : 'url(\"' + imageUrl + '\")'
-//							'background' : 'red'
-//						});
-//						$(res).trigger('refresh');
-						$('#container_div_representCard').css({
-							'height' : height,
-							'width' : width
-						});
-						$('#qrCode_div_representCard').css({
-							'width' : '38%',
-							'position' : 'absolute',
-							'left' : '0',
-							'bottom' : '0',
-							'padding' : '0 20px',
-							'border-right' : '1px solid #999'
-						});
-						
-						$('#qrCode_div_representCard').attr('src', '../../images/qrCode.jpg');
-						
-						$('#background_div_representCard').css({
-							'background-image' : 'url("' + (jr.root[0].image.image ? jr.root[0].image.image : 'http://digie-image-test.oss.aliyuncs.com/WxRepresent/40/20160416154639937.jpg') + '")',
-							'height' : '75%',
-							'width' : '100%'
-						});
-						
-						$('#title_h1_representCard').html(title);
-						$('#title_h1_representCard').css('font-size', '34px');
-						$('#descrition_p_representCard').html(desc);
-						$('#descrition_p_representCard').css('font-size', '26px');
-					}
-				},
-				failure : function(req, opt){
-					Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
-				}
-			});
+	loadPost();
+	function loadPost(){
+		var host = null;
+		if(window.location.hostname == 'e-tones.net'){
+			host = 'wx.e-tones.net'
+		}else if(window.location.hostname == 'ts.e-tones.net'){
+			host = 'ts.e-tones.net';
+		}else if(window.location.hostname == 'localhost'){
+			host = 'localhost:8080'
+		}else{
+			host = window.location.hostname;
 		}
-	});
+	
+		$('#posterContainer_div_weixinRepresent').load('http://' + host + '/wx-term/weixin/order/representCard.html', function(res, status, xhr){
+			var title, imageUrl, desc; 
+			var height = $('#posterContainer_div_weixinRepresent').height() - 20;
+			var width = $('#posterContainer_div_weixinRepresent').width();
+			
+			if(status == 'success'){
+				Ext.Ajax.request({
+					url : '../../OperateRepresent.do',
+					params : {
+						dataSource : 'getByCond'
+					},
+					success : function(data, opt){
+						var jr = Ext.decode(data.responseText);
+						if(jr.success){
+							title = jr.root[0].title;
+							desc = jr.root[0].slogon;
+							
+							$('#container_div_representCard').css({
+								'height' : height,
+								'width' : width
+							});
+							$('#qrCode_div_representCard').css({
+								'width' : '38%',
+								'position' : 'absolute',
+								'left' : '0',
+								'bottom' : '0',
+								'padding' : '0 20px',
+								'border-right' : '1px solid #999'
+							});
+							
+							$('#qrCode_div_representCard').attr('src', '../../images/qrCode.jpg');
+							
+							$('#background_div_representCard').css({
+								'background-image' : 'url("' + (jr.root[0].image ? jr.root[0].image.image : 'http://digie-image-test.oss.aliyuncs.com/WxRepresent/40/20160416154639937.jpg') + '")',
+								'height' : '75%',
+								'width' : '100%'
+							});
+							
+							$('#title_h1_representCard').html(title);
+							$('#title_h1_representCard').css('font-size', '34px');
+							$('#descrition_p_representCard').html(desc);
+							$('#descrition_p_representCard').css('font-size', '26px');
+						}
+					},
+					failure : function(req, opt){
+						Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+					}
+				});
+			}
+		});
+	}
 });

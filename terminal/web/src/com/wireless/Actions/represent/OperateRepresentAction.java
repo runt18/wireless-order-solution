@@ -46,17 +46,17 @@ public class OperateRepresentAction extends DispatchAction{
 			final Represent.UpdateBuilder builder = new Represent.UpdateBuilder(Integer.parseInt(id));
 			
 			//标题
-			if(title != null){
+			if(title != null && !title.isEmpty()){
 				builder.setTitle(title);
 			}
 			
 			//imageId
-			if(imageId != null){
+			if(imageId != null && !imageId.isEmpty()){
 				builder.setImage(Integer.parseInt(imageId));
 			}
 			
 			//宣传语
-			if(slogon != null){
+			if(slogon != null && !slogon.isEmpty()){
 				builder.setSlogon(slogon);
 			}
 			

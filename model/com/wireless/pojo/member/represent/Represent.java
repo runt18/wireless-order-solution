@@ -184,7 +184,7 @@ public class Represent implements Jsonable {
 		}
 		
 		public UpdateBuilder setCommissionRate(float commissionRate){
-			if(commissionRate > 0 && commissionRate <= 1){
+			if(commissionRate >= 0 && commissionRate <= 1){
 				this.commissionRate = commissionRate;
 			}else{
 				throw new IllegalArgumentException("佣金比例只能在0到1之间");

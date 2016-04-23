@@ -39,7 +39,7 @@ $(function(){
 				}
 			},
 			error : function(req, status, err){
-//				console.log(err);
+				console.log(err);
 			}
 		});
 	}
@@ -48,11 +48,15 @@ $(function(){
 		var containerHeight = $(window).height();
 		var containerWidth = $(window).width();
 		
+		
+		
 		$('#container_div_representCard').css({
 			'height' : containerHeight,
 			'width' : containerWidth
 		});
 		
+		
+		//活动海报
 		$('#background_div_representCard').css({
 			'height' : '75%',
 			'width' : '100%',
@@ -64,23 +68,8 @@ $(function(){
 			'background-image' : 'url("' + (data.root[0].image ? data.root[0].image.image : 'http://digie-image-test.oss.aliyuncs.com/WxRepresent/40/20160416154639937.jpg') + '")',
 			'background-size' : '100% 100%'
 		});
-//
-//		//背景图片
-//		var backgroundDom = $('<div/>');
-//		backgroundDom.css({
-//			'height' : backgroundHeight,
-//			'width' : backgroundWidth,
-////			'background-color' : 'red',
-//			'position' : 'relative',
-//			'left' : '0px',
-//			'right' : '0px',
-//			'padding-top' : '5%',
-//			'background-image' : 'url("images/represent-background.jpg")',
-//			'background-size' : '100% 100%'
-//		});
-//		
-//		
-		//二维码
+		
+		//活动二维码
 		var qrCode = $('#qrCode_div_representCard');
 		qrCode.css({
 			'width' : '38%',
@@ -91,13 +80,10 @@ $(function(){
 			'padding' : '0 64px'
 		});
 		
-//		
-//		
-//		//活动标题
-//		var activeTitle = $('<h1/>');
-//		
+		
+		//活动标题
 		$('#title_h1_representCard').html(data.root[0].title);
-//		
+
 		$('#title_h1_representCard').css({
 			'color' : 'rgb(224, 11, 19)',
 			'font-family' : '微软雅黑',
@@ -106,9 +92,8 @@ $(function(){
 			'margin' : '12% auto',
 			'font-size' : '85px'
 		});
-//		
-//		var descrition = $('<p/>');
-//		
+
+		//活动详情
 		$('#descrition_p_representCard').html(data.root[0].slogon);
 		$('#descrition_p_representCard').css({
 			'width' : '80%',
@@ -120,9 +105,5 @@ $(function(){
 			'margin-top' : '20%',
 			'font-weight' : 'bold'
 		});
-//		
-//		backgroundDom.append(activeTitle).append(descrition).append(qrCode);
-//		
-//		$('body').append(backgroundDom);
 	}
 })
