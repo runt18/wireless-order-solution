@@ -73,6 +73,12 @@ SELECT id FROM `wireless_order_db`.`restaurant` WHERE id > 10;
 ALTER TABLE `wireless_order_db`.`member` 
 ADD COLUMN `total_commission` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `used_point`;
 
+-- -----------------------------------------------------
+-- Update the branch_id to restaurant id for table 'coupon_operation'
+-- -----------------------------------------------------
+UPDATE wireless_order_db.coupon_operation
+SET branch_id = restaurant_id;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
