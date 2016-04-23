@@ -1742,21 +1742,22 @@ public class MemberDao {
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 
-		//获取关系链
-		final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
-		if(!recommends.isEmpty()){
-			
-			//获取推荐人
-			Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
-			
-			//获取门店的佣金比例
-			float commissionRate = RepresentDao.getByCond(dbCon, staff, null).get(0).getComissionRate();
-			
-			//计算出佣金充额
-			float commission = consumePrice * commissionRate;
-			
-			//为推荐人充值佣金 
-			charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+		//获取门店的佣金比例
+		float commissionRate = RepresentDao.getByCond(dbCon, staff, null).get(0).getComissionRate();
+		if(commissionRate > 0){
+			//获取关系链
+			final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
+			if(!recommends.isEmpty()){
+				
+				//获取推荐人
+				Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
+				
+				//计算出佣金充额
+				float commission = consumePrice * commissionRate;
+				
+				//为推荐人充值佣金 
+				charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+			}
 		}
 		
 		return mo;
