@@ -38,6 +38,20 @@ import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 public class WxOperateRepresentAction extends DispatchAction{
 	
 	/**
+	 * 获取推荐人的信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward referrer(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//TODO
+		return null;
+	}
+	
+	/**
 	 * 生成【我要代言】的关系链二维码
 	 * @param mapping
 	 * @param form
