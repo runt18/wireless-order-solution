@@ -41,7 +41,6 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.promotion.CouponDao;
-import com.wireless.db.promotion.CouponEffectDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -51,7 +50,6 @@ import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -74,7 +72,6 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.promotion.Coupon;
-import com.wireless.pojo.promotion.CouponEffect;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
@@ -155,166 +152,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		normalNumStyle.setBorderRight((short)1);
 		
 	}
-	
-	public ActionForward couponEffectDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String("优惠活动效果统计.xls".getBytes("GBK"), "ISO8859_1"));
-		
-		final String pin = (String)request.getAttribute("pin");
-		final String beginDate = request.getParameter("beginDate");
-		final String endDate = request.getParameter("endDate");
-		final String couponId = request.getParameter("couponId");
-		final String branchId = request.getParameter("branchId");
-		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		final CouponEffectDao.ExtraCond extraCond = new CouponEffectDao.ExtraCond();
-		
-		if(beginDate != null && !beginDate.isEmpty() && endDate != null && !endDate.isEmpty()){
-			extraCond.setRange(beginDate, endDate);
-		}
-		
-		if(couponId != null && !couponId.isEmpty()){
-			extraCond.setCoupon(Integer.parseInt(couponId));
-		}
-		
-		if(branchId != null && !branchId.isEmpty()){
-			extraCond.setBranchId(Integer.parseInt(branchId));
-		}
-		
-		//获取优惠活动的记录
-		List<CouponEffect> result = CouponEffectDao.calcByCond(staff, extraCond);
-		
-		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("优惠活动效果统计");
-		HSSFRow row = null;
-		HSSFCell cell = null;
-		
-		initParams(wb);
-		
-		sheet.setColumnWidth(0, 8000);
-		sheet.setColumnWidth(1, 4000);
-		sheet.setColumnWidth(2, 3500);
-		sheet.setColumnWidth(3, 4500);
-		sheet.setColumnWidth(4, 4000);
-		sheet.setColumnWidth(5, 5000);
-		sheet.setColumnWidth(4, 7000);
-		sheet.setColumnWidth(5, 8500);
-		
-		// 报表头
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 10));
-		
-		//冻结行
-		sheet.createFreezePane(0, 5, 0, 5);
-		
-		row = sheet.createRow(0);
-		row.setHeight((short) 550);
-		cell = row.createCell(0);
-		cell.setCellValue("优惠活动效果统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
-		cell.setCellStyle(titleStyle);
-		
-		// 摘要
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		cell = row.createCell(0);
-		cell.setCellValue("统计时间: " + beginDate + " 至 " + endDate + "         共: " + result.size() + " 条");
-		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
-		
-		// 导出操作相关信息
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " + staff.getName());
-		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
-		
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		row.setHeight((short) 350);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
-		
-		row = sheet.createRow(sheet.getLastRowNum() + 1);
-		
-		cell = row.createCell(0);
-		cell.setCellValue("优惠活动名称");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("优惠券面额");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("共发送张数");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("优惠券成本");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("共使用张数");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("使用的优惠券总面额");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("拉动消费次数");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("拉动消费额");
-		cell.setCellStyle(headerStyle);
-		
-		if(result != null && result.size() > 0){
-			for(CouponEffect item : result){
-				row = sheet.createRow(sheet.getLastRowNum() + 1);
-				row.setHeight((short) 350);
-				
-				cell = row.createCell(0);
-				cell.setCellValue(item.getCouponName());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getCouponPrice());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getIssuedAmount());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getIssuedPrice());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getUsedAmount());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getUsedPrice());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getSalesAmount());
-				cell.setCellStyle(headerStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(item.getEffectSales());
-				cell.setCellStyle(headerStyle);
-				
-			}
-		}
-		
-		OutputStream os = response.getOutputStream();
-        wb.write(os);
-        os.flush();
-        os.close();
-		return null;
-		
-		
-	}
-	
 	
 	/**
 	 * 销售统计（菜品）导出excel

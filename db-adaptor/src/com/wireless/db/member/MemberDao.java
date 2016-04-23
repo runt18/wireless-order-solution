@@ -1756,7 +1756,9 @@ public class MemberDao {
 				float commission = consumePrice * commissionRate;
 				
 				//为推荐人充值佣金 
-				charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+				if(commission > 0){
+					charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+				}
 			}
 		}
 		

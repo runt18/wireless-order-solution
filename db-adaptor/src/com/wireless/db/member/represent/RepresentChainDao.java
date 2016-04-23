@@ -132,7 +132,6 @@ public class RepresentChainDao {
 					}
 					if(subscribes.length() != 0){
 						extraCond.append(" AND subscribe_member_id IN ( " + subscribes.toString() + " ) ");
-						System.out.println(subscribes.toString());
 					}
 				} catch (SQLException | BusinessException ignored) {
 					ignored.printStackTrace();

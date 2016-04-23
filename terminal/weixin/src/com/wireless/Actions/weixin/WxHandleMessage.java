@@ -42,11 +42,6 @@ import javax.swing.ImageIcon;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.marker.weixin.HandleMessageAdapter;
-import org.marker.weixin.api.Template;
-import org.marker.weixin.api.Template.Keyword;
-import org.marker.weixin.api.Token;
-import org.marker.weixin.auth.AuthParam;
-import org.marker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
@@ -78,7 +73,6 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
-import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -638,7 +632,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			final Member subscriber = MemberDao.getByWxSerial(staff, msg.getFromUserName());
 			final Represent represent = RepresentDao.getByCond(staff, null).get(0);
 			
-			Map<Member, MemberOperation[]> result = MemberDao.chain(staff, new Member.ChainBuilder(subscriber, referrer));
+			MemberDao.chain(staff, new Member.ChainBuilder(subscriber, referrer));
 
 			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 			final String picUrl;
@@ -655,51 +649,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					      .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
 					      .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
 			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("关注有礼", desc, picUrl, createUrl(msg, WEIXIN_MEMBER))));
-			
-			//发送微信模板信息通知推荐人获得赠送充值和积分的消息
-			if(wxRestaurant.hasChargeTemplate()){
-				try{
-					final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-					final Token token = Token.newInstance(authorizerToken);
-					
-					@SuppressWarnings("unused")
-					MemberOperation chargeMo = null, pointMo = null;
-					for(MemberOperation mo : result.get(referrer)){
-						if(mo.getOperationType() == MemberOperation.OperationType.CHARGE && mo.getChargeType() == MemberOperation.ChargeType.RECOMMEND){
-							chargeMo = mo;
-						}else if(mo.getOperationType() == MemberOperation.OperationType.POINT_RECOMMEND){
-							pointMo = mo;
-						}
-					}
-					/**
-					 * {{first.DATA}}
-					 * 店面：{{keyword1.DATA}}
-					 * 充值时间：{{keyword2.DATA}}
-					 * 充值金额：{{keyword3.DATA}}
-					 * 赠送金额：{{keyword4.DATA}}
-					 * 可用余额：{{keyword5.DATA}}
-					 * {{remark.DATA}}
-					 */
-					Template.send(token, new Template.Builder()
-							.setToUser(referrer.getWeixin().getSerial())
-							.setTemplateId(wxRestaurant.getChargeTemplate())
-							.addKeyword(new Keyword("first", 
-										("亲爱的会员【$(referrer)】, 您成功推荐【$(subscriber)】成为本店会员, 现获得$(recommend_money)元的充值赠额和$(recommend_point)分的赠送积分")
-										.replace("$(referrer)", referrer.getName())
-										.replace("$(subscriber)", subscriber.getName())
-										.replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
-										.replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()))))
-							.addKeyword(new Keyword("keyword1", wxRestaurant.getNickName()))		//餐厅名称
-							.addKeyword(new Keyword("keyword2", DateUtil.format(chargeMo != null ? chargeMo.getOperateDate() : System.currentTimeMillis())))	//充值时间
-							.addKeyword(new Keyword("keyword3", NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(chargeMo != null ? chargeMo.getChargeMoney() : 0)))	//充值金额
-							.addKeyword(new Keyword("keyword4", NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(chargeMo != null ? chargeMo.getDeltaBaseMoney() + chargeMo.getDeltaExtraMoney() - chargeMo.getChargeMoney() : 0)))				//赠送金额
-							.addKeyword(new Keyword("keyword5", NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(chargeMo != null ? chargeMo.getRemainingTotalMoney() : referrer.getTotalBalance())))  //可用余额
-							.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
-							);
-				}catch(Exception ignored){
-					ignored.printStackTrace();
-				}
-			}
 		}
 	}
 	

@@ -98,7 +98,7 @@ Ext.onReady(function(){
 						if(jr.root[0].typeVal != '2'){
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
 						}else{
-							data.push(['', '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 							 
 							for(var i = 0; i < jr.root[0].branches.length; i++){
 								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
@@ -106,12 +106,7 @@ Ext.onReady(function(){
 						}
 						
 						thiz.store.loadData(data);
-						if(jr.root[0].typeVal != '2'){
-							thiz.setValue(jr.root[0].id);
-						}else{
-							thiz.setValue('');
-						}
-						
+						thiz.setValue(jr.root[0].id);
 						thiz.fireEvent('select');
 					}
 				});
@@ -158,8 +153,6 @@ Ext.onReady(function(){
 			ds.baseParams['dataSource'] = 'calcByCond';
 			ds.baseParams['beginDate'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
 			ds.baseParams['endDate'] = Ext.util.Format.date(endDate.getValue(), 'y-m-d 23:59:59');
-			ds.baseParams['branchId'] = branchSelect_combo_couponEffect.getValue();
-			ds.baseParams['couponId'] = couponType_combo_couponEffect.getValue();
 			ds.load({
 				params : {
 					start : 0,
@@ -167,25 +160,6 @@ Ext.onReady(function(){
 				}
 			});
 		}
-	}, {
-		text : '导出',
-		iconCls : 'icon_tb_exoprt_excel',
-		handler : function(){
-		
-		var url = '../../{0}?dataSource={1}&beginDate={2}&endDate={3}&couponTypeId={4}&branchId={5}';
-		url = String.format(
-			url,
-			'ExportHistoryStatisticsToExecl.do',
-			'couponEffectDetail',
-			beginDate.getValue().format('Y-m-d 00:00:00'),
-			endDate.getValue().format('Y-m-d 23:59:59'),
-			couponType_combo_couponEffect.getValue(),
-			branchSelect_combo_couponEffect.getValue()
-		)
-		window.location = url;
-		
-		}
-		
 	}]
 	
 	//头部
@@ -320,11 +294,7 @@ Ext.onReady(function(){
 	
 	//定义couponGrid的位置
 	couponEffect.region = 'center';
-	couponEffect.on('render', function(){
-		dataCombo.setValue(1);
-		dataCombo.fireEvent('select', dataCombo, null, 1);		
-	});
-	
+
 	couponEffect.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
@@ -350,8 +320,8 @@ Ext.onReady(function(){
 		items : [couponEffectPanel]
 	});
 	
-	Ext.getCmp('couponEffect_btn_couponEffectStatistics').handler();	
-	
+	dataCombo.setValue(1);
+	dataCombo.fireEvent('select', dataCombo, null, 1);
 	
 	function couponEffectOperate(a, b, c){
 		return '<a class="couponEffect">查看详细</a>'
