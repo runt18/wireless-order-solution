@@ -51,14 +51,14 @@ $(function(){
 			if(data.success){
 				//会员卡号
 				$('#divWXMemberCard').html('No.' + data.other.weixinCard);
+				$('#fansAmount_span_member').html(data.other.member.fansAmount);
+				$('#totalCommission_span_member').html(data.other.member.totalCommission);
 				
 				if(data.other.status == 2){
 					//手机号已绑定状态
 					$('#phone_div_member').show();
 					$('#bind_div_member').hide();
 					
-					$('#fansAmount_span_member').html(data.other.member.fansAmount);
-					$('#totalCommission_span_member').html(data.other.member.totalCommission);
 					$('#divMemberRecommendHistory').css('display', 'block');
 				}else if(data.other.status == 1){
 					//手机号码未绑定状态
@@ -532,7 +532,7 @@ $(function(){
 
 					if(data.root.length > 0){
 						var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
-						'<td style="width:39%;text-align: center;line-height:20px;">{subscribeDate}</td>' + 
+						'<td style="width:39%;text-align: center;line-height:30px;">{subscribeDate}</td>' + 
 						'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
 						'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
 						'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
@@ -542,7 +542,7 @@ $(function(){
 						for(var i = 0; i < data.root.length; i++){
 							temp = data.root[i];
 							html.push(template.format({
-								subscribeDate : temp.subscribeDate,
+								subscribeDate : new Date(temp.subscribeDate).format('yyyy-MM-dd'),
 								subscribeMember : temp.subscribeMember,
 								recommendMoney : temp.recommendMoney,
 								recommendPoint : temp.recommendPoint
@@ -578,7 +578,7 @@ $(function(){
 				Util.lm.hide();
 				if(data.success){
 					var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
-					'<td style="width:39%;text-align: center;line-height:20px;">{operateDateFormat}</td>' + 
+					'<td style="width:39%;text-align: center;line-height:30px;">{operateDateFormat}</td>' + 
 					'<td style="width:30%;text-align:center;line-height:30px;">{consumeMemberName}</td>' +
 					'<td style="width:20%;text-align:center;line-height:30px;">{deltaTotalMoney}元</td>' +
 					'</tr>';
@@ -587,7 +587,7 @@ $(function(){
 					for(var i = 0; i < data.root.length; i++){
 						temp = data.root[i];
 						html.push(template.format({
-							operateDateFormat : temp.operateDateFormat,
+							operateDateFormat : new Date(temp.operateDateFormat).format('yyyy-MM-dd'),
 							consumeMemberName : temp.member.name,
 							deltaTotalMoney : temp.deltaTotalMoney
 						}));

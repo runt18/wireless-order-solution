@@ -250,9 +250,10 @@ Ext.onReady(function(){
 			}, {
 				id : 'checkCommission_checkbox_weixinRepresent',
 				xtype : 'checkbox',
+				checked : true,
 				listeners : {
-					'check' : function(thiz){
-						if(thiz.checked){
+					check : function(){
+						if(Ext.getCmp('checkCommission_checkbox_weixinRepresent').checked){
 							Ext.getCmp('commissionRange_numfield_weixinRepresent').enable();
 						}else{
 							Ext.getCmp('commissionRange_numfield_weixinRepresent').disable();
@@ -485,12 +486,12 @@ Ext.onReady(function(){
 								'height' : height,
 								'width' : width
 							});
+							
 							$('#qrCode_div_representCard').css({
-								'width' : '38%',
+								'width' : '28%',
 								'position' : 'absolute',
 								'left' : '0',
-								'bottom' : '0',
-								'padding' : '0 20px',
+								'padding' : '0 12%',
 								'border-right' : '1px solid #999'
 							});
 							
@@ -499,13 +500,37 @@ Ext.onReady(function(){
 							$('#background_div_representCard').css({
 								'background-image' : 'url("' + (jr.root[0].image ? jr.root[0].image.image : 'http://digie-image-test.oss.aliyuncs.com/WxRepresent/40/20160416154639937.jpg') + '")',
 								'height' : '75%',
-								'width' : '100%'
+								'width' : '100%',
+								'margin-bottom' : '2%'
 							});
+							
+							$('#headingPhoto_img_representCard').css({
+								'width' : '28%',
+								'padding' : '0 9%',
+								'border-radius' : '50%'
+							});
+							
+							$('#headingPhoto_img_representCard').attr('src', 'http://wx.qlogo.cn/mmopen/dmwVvwWRJuBdrMQylJiaxqAMjxT9bDcViaQ4Q6ybvyUUnKQKJLiakaiaDsibhgWeOquBFvNHvasOic2afurSKwFeia7sfrORo1vdY7f/0');
 							
 							$('#title_h1_representCard').html(title);
 							$('#title_h1_representCard').css('font-size', '34px');
 							$('#descrition_p_representCard').html(desc);
 							$('#descrition_p_representCard').css('font-size', '26px');
+							
+							$('#decoration_span_represetnCard').css({
+								'font-size' : '110%',
+								'width' : '40%',
+								'color' : '#666'
+							});
+		
+							$('#tips_span_representCard').css({
+								'font-size' : '110%',
+								'width' : '50%',
+								'color' : '#666'	
+							});
+							
+							$('#restaurantTips_span_representCard').html('【店铺名】');
+							
 						}
 					},
 					failure : function(req, opt){

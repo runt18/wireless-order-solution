@@ -94,32 +94,4 @@ public class WxOperateRestaurantAction extends DispatchAction {
 		return null;
 	}
 	
-	
-	
-	/**
-	 * 获取餐厅的代言设置
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward representActive(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String fid = request.getParameter("fid");
-		final JObject jObject = new JObject();
-		try{
-			final Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
-			
-			final RepresentDao.ExtraCond extraCond = new RepresentDao.ExtraCond();
-			
-			jObject.setRoot(RepresentDao.getByCond(staff, extraCond));
-		}catch(BusinessException | SQLException e){
-			e.printStackTrace();
-			jObject.initTip(e);
-		}finally{
-			response.getWriter().print(jObject.toString());
-		}
-		return null;
-	}
 }
