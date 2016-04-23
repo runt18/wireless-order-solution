@@ -64,6 +64,7 @@ public class CalcBillStatisticsDao {
 		private boolean isChain = false;
 		private Region.RegionId regionId;
 		private Department.DeptId deptId;
+		private int kitchenId;
 		private String foodName;
 		private HourRange hourRange;
 		private int staffId;
@@ -90,6 +91,16 @@ public class CalcBillStatisticsDao {
 		
 		public ExtraCond setDept(Department.DeptId deptId){
 			this.deptId = deptId;
+			return this;
+		}
+		
+		public ExtraCond setKitchen(Kitchen kitchen){
+			this.kitchenId = kitchen.getId();
+			return this;
+		}
+		
+		public ExtraCond setKitchen(int kitchenId){
+			this.kitchenId = kitchenId;
 			return this;
 		}
 		
@@ -133,6 +144,9 @@ public class CalcBillStatisticsDao {
 			}
 			if(staffId4OrderFood > 0){
 				extraCond.append(" AND OF.staff_id = " + staffId4OrderFood);
+			}
+			if(kitchenId > 0){
+				extraCond.append(" AND OF.kitchen_id = " + kitchenId);
 			}
 			return extraCond.toString();
 		}
