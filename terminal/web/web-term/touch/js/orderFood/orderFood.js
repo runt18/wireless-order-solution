@@ -87,7 +87,7 @@ $(function(){
 	//初始化新点菜区域
 	function initNewFoodContent(){
 		//已点菜列表					  
-		var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-unique={unique} data-theme={dataTheme} class={dataClass} data-value={id} data-type="orderFoodCmp" ><a >'+
+		var orderFoodCmpTemplet = '	<li data-icon={isGift} data-index={dataIndex} data-theme={dataTheme} class={dataClass} data-value={id} data-type="orderFoodCmp" ><a >'+
 										'<h1 style="font-size:20px;">{name}</h1>' +
 										'<div class="{hasComboFood}"><ul data-role="listview" data-inset="false" class="div4comboFoodList">{comboFoodList}</ul></div><br>' +
 										'<span style="color:green;">{tasteDisplay}</span>' +
@@ -136,11 +136,10 @@ $(function(){
 				dataIndex : index,
 				dataTheme : e.selected ? 'e' : 'c',
 				dataClass : e.selected ? 'ui-btn-up-e' : 'ui-btn-up-c',
-				unique : e.unique,
 				id : e.id,
 				name : e.name,
 				count : e.count,
-				unitPrice : e.unitPrice.toFixed(2),
+				unitPrice : e.getUnitPrice().toFixed(2),
 				totalPrice : e.getPrice().toFixed(2),
 				foodStatus : foodStatus.join('，'),
 				isGift : typeof e.isGift == 'boolean' && e.isGift ? 'forFree' : 'false',

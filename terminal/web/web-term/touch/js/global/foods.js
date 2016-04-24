@@ -255,12 +255,12 @@ WirelessOrder.Taste = function(taste){
 		//判断计算方式是否用价钱
 		_instance.isCalcByPrice = function(){
 			return _instance.calcValue == WirelessOrder.Taste.CalcType.BY_PRICE.val;
-		}
+		};
 		
 		//判断taste是否相同
 		_instance.isTasteMatch = function(taste){
 		
-		}
+		};
 		
 		return _instance;
 	}
@@ -269,7 +269,7 @@ WirelessOrder.Taste = function(taste){
 WirelessOrder.Taste.CalcType = {
 	BY_PRICE : {val : 0, name : "按价格"},
 	BY_RATE : {val : 1, name : "按比例"}
-}
+};
 
 WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	var _instance;
@@ -309,7 +309,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 				_instance.normalTasteContent.splice(index, 1);
 			}
 		});
-	}
+	};
 	
 	//保存口味组
 	_instance.setTastes = function(tastes){
@@ -397,7 +397,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 				price : price ? price : 0 
 			};
 		}
-	}
+	};
 	
 	
 	function isNormalMatch(tasteGroup){
@@ -450,7 +450,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	//判断口味组是否相同
 	_instance.equals = function(tasteGroup){
 		return isNormalMatch(tasteGroup) && isTmpMatch(tasteGroup);
-	}
+	};
 	
 	
 	return _instance;
@@ -468,7 +468,7 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 		
 		_instance.tasteGroup.addTaste(taste);
 		parentFood.addTaste(taste);
-	}
+	};
 	
 	
 	_instance.removeTaste = function(taste){
@@ -486,16 +486,16 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 			return true;
 		}
 		
-	}
+	};
 	
 	_instance.setFoodUnit = function(unit){
 		this.foodUnit = unit;
-	}
+	};
 	
 	//是否有单位
 	_instance.hasFoodUnit = function(){
 		return typeof _instance.foodUnit != 'undefined';
-	}
+	};
 	
 	//是否有临时口味
 	_instance.hasTempTaste = function(){
@@ -504,7 +504,7 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 		}
 		
 		return _instance.tasteGroup.hasTmpTaste();
-	}
+	};
 	
 	
 	//添加临时口味
@@ -518,11 +518,11 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 		tastes.forEach(function(eachTaste, index){
 			parentFood.addTaste(eachTaste);
 		});
-	}
+	};
 	
 	_instance.hasTasteGroup = function(){
 		return typeof _instance.tasteGroup !== 'undefined'; 
-	}
+	};
 	
 	_instance.getTastePref = function(){
 		if(this.hasTasteGroup()){
@@ -531,7 +531,7 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 			return '';
 		}
 		
-	}
+	};
 	
 	
 	_instance.setTempTaste = function(name, price){
@@ -541,7 +541,7 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 		}
 		
 		_instance.tasteGroup.setTmpTaste(name, price);
-	}
+	};
 	
 	
 	return _instance;
@@ -611,7 +611,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 			//判断taste是否经过wirelessOrder.Taste包装,如果不是,就要重新进行包装
 			_orderFood.tasteGroup.addTaste(taste);
 		}		
-	}
+	};
 	
 	_orderFood.removeTaste = function(taste){
 		if(typeof _orderFood.tasteGroup === 'undefined'){
@@ -623,7 +623,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}
 		
 		
-	}
+	};
 	
 	//加入口味组
 	_orderFood.setTastes = function(tastes){
@@ -633,7 +633,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}
 		
 		_orderFood.tasteGroup.setTastes(tastes);
-	}
+	};
 	
 	//设置是否赠送
 	_orderFood.setGift = function(onOff, loginStaff){
@@ -660,7 +660,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}
 		
 		return _orderFood.tasteGroup.hasTmpTaste();
-	}
+	};
 	
 	//添加临时口味
 	_orderFood.setTempTaste = function(name, price){
@@ -670,9 +670,18 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}
 		
 		_orderFood.tasteGroup.setTmpTaste(name, price);
-	}
+	};
 	
+	//计算菜品的单价
+	_orderFood.getUnitPrice = function(){
+		if(this.isWeight()){
+			return this.unitPrice;
+		}else{
+			return this.unitPrice + (this.hasTasteGroup() ? this.tasteGroup.getPrice() : 0);
+		}
+	};
 	
+	//计算菜品的价钱
 	_orderFood.getPrice = function(){
 		if(_orderFood.isWeight()){
 			return _orderFood.unitPrice * _orderFood.count + (_orderFood.hasTasteGroup() ? _orderFood.tasteGroup.getPrice() : 0);
@@ -684,7 +693,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 	
 	_orderFood.hasTasteGroup = function(){
 		return typeof _orderFood.tasteGroup !== 'undefined';
-	}
+	};
 	
 	_orderFood.getTasteGroup = function(){
 		if(_orderFood.hasTasteGroup()){
@@ -692,7 +701,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}else{
 			return null;
 		}
-	}
+	};
 	
 	function isUnitMatch(food){
 		if(_orderFood.isUnit() && food.isUnit()){
@@ -726,7 +735,7 @@ WirelessOrder.OrderFood = function(food, isTemporary){
 		}else{
 			return true;
 		}
-	}
+	};
 	
 	//-------------初始化------------------------
 
@@ -792,7 +801,7 @@ WirelessOrder.Order = function(){
 	//判断是否有菜品
 	_orderFoods.isEmpty = function(){
 		return this.length == 0;
-	}
+	};
 
 	
 	//增加菜品
@@ -812,14 +821,9 @@ WirelessOrder.Order = function(){
 			_orderFoods[index].addCount(1);
 			//将改变的菜品置为选中状态
 			_orderFoods.select(index);
-			//重新赋值唯一标示
-			foodData.unique = _orderFoods[index].unique;
 			
 		}else{
 
-			//生成唯一标示
-			foodData.unique = new Date().getTime();
-			
 			var multiPrice = WirelessOrder.foods.getById(foodData.id).multiUnitPrice;
 			if(!foodData.hasFoodUnit() && multiPrice.length > 0){
 				foodData.setFoodUnit(multiPrice[0]);	
@@ -885,9 +889,8 @@ WirelessOrder.Order = function(){
 			price : 0,		//价钱
 			count : 0,		//数量
 			kitchen : 0		//分厨
-		}
+		};
 		_orderFoods.push(new WirelessOrder.OrderFood({
-			unique : new Date().getTime(),
 			id : (new Date().getTime() + '').substring(5, 9),
 			alias : (new Date().getTime() + '').substring(5, 9),
 			name : c.name,
@@ -904,13 +907,13 @@ WirelessOrder.Order = function(){
 		for(var i = 0; i < _orderFoods.length; i++){
 			_orderFoods[i].addTaste(taste);	
 		}
-	}
+	};
 	
 	_orderFoods.removeAllTaste = function(taste){
 		for(var i = 0; i < _orderFoods.length; i++){
 			_orderFoods[i].removeTaste(taste);	
 		}
-	}
+	};
 	
 	
 	return _orderFoods;
