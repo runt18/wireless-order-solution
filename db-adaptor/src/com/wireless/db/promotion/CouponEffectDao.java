@@ -155,9 +155,11 @@ public class CouponEffectDao {
 		sql = " SELECT CT.coupon_type_id, COUNT(*) AS sales_amount, SUM(TMP.actual_price) AS sales_price FROM( " +
 			    " SELECT O.id, MAX(CO.`coupon_id`) AS coupon_id, MAX(O.actual_price) AS actual_price " +
 			    " FROM " + Params.dbName + ".coupon_operation CO " +
-			    " JOIN " + Params.dbName + ".order_history O ON CO.associate_id = O.id AND CO.operate =  " + CouponOperation.Operate.ORDER_USE.getVal() +
+			    " JOIN " + Params.dbName + ".order_history O ON CO.associate_id = O.id " +
 			    " WHERE 1 = 1 " +
-			    " AND CO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId())  +
+			    " AND CO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
+			    " AND CO.operate =  " + CouponOperation.Operate.ORDER_USE.getVal() +
+			    (extraCond != null ? extraCond.toString() : "") +
 			    " GROUP BY O.id " +
 				" ) AS TMP " +
 			 " LEFT JOIN `" + Params.dbName + "`.`coupon` C ON C.`coupon_id` = TMP.coupon_id " +
