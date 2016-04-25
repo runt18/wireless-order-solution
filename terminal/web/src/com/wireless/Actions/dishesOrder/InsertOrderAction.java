@@ -45,8 +45,6 @@ public class InsertOrderAction extends Action{
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-
-			
 			final PrintOption printOption;
 			if(notPrint != null && !notPrint.isEmpty()){
 				printOption = Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT;
