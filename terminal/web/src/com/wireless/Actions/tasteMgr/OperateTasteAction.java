@@ -1,5 +1,7 @@
 package com.wireless.Actions.tasteMgr;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -105,26 +107,57 @@ public class OperateTasteAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward delete(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward delete(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
 		
-		
-		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String id = request.getParameter("id");
 			TasteDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
-			jobject.initTip(true, "操作成功, 已删除口味信息.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 已删除口味信息.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 获取口味信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		final JObject jObject = new JObject();
+		try{
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final TasteDao.ExtraCond extraCond = new TasteDao.ExtraCond();
+			
+			if(id != null && !id.isEmpty()){
+				extraCond.setId(Integer.parseInt(id));
+			}
+			
+			jObject.setRoot(TasteDao.getByCond(staff, extraCond, null));
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
