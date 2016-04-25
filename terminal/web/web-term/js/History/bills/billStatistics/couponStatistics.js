@@ -1,5 +1,6 @@
 Ext.onReady(function(){
 	var hours;
+	var isDuty = false;
 	var beginDate = new Ext.form.DateField({
 		id: 'beginDate_combo_coupon',
 		xtype : 'datefield',
@@ -177,7 +178,7 @@ Ext.onReady(function(){
 						if(jr.root[0].typeVal != '2'){
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
 						}else{
-							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							data.push(['', '全部'],[jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 							 
 							for(var i = 0; i < jr.root[0].branches.length; i++){
 								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
@@ -255,8 +256,9 @@ Ext.onReady(function(){
 		text : '搜索',
 		id : 'coupon_btnSearch',
 		iconCls : 'btn_search',
-		handler : function(e){
-			
+		handler : function(e, aa){
+			console.log(e);
+			consoloe.log(aa);
 			if(!beginDate.isValid() || !endDate.isValid){
 				return;
 			}
@@ -275,6 +277,7 @@ Ext.onReady(function(){
 			store.baseParams['endDate'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 			store.baseParams['staffId'] = couponStaff.getValue() < 0 ? '' : couponStaff.getValue();
 			store.baseParams['opening'] = businessHour.opening;
+			store.baseParams['isDuty'] = isDuty;
 			store.baseParams['ending'] = businessHour.ending;
 			store.baseParams['couponTypeId'] = coupon.getValue();
 			store.baseParams['branchId'] = branch_combo_coupon.getValue()

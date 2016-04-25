@@ -3,6 +3,8 @@ $(function(){
 	
 	var salesSubQueryType = 0;
 	var salesSubDeptId = -1;
+	var salesSubKitchenId = -1;
+	var isLeaf = false;
 	var SALESSUB_PAGE_LIMIT = 22;
 	var titleDeptName, titleRegionName, selectDeptId;
 	var deptStatPanelGrid, salesSub_hours;
@@ -91,8 +93,18 @@ $(function(){
 					}
 	        	},
 	        	click : function(e){
+	        		
+	        		if(e.leaf){
+	        			salesSubKitchenId = e.attributes.KitchenID;
+	        			salesSubDeptId = -1;
+	        			isLeaf = true;
+	        		}else{
+	        			salesSubDeptId = e.attributes.deptID;
+	        			salesSubKitchenId = -1;
+	        			isLeaf = false;
+	        		}
 	        		Ext.getDom('lab_salesSubDept_food').innerHTML = e.text;
-	        		salesSubDeptId = e.attributes.deptID;
+	        		
 	        		Ext.getCmp('foodStatistic_btnSearch').handler();
 	        	}
 	        }
@@ -379,6 +391,7 @@ $(function(){
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['deptID'] = branch_combo_foodstatistics.getValue() == -1 ? -1 : salesSubDeptId;
+				gs.baseParams['kitchenID'] = isLeaf ? salesSubKitchenId : -1;;
 				gs.baseParams['foodName'] = foodName.getValue();
 				gs.baseParams['region'] = Ext.getCmp("foodStatistic_comboRegion").getValue();
 				gs.baseParams['staffId'] = foodSale_combo_staffs.getValue();

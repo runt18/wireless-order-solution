@@ -278,6 +278,7 @@
 								Ext.getCmp('endDate_combo_receipts').setValue(sendToStatisticsPageEndDate);
 								
 								receipt_hours = sendToStatisticsPageHours;
+								isDuty = true;
 								
 								Ext.getCmp('regionSelect_combo_businessReceips').setValue(sendToStatisticsRegion);
 								
@@ -525,13 +526,13 @@
 								Ext.getCmp('endDate_combo_coupon').setValue(sendToStatisticsPageEndDate);
 								
 								hours = sendToStatisticsPageHours;
-								
+								var isDuty = true;
 								
 								Ext.getCmp('coupon_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
 								Ext.getCmp('coupon_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
 								Ext.getCmp('coupon_comboBusinessHour').setValue(hours.hourComboValue);	
 								
-								Ext.getCmp('coupon_btnSearch').handler();
+								Ext.getCmp('coupon_btnSearch').handler(isDuty);
 								businessSubStatisticsLoading.hide();
 								
 							}else{
