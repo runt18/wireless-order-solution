@@ -39,6 +39,33 @@ Ext.onReady(function(){
 		}
 		
 	});
+	
+	var alarmData = [[-1, '全部'],['underAlarm', '低于'],['overAlarm', '高于']];
+	var materialAlarmCombo;
+	materialAlarmCombo = new Ext.form.ComboBox({
+		id : 'alarmCombo_combo_stockDistribution',
+		fidldLabel : '库存预警:',
+		forceSelection : true,
+		width : 110,
+		value : -1,
+		store : new Ext.data.SimpleStore({
+			fields : [ 'value', 'text' ],
+			data : alarmData
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		readOnly : false,
+		listeners : {
+	        select : function(){  
+	        	Ext.getCmp('btnStockDistributionSearch').handler();
+			}  
+		}
+		
+	});
 	var materialCateStore = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
 		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do'}),
@@ -163,6 +190,16 @@ Ext.onReady(function(){
 		}
 	});
 	
+	
+	function renderAlarmAmount(data, cel, store){
+		
+		if(store.json.alarmAmount){
+			return data >= store.json.alarmAmount ? '<span style="font-weight: bold; color :green;font-size :14px;">' + data + '<span>' : '<span style="font-weight: bold; color :red;font-size :14px;">' + data + '<span>';
+		}else{
+			return '<span style="font-weight: bold; color :green;font-size :14px;">' + data + '<span>';
+		}
+	}
+	
 	var deptColumnModel = [{header:'品项名称', dataIndex:'materialName', width:200}];
 	var dataStore = [{name : 'materialName'}];
 	for (var i = 0; i < deptProperty.length; i++) {
@@ -170,11 +207,13 @@ Ext.onReady(function(){
 		dataStore.push({name : 'dept'+deptProperty[i].id });
 	}
 	deptColumnModel.push({header:'成本单价', dataIndex:'price', align: 'right', renderer : Ext.ux.txtFormat.gridDou});
-	deptColumnModel.push({header:'数量合计', dataIndex:'stock', align: 'right'});
+	deptColumnModel.push({header:'数量合计', dataIndex:'stock', align: 'right', renderer : renderAlarmAmount});
+	deptColumnModel.push({header:'预警数量', dataIndex:'alarmAmount', align: 'right', renderer : function(data){return data ? data : ''}});
 	deptColumnModel.push({header:'成本金额', dataIndex:'cost', align: 'right', renderer : Ext.ux.txtFormat.gridDou});
 	
 	dataStore.push({name : 'price'});
 	dataStore.push({name : 'stock'});
+	dataStore.push({name : 'alarmAmount'});
 	dataStore.push({name : 'cost'});
 	
 /*	var stockDetail = new Ext.grid.ColumnModel([
@@ -255,7 +294,9 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '&nbsp;'},
 		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
-
+		{xtype : 'tbtext', text : '&nbsp;'},
+		{xtype : 'tbtext', text : '库存预警:'},
+		materialAlarmCombo,
 		'->', 
 /*			{
 				text : '展开/收缩',
@@ -276,6 +317,7 @@ Ext.onReady(function(){
 					stockds.baseParams['cateType'] = Ext.getCmp('sdir_materialType').getValue();
 					stockds.baseParams['cateId'] = Ext.getCmp('sdir_materialCate').getValue();
 					stockds.baseParams['materialId'] = Ext.getCmp('sdir_materialId').getValue();
+					stockds.baseParams['checkAlarm'] = Ext.getCmp('alarmCombo_combo_stockDistribution').getValue();
 					stockds.load({
 						params : {
 							start : 0,
@@ -315,30 +357,31 @@ Ext.onReady(function(){
 		bbar : pagingBar
 	});
 	
+	
+	//汇总
 	stockDistributionGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 
 			var sumRow = stockDistributionGrid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			for(var i = 0; i < stockDistributionGrid.getColumnModel().getColumnCount(); i++){
-				var sumCell = stockDistributionGrid.getView().getCell(store.getCount() - 1, i);
-				sumCell.style.fontSize = '15px';
-				sumCell.style.fontWeight = 'bold';
-				sumCell.style.color = 'green';
-			}
-			
 			var index;
 			for (var i = 0; i < deptProperty.length; i++) {
 				stockDistributionGrid.getView().getCell(store.getCount()-1, i+1).innerHTML = '--';
 				index = i;
 			}
 			stockDistributionGrid.getView().getCell(store.getCount()-1, index+2).innerHTML = '--';
+			stockDistributionGrid.getView().getCell(store.getCount()-1, index+4).innerHTML = '--';
+			
+			for(var i = 0; i < stockDistributionGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = stockDistributionGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
+			}
 		}
 		
 	});
 	
-	
-	ds.load({params:{start:0,limit:13}});
 	
 	new Ext.Panel({
 		renderTo : 'divStockDistribution',
@@ -346,5 +389,7 @@ Ext.onReady(function(){
 		height : parseInt(Ext.getDom('divStockDistribution').parentElement.style.height.replace(/px/g,'')),
 		items : [stockDistributionGrid]
 	});
+	
+	stockDistributionGrid.getStore().load({params:{start:0,limit:13}});
 });
 

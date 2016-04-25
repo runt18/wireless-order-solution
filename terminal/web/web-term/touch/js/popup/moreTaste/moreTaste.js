@@ -14,6 +14,7 @@ define(function(require, exports, module){
 		_moreTastePopup = new JqmPopupDiv({
 			loadUrl : './popup/moreTaste/moreTaste.html',
 			pageInit : function(self){
+				initTastesGroups();
 				
 				_self = self;
 				
@@ -38,8 +39,6 @@ define(function(require, exports, module){
 					_tastePaging.next();
 				});
 				
-				initTastesGroups();
-				
 			}
 			
 		});
@@ -53,43 +52,57 @@ define(function(require, exports, module){
 		};
 		
 		function initTastesGroups(){
-			var tastesGroups = null;
-			var data = [];
-			if(Wireless.Tastes.length > 0){
-				data.push({
-					id : Wireless.Tastes[0].cateValue,
-					name : Wireless.Tastes[0].cateText,
-					items : []
-				});
-			}
-			
-			var has = true, temp = {};
-			for(var i = 0; i < Wireless.Tastes.length; i++){
-				
-				_allTastes.push(Wireless.Tastes[i]);
-				
-				has = false;
-				for(var k = 0; k < data.length; k++){
-					if(Wireless.Tastes[i].cateValue == data[k].id){
-						data[k].items.push(Wireless.Tastes[i]);
-						has = true;
-						break;
+			$.ajax({
+				url : '../QueryMenu.do',
+				type : 'post',
+				data : {
+					dataSource : 'tastes'
+				},
+				success : function(result, status, xhr){
+					if(result.success){
+						var tastes = result;
+						var tastesGroups = null;
+						var data = [];
+						if(tastes.root.length > 0){
+							data.push({
+								id : tastes.root[0].taste.cateValue,
+								name : tastes.root[0].taste.cateText,
+								items : []
+							});
+						}
+						
+						var has = true, temp = {};
+						for(var i = 0; i < tastes.root.length; i++){
+							
+							_allTastes.push(tastes.root[i]);
+							
+							has = false;
+							for(var k = 0; k < data.length; k++){
+								if(tastes.root[i].taste.cateValue == data[k].id){
+									data[k].items.push(tastes.root[i]);
+									has = true;
+									break;
+								}
+							}
+							if(!has){
+								temp = {
+									id : tastes.root[i].taste.cateValue,
+									name : tastes.root[i].taste.cateText,
+									items : []
+								};
+								temp.items.push(tastes.root[i]);
+								data.push(temp);
+							}
+						}	
+						
+						tastesGroups = data;
+						
+						ininTasteMenu(tastesGroups);
+					}else{
+						Util.msg.tip(result.msg);
 					}
 				}
-				if(!has){
-					temp = {
-						id : Wireless.Tastes[i].cateValue,
-						name : Wireless.Tastes[i].cateText,
-						items : []
-					};
-					temp.items.push(Wireless.Tastes[i]);
-					data.push(temp);
-				}
-			}	
-			
-			tastesGroups = data;
-			
-			ininTasteMenu(tastesGroups);
+			});
 		}
 		
 		//初始化口味组
@@ -147,7 +160,7 @@ define(function(require, exports, module){
 							chooseTaste = tastesGroups[i].items;
 						}
 					}
-						
+					
 					//口味列表
 					var tasteCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
 					_tastePaging = new WirelessOrder.Padding({
@@ -161,7 +174,7 @@ define(function(require, exports, module){
 								if(param.selectedFood.hasTasteGroup()){
 									if(param.selectedFood.tasteGroup.hasNormalTaste()){
 										for(var i = 0; i < param.selectedFood.tasteGroup.normalTasteContent.length; i++){
-											if(item.id == param.selectedFood.tasteGroup.normalTasteContent[i].id){
+											if(item.taste.id == param.selectedFood.tasteGroup.normalTasteContent[i].id){
 												theme = "e";
 												break;
 											}
@@ -172,9 +185,9 @@ define(function(require, exports, module){
 							
 							return tasteCmpTemplet.format({
 								index : index,
-								id : item.id,
-								name : item.name,
-								price :  item.calcValue == 1 ? ( item.rate * 100) + '%' : ('￥'+  item.price),
+								id : item.taste.id,
+								name : item.taste.name,
+								price :  item.taste.calcValue == 1 ? ( item.taste.rate * 100) + '%' : ('￥'+  item.taste.price),
 								theme : theme
 							});
 						},
@@ -185,9 +198,9 @@ define(function(require, exports, module){
 								
 								if(param.postTasteCancel && typeof param.postTasteClick == 'function'){
 									if(param.selectedFood){
-										param.postTasteCancel(item, param.selectedFood);	
+										param.postTasteCancel(item.taste, param.selectedFood);	
 									}else{
-										param.postTasteCancel(item, null);	
+										param.postTasteCancel(item.taste, null);	
 									}
 								}
 								
@@ -196,9 +209,9 @@ define(function(require, exports, module){
 								
 								if(param.postTasteClick && typeof param.postTasteClick == 'function'){
 									if(param.selectedFood){
-										param.postTasteClick(item, param.selectedFood);	
+										param.postTasteClick(item.taste, param.selectedFood);	
 									}else{
-										param.postTasteClick(item, null);	
+										param.postTasteClick(item.taste, null);	
 									}
 								}
 							}
