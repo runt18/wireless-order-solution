@@ -321,8 +321,13 @@ public class CouponTypeDao {
 			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);
 		}else{
 			CouponType type = result.get(0);
-			if(type.hasImage()){
-				type.setImage(OssImageDao.getById(dbCon, staff.isBranch() ? StaffDao.getAdminByRestaurant(dbCon, staff.getGroupId()) : staff, type.getImage().getId()));
+			try{
+				if(type.hasImage()){
+					type.setImage(OssImageDao.getById(dbCon, staff.isBranch() ? StaffDao.getAdminByRestaurant(dbCon, staff.getGroupId()) : staff, type.getImage().getId()));
+				}
+			}catch(BusinessException ignored){
+				ignored.printStackTrace();
+				type.setImage(null);
 			}
 			return type;
 		}

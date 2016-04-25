@@ -75,9 +75,21 @@ public class MemberOperationDao {
 		private boolean containsCoupon;
 		private int branchId;
 		private int restaurantId;
+		private Float minChargeAmount;
+		private Float maxChargeAmount;
 		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType);
+		}
+		
+		public ExtraCond setMinChargeAmount(Float min){
+			this.minChargeAmount = min;
+			return this;
+		}
+		
+		public ExtraCond setMaxChargeAmount(Float max){
+			this.maxChargeAmount = max;
+			return this;
 		}
 		
 		public ExtraCond setId(int id){
@@ -250,6 +262,13 @@ public class MemberOperationDao {
 			}
 			if(branchId != 0){
 				extraCond.append(" AND MO.branch_id = " + branchId);
+			}
+			if(minChargeAmount != null && maxChargeAmount != null){
+				extraCond.append(" AND base_balance BETWEEN " + minChargeAmount + " AND " + maxChargeAmount);
+			}else if(minChargeAmount != null && maxChargeAmount == null){
+				extraCond.append(" AND base_balance > " + minChargeAmount);
+			}else if(minChargeAmount == null && maxChargeAmount != null){
+				extraCond.append(" AND base_balance < " + maxChargeAmount);
 			}
 			return extraCond.toString();
 		}

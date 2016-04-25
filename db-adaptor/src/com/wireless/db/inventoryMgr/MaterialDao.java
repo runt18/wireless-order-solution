@@ -88,7 +88,7 @@ public class MaterialDao {
 		final List<Material> result = new ArrayList<Material>();
 		
 		String sql;
-		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.status, M.last_mod_staff, M.last_mod_date, " +
+		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.status, M.last_mod_staff, M.last_mod_date, M.alarm_amount, " +
 			  " MC.cate_id, MC.name cate_name, MC.type cate_type " + 
 			  " FROM material M " + 
 			  " JOIN material_cate MC ON MC.restaurant_id = M.restaurant_id AND MC.cate_id = M.cate_id "	+
@@ -106,6 +106,7 @@ public class MaterialDao {
 			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
 			item.setLastModStaff(dbCon.rs.getString("last_mod_staff"));
 			item.setStatus(dbCon.rs.getInt("status"));
+			item.setAlarmAmount(dbCon.rs.getInt("alarm_amount"));
 			MaterialCate cate = new MaterialCate(dbCon.rs.getInt("cate_id"));
 			cate.setName(dbCon.rs.getString("cate_name"));
 			cate.setType(MaterialCate.Type.valueOf(dbCon.rs.getInt("cate_type")));
@@ -196,7 +197,7 @@ public class MaterialDao {
 	public static int insert(DBCon dbCon, Material m) throws SQLException{
 		int count = 0;
 		String insertSQL = "INSERT INTO material"
-						 + " (restaurant_id, cate_id, price, stock, status, name, last_mod_staff, last_mod_date)"
+						 + " (restaurant_id, cate_id, price, stock, status, name, last_mod_staff, last_mod_date, alarm_amount)"
 						 + " values("
 						 + m.getRestaurantId() + ","
 						 + m.getCate().getId() + ","
@@ -205,7 +206,8 @@ public class MaterialDao {
 						 + m.getStatus().getValue() + ","
 						 + "'" + m.getName() + "'" + ","
 						 + "'" + m.getLastModStaff() + "'" + ","
-						 + "NOW()"
+						 + "NOW()" + ","
+						 + (m.hasAlarm() ? m.getAlarmAmount() : "")
 						 + ")";
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		return count;
@@ -245,6 +247,7 @@ public class MaterialDao {
 				 + (m.getPrice() != 0 ? " ,price = " + m.getPrice() : "")
 				 + (m.getStock() != 0 ? " ,stock = " + m.getStock() : "")
 				 + (m.getName() != null?" ,name = '" + m.getName() + "'" : "")
+				 + (m.hasAlarm() ? " ,alarm_amount = " + m.getAlarmAmount() : "")
 				 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
 				 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
 				 + " WHERE material_id = " + m.getId()
