@@ -47,6 +47,7 @@ public class Material implements Jsonable {
 	private Status status;
 	private String pinyin;
 	private boolean isGood = false;
+	private int alarmAmount;
 	
 	void init(int id, int restaurantId, int cateId, float price, float stock, String name, String lastModStaff, long lastModDate, Status status){
 		this.id = id;
@@ -209,6 +210,17 @@ public class Material implements Jsonable {
 		this.stock = stock - count;
 	}
 	
+	public boolean hasAlarm(){
+		return this.alarmAmount != 0;
+	}
+	
+	public void setAlarmAmount(int alarmAmount){
+		this.alarmAmount = alarmAmount;
+	}
+	
+	public int getAlarmAmount() {
+		return this.alarmAmount;
+	}
 	
 	public boolean isGood() {
 		return isGood;
@@ -335,6 +347,7 @@ public class Material implements Jsonable {
 		jm.putLong("lastModDate", this.getLastModDate());
 		jm.putString("lastModDateFormat", DateUtil.format(this.getLastModDate()));
 		jm.putString("pinyin", this.pinyin);
+		jm.putInt("alarmAmount", this.alarmAmount);
 		if(this.cate != null){
 			jm.putInt("cateId", this.getCate().getId());
 			jm.putString("cateName", this.getCate().getName());
