@@ -546,33 +546,37 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putInt(Key4Json.TASTE_ID.key, this.tasteId);
-		jm.putInt(Key4Json.TASTE_ALIAS.key, this.tasteId);
-		jm.putInt(Key4Json.RESTAURANT_ID.key, this.restaurantId);
-		jm.putString(Key4Json.TASTE_NAME.key, this.preference);
-		jm.putFloat(Key4Json.TASTE_PRICE.key, this.getPrice());
-		jm.putFloat(Key4Json.TASTE_RATE.key, this.rate);
-		jm.putInt(Key4Json.TASTE_RANK.key, this.rank);
-		if(this.category != null){
-			jm.putInt(Key4Json.TASTE_CATE_ID.key, this.category.getId());
-			jm.putString(Key4Json.TASTE_CATE_TEXT.key, this.category.getName());			
-			jm.putInt(Key4Json.TASTE_CATE_STATUS.key, this.category.getStatus().getVal());
-			jm.putString(Key4Json.TASTE_CATE_STATUS_TEXT.key, this.category.getStatus().getDesc());
+		if(flag == TASTE_JSONABLE_4_POPULAR){
+			jm.putInt(Key4Json.TASTE_ID.key, this.tasteId);
+		}else{
+			jm.putInt(Key4Json.TASTE_ID.key, this.tasteId);
+			jm.putInt(Key4Json.TASTE_ALIAS.key, this.tasteId);
+			jm.putInt(Key4Json.RESTAURANT_ID.key, this.restaurantId);
+			jm.putString(Key4Json.TASTE_NAME.key, this.preference);
+			jm.putFloat(Key4Json.TASTE_PRICE.key, this.getPrice());
+			jm.putFloat(Key4Json.TASTE_RATE.key, this.rate);
+			jm.putInt(Key4Json.TASTE_RANK.key, this.rank);
+			if(this.category != null){
+				jm.putInt(Key4Json.TASTE_CATE_ID.key, this.category.getId());
+				jm.putString(Key4Json.TASTE_CATE_TEXT.key, this.category.getName());			
+				jm.putInt(Key4Json.TASTE_CATE_STATUS.key, this.category.getStatus().getVal());
+				jm.putString(Key4Json.TASTE_CATE_STATUS_TEXT.key, this.category.getStatus().getDesc());
+			}
+			if(this.calc != null){
+				jm.putInt(Key4Json.TASTE_CALC_TYPE.key, this.calc.getVal());
+				jm.putString(Key4Json.TASTE_CALC_TEXT.key, this.calc.getDesc());			
+			}
+			if(this.type != null){
+				jm.putInt(Key4Json.TASTE_TYPE.key, this.type.getVal());
+				jm.putString(Key4Json.TASTE_TYPE_TEXT.key, this.type.getDesc());			
+			}
 		}
-		if(this.calc != null){
-			jm.putInt(Key4Json.TASTE_CALC_TYPE.key, this.calc.getVal());
-			jm.putString(Key4Json.TASTE_CALC_TEXT.key, this.calc.getDesc());			
-		}
-		if(this.type != null){
-			jm.putInt(Key4Json.TASTE_TYPE.key, this.type.getVal());
-			jm.putString(Key4Json.TASTE_TYPE_TEXT.key, this.type.getDesc());			
-		}
-		
 		return jm;
 	}
 	
 	public final static int TASTE_JSONABLE_4_COMMIT = 0;
 	public final static int TMP_TASTE_JSONABLE_4_COMMIT = 1;
+	public final static int TASTE_JSONABLE_4_POPULAR = 2;
 	
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
