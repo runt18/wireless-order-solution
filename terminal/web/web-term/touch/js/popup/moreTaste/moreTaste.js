@@ -14,7 +14,6 @@ define(function(require, exports, module){
 		_moreTastePopup = new JqmPopupDiv({
 			loadUrl : './popup/moreTaste/moreTaste.html',
 			pageInit : function(self){
-				initTastesGroups();
 				
 				_self = self;
 				
@@ -39,6 +38,8 @@ define(function(require, exports, module){
 					_tastePaging.next();
 				});
 				
+				initTastesGroups();
+				
 			}
 			
 		});
@@ -52,57 +53,43 @@ define(function(require, exports, module){
 		}
 		
 		function initTastesGroups(){
-			$.ajax({
-				url : '../QueryMenu.do',
-				type : 'post',
-				data : {
-					dataSource : 'tastes'
-				},
-				success : function(result, status, xhr){
-					if(result.success){
-						var tastes = result;
-						var tastesGroups = null;
-						var data = [];
-						if(tastes.root.length > 0){
-							data.push({
-								id : tastes.root[0].taste.cateValue,
-								name : tastes.root[0].taste.cateText,
-								items : []
-							});
-						}
-						
-						var has = true, temp = {};
-						for(var i = 0; i < tastes.root.length; i++){
-							
-							_allTastes.push(tastes.root[i]);
-							
-							has = false;
-							for(var k = 0; k < data.length; k++){
-								if(tastes.root[i].taste.cateValue == data[k].id){
-									data[k].items.push(tastes.root[i]);
-									has = true;
-									break;
-								}
-							}
-							if(!has){
-								temp = {
-									id : tastes.root[i].taste.cateValue,
-									name : tastes.root[i].taste.cateText,
-									items : []
-								};
-								temp.items.push(tastes.root[i]);
-								data.push(temp);
-							}
-						}	
-						
-						tastesGroups = data;
-						
-						ininTasteMenu(tastesGroups);
-					}else{
-						Util.msg.tip(result.msg);
+			var tastesGroups = null;
+			var data = [];
+			if(Wireless.Tastes.length > 0){
+				data.push({
+					id : Wireless.Tastes[0].taste.cateValue,
+					name : Wireless.Tastes[0].taste.cateText,
+					items : []
+				});
+			}
+			
+			var has = true, temp = {};
+			for(var i = 0; i < Wireless.Tastes.length; i++){
+				
+				_allTastes.push(Wireless.Tastes[i]);
+				
+				has = false;
+				for(var k = 0; k < data.length; k++){
+					if(Wireless.Tastes[i].taste.cateValue == data[k].id){
+						data[k].items.push(Wireless.Tastes[i]);
+						has = true;
+						break;
 					}
 				}
-			});
+				if(!has){
+					temp = {
+						id : Wireless.Tastes[i].taste.cateValue,
+						name : Wireless.Tastes[i].taste.cateText,
+						items : []
+					};
+					temp.items.push(Wireless.Tastes[i]);
+					data.push(temp);
+				}
+			}	
+			
+			tastesGroups = data;
+			
+			ininTasteMenu(tastesGroups);
 		}
 		
 		//初始化口味组
@@ -160,7 +147,7 @@ define(function(require, exports, module){
 							chooseTaste = tastesGroups[i].items;
 						}
 					}
-					
+						
 					//口味列表
 					var tasteCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
 					_tastePaging = new WirelessOrder.Padding({

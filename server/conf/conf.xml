@@ -3,17 +3,17 @@
 	<!-- the name of db -->
 	<db>wireless_order_db</db>
 	<!-- the ip address of the db host -->
-	<host>192.168.33.100</host> 
+	<host>127.0.0.1</host>
 	<!-- the port that the db is listened on -->
 	<port>3306</port>
 	<!-- the db account -->
 	<user>root</user>
 	<!-- password to the db account -->
-	<pwd>HelloZ315</pwd>
+	<pwd>root</pwd>
 	<!-- the port listened on socket for terminal -->
-    <listen>55555</listen>
+	<listen>55555</listen>
 	<!-- the backup server -->
-    <backup ip="192.168.1.110" port="55555"/>
+	<backup ip="192.168.1.110" port="55555" />
 	<!-- the port listened on socket for printer -->
 	<printer_listen>44444</printer_listen>
 	<!-- the port listened on socket for monitor -->
@@ -21,61 +21,53 @@
 	<!-- the backup connector -->
 	<!-- <backup ip="ts.e-tones.net" port="55555"/> -->
 	<!-- the template to print order -->
-	<print_template func="1">		
-		<file style="3" path="ptemp/order_76mm"/><!-- 76mm -->
-		<file style="2" path="ptemp/order_80mm"/><!-- 80mm -->
-        <file style="1" path="ptemp/order_58mm"/><!-- 58mm -->
+	<print_template func="1">
+		<file style="3" path="ptemp/order_76mm" /><!-- 76mm -->
+		<file style="2" path="ptemp/order_80mm" /><!-- 80mm -->
+		<file style="1" path="ptemp/order_58mm" /><!-- 58mm -->
 	</print_template>
 	<!-- the template to print order detail -->
 	<print_template func="2">
-		<file style="4" path="ptemp/order_detail_5040mm"/><!-- label 50mm * 40mm -->
-		<file style="3" path="ptemp/order_detail_76mm"/><!-- 76mm -->
-		<file style="2" path="ptemp/order_detail_80mm"/><!-- 80mm -->
-		<file style="1" path="ptemp/order_detail_58mm"/><!-- 58mm -->
+		<file style="4" path="ptemp/order_detail_5040mm" /><!-- label 50mm 
+			* 40mm -->
+		<file style="3" path="ptemp/order_detail_76mm" /><!-- 76mm -->
+		<file style="2" path="ptemp/order_detail_80mm" /><!-- 80mm -->
+		<file style="1" path="ptemp/order_detail_58mm" /><!-- 58mm -->
 	</print_template>
 	<!-- the template to print receipt -->
 	<print_template func="3">
-		<file style="3" path="ptemp/receipt_76mm"/><!-- 76mm -->
-        <file style="2" path="ptemp/receipt_80mm"/><!-- 80mm -->
-		<file style="1" path="ptemp/receipt_58mm"/><!-- 58mm -->
+		<file style="3" path="ptemp/receipt_76mm" /><!-- 76mm -->
+		<file style="2" path="ptemp/receipt_80mm" /><!-- 80mm -->
+		<file style="1" path="ptemp/receipt_58mm" /><!-- 58mm -->
 	</print_template>
-    <!-- the template to print table transfer -->
+	<!-- the template to print table transfer -->
 	<print_template func="6">
-		<file style="3" path="ptemp/transfer_76mm"/><!-- 76mm -->
-        <file style="2" path="ptemp/transfer_80mm"/><!-- 80mm -->
-		<file style="1" path="ptemp/transfer_58mm"/><!-- 58mm -->
+		<file style="3" path="ptemp/transfer_76mm" /><!-- 76mm -->
+		<file style="2" path="ptemp/transfer_80mm" /><!-- 80mm -->
+		<file style="1" path="ptemp/transfer_58mm" /><!-- 58mm -->
 	</print_template>
 	<!-- the template to print shift receipt -->
 	<print_template func="126">
-		<file style="3" path="ptemp/shift_76mm"/><!-- 76mm -->
-        <file style="2" path="ptemp/shift_80mm"/><!-- 80mm -->
-		<file style="1" path="ptemp/shift_58mm"/><!-- 58mm -->
+		<file style="3" path="ptemp/shift_76mm" /><!-- 76mm -->
+		<file style="2" path="ptemp/shift_80mm" /><!-- 80mm -->
+		<file style="1" path="ptemp/shift_58mm" /><!-- 58mm -->
 	</print_template>
 	<!-- the parameter to thread pool -->
 	<cool_pool_size>100</cool_pool_size>
 	<max_pool_size>200</max_pool_size>
 	<block_queue_size>50</block_queue_size>
 	<alive_time>600</alive_time>
-	<!-- 
-	define the time to perform the sweep db task.
-	the format is as below.
-	dayOfMonth, hourOfDay, minute, second
-	e.g. "15, 2, 0, 0" means the task would be executed on 15th 2:00:00am every month 
-	-->
+	<!-- define the time to perform the sweep db task. the format is as below. 
+		dayOfMonth, hourOfDay, minute, second e.g. "15, 2, 0, 0" means the task would 
+		be executed on 15th 2:00:00am every month -->
 	<sweep_db>22,13,05,0</sweep_db>
-	<!-- 
-	define the time to perform the sweep printer socket task.
-	the format is as below.
-	hourOfDay, minute, second
-	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
-	-->
+	<!-- define the time to perform the sweep printer socket task. the format 
+		is as below. hourOfDay, minute, second e.g. "2, 0, 0" means the task would 
+		be executed on 2:00:00am every day -->
 	<sweep_prt_conn>14,0,0</sweep_prt_conn>
-    <!-- 
-	define the time to perform the daily settlement task.
-	the format is as below.
-	hourOfDay, minute, second
-	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
-	-->
+	<!-- define the time to perform the daily settlement task. the format is 
+		as below. hourOfDay, minute, second e.g. "2, 0, 0" means the task would be 
+		executed on 2:00:00am every day -->
 	<daily_settlement>2,59,0</daily_settlement>
 	<!-- the OTA server address and port -->
 	<OTA>
