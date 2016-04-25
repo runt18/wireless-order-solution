@@ -31,11 +31,11 @@ Ext.onReady(function(){
 	    			}
 	    			
 	    			var progressText = jr.root[0].isProgress ? '<span style="color:green;font-weight:bold;display:inline-block;margin-right:10px;">进行中</span>' : '<span style="color:red;font-weight:bold;display:inline-block;margin-right:10px;">已结束</span>'
-	    			var activeTitle = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">活动名称：' + jr.root[0].title + '</span>';
+	    			var activeTitle = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">活动名称：' + (jr.root[0].title ? jr.root[0].title : '')  + '</span>';
 	    			var reperesenterReceive = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">推荐人获得：' + jr.root[0].recommendMoney + '(元),' + jr.root[0].reconmendPoint + '(积分);</span>';
 	    			var appenderReceive = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">关注人获得：' + jr.root[0].subscribeMoney + '(元),' + jr.root[0].subscribePoint + '(积分);</span>';
-	    			var appenderReceive = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">佣金比率：' + (jr.root[0].commissionRate ? jr.root[0].commissionRate * 100 : 0) + '%;</span>';
-	    			centerPanel.setTitle(progressText + activeTitle + reperesenterReceive + appenderReceive);
+	    			var commissionRate = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">佣金比率：' + (jr.root[0].commissionRate ? jr.root[0].commissionRate * 100 : 0) + '%;</span>';
+	    			centerPanel.setTitle(progressText + activeTitle + reperesenterReceive + appenderReceive + commissionRate);
 	    			
 	    			var isChooseGivePoint = (jr.root[0].reconmendPoint || jr.root[0].subscribePoint) ? true : false;
 	    			var isChooseGiveMoney = (jr.root[0].recommendMoney || jr.root[0].subscribeMoney) ? true : false;
@@ -414,8 +414,9 @@ Ext.onReady(function(){
         				success : function(res, opt){
         					var jr = Ext.decode(res.responseText);
         					if(jr.success){
-        						Ext.MessageBox.alert('溫磬提示', '保存成功');
+        						Ext.example.msg(jr.title, jr.msg);
         						initRepresentMsg();
+        						loadPost();
         					}else{
         						Ext.MessageBox.alert('溫磬提示', '保存失败');
         					}

@@ -46,7 +46,7 @@ public class OperateRepresentAction extends DispatchAction{
 			final Represent.UpdateBuilder builder = new Represent.UpdateBuilder(Integer.parseInt(id));
 			
 			//标题
-			if(title != null && !title.isEmpty()){
+			if(title != null){
 				builder.setTitle(title);
 			}
 			
@@ -56,7 +56,7 @@ public class OperateRepresentAction extends DispatchAction{
 			}
 			
 			//宣传语
-			if(slogon != null && !slogon.isEmpty()){
+			if(slogon != null){
 				builder.setSlogon(slogon);
 			}
 			
