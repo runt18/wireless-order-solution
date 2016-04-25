@@ -7,6 +7,9 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/QueryWxCommisison" type="com.wireless.Actions.represent.QueryWxCommisisonAction"
+			scope="request" parameter="dataSource">
+		</action>
 		<action path="/OperateCouponEffect" type="com.wireless.Actions.couponEffect.OperateCouponEffectAction"
 			scope="request" parameter="dataSource">
 		</action>
