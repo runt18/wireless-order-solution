@@ -150,39 +150,6 @@ WirelessOrder.FoodList = function(source){
 	return _foods;
 };
 
-WirelessOrder.TasteList = function(tastelist){
-	var _tastes;
-	
-	if(tastelist){
-		_tastes = tastelist;
-		
-		//按菜品id进行排序
-		_tastes.sort(function(obj1, obj2){
-			if(obj1.id > obj2.id){
-				return 1;
-			}else if(obj1.id < obj2.id){
-				return -1;
-			}else{
-				return 0;
-			}
-		});
-		
-	}else{
-		_tastes = [];
-	}
-	
-	
-	_tastes.getById = function(tasteId){
-		for(var i = 0; i < _tastes.length; i++){
-			if(_tastes[i].id == tasteId){
-				return _tastes[i];
-			}
-		}
-	}			
-					
-	return _tastes;	
-};
-
 (function(){
 	
 	var SPECIAL_FLAG = 1 << 0;		/* 特价 */
@@ -272,10 +239,6 @@ WirelessOrder.TasteList = function(tastelist){
 		//获取菜品单位
 		_food.getFoodUnit = function(){
 			return this.multiUnitPrice;
-		};
-		
-		_food.hasPopTastes = function(){
-			return typeof this.popTastes != 'undefined' && this.popTastes.length > 0;
 		};
 		
 		return _food;
@@ -542,10 +505,6 @@ WirelessOrder.ComboOrderFood = function(comboFood, parentFood){
 		
 		return _instance.tasteGroup.hasTmpTaste();
 	};
-	
-	_instance.hasPopTastes = function(){
-		return typeof this.popTastes != 'undefined' && this.popTastes.length > 0;
-	}
 	
 	
 	//添加临时口味

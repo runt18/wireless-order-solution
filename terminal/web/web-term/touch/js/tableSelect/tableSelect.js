@@ -1171,21 +1171,7 @@ $(function(){
 
 	//更新菜品列表
 	function initFoodData(){
-		$.ajax({
-			url : '../OperateTaste.do',
-			type : 'post',
-			data : {
-				dataSource : 'getByCond'
-			},
-			dataType : 'json',
-			success : function(data){
-				if(data.success){
-					Wireless.Tastes = new WirelessOrder.TasteList(data.root);
-				}else{
-					Util.msg.tip(data.msg);
-				}
-			}
-		});
+		
 		
 		//加载菜品列表
 		$.ajax({

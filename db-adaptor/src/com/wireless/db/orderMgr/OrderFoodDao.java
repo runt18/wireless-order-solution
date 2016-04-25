@@ -853,6 +853,7 @@ public class OrderFoodDao {
 				  (of.hasCancelReason() ? of.getCancelReason().getId() : "NULL") + "," +
 				  (of.hasCancelReason() ? "'" + of.getCancelReason().getReason() + "'" : "NULL") +
 				  " ) ";
+			System.err.println(staff.getRestaurantId() + "..." + of.getName());
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				ofAmount++;
 			}	

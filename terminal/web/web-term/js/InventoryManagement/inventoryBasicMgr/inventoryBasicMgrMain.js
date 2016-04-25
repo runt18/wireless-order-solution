@@ -238,6 +238,12 @@ function initOperateMaterialWin(){
 			allowBlank : false
 		});		
 		
+		var alarmAmount = new Ext.form.TextField({
+			id : 'alarmAmount_textfield_basicMgrMain',
+			fieldLabel : '预警数量',
+			allowBlank : true
+		});
+		
 		var initMaterialCate = new Ext.form.ComboBox({
 			id : 'txtMaterialCate',
 			fieldLabel : '所属类别',
@@ -270,7 +276,7 @@ function initOperateMaterialWin(){
 				defaults : {
 					width : 130
 				},
-				items : [materialId, materialName,materialPrice, initMaterialCate]
+				items : [materialId, materialName, materialPrice, alarmAmount, initMaterialCate]
 			}],
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -297,6 +303,7 @@ function initOperateMaterialWin(){
 		    		var materialName = Ext.getCmp('txtMaterialName');
 		    		var materialCate = Ext.getCmp('txtMaterialCate');
 		    		var materialPrice = Ext.getCmp('txtMaterialPrice');
+		    		var alarmAmount = Ext.getCmp('alarmAmount_textfield_basicMgrMain');
 		    		
 		    		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 
@@ -308,6 +315,7 @@ function initOperateMaterialWin(){
 		    			materialName.setValue(data['name']);
 		    			materialPrice.setValue(data['price']);
 		    			materialCate.setValue(data['cateId']);	
+		    			alarmAmount.setValue(data['alarmAmount']);
 		    			
 		    			materialPrice.focus(true, 100);
 		    		}else{
@@ -316,6 +324,7 @@ function initOperateMaterialWin(){
 		    			materialName.setValue(data['name']);
 		    			materialCate.setValue(data['cateId']);	
 		    			materialPrice.setValue(data['price']);
+		    			alarmAmount.setValue(data['alarmAmount']);
 		    			
 		    			materialName.focus(true, 100);
 		    		}
@@ -335,6 +344,7 @@ function initOperateMaterialWin(){
 		    		var materialName = Ext.getCmp('txtMaterialName');
 		    		var materialCate = Ext.getCmp('txtMaterialCate');
 		    		var materialPrice = Ext.getCmp('txtMaterialPrice');
+		    		var alarmAmount = Ext.getCmp('alarmAmount_textfield_basicMgrMain');
 		    		
 		    		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 
@@ -346,12 +356,14 @@ function initOperateMaterialWin(){
 		    			materialName.setValue(data['name']);
 		    			materialPrice.setValue(data['price']);
 		    			materialCate.setValue(data['cateId']);	
+		    			alarmAmount.setValue(data['alarmAmount']);
 		    		}else{
 		    			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
 		    			materialId.setValue(data['id']);
 		    			materialName.setValue(data['name']);
 		    			materialCate.setValue(data['cateId']);	
 		    			materialPrice.setValue(data['price']);
+		    			alarmAmount.setValue(data['alarmAmount']);
 		    		}
 		    		
 		    		if(operateMaterialWin.otype == Ext.ux.otype['insert']){
@@ -390,6 +402,7 @@ function initOperateMaterialWin(){
 							id : materialId.getValue(),
 							price : materialPrice.getValue(),
 							name : materialName.getValue(),
+							alarmAmount : alarmAmount.getValue(), 
 							cateId : initMaterialCate.getValue(),
 							cType : operateMaterialWin.cateType
 						},
@@ -410,6 +423,7 @@ function initOperateMaterialWin(){
 									Ext.getCmp('txtMaterialName').focus(true, 100);
 									Ext.getCmp('txtMaterialPrice').clearInvalid();
 									Ext.getCmp('txtMaterialName').clearInvalid();
+									Ext.getCmp('alarmAmount_textfield_basicMgrMain').clearInvalid();
 								}
 								
 							}else{
@@ -442,6 +456,7 @@ function initOperateMaterialWin(){
 					
 					Ext.getCmp('txtMaterialName').clearInvalid();
 					Ext.getCmp('txtMaterialPrice').clearInvalid();
+					Ext.getCmp('alarmAmount_textfield_basicMgrMain').clearInvalid();
 					
 					Ext.getCmp('btnPreviousFoodMaterial').setDisabled(false);
 					Ext.getCmp('btnNextFoodMaterial').setDisabled(false);
@@ -467,16 +482,18 @@ function operateMaterialHandler(c){
 	var materialName = Ext.getCmp('txtMaterialName');
 	var materialCate = Ext.getCmp('txtMaterialCate');
 	var materialPrice = Ext.getCmp('txtMaterialPrice');
+	var alarmAmount = Ext.getCmp('alarmAmount_textfield_basicMgrMain');
 	
 	var btnPreviousFoodMaterial = Ext.getCmp('btnPreviousFoodMaterial');
 	var btnNextFoodMaterial = Ext.getCmp('btnNextFoodMaterial');
-	
+	//TODO
 	if(c.otype == Ext.ux.otype['insert']){
 		materialCate.store.loadData(materialGoodCateData.concat(materialCateData));
 		
 		materialId.setValue();
 		materialName.setValue();
 		materialCate.setValue();
+		alarmAmount.setValue();
 		materialName.clearInvalid();
 		materialCate.clearInvalid();
 		materialCate.setDisabled(false);
@@ -518,6 +535,7 @@ function operateMaterialHandler(c){
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialPrice.setValue(data['price']);
+			alarmAmount.setValue(data['alarmAmount'] ? data['alarmAmount'] : '');
 			materialCate.setValue(data['cateId']);	
 			
 			materialPrice.focus(true, 100);
@@ -525,7 +543,8 @@ function operateMaterialHandler(c){
 			materialCate.store.loadData(materialCateData);
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
-			materialCate.setValue(data['cateId']);	
+			materialCate.setValue(data['cateId']);
+			alarmAmoutn.setValue(data['alarmAmount'] ? data['alarmAmount'] : '');
 			materialPrice.setValue(data['price']);
 			
 			materialName.focus(true, 100);
@@ -580,6 +599,9 @@ function materialBasicGridOperateRenderer(){
 		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'update\']})">修改</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'delete\']})">删除</a>';
+}
+function alarmAmountRenderer(data){
+	return data ? data : '';
 }
 function initControl(){
 	var materialCateTreeTbae = new Ext.Toolbar({
@@ -738,12 +760,13 @@ function initControl(){
 			['对应菜品', 'belongFood', 220],
 			['总数量', 'stock',,'right'],
 			['单位成本', 'price',,'right'],
+			['预警数量', 'alarmAmount',,'right', 'alarmAmountRenderer'],
 			['状态', 'statusText',,'center'],
 			['最后修改人', 'lastModStaff'],
 			['最后修改时间', 'lastModDateFormat', 150],
 			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']
 		],
-		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'statusValue', 'statusText',
+		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'alarmAmount', 'statusValue', 'statusText',
 		 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'isGood'],
 		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_25,
