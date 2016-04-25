@@ -47,6 +47,7 @@ public class SalesSubStatisticsAction extends Action {
 		final String businessHourEnd = request.getParameter("ending");
 		final String orderType = request.getParameter("orderType");
 		final String deptID = request.getParameter("deptID");
+		final String kitchenID = request.getParameter("kitchenID");
 		final String foodName = request.getParameter("foodName");
 		final String region = request.getParameter("region");
 		final String staffId = request.getParameter("staffId");
@@ -147,6 +148,11 @@ public class SalesSubStatisticsAction extends Action {
 				if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
 					extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
 				}
+				
+				if(kitchenID != null && !kitchenID.isEmpty() && !kitchenID.equals("-1")){
+					extraCond.setKitchen(Integer.parseInt(kitchenID));
+				}
+				
 				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 					extraCond.setStaffId4OrderFood(Integer.parseInt(staffId));
 				}

@@ -51,6 +51,7 @@ public class OperateCouponAction extends DispatchAction{
 		final String staffId = request.getParameter("staffId");
 		final String begin = request.getParameter("beginDate");
 		final String end = request.getParameter("endDate");
+		final String isDuty = request.getParameter("isDuty");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
 		final String operate = request.getParameter("operate");
@@ -74,9 +75,13 @@ public class OperateCouponAction extends DispatchAction{
 			}
 			
 			if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
-				DutyRange range = DutyRangeDao.exec(staff, begin, end);
-				if(range != null){
-					extraCond.setRange(range);
+				if(isDuty != null && !isDuty.isEmpty() && Boolean.parseBoolean(isDuty)){
+					DutyRange range = DutyRangeDao.exec(staff, begin, end);
+					if(range != null){
+						extraCond.setRange(range);
+					}else{
+						extraCond.setRange(begin, end);
+					}
 				}else{
 					extraCond.setRange(begin, end);
 				}

@@ -18,6 +18,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.DepartmentTree.DeptNode;
+import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -60,8 +61,11 @@ public class QueryDeptTreeAction extends Action{
 				jsonSB.append(",deptID:'" + depts.get(i).getKey().getId() + "'");
 				jsonSB.append(",type:'" + depts.get(i).getKey().getType().getVal() + "'");
 				jsonSB.append(",restaurantID:'" + depts.get(i).getKey().getRestaurantId() + "'");
-				jsonSB.append(",leaf:true");
-				jsonSB.append("}");
+				jsonSB.append(",expanded : true");
+				jsonSB.append(",expandable : true");
+				jsonSB.append(",children:[");
+				jsonSB.append(getChildren(depts.get(i).getValue()));
+				jsonSB.append("]}");
 			}
 		} catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -70,6 +74,28 @@ public class QueryDeptTreeAction extends Action{
 		}
 		return null;
 	}
-
+	
+	private StringBuilder getChildren(List<KitchenNode> list) throws SQLException{
+		StringBuilder jsb = new StringBuilder();
+		
+		for(int i = 0; i < list.size(); i++){
+			if(i > 0){
+				jsb.append(",");
+			}
+			jsb.append("{");
+			jsb.append("leaf:true");
+			jsb.append(",text:'" + list.get(i).getKey().getName() + "'");
+			jsb.append(",isAllowTemp:" + list.get(i).getKey().isAllowTemp());
+			jsb.append(",KitchenID:" + list.get(i).getKey().getId());
+			jsb.append(",name:'" + list.get(i).getKey().getName() + "'");
+			jsb.append(",belongDept:" + list.get(i).getKey().getDept().getId());
+			if(list.get(i).getKey().isAllowTemp()){
+				jsb.append(",icon:'../../images/linshicai.png'");
+			}
+			jsb.append("}");
+		}
+		
+		return jsb;
+	}
 	
 }
