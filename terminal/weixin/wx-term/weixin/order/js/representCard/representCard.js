@@ -33,6 +33,7 @@ $(function(){
 			success : function(data, status, err){
 				if(data.success){
 					$('#restaurantTips_span_representCard').html('【' + data.root[0].name + '】');
+					$('#restaurantDecoration_span_representCard').html('成为【' + data.root[0].name + '】会员');
 				}				
 			},
 			error : function(req, status, err){
@@ -84,9 +85,9 @@ $(function(){
 					}
 					
 					if(data.root[0].nickname){
-						$('#decoration_span_represetnCard').html('来自好友【' + data.root[0] + '】的推荐');
+						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0] + '】推荐你');
 					}else{
-						$('#decoration_span_represetnCard').html('来自好友【wode】的推荐');
+						$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
 					}
 					
 					
@@ -101,13 +102,13 @@ $(function(){
 	}
 	
 	function showPoster(data){
-		var containerHeight = $(window).height();
-		var containerWidth = $(window).width();
+		var containerHeight = document.documentElement.clientHeight;
+		var containerWidth = document.documentElement.clientWidth;
 		
 		
 		
 		$('#container_div_representCard').css({
-			'height' : containerHeight,
+			'height' : containerHeight * 0.94,
 			'width' : containerWidth
 		});
 		
