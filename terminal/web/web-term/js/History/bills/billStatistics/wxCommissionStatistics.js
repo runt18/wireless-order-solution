@@ -29,7 +29,7 @@ Ext.onReady(function(){
 	
 	
 	
-			//门店选择
+	//门店选择
 	var branchSelect_combo_wxCommission = new Ext.form.ComboBox({
 		id : 'branchSelect_combo_WxCommissionStatistics',
 		readOnly : false,
@@ -262,7 +262,7 @@ Ext.onReady(function(){
 					thiz.center();	
 					
 					thiz.orderId = orderId;
-					thiz.branchId = restaurantID
+					thiz.branchId = Ext.getCmp('branchSelect_combo_WxCommissionStatistics').getValue();
 				}
 			}
 		});

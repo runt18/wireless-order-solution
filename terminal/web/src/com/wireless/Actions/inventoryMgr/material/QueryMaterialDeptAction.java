@@ -40,6 +40,7 @@ public class QueryMaterialDeptAction extends Action{
 		final String cateType = request.getParameter("cateType");
 		final String cateId = request.getParameter("cateId");
 		final String materialId = request.getParameter("materialId");
+		final String checkAlarm = request.getParameter("checkAlarm");
 		final JObject jObject = new JObject();
 		try{
 
@@ -58,6 +59,10 @@ public class QueryMaterialDeptAction extends Action{
 			
 			if (cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
 				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
+			}
+			
+			if(checkAlarm != null && !checkAlarm.isEmpty()){
+				extraCond.setIsAlarm(checkAlarm);
 			}
 			
 			final List<MaterialDept> root = MaterialDeptDao.getByCond(staff, extraCond, null);
@@ -101,7 +106,7 @@ public class QueryMaterialDeptAction extends Action{
 					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putString("materialName", entry.getKey().getName());
-						
+						jm.putInt("alarmAmount", entry.getKey().getAlarmAmount());
 						//数量合计
 						float totalStock = 0;
 						//成本合计

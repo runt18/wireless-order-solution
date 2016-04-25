@@ -486,13 +486,14 @@ function operateMaterialHandler(c){
 	
 	var btnPreviousFoodMaterial = Ext.getCmp('btnPreviousFoodMaterial');
 	var btnNextFoodMaterial = Ext.getCmp('btnNextFoodMaterial');
-	
+	//TODO
 	if(c.otype == Ext.ux.otype['insert']){
 		materialCate.store.loadData(materialGoodCateData.concat(materialCateData));
 		
 		materialId.setValue();
 		materialName.setValue();
 		materialCate.setValue();
+		alarmAmount.setValue();
 		materialName.clearInvalid();
 		materialCate.clearInvalid();
 		materialCate.setDisabled(false);
@@ -534,7 +535,7 @@ function operateMaterialHandler(c){
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialPrice.setValue(data['price']);
-			alarmAmount.setValue(data['alarmAmount']);
+			alarmAmount.setValue(data['alarmAmount'] ? data['alarmAmount'] : '');
 			materialCate.setValue(data['cateId']);	
 			
 			materialPrice.focus(true, 100);
@@ -543,7 +544,7 @@ function operateMaterialHandler(c){
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialCate.setValue(data['cateId']);
-			alarmAmoutn.setValue(data['alarmAmount']);
+			alarmAmoutn.setValue(data['alarmAmount'] ? data['alarmAmount'] : '');
 			materialPrice.setValue(data['price']);
 			
 			materialName.focus(true, 100);
@@ -598,6 +599,9 @@ function materialBasicGridOperateRenderer(){
 		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'update\']})">修改</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'delete\']})">删除</a>';
+}
+function alarmAmountRenderer(data){
+	return data ? data : '';
 }
 function initControl(){
 	var materialCateTreeTbae = new Ext.Toolbar({
@@ -756,12 +760,13 @@ function initControl(){
 			['对应菜品', 'belongFood', 220],
 			['总数量', 'stock',,'right'],
 			['单位成本', 'price',,'right'],
+			['预警数量', 'alarmAmount',,'right', 'alarmAmountRenderer'],
 			['状态', 'statusText',,'center'],
 			['最后修改人', 'lastModStaff'],
 			['最后修改时间', 'lastModDateFormat', 150],
 			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']
 		],
-		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'statusValue', 'statusText',
+		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'alarmAmount', 'statusValue', 'statusText',
 		 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'isGood'],
 		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_25,

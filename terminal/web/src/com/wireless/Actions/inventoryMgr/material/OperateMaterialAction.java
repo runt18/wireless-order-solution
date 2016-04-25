@@ -79,14 +79,14 @@ public class OperateMaterialAction extends DispatchAction {
 		
 		
 		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String restaurantID = (String) request.getAttribute("restaurantID");
+		final String id = request.getParameter("id");
+		final String name = request.getParameter("name");
+		final String cateId = request.getParameter("cateId");
+		final String price = request.getParameter("price");
+		final String alarmAmount = request.getParameter("alarmAmount");
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String restaurantID = (String) request.getAttribute("restaurantID");
-			String id = request.getParameter("id");
-			String name = request.getParameter("name");
-			String cateId = request.getParameter("cateId");
-			String price = request.getParameter("price");
-//			String cType = request.getParameter("cType");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -95,6 +95,7 @@ public class OperateMaterialAction extends DispatchAction {
 			m.setId(Integer.valueOf(id));
 			m.setRestaurantId(Integer.valueOf(restaurantID));
 			m.setLastModStaff(staff.getName());
+			m.setAlarmAmount(Integer.valueOf(alarmAmount));
 			
 			if(cateId != null && !cateId.isEmpty()){
 				m.setCate(Integer.valueOf(cateId), "");
