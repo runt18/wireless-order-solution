@@ -49,7 +49,7 @@ public class CouponEffectDao {
 			}
 			
 			if(this.couponId != 0){
-				extraCond.append(" AND CO.coupon_id =" + this.couponId);
+				extraCond.append(" AND C.coupon_type_id =" + this.couponId);
 			}
 			
 			if(this.branchId != 0){
@@ -156,6 +156,7 @@ public class CouponEffectDao {
 			    " SELECT O.id, MAX(CO.`coupon_id`) AS coupon_id, MAX(O.actual_price) AS actual_price " +
 			    " FROM " + Params.dbName + ".coupon_operation CO " +
 			    " JOIN " + Params.dbName + ".order_history O ON CO.associate_id = O.id " +
+			    " LEFT JOIN `" + Params.dbName + "`.`coupon` C ON  C.`coupon_id` = CO.coupon_id " +
 			    " WHERE 1 = 1 " +
 			    " AND CO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			    " AND CO.operate =  " + CouponOperation.Operate.ORDER_USE.getVal() +
