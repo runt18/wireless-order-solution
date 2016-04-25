@@ -234,7 +234,10 @@ Ext.onReady(function(){
 				});
 				
 				if(!isJump){
+					isDuty = false;
 					Ext.getCmp('coupon_btnSearch').handler();	
+				}else{
+					isDuty = true;
 				}
 			}
 		}
@@ -257,8 +260,6 @@ Ext.onReady(function(){
 		id : 'coupon_btnSearch',
 		iconCls : 'btn_search',
 		handler : function(e, aa){
-			console.log(e);
-			consoloe.log(aa);
 			if(!beginDate.isValid() || !endDate.isValid){
 				return;
 			}
@@ -280,7 +281,7 @@ Ext.onReady(function(){
 			store.baseParams['isDuty'] = isDuty;
 			store.baseParams['ending'] = businessHour.ending;
 			store.baseParams['couponTypeId'] = coupon.getValue();
-			store.baseParams['branchId'] = branch_combo_coupon.getValue()
+			store.baseParams['branchId'] = branch_combo_coupon.getValue();
 			
 			if(couponType.getValue() == 'issue' || couponType.getValue() == 'use' ){
 				store.baseParams['operate'] = null;
@@ -492,13 +493,12 @@ Ext.onReady(function(){
 					thiz.load({
 						url : '../window/history/viewBillDetail.jsp', 
 						scripts : true,
-						params : {
-							orderId : associateId,
-							queryType : 'History'
-						},
 						method : 'post'
 					});
 					thiz.center();	
+					thiz.orderId = associateId;
+					thiz.queryType = 'History';
+					
 				}
 			}
 		});
