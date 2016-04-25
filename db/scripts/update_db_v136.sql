@@ -73,6 +73,12 @@ SELECT id FROM `wireless_order_db`.`restaurant` WHERE id > 10;
 ALTER TABLE `wireless_order_db`.`member` 
 ADD COLUMN `total_commission` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `used_point`;
 
+-- -----------------------------------------------------
+-- Add the field 'alarm_amount' to table 'material'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`material` 
+ADD COLUMN `alarm_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `status`;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
