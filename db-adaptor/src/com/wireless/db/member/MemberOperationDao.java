@@ -264,11 +264,11 @@ public class MemberOperationDao {
 				extraCond.append(" AND MO.branch_id = " + branchId);
 			}
 			if(minChargeAmount != null && maxChargeAmount != null){
-				extraCond.append(" AND base_balance BETWEEN " + minChargeAmount + " AND " + maxChargeAmount);
+				extraCond.append(" AND delta_extra_money BETWEEN " + minChargeAmount + " AND " + maxChargeAmount);
 			}else if(minChargeAmount != null && maxChargeAmount == null){
-				extraCond.append(" AND base_balance > " + minChargeAmount);
+				extraCond.append(" AND delta_extra_money > " + minChargeAmount);
 			}else if(minChargeAmount == null && maxChargeAmount != null){
-				extraCond.append(" AND base_balance < " + maxChargeAmount);
+				extraCond.append(" AND delta_extra_money < " + maxChargeAmount);
 			}
 			return extraCond.toString();
 		}
