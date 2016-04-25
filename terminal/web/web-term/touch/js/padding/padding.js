@@ -6,7 +6,7 @@ WirelessOrder.Padding = function(c){
 		renderTo : null,							//分页渲染的目标div
 		displayTo : null,							//显示分页信息的div
 		itemLook : function(index, item){},			//分页中每个item的显示样式
-		itemClick : function(index, item){},		//分页中每个item的click函数
+		itemClick : function(index, item, element){},		//分页中每个item的click函数
 		onPageChanged : function(pageNo, items){},	//页数变化时的回调函数
 		limit : null                                //限制个数
 	};

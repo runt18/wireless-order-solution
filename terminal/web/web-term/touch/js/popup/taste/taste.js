@@ -180,7 +180,6 @@ define(function(require, exports, module){
 					
 					initFoodUnit(chooseFood);
 					
-					
 				}
 			});
 			
@@ -189,118 +188,128 @@ define(function(require, exports, module){
 		}
 			
 		function initCommonTaste(chooseFood){
-			$.post('../QueryFoodTaste.do',  {foodID : chooseFood.id}, function(jr){
-				if(jr.success){
-					var tastes = jr.root;
+			
+			var tastes = [];
+			
+			
+			
+			if(chooseFood.isComboFood){
+				WirelessOrder.foods.getById(chooseFood.id).popTastes.forEach(function(eachTaste){
+					tastes.push(Wireless.Tastes.getById(eachTaste.id));
+				});
+			}else{
+				chooseFood.src.popTastes.forEach(function(eachTaste){
+					tastes.push(Wireless.Tastes.getById(eachTaste.id));
+				});
+			}
+				
+			_self.find('[id="normalTaste_div_taste"]').html('');
+			var html = [];
+			var tasteCmpTemplet = '<a data-type="normalTaste" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
+			
+			if(tastes.length > 0){
+						
+				for(var i = 0; i < tastes.length; i++){
+					var theme = "c";
+					if(chooseFood.src.hasTasteGroup()){
+						if(chooseFood.src.tasteGroup.hasNormalTaste()){
+							for(var j = 0; j < chooseFood.src.tasteGroup.normalTasteContent.length; j++){
+								if(tastes[i].id === chooseFood.src.tasteGroup.normalTasteContent[j].id){
+									theme = "e"
+								}
+							}
+						}
+					}
+						
+					html.push(tasteCmpTemplet.format({
+						index : i,
+						id : tastes[i].id,
+						name : tastes[i].name,
+						price : tastes[i].calcValue == 1 ? (tastes[i].rate * 100) + '%' : ('￥'+ tastes[i].price),
+						theme : theme
+					}));
+				}
+				
+				html.push('<a data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-type="moreTaste" data-theme="b">更多口味</a>' +
+				'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
+				
+				
+			}else{
+				html.push('<a data-role="button" data-corners="false" data-inline="true" data-type="moreTaste" class="moreTasteCmp" data-theme="b">更多口味</a>' +
+				'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
+			}
+			
+			_self.find('[id="normalTaste_div_taste"]').html(html.join("")).trigger('create');	
+			
+			_self.find('[id="normalTasteCollapsible_div_taste"]').trigger("expand");
+			
+			
+			//点击更多口味
+			_self.find('[data-type="moreTaste"]').click(function(){
+				
+				_tastePopup.close(function(){
+					var more = require('../moreTaste/moreTaste');
 					
-					_self.find('[id="normalTaste_div_taste"]').html('');
-					var html = [];
-					var tasteCmpTemplet = '<a data-type="normalTaste" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
-					if(tastes.length > 0){
+					var moreTaste = null;
+					moreTaste = more.newInstance({
+						selectedFood : chooseFood.src,
+						postTasteClick : function(taste, chooseFood){
+							chooseFood.addTaste(taste);
+							param.postTasteChanged(taste, chooseFood);
+						},
+						postTasteCancel : function(taste, chooseFood){
+							chooseFood.removeTaste(taste);
+							param.postTasteChanged(taste, chooseFood);
+						}
+					});
+					
+					moreTaste.open();
+				});
+				
+			});
+			
+			//点击手写口味
+			_self.find('[data-type="handWritingTaste"]').click(function(){
+				var temp = require('../tempTaste/tempTaste');
+				
+				var tempTaste = null;
+				tempTaste = temp.newInstance({
+					selectedFood : chooseFood.src,
+					confirm : function(chooseFood, name, price){
+						chooseFood.setTempTaste(name, price);
+						param.postTasteChanged();
+					}
+				});
+				tempTaste.open();
+				
+			});
+			
+			//点击常用口味
+			_self.find('[data-type="normalTaste"]').each(function(index, element){
+				element.onclick = function(){
+					if($(element).attr('data-theme') == 'e'){
+						$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
 						
 						for(var i = 0; i < tastes.length; i++){
-							var theme = "c";
-							if(chooseFood.src.hasTasteGroup()){
-								if(chooseFood.src.tasteGroup.hasNormalTaste()){
-									for(var j = 0; j < chooseFood.src.tasteGroup.normalTasteContent.length; j++){
-										if(tastes[i].taste.id === chooseFood.src.tasteGroup.normalTasteContent[j].id){
-											theme = "e"
-										}
-									}
-								}
+							if(parseInt($(element).attr('data-value')) === tastes[i].id){
+								chooseFood.src.removeTaste(tastes[i]);
+								param.postTasteChanged(tastes[i], chooseFood.src);
 							}
-								
-							html.push(tasteCmpTemplet.format({
-								index : i,
-								id : tastes[i].taste.id,
-								name : tastes[i].taste.name,
-								price : tastes[i].taste.calcValue == 1 ? (tastes[i].taste.rate * 100) + '%' : ('￥'+ tastes[i].taste.price),
-								theme : theme
-							}));
 						}
-						
-						html.push('<a data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-type="moreTaste" data-theme="b">更多口味</a>' +
-						'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
-						
-						
 					}else{
-						html.push('<a data-role="button" data-corners="false" data-inline="true" data-type="moreTaste" class="moreTasteCmp" data-theme="b">更多口味</a>' +
-						'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
+						$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
+						
+						for(var i = 0; i < tastes.length; i++){
+							if(parseInt($(element).attr('data-value')) === tastes[i].id){
+								chooseFood.src.addTaste(tastes[i]);
+								param.postTasteChanged(tastes[i], chooseFood.src);
+							}
+						}
 					}
-					
-					_self.find('[id="normalTaste_div_taste"]').html(html.join("")).trigger('create');	
-					_self.find('[id="normalTasteCollapsible_div_taste"]').trigger("expand");
-					
-					//点击更多口味
-					_self.find('[data-type="moreTaste"]').click(function(){
-						
-						_tastePopup.close(function(){
-							var more = require('../moreTaste/moreTaste');
-							
-							var moreTaste = null;
-							moreTaste = more.newInstance({
-								selectedFood : chooseFood.src,
-								postTasteClick : function(taste, chooseFood){
-									chooseFood.addTaste(taste);
-									param.postTasteChanged(taste, chooseFood);
-								},
-								postTasteCancel : function(taste, chooseFood){
-									chooseFood.removeTaste(taste);
-									param.postTasteChanged(taste, chooseFood);
-								}
-							});
-							
-							moreTaste.open();
-						});
-						
-					});
-					
-					//点击手写口味
-					_self.find('[data-type="handWritingTaste"]').click(function(){
-						var temp = require('../tempTaste/tempTaste');
-						
-						var tempTaste = null;
-						tempTaste = temp.newInstance({
-							selectedFood : chooseFood.src,
-							confirm : function(chooseFood, name, price){
-								chooseFood.setTempTaste(name, price);
-								param.postTasteChanged();
-							}
-						});
-						tempTaste.open();
-						
-					});
-					
-					//点击常用口味
-					_self.find('[data-type="normalTaste"]').each(function(index, element){
-						element.onclick = function(){
-							if($(element).attr('data-theme') == 'e'){
-								$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
-								
-								for(var i = 0; i < tastes.length; i++){
-									if(parseInt($(element).attr('data-value')) === tastes[i].taste.id){
-										chooseFood.src.removeTaste(tastes[i].taste);
-										param.postTasteChanged(tastes[i].taste, chooseFood.src);
-									}
-								}
-							}else{
-								$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
-								
-								for(var i = 0; i < tastes.length; i++){
-									if(parseInt($(element).attr('data-value')) === tastes[i].taste.id){
-										chooseFood.src.addTaste(tastes[i].taste);
-										param.postTasteChanged(tastes[i].taste, chooseFood.src);
-									}
-								}
-							}
-							$(element).buttonMarkup( "refresh" );
-						}       
-					});
-				}else{
-					Util.msg.tip(jr.msg);
-				}
-			});	
-			
+					$(element).buttonMarkup( "refresh" );
+				}       
+			});
+
 		}
 		
 		

@@ -4,7 +4,7 @@ define(function(require, exports, module){
 			selectedFood : selectedFood,               				   //选中的菜品	
 			postTasteClick : function(taste, selectedFood){},          //点击口味的回调事件
 			postTasteCancel : function(taste, selectedFood){}          //取消点击口味的回调事件
-		}
+		};
 	
 		var _moreTastePopup = null;
 		var _self  = null;
@@ -46,19 +46,19 @@ define(function(require, exports, module){
 		
 		this.open = function(afterOpen){
 			_moreTastePopup.open();
-		}
+		};
 	
 		this.close = function(afterClose, timeout){
 			_moreTastePopup.close();
-		}
+		};
 		
 		function initTastesGroups(){
 			var tastesGroups = null;
 			var data = [];
 			if(Wireless.Tastes.length > 0){
 				data.push({
-					id : Wireless.Tastes[0].taste.cateValue,
-					name : Wireless.Tastes[0].taste.cateText,
+					id : Wireless.Tastes[0].cateValue,
+					name : Wireless.Tastes[0].cateText,
 					items : []
 				});
 			}
@@ -70,7 +70,7 @@ define(function(require, exports, module){
 				
 				has = false;
 				for(var k = 0; k < data.length; k++){
-					if(Wireless.Tastes[i].taste.cateValue == data[k].id){
+					if(Wireless.Tastes[i].cateValue == data[k].id){
 						data[k].items.push(Wireless.Tastes[i]);
 						has = true;
 						break;
@@ -78,8 +78,8 @@ define(function(require, exports, module){
 				}
 				if(!has){
 					temp = {
-						id : Wireless.Tastes[i].taste.cateValue,
-						name : Wireless.Tastes[i].taste.cateText,
+						id : Wireless.Tastes[i].cateValue,
+						name : Wireless.Tastes[i].cateText,
 						items : []
 					};
 					temp.items.push(Wireless.Tastes[i]);
@@ -93,13 +93,13 @@ define(function(require, exports, module){
 		}
 		
 		//初始化口味组
-		function ininTasteMenu(tastesGroups, start){
+		function ininTasteMenu(tastesGroups, startIndex){
 			var start;
 			
-			if(start){
-				start = start;
+			if(startIndex){
+				start = startIndex;
 			}else{
-				var start = 0;
+				start = 0;
 			}
 			var pageLimit = tastesGroups.length > 7 ? 6 : 7;
 			//口味组
@@ -151,8 +151,9 @@ define(function(require, exports, module){
 					//口味列表
 					var tasteCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
 					_tastePaging = new WirelessOrder.Padding({
-						renderTo : $('#tastesCmp_div_moreTaste'),
-						displayTo : $('#tastePagingDesc_div_moreTaste'),
+						data : chooseTaste,
+						renderTo : _self.find('[id="tastesCmp_div_moreTaste"]'), 
+						displayTo : _self.find('[id="tastePagingDesc_div_moreTaste"]'),
 						itemLook : function(index, item){
 							var theme = "c";
 							
@@ -160,7 +161,7 @@ define(function(require, exports, module){
 								if(param.selectedFood.hasTasteGroup()){
 									if(param.selectedFood.tasteGroup.hasNormalTaste()){
 										for(var i = 0; i < param.selectedFood.tasteGroup.normalTasteContent.length; i++){
-											if(item.taste.id == param.selectedFood.tasteGroup.normalTasteContent[i].id){
+											if(item.id == param.selectedFood.tasteGroup.normalTasteContent[i].id){
 												theme = "e";
 												break;
 											}
@@ -171,60 +172,40 @@ define(function(require, exports, module){
 							
 							return tasteCmpTemplet.format({
 								index : index,
-								id : item.taste.id,
-								name : item.taste.name,
-								price :  item.taste.calcValue == 1 ? ( item.taste.rate * 100) + '%' : ('￥'+  item.taste.price),
+								id : item.id,
+								name : item.name,
+								price :  item.calcValue == 1 ? ( item.rate * 100) + '%' : ('￥'+  item.price),
 								theme : theme
 							});
-						}
-					});
-					
-					_tastePaging.data(chooseTaste);
-					
-					//口味的点击事件
-					_self.find('[id="tastesCmp_div_moreTaste"] a').each(function(index, element){
-						element.onclick = function(){
-							
+						},
+						itemClick : function(pageNo, item, element){
+							//每个口味的点击事件
 							if($(element).attr('data-theme') == 'e'){
 								$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
 								
-								for(var i = 0; i < _allTastes.length; i++){
-									if(parseInt($(element).attr('data-value')) === _allTastes[i].taste.id){
-										if(param.selectedFood){
-											if(param.postTasteCancel && typeof param.postTasteClick == 'function'){
-												param.postTasteCancel(_allTastes[i].taste, param.selectedFood);	
-											}
-										}else{
-											if(param.postTasteCancel && typeof param.postTasteCancel == 'function'){
-												param.postTasteCancel(_allTastes[i].taste, null);	
-											}									
-										}
+								if(param.postTasteCancel && typeof param.postTasteClick == 'function'){
+									if(param.selectedFood){
+										param.postTasteCancel(item, param.selectedFood);	
+									}else{
+										param.postTasteCancel(item, null);	
 									}
 								}
 								
 							}else{
 								$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
 								
-								for(var i = 0; i < _allTastes.length; i++){
-									if(parseInt($(element).attr('data-value')) === _allTastes[i].taste.id){
-										if(param.selectedFood){
-											if(param.postTasteClick && typeof param.postTasteClick == 'function'){
-												param.postTasteClick(_allTastes[i].taste, param.selectedFood);	
-											}
-										}else{
-											if(param.postTasteClick && typeof param.postTasteClick == 'function'){
-												param.postTasteClick(_allTastes[i].taste, null);	
-											}									
-										}
+								if(param.postTasteClick && typeof param.postTasteClick == 'function'){
+									if(param.selectedFood){
+										param.postTasteClick(item, param.selectedFood);	
+									}else{
+										param.postTasteClick(item, null);	
 									}
 								}
-								
 							}
 							$(element).buttonMarkup( "refresh" );
-							
 						}
 					});
-				}
+				};
 			});
 			
 			_self.find('[data-type="tastesGroupsCmp"]')[0].click();
@@ -256,5 +237,5 @@ define(function(require, exports, module){
 	
 	exports.newInstance = function(param){
 		return new MoreTastePopup(param);
-	}
-}) 
+	};
+});
