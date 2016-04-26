@@ -400,11 +400,11 @@ Ext.onReady(function(){
 	};
 	
 	function issuedAmountJump(v){
-		return '<a class="issuedAmount">' + v + '</a>';
+		return '<a class="issuedAmount" style="cursor:pointer;">' + v + '</a>';
 	}
 	
 	function usedAmountJump(v){
-		return '<a class="usedAmount">' + v + '</a>';
+		return '<a class="usedAmount" style="cursor:pointer;">' + v + '</a>';
 	};
 	
 });
