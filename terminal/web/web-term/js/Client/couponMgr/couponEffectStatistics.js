@@ -157,7 +157,7 @@ Ext.onReady(function(){
 		handler : function(e){
 			ds.baseParams['dataSource'] = 'calcByCond';
 			ds.baseParams['beginDate'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
-			ds.baseParams['endDate'] = Ext.util.Format.date(endDate.getValue(), 'y-m-d 23:59:59');
+			ds.baseParams['endDate'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 			ds.baseParams['branchId'] = branchSelect_combo_couponEffect.getValue();
 			ds.baseParams['couponId'] = couponType_combo_couponEffect.getValue();
 			ds.load({
@@ -206,9 +206,9 @@ Ext.onReady(function(){
 		new Ext.grid.RowNumberer(),
 		{header : '优惠活动名称', dataIndex : 'couponName'},
 		{header : '优惠券面额', dataIndex : 'couponPrice', renderer : Ext.ux.txtFormat.gridDou},
-		{header : '共发送张数', dataIndex : 'issuedAmount'},
+		{header : '共发送张数', dataIndex : 'issuedAmount', renderer : issuedAmountJump},
 		{header : '优惠券成本', dataIndex : 'issuedPrice', renderer : Ext.ux.txtFormat.gridDou},
-		{header : '共使用张数', dataIndex : 'usedAmount'},
+		{header : '共使用张数', dataIndex : 'usedAmount', renderer : usedAmountJump},
 		{header : '使用的优惠券总面额', dataIndex : 'usedPrice', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '拉动消费次数', dataIndex : 'salesAmount'},
 		{header : '拉动消费额', dataIndex : 'effectSales', renderer : Ext.ux.txtFormat.gridDou},
@@ -246,11 +246,15 @@ Ext.onReady(function(){
         			couponEffect.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
         			couponEffect.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 				}
+				
+				var businessSubStatisticsLoading = new Ext.LoadMask(document.body, {
+						msg : '正在获取数据...'
+				});
+				
+				//查看详情				
 				$('#body_div_couponEffectStatistics').find('.couponEffect').each(function(index, element){
 					element.onclick = function(){
-						var businessSubStatisticsLoading = new Ext.LoadMask(document.body, {
-							msg : '正在获取数据...'
-						});
+					
 						Ext.ux.addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html', function(){
 							businessSubStatisticsLoading.show();
 							
@@ -272,6 +276,60 @@ Ext.onReady(function(){
 						});
 					}
 				});
+				
+				//发送的张数跳转
+				$('#body_div_couponEffectStatistics').find('.issuedAmount').each(function(index, element){
+					element.onclick = function(){
+						
+						Ext.ux.addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html', function(){
+							businessSubStatisticsLoading.show();
+							
+							//设置门店选择的值
+							Ext.getCmp('branch_combo_coupon').setValue(branchSelect_combo_couponEffect.getValue());
+
+							//设置是跳转页面
+							var isJump = false;
+							Ext.getCmp('branch_combo_coupon').fireEvent('select', isJump);
+							
+							Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
+							Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
+							
+							Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							Ext.getCmp('couponType_combo_couponStatistics').setValue('issue');
+							//设置优惠券类型
+							Ext.getCmp('coupon_btnSearch').handler();
+							businessSubStatisticsLoading.hide();
+											
+						});
+					}
+				});
+				
+				//使用张数跳转
+				$('#body_div_couponEffectStatistics').find('.usedAmount').each(function(index, element){
+					element.onclick = function(){
+						Ext.ux.addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html', function(){
+							businessSubStatisticsLoading.show();
+							
+							//设置门店选择的值
+							Ext.getCmp('branch_combo_coupon').setValue(branchSelect_combo_couponEffect.getValue());
+
+							//设置是跳转页面
+							var isJump = false;
+							Ext.getCmp('branch_combo_coupon').fireEvent('select', isJump);
+							
+							Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
+							Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
+							
+							Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							Ext.getCmp('couponType_combo_couponStatistics').setValue('use');
+							//设置优惠券类型
+							Ext.getCmp('coupon_btnSearch').handler();
+							businessSubStatisticsLoading.hide();
+											
+						});						
+					}
+				});
+				
 			}
 		}
 	});
@@ -323,7 +381,7 @@ Ext.onReady(function(){
 		region : 'center',
 		frame : true,	
 		items : [couponEffect]
-	});
+	}); 
 	
 	new Ext.Panel({
 		renderTo : 'body_div_couponEffectStatistics',
@@ -339,6 +397,14 @@ Ext.onReady(function(){
 	
 	function couponEffectOperate(a, b, c){
 		return '<a class="couponEffect">查看详细</a>'
+	};
+	
+	function issuedAmountJump(v){
+		return '<a class="issuedAmount">' + v + '</a>';
 	}
+	
+	function usedAmountJump(v){
+		return '<a class="usedAmount">' + v + '</a>';
+	};
 	
 });

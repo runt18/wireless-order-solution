@@ -32,6 +32,7 @@ Ext.onReady(function(){
 	//操作类型的select
 	var couponType = new Ext.form.ComboBox({
 		xtype : 'combo',
+		id : 'couponType_combo_couponStatistics',
 		forceSelection : true,
 		width : 80,
 		store : new Ext.data.SimpleStore({
