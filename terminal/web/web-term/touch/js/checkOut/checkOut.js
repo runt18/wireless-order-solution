@@ -1423,7 +1423,7 @@ $(function(){
 		$('#weixinWaiter_li_tableSelect').click(function(){
 			var url = null;
 			if(window.location.hostname === 'e-tones.net'){
-				url = 'http://wx.' + hostname + ':' + window.location.port + '/wx-term/WxOperateWaiter.do';
+				url = 'http://wx.' + window.location.hostname + ':' + window.location.port + '/wx-term/WxOperateWaiter.do';
 			}else{
 				url = window.location.origin + '/wx-term/WxOperateWaiter.do';
 			}

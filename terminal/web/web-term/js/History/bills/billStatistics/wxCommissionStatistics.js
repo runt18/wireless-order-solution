@@ -60,6 +60,7 @@ Ext.onReady(function(){
 						if(jr.root[0].typeVal != '2'){
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
 						}else{
+							data.push(['-1', '全部']);
 							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 							 
 							for(var i = 0; i < jr.root[0].branches.length; i++){
@@ -136,10 +137,13 @@ Ext.onReady(function(){
 		{
 			header : '日期',
 			dataIndex : 'operateDateFormat'
-		},{
+		}, {
 			header : '代言人',
 			dataIndex : 'member.name'
-		},{
+		}, {
+			header : '所属门店',
+			dataIndex : 'branchName'
+		}, {
 			header : '佣金金额',
 			dataIndex : 'deltaTotalMoney'
 		},{
@@ -178,6 +182,8 @@ Ext.onReady(function(){
 			name : 'operateDateFormat'
 		},{
 			name : 'member.name'
+		},{
+			name : 'branchName'
 		},{
 			name : 'deltaTotalMoney'
 		},{
