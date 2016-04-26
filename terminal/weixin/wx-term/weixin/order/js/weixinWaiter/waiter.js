@@ -120,6 +120,31 @@ $(function(){
 				}
 			}
 		});	
+		
+		var waiterTabArr = [].slice.call($('#waiterTab_div_waiter').find('[data-type=waiterTab]'));
+		waiterTabArr.forEach(function(el, index){
+			el.onclick = function(){
+				$(el).addClass('checkTab');
+				$(el).siblings().removeClass('checkTab');
+				if(el.getAttribute('data-name') == 'foodListTab_waiter'){
+					$('#containerList_div_waiter').css('margin-left', '0');
+				}else{
+					$('#containerList_div_waiter').css('margin-left', '-100%');
+				}
+			}
+		});
+		
+		$('#containerList_div_waiter').on('swipeleft',function(e){
+ 			$('#containerList_div_waiter').css('margin-left', '-100%');
+ 			$('[data-name=orderListTab_waiter]').addClass('checkTab');
+			$('[data-name=foodListTab_waiter]').removeClass('checkTab');
+		});
+		
+		$('#containerList_div_waiter').on('swiperight',function(e){
+ 			$('#containerList_div_waiter').css('margin-left', '0');
+ 			$('[data-name=foodListTab_waiter]').addClass('checkTab');
+			$('[data-name=orderListTab_waiter]').removeClass('checkTab');
+		});
 	}
 	
 	
@@ -155,7 +180,9 @@ $(function(){
 					foodUnit : temp.tasteGroup.tastePref
 				}));
 			});
-			$('#orderList_div_waiter').append(html.join(''));
+			$('#foodList_div_waiter').append(html.join(''));
+			$('#foodAmountTips_span_waiter').html((data.orderFoods.length ? data.orderFoods.length : ''));
+			$('#foodAmountTips_span_waiter').css('background', (data.orderFoods.length ? 'red' : ''));
 		}else{
 			var html = [];
 			data.foods.forEach(function(temp, i){
@@ -169,11 +196,13 @@ $(function(){
 				}));
 			});
 			$('#orderList_div_waiter').prepend(html.join(''));
+			$('#orderAmountTips_span_waiter').html((data.foods.length ? data.foods.length : ''));
+			$('#orderAmountTips_span_waiter').css('background', (data.foods.length ? 'red' : ''));
 		}
 		
 		var hasFoods = false;
 		//标前缀
-		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
+		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
 			$('#tips_span_waiter').html('');
 			$('#tips_span_waiter').css('margin', '0');
@@ -437,7 +466,7 @@ $(function(){
 							//关闭后回调
 							orderFoodPopup.closeShopping();
 							$('#closeFastFood_a_waiter').click();
-							$('#orderList_div_waiter').html('');
+							$('#foodList_div_waiter').html('');
 							initWaiterOrder();
 						}
 					});
