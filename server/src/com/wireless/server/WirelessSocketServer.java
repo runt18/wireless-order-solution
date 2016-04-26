@@ -57,6 +57,8 @@ public class WirelessSocketServer {
     static String user = "";   
     //the password to database
     static String password = "";
+    //the wx server
+    static String wxServer = "wx.e-tones.net";
     
     static int coolPoolSize = 100;
     static int maxPoolSize = 200;
@@ -200,6 +202,12 @@ public class WirelessSocketServer {
 						  							TimeUnit.SECONDS,
 						  							new ArrayBlockingQueue<Runnable>(blockQueueSize), 
 						  							new ThreadPoolExecutor.DiscardPolicy()); 
+				
+				//Get the wx server.
+				nl = doc.getElementsByTagName("wx_server");
+				if(nl.item(0) != null){
+					wxServer = nl.item(0).getFirstChild().getNodeValue();
+				}
 				
 				//start to run the monitor handler
 				monitorHandler = new MonitorHandler();
