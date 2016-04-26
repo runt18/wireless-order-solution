@@ -120,8 +120,8 @@ Ext.onReady(function(){
 				iconCls : 'btn_search',
 				handler : function(){
 					var store = Ext.getCmp('commissionPanel_gridPanel_commissionStatistics').getStore();
-					store.baseParams['dateBegin'] = Ext.getCmp('beginDate_datefiled_wxCommissionStatistics').getValue();
-					store.baseParams['dateEnd'] = Ext.getCmp('endDate_datefield_wxCommissionStatistics').getValue();
+					store.baseParams['dateBegin'] = Ext.getCmp('beginDate_datefiled_wxCommissionStatistics').getValue() ? Ext.util.Format.date(Ext.getCmp('beginDate_datefiled_wxCommissionStatistics').getValue(), 'Y-m-d 00:00:00') : '';
+					store.baseParams['dateEnd'] = Ext.getCmp('endDate_datefield_wxCommissionStatistics').getValue() ? Ext.util.Format.date(Ext.getCmp('endDate_datefield_wxCommissionStatistics').getValue(), 'Y-m-d 23:59:59') : '';
 					store.baseParams['branchId'] = Ext.getCmp('branchSelect_combo_WxCommissionStatistics').getValue() ? Ext.getCmp('branchSelect_combo_WxCommissionStatistics').getValue() : restaurantID;
 					store.baseParams['minCommissionAmount'] = Ext.getCmp('minCommissionAmount_numberfield_wxCommissionStatistics').getValue();
 					store.baseParams['maxCommissionAmount'] = Ext.getCmp('maxCommissionAmount_numberfield_wxCommissionStatistics').getValue();
