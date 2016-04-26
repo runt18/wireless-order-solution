@@ -834,7 +834,7 @@ public class OrderFoodDao {
 				  of.getCount() + ", " + 
 				  of.getFoodPrice() + ", " + 
 				  of.asFood().getCommission() + ", " +
-				  "'" + of.getName().trim() + "', " + 
+				  "'" + (of.getName().length() <= 25 ? of.getName().trim() : of.getName().substring(0, 25)) + "', " + 
 				  of.asFood().getStatus() + ", " +
 				  (of.hasFoodUnit() ? of.getFoodUnit().getId() : " NULL ") + "," +
 				  (of.hasFoodUnit() ? "'" + of.getFoodUnit().getUnit() + "'" : " NULL ") + "," +
@@ -853,7 +853,7 @@ public class OrderFoodDao {
 				  (of.hasCancelReason() ? of.getCancelReason().getId() : "NULL") + "," +
 				  (of.hasCancelReason() ? "'" + of.getCancelReason().getReason() + "'" : "NULL") +
 				  " ) ";
-			System.err.println(staff.getRestaurantId() + "..." + of.getName());
+			//System.err.println(staff.getRestaurantId() + "..." + of.getName());
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				ofAmount++;
 			}	
