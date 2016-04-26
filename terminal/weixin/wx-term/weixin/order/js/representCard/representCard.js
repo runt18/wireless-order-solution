@@ -1,6 +1,7 @@
 $(function(){
 	initRepresentCard();
 	function initRepresentCard(){
+		var restaurant, nickName;
 		//获取饭店的代言设置
 		$.ajax({
 			url : '../../WxOperateRepresent.do',
@@ -34,6 +35,7 @@ $(function(){
 				if(data.success){
 					$('#restaurantTips_span_representCard').html('【' + data.root[0].name + '】');
 					$('#restaurantDecoration_span_representCard').html('成为【' + data.root[0].name + '】会员');
+					restaurant = data.root[0].name;
 				}				
 			},
 			error : function(req, status, err){
@@ -86,6 +88,7 @@ $(function(){
 					
 					if(data.root[0].nickname){
 						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0].nickname + '】推荐你');
+						nickName = data.root[0].nickname;
 					}else{
 						$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
 					}
@@ -99,6 +102,13 @@ $(function(){
 				console.log(err);
 			}
 		});
+		(function(){
+			if(restaurant && nickName){
+				document.getElementsByTagName('title')[0].innerHTML = '好友【' + nickName + '】推荐你成为【' + restaurant + '】会员';
+			}else{
+				setTimeout(arguments.callee, 500);
+			}	
+		})();
 	}
 	
 	function showPoster(data){
