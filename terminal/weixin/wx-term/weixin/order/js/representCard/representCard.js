@@ -130,11 +130,11 @@ $(function(){
 		//活动二维码
 		var qrCode = $('#qrCode_div_representCard');
 		qrCode.css({
-			'width' : '38%',
+			'width' : '30%',
 			'position' : 'absolute',
 			'left' : '0px',
 			'border-right' : '1px solid #666',
-			'padding' : '0 6%'
+			'padding' : '0 10%'
 		});
 		
 		
@@ -171,13 +171,13 @@ $(function(){
 		});
 		
 		$('#decoration_span_represetnCard').css({
-			'font-size' : '235%',
+			'font-size' : '214%',
 			'width' : '50%',
 			'color' : '#666'
 		});
 		
 		$('#tips_span_representCard').css({
-			'font-size' : '224%',
+			'font-size' : '214%',
 			'width' : '50%',
 			'color' : '#666'	
 		});
