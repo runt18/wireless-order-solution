@@ -85,7 +85,7 @@ $(function(){
 					}
 					
 					if(data.root[0].nickname){
-						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0] + '】推荐你');
+						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0].nickname + '】推荐你');
 					}else{
 						$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
 					}
