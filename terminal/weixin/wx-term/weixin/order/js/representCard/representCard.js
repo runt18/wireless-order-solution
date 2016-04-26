@@ -108,7 +108,7 @@ $(function(){
 		
 		
 		$('#container_div_representCard').css({
-			'height' : containerHeight * 0.94,
+			'height' : containerHeight * 0.95,
 			'width' : containerWidth
 		});
 		
@@ -165,7 +165,7 @@ $(function(){
 		
 		//推荐人头像设置
 		$('#headingPhoto_img_representCard').css({
-			'width' : '27%',
+			'width' : '25%',
 			'padding' : '0 11%',
 			'border-radius' : '50%'
 		});
