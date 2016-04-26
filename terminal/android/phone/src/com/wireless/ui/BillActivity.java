@@ -387,7 +387,7 @@ public class BillActivity extends Activity {
 		}
 		
 		/**
-		 * 在执行请求删单操作前显示提示信息
+		 * 在执行请求操作前显示提示信息
 		 */
 		@Override
 		protected void onPreExecute(){

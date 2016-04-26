@@ -6,7 +6,7 @@ define(function(require, exports, module){
 			selectedFood : null,      								//点中的菜品的信息,用来加载套菜和口味
 			postTasteChanged : function(taste, selectedFood){}, 
 			postUnitClick : function(selectedFood, taste){}			//点击单位的回调
-		}
+		};
 		
 		var _tastePopup = null;
 		var _selectedFood = null;
@@ -42,7 +42,7 @@ define(function(require, exports, module){
 		this.close = function(afterClose, timeout){
 			_tastePopup.close();
 			
-			if(afterClose &&　typeof afterClose == 'function'){
+			if(afterClose && typeof afterClose == 'function'){
 				if(timeout){
 					setTimeout(afterOpen, timeout);
 				}else{
@@ -56,45 +56,39 @@ define(function(require, exports, module){
 		
 		//加载菜品信息
 		function initFood(){
-			$.post('../QueryFoodTaste.do', {foodID : _selectedFood.id}, function(jr){
-				if(jr.success){
-					var commonTastes = jr.root;
-					var multiPrice = WirelessOrder.foods.getById(_selectedFood.id).multiUnitPrice;
-					
-					var foodGroups = [];
-					
-					foodGroups.push({
-						id : _selectedFood.id,
-						name : _selectedFood.name,
-						isComboFood : false,
-						src : _selectedFood
-					});
-					
-					if(_selectedFood.isCombo()){
-						for(var i = 0; i < _selectedFood.combo.length; i++){
-							_selectedFood.combo[i].comboFood.isComboFood = true;
-							foodGroups.push({
-								id : _selectedFood.combo[i].comboFood.id,
-								name : _selectedFood.combo[i].comboFood.name,
-								isComboFood : true,
-								src : _selectedFood.combo[i]
-							});
-						}
-					}
-					
-					initFoodGroupCmp(foodGroups, commonTastes, multiPrice);
-					
-					if($("#orderPinyinCmp").is(":hidden") && $("#orderHandCmp").is(":hidden")){
-						_self.css({top : 'initial', bottom : '90px'});
-					}else{
-						_self.css({top : 'initial', bottom : '48.5%'});
-					}
-					
-				}
+			
+			var foodGroups = [];
+			
+			foodGroups.push({
+				id : _selectedFood.id,
+				name : _selectedFood.name,
+				isComboFood : false,
+				src : _selectedFood
 			});
+			
+			if(_selectedFood.isCombo()){
+				for(var i = 0; i < _selectedFood.combo.length; i++){
+					_selectedFood.combo[i].comboFood.isComboFood = true;
+					foodGroups.push({
+						id : _selectedFood.combo[i].comboFood.id,
+						name : _selectedFood.combo[i].comboFood.name,
+						isComboFood : true,
+						src : _selectedFood.combo[i]
+					});
+				}
+			}
+			
+			initFoodGroupCmp(foodGroups);
+			
+			if($("#orderPinyinCmp").is(":hidden") && $("#orderHandCmp").is(":hidden")){
+				_self.css({top : 'initial', bottom : '90px'});
+			}else{
+				_self.css({top : 'initial', bottom : '48.5%'});
+			}
+					
 		}
 		
-		function initFoodGroupCmp(foodGroups, tastes, multiPrice, start){
+		function initFoodGroupCmp(foodGroups, startIndex){
 			//套菜组
 			var comboFoodGroupCmpTemplet = '<a data-role="button" data-inline="true" class="comboFoodPopTopBtn" data-value={id} data-index={index} ' +
 										'data-theme="{theme}">' +
@@ -102,10 +96,10 @@ define(function(require, exports, module){
 										'</a>';
 			var start;
 			
-			if(start){
-				start = start;
+			if(startIndex){
+				start = startIndex;
 			}else{
-				var start = 0;
+				start = 0;
 			}
 			
 			var foodGroupsLimit =  foodGroups.length > 6 ? 5 : 6;
@@ -144,7 +138,7 @@ define(function(require, exports, module){
 					start += foodGroupsLimit;
 					return;
 				}
-				initFoodGroupCmp(foodGroups, tastes, multiPrice, start);
+				initFoodGroupCmp(foodGroups, start);
 			});
 			
 			//下一页
@@ -155,7 +149,7 @@ define(function(require, exports, module){
 					return;
 				}
 				
-				initFoodGroupCmp(foodGroups, tastes, multiPrice, start);
+				initFoodGroupCmp(foodGroups, start);
 			});
 			
 			//点击口味组
@@ -180,8 +174,7 @@ define(function(require, exports, module){
 					
 					initFoodUnit(chooseFood);
 					
-					
-				}
+				};
 			});
 			
 			_self.find('[id="tasteName_div_taste"] .comboFoodPopTopBtn')[0].click();
@@ -189,133 +182,140 @@ define(function(require, exports, module){
 		}
 			
 		function initCommonTaste(chooseFood){
-			$.post('../QueryFoodTaste.do',  {foodID : chooseFood.id}, function(jr){
-				if(jr.success){
-					var tastes = jr.root;
+			
+			var tastes = [];
+			
+			
+			
+			if(chooseFood.isComboFood){
+				WirelessOrder.foods.getById(chooseFood.id).popTastes.forEach(function(eachTaste){
+					tastes.push(Wireless.Tastes.getById(eachTaste.id));
+				});
+			}else{
+				chooseFood.src.popTastes.forEach(function(eachTaste){
+					tastes.push(Wireless.Tastes.getById(eachTaste.id));
+				});
+			}
+				
+			_self.find('[id="normalTaste_div_taste"]').html('');
+			var html = [];
+			var tasteCmpTemplet = '<a data-type="normalTaste" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
+			
+			if(tastes.length > 0){
+						
+				for(var i = 0; i < tastes.length; i++){
+					var theme = "c";
+					if(chooseFood.src.hasTasteGroup()){
+						if(chooseFood.src.tasteGroup.hasNormalTaste()){
+							for(var j = 0; j < chooseFood.src.tasteGroup.normalTasteContent.length; j++){
+								if(tastes[i].id === chooseFood.src.tasteGroup.normalTasteContent[j].id){
+									theme = "e";
+								}
+							}
+						}
+					}
+						
+					html.push(tasteCmpTemplet.format({
+						index : i,
+						id : tastes[i].id,
+						name : tastes[i].name,
+						price : tastes[i].calcValue == 1 ? (tastes[i].rate * 100) + '%' : ('￥'+ tastes[i].price),
+						theme : theme
+					}));
+				}
+				
+				html.push('<a data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-type="moreTaste" data-theme="b">更多口味</a>' +
+				'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
+				
+				
+			}else{
+				html.push('<a data-role="button" data-corners="false" data-inline="true" data-type="moreTaste" class="moreTasteCmp" data-theme="b">更多口味</a>' +
+				'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
+			}
+			
+			_self.find('[id="normalTaste_div_taste"]').html(html.join("")).trigger('create');	
+			
+			_self.find('[id="normalTasteCollapsible_div_taste"]').trigger("expand");
+			
+			
+			//点击更多口味
+			_self.find('[data-type="moreTaste"]').click(function(){
+				
+				_tastePopup.close(function(){
+					var more = require('../moreTaste/moreTaste');
 					
-					_self.find('[id="normalTaste_div_taste"]').html('');
-					var html = [];
-					var tasteCmpTemplet = '<a data-type="normalTaste" data-role="button" data-corners="false" data-inline="true" class="tasteCmp" data-index={index} data-value={id} data-theme={theme}><div>{name}<br>{price}</div></a>';
-					if(tastes.length > 0){
+					var moreTaste = null;
+					moreTaste = more.newInstance({
+						selectedFood : chooseFood.src,
+						postTasteClick : function(taste, chooseFood){
+							chooseFood.addTaste(taste);
+							param.postTasteChanged(taste, chooseFood);
+						},
+						postTasteCancel : function(taste, chooseFood){
+							chooseFood.removeTaste(taste);
+							param.postTasteChanged(taste, chooseFood);
+						}
+					});
+					
+					moreTaste.open();
+				});
+				
+			});
+			
+			//点击手写口味
+			_self.find('[data-type="handWritingTaste"]').click(function(){
+				var temp = require('../tempTaste/tempTaste');
+				
+				var tempTaste = null;
+				tempTaste = temp.newInstance({
+					selectedFood : chooseFood.src,
+					confirm : function(chooseFood, name, price){
+						chooseFood.setTempTaste(name, price);
+						param.postTasteChanged();
+					}
+				});
+				tempTaste.open();
+				
+			});
+			
+			//点击常用口味
+			_self.find('[data-type="normalTaste"]').each(function(index, element){
+				element.onclick = function(){
+					if($(element).attr('data-theme') == 'e'){
+						$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
 						
 						for(var i = 0; i < tastes.length; i++){
-							var theme = "c";
-							if(chooseFood.src.hasTasteGroup()){
-								if(chooseFood.src.tasteGroup.hasNormalTaste()){
-									for(var j = 0; j < chooseFood.src.tasteGroup.normalTasteContent.length; j++){
-										if(tastes[i].taste.id === chooseFood.src.tasteGroup.normalTasteContent[j].id){
-											theme = "e"
-										}
-									}
-								}
+							if(parseInt($(element).attr('data-value')) === tastes[i].id){
+								chooseFood.src.removeTaste(tastes[i]);
+								param.postTasteChanged(tastes[i], chooseFood.src);
 							}
-								
-							html.push(tasteCmpTemplet.format({
-								index : i,
-								id : tastes[i].taste.id,
-								name : tastes[i].taste.name,
-								price : tastes[i].taste.calcValue == 1 ? (tastes[i].taste.rate * 100) + '%' : ('￥'+ tastes[i].taste.price),
-								theme : theme
-							}));
 						}
-						
-						html.push('<a data-role="button" data-corners="false" data-inline="true" class="moreTasteCmp" data-type="moreTaste" data-theme="b">更多口味</a>' +
-						'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
-						
-						
 					}else{
-						html.push('<a data-role="button" data-corners="false" data-inline="true" data-type="moreTaste" class="moreTasteCmp" data-theme="b">更多口味</a>' +
-						'<a data-role="button" data-corners="false" data-inline="true" data-type="handWritingTaste" class="moreTasteCmp" data-theme="b">手写口味</a>');
+						$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
+						
+						for(var i = 0; i < tastes.length; i++){
+							if(parseInt($(element).attr('data-value')) === tastes[i].id){
+								chooseFood.src.addTaste(tastes[i]);
+								param.postTasteChanged(tastes[i], chooseFood.src);
+							}
+						}
 					}
-					
-					_self.find('[id="normalTaste_div_taste"]').html(html.join("")).trigger('create');	
-					_self.find('[id="normalTasteCollapsible_div_taste"]').trigger("expand");
-					
-					//点击更多口味
-					_self.find('[data-type="moreTaste"]').click(function(){
-						
-						_tastePopup.close(function(){
-							var more = require('../moreTaste/moreTaste');
-							
-							var moreTaste = null;
-							moreTaste = more.newInstance({
-								selectedFood : chooseFood.src,
-								postTasteClick : function(taste, chooseFood){
-									chooseFood.addTaste(taste);
-									param.postTasteChanged(taste, chooseFood);
-								},
-								postTasteCancel : function(taste, chooseFood){
-									chooseFood.removeTaste(taste);
-									param.postTasteChanged(taste, chooseFood);
-								}
-							});
-							
-							moreTaste.open();
-						});
-						
-					});
-					
-					//点击手写口味
-					_self.find('[data-type="handWritingTaste"]').click(function(){
-						var temp = require('../tempTaste/tempTaste');
-						
-						var tempTaste = null;
-						tempTaste = temp.newInstance({
-							selectedFood : chooseFood.src,
-							confirm : function(chooseFood, name, price){
-								chooseFood.setTempTaste(name, price);
-								param.postTasteChanged();
-							}
-						});
-						tempTaste.open();
-						
-					});
-					
-					//点击常用口味
-					_self.find('[data-type="normalTaste"]').each(function(index, element){
-						element.onclick = function(){
-							if($(element).attr('data-theme') == 'e'){
-								$(element).attr('data-theme', 'c').removeClass('ui-btn-up-e').addClass('ui-btn-up-c');
-								
-								for(var i = 0; i < tastes.length; i++){
-									if(parseInt($(element).attr('data-value')) === tastes[i].taste.id){
-										chooseFood.src.removeTaste(tastes[i].taste);
-										param.postTasteChanged(tastes[i].taste, chooseFood.src);
-									}
-								}
-							}else{
-								$(element).attr('data-theme', 'e').removeClass('ui-btn-up-c').addClass('ui-btn-up-e');
-								
-								for(var i = 0; i < tastes.length; i++){
-									if(parseInt($(element).attr('data-value')) === tastes[i].taste.id){
-										chooseFood.src.addTaste(tastes[i].taste);
-										param.postTasteChanged(tastes[i].taste, chooseFood.src);
-									}
-								}
-							}
-							$(element).buttonMarkup( "refresh" );
-						}       
-					});
-				}else{
-					Util.msg.tip(jr.msg);
-				}
-			});	
-			
+					$(element).buttonMarkup( "refresh" );
+				};       
+			});
+
 		}
 		
 		
 		
 		function initFoodUnit(chooseFood){
 			var multiPrice = WirelessOrder.foods.getById(chooseFood.id).multiUnitPrice;		 
-			var selectedFoodId = null;
-			var selectedFood = null;
 			//多单位
 			var multiPriceCmpTemplet = '<a data-role="button" data-corners="false" data-inline="true" class="multiPriceCmp" data-index={index} data-value={id} data-theme={theme}><div>{multiPrice}</div></a>';
 			
-			var hasMultiPrice = null;
 			if(multiPrice.length > 0){
 				var html = [];
-				var chooseUnit;
+				var chooseUnit = null;
 				var hasLight = false;
 				for(var i = 0; i < multiPrice.length; i++){
 					if(chooseFood.src.hasFoodUnit() && !hasLight){
@@ -361,7 +361,7 @@ define(function(require, exports, module){
 								}
 							}	
 						}
-					}
+					};
 				});
 				
 				
@@ -381,5 +381,5 @@ define(function(require, exports, module){
 	
 	exports.newInstance = function(param){
 		return new TastePopup(param);	
-	}
+	};
 });

@@ -254,31 +254,21 @@ Ext.onReady(function(){
 						Ext.ux.addTab('couponStatistics', '优惠券统计 ', 'History_Module/CouponStatistics.html', function(){
 							businessSubStatisticsLoading.show();
 							
-							console.log(element);
+							//设置门店选择的值
+							Ext.getCmp('branch_combo_coupon').setValue(branchSelect_combo_couponEffect.getValue());
 							
-							(function(){
-					
-								if(Ext.getCmp('branch_combo_coupon').getValue()){
-									
-									//设置门店选择的值
-									Ext.getCmp('branch_combo_coupon').setValue(branchSelect_combo_couponEffect.getValue());
-									
-									//设置是跳转页面
-									var isJump = true;
-									Ext.getCmp('branch_combo_coupon').fireEvent('select', isJump);
-									
-									Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
-									Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
-									
-									Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
-									//设置优惠券类型
-									Ext.getCmp('coupon_btnSearch').handler();
-									businessSubStatisticsLoading.hide();
+							//设置是跳转页面
+							var isJump = false;
+							Ext.getCmp('branch_combo_coupon').fireEvent('select', isJump);
+							
+							Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
+							Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
+							
+							Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							//设置优惠券类型
+							Ext.getCmp('coupon_btnSearch').handler();
+							businessSubStatisticsLoading.hide();
 											
-								}else{
-									setTimeout(arguments.callee, 500);
-								}
-							})();
 						});
 					}
 				});
