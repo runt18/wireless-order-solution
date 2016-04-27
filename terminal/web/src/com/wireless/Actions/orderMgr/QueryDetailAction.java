@@ -56,7 +56,7 @@ public class QueryDetailAction extends Action {
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			if(branchId != null && !branchId.isEmpty()){
+			if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
 			
@@ -93,15 +93,15 @@ public class QueryDetailAction extends Action {
 					extraCond.setFood(Integer.parseInt(foodId));
 				}
 				
-				if(kitchenID != null && !kitchenID.isEmpty()){
+				if(kitchenID != null && !kitchenID.isEmpty() && !kitchenID.equals("-1")){
 					extraCond.setKitchen(Integer.parseInt(kitchenID));
 				}
 				
-				if(regionId != null && !regionId.isEmpty()){
+				if(regionId != null && !regionId.isEmpty() && !regionId.equals("-1")){
 					extraCond.setRegionId(Region.RegionId.valueOf(Integer.parseInt(regionId)));
 				}
 				
-				if(staffId != null && !staffId.isEmpty()){
+				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 					extraCond.setStaffId(Integer.parseInt(staffId));
 				}
 				
@@ -114,11 +114,13 @@ public class QueryDetailAction extends Action {
 					extraCond.setHourRange(range);
 				}
 				
-				if(deptID != null && !deptID.isEmpty()){
+				if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
 					extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 				}
 				
-				extraCond.setOrder(Integer.parseInt(orderID));
+				if(orderID != null && !orderID.isEmpty()){
+					extraCond.setOrder(Integer.parseInt(orderID));
+				}
 				
 				list = OrderFoodDao.getSingleDetail(staff, extraCond, " ORDER BY OF.order_date ");
 			}
