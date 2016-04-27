@@ -6,7 +6,14 @@ Ext.onReady(function(){
  	var foodStatus = Ext.WindowMgr.getActive().foodStatus;
  	var branchId = Ext.WindowMgr.getActive().branchId;
  	var deptId = Ext.WindowMgr.getActive().deptID;
- 	
+ 	var kitchenId = Ext.WindowMgr.getActive().kitchenID;
+ 	var foodId = Ext.WindowMgr.getActive().foodId;
+ 	var regionId = Ext.WindowMgr.getActive().regionId;
+ 	var staffId = Ext.WindowMgr.getActive().staffID;
+ 	var beginDate = Ext.WindowMgr.getActive().beginDate;
+ 	var endDate = Ext.WindowMgr.getActive().endDate;
+ 	var opening = Ext.WindowMgr.getActive().opening;
+ 	var ending = Ext.WindowMgr.getActive().ending;
  	
  	
  	
@@ -37,7 +44,8 @@ Ext.onReady(function(){
 	    [
 		    [true, false, false, false], 
 		    ['日期','orderDateFormat',100],
-		    ['名称','name',130],
+		    ['名称','name',100],
+		    ['账单号', 'orderId', 100],
 		    ['单价','unitPrice',60, 'right', Ext.ux.txtFormat.gridDou],
 		    ['数量','count', 60, 'right', Ext.ux.txtFormat.gridDou], 
 		    ['口味','tasteGroup.tastePref'],
@@ -49,10 +57,12 @@ Ext.onReady(function(){
 		    ['服务员','waiter', 60],
 		    ['退菜原因', 'cancelReason.reason']
 		],
-		['orderDateFormat', 'name', 'unitPrice', 'count', 'discount',
+		['orderDateFormat', 'name', 'orderId', 'unitPrice', 'count', 'discount',
 		 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'kitchen.name', 'waiter', 'cancelReason.reason', 
 		 'isGift', 'isReturn', 'isRepaid','isTransfer', 'isCommission', 'operation'],
-	    [ ['orderID', orderId], ['queryType', queryType ? queryType : 'history'], ['branchId', branchId]],
+	    [ ['orderID', orderId], ['queryType', queryType ? queryType : 'history'], ['branchId', branchId], ['deptID', deptId ? deptId : ''], ['kitchenID', kitchenId ? kitchenId : ''],
+	    ['foodId' , foodId ? foodId : ''], ['regionId', regionId ? regionId : ''], ['staffID', staffId ? staffId : ''], ['beginDate', beginDate ? beginDate : ''],
+	    ['endDate', endDate ? endDate : ''], ['opening', opening ? opening : ''], ['ending', ending ? ending : '']],
 	    billDetailpageRecordCount,
 	    ''
 	);

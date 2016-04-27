@@ -359,7 +359,7 @@ $(function(){
 	
 		var orderFoodStatPanelGridTbarItem = [{
 				xtype : 'tbtext',
-				width : 250,
+				width : 150,
 				text : String.format(Ext.ux.txtFormat.typeName, '部门选择', 'lab_salesSubDept_food', '----')
 			},
 		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品选择:'}, foodName,
@@ -472,7 +472,7 @@ $(function(){
 	         ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou],
 	         ['赠送数量', 'giftedAmount', null, 'right', Ext.ux.txtFormat.gridDou],
 	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
-	         ['操作', 'operate', null, 'right', foodOperate]
+	         ['操作', 'operate', null, 'center', foodOperate]
 			//['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 			],
 			SalesSubStatRecord.getKeys().concat(['food', 'food.name', 'restaurant']),
@@ -550,8 +550,14 @@ $(function(){
 									thiz.center();
 									thiz.queryType = 'History';
 									
-									thiz.deptID = salesSubDeptId;
-									thiz.kitchenID = salesSubDeptId;
+									if(isLeaf){
+										thiz.deptID = -1;
+										thiz.kitchenID = salesSubDeptId;
+									}else{
+										thiz.deptID = salesSubDeptId;
+										thiz.kitchenID = -1;
+									}
+									
 									thiz.foodId = $(element).attr('food_id');
 									thiz.regionId = Ext.getCmp('foodStatistic_comboRegion').getValue();
 									thiz.staffID = foodSale_combo_staffs.getValue();
@@ -568,9 +574,8 @@ $(function(){
 										opening = '';
 										ending = '';
 									}									
-									c.
-									thiz.opening = opening;
-									thiz.ending = ending;
+									thiz.opening = opening == '00:00' ? '' : opening;
+									thiz.ending = ending == '00:00' ? '' : ending;
 									
 								}
 							}
