@@ -103,11 +103,14 @@ $(function(){
 				console.log(err);
 			}
 		});
+		var limitAmount = 0;
 		(function(){
 			if(restaurant && nickName){
 				document.getElementsByTagName('title')[0].innerHTML = '好友【' + nickName + '】推荐你成为【' + restaurant + '】会员';
 			}else{
-				setTimeout(arguments.callee, 500);
+				if(limitAmount++ <= 5){
+					setTimeout(arguments.callee, 500);
+				}
 			}	
 		})();
 	}
