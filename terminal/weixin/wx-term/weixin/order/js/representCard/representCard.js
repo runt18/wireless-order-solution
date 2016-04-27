@@ -1,7 +1,14 @@
 $(function(){
+	var debug = false;
+	
 	initRepresentCard();
 	function initRepresentCard(){
 		var restaurant, nickName;
+		if(debug){
+			$("#qrCode_div_representCard").attr('src', '../order/images/qrCode.jpg' );
+			$('#headingPhoto_img_representCard').attr('src', 'http://wx.qlogo.cn/mmopen/dmwVvwWRJuBdrMQylJiaxqAMjxT9bDcViaQ4Q6ybvyUUnKQKJLiakaiaDsibhgWeOquBFvNHvasOic2afurSKwFeia7sfrORo1vdY7f/0');
+			$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
+		}
 		//获取饭店的代言设置
 		$.ajax({
 			url : '../../WxOperateRepresent.do',
@@ -58,8 +65,7 @@ $(function(){
 				if(data.success){
 					$("#qrCode_div_representCard").attr('src', 'http://qr.liantu.com/api.php?text=' + data.msg );
 				}else{
-					$("#qrCode_div_representCard").attr('src', '../order/images/qrCode.jpg' );
-					alert(data.msg);
+					alert('网络异常,请刷新页面');
 				}
 			},
 			error : function(req, status, err){
@@ -82,17 +88,12 @@ $(function(){
 					
 					if(data.root[0].headimgurl){
 						$('#headingPhoto_img_representCard').attr('src', data.root[0].headimgurl);
-					}else{
-						$('#headingPhoto_img_representCard').attr('src', 'http://wx.qlogo.cn/mmopen/dmwVvwWRJuBdrMQylJiaxqAMjxT9bDcViaQ4Q6ybvyUUnKQKJLiakaiaDsibhgWeOquBFvNHvasOic2afurSKwFeia7sfrORo1vdY7f/0');
 					}
 					
 					if(data.root[0].nickname){
 						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0].nickname + '】推荐你');
 						nickName = data.root[0].nickname;
-					}else{
-						$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
 					}
-					
 					
 				}else{
 					alert(data.msg);
