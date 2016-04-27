@@ -608,7 +608,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		if(qrParam.type == QrCodeType.WAITER){
 			//扫描带参二维码,进入微信店小二
 			final int groupId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
-			final int orderId = Integer.parseInt(msg.getEventKey().substring(1));
+			final int orderId = qrParam.param;
 			final int branchId = getRestaurantByOrder(orderId);
 			final Staff staff = StaffDao.getAdminByRestaurant(branchId);
 			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(groupId));
@@ -638,7 +638,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			//扫描【我要代言】的带参二维码，生成推荐关系链
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
-			final Member referrer = MemberDao.getById(staff, Integer.parseInt(msg.getEventKey().substring(1)));
+			final Member referrer = MemberDao.getById(staff, qrParam.param);
 			final Member subscriber = MemberDao.getByWxSerial(staff, msg.getFromUserName());
 			final Represent represent = RepresentDao.getByCond(staff, null).get(0);
 			
