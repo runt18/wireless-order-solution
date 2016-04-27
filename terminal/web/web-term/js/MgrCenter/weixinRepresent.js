@@ -22,14 +22,13 @@ Ext.onReady(function(){
 	    			Ext.getCmp('appenderPoint_textfield_weixinRepresent').setValue(jr.root[0].subscribePoint);
 	    			Ext.getCmp('appenderExtraBalance_textfield_weixinRepresent').setValue(jr.root[0].subscribeMoney);
 	    			
-	    			Ext.getCmp('commissionRange_numfield_weixinRepresent').setValue(jr.root[0].commissionRate ? (jr.root[0].commissionRate * 100).toFixed(2) : '');
-	    			
 	    			if(jr.root[0].commissionRate){
-	    				Ext.getCmp('commissionRange_numfield_weixinRepresent').enable();
-	    			}else{
-	    				Ext.getCmp('commissionRange_numfield_weixinRepresent').disable();
+	    				Ext.getDom('checkCommission_checkbox_weixinRepresent').checked = true;
 	    			}
 	    			
+	    			Ext.getCmp('checkCommission_checkbox_weixinRepresent').fireEvent('check', Ext.getCmp('checkCommission_checkbox_weixinRepresent'), true);
+					Ext.getCmp('commissionRange_numfield_weixinRepresent').setValue(jr.root[0].commissionRate ? (jr.root[0].commissionRate * 100).toFixed(2) : '');
+	    				
 	    			var progressText = jr.root[0].isProgress ? '<span style="color:green;font-weight:bold;display:inline-block;margin-right:10px;">进行中</span>' : '<span style="color:red;font-weight:bold;display:inline-block;margin-right:10px;">已结束</span>'
 	    			var activeTitle = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">活动名称：' + (jr.root[0].title ? jr.root[0].title : '')  + '</span>';
 	    			var reperesenterReceive = '<span style="font-weight:bold;display:inline-block;margin-right:10px;">推荐人获得：' + jr.root[0].recommendMoney + '(元),' + jr.root[0].reconmendPoint + '(积分);</span>';
@@ -250,10 +249,13 @@ Ext.onReady(function(){
 			}, {
 				id : 'checkCommission_checkbox_weixinRepresent',
 				xtype : 'checkbox',
-				checked : true,
 				listeners : {
-					check : function(){
-						if(Ext.getCmp('checkCommission_checkbox_weixinRepresent').checked){
+					focus : function(){
+						Ext.getCmp('commissionRange_numfield_weixinRepresent').disable();
+						Ext.getCmp('commissionRange_numfield_weixinRepresent').setValue('');						
+					},
+					check : function(checkbox, checked){
+						if(checked){
 							Ext.getCmp('commissionRange_numfield_weixinRepresent').enable();
 						}else{
 							Ext.getCmp('commissionRange_numfield_weixinRepresent').disable();
