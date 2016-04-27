@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponEffect;
 import com.wireless.pojo.promotion.CouponOperation;
+import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class CouponEffectDao {
@@ -17,7 +17,7 @@ public class CouponEffectDao {
 		
 		private String beginDate;
 		private String endDate;
-		private int couponId;
+		private int couponTypeId;
 		private int branchId;
 		
 		public ExtraCond setRange(String beginDate, String endDate){
@@ -26,13 +26,13 @@ public class CouponEffectDao {
 			return this;
 		}
 		
-		public ExtraCond setCoupon(Coupon coupon){
-			this.couponId = coupon.getId();
+		public ExtraCond setCouponType(CouponType couponType){
+			this.couponTypeId = couponType.getId();
 			return this;
 		}
 		
-		public ExtraCond setCoupon(int couponId){
-			this.couponId = couponId;
+		public ExtraCond setCouponType(int couponId){
+			this.couponTypeId = couponId;
 			return this;
 		}
 		
@@ -48,8 +48,8 @@ public class CouponEffectDao {
 				extraCond.append("  AND CO.operate_date BETWEEN '" + this.beginDate + "' AND '" + this.endDate + "'");
 			}
 			
-			if(this.couponId != 0){
-				extraCond.append(" AND C.coupon_type_id =" + this.couponId);
+			if(this.couponTypeId != 0){
+				extraCond.append(" AND C.coupon_type_id =" + this.couponTypeId);
 			}
 			
 			if(this.branchId != 0){
@@ -126,7 +126,7 @@ public class CouponEffectDao {
 			  " AND CO.restaurant_id =" + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " GROUP BY CT.coupon_type_id ";
-				
+		
 		final List<CouponEffect> result = new ArrayList<>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){

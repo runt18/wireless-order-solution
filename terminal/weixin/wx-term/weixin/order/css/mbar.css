@@ -122,3 +122,10 @@ a {
 	line-height: 45px;
 	font-size: 14px;
 }
+
+.checkTab {
+	color: #FD9790;
+	font-weight: bold;
+	background: #DEF9FD;
+	box-shadow: 0px 0px 2px #000000;
+}

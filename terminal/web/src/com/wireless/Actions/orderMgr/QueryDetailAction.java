@@ -11,15 +11,19 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
-import com.wireless.db.orderMgr.OrderFoodDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Department.DeptId;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.util.DataPaging;
@@ -31,13 +35,21 @@ public class QueryDetailAction extends Action {
 		
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
+		final String beginDate = request.getParameter("beginDate");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String endDate = request.getParameter("endDate");
 		final String orderID = request.getParameter("orderID");
 		final String tableID = request.getParameter("tableID");
+		final String deptID = request.getParameter("deptID");
+		final String kitchenID = request.getParameter("kitchenID");
 		final String queryType = request.getParameter("queryType");
+		final String staffId = request.getParameter("staffID");
 		final String isPaging = request.getParameter("isPaging");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
-		
+		final String foodId = request.getParameter("foodId");
+		final String regionId = request.getParameter("regionId");
 		final JObject jObject = new JObject();
 
 		try{
@@ -50,9 +62,7 @@ public class QueryDetailAction extends Action {
 			
 			List<OrderFood> list = null;
 
-			if (queryType.equalsIgnoreCase("today")) {
-				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
-			}else if (queryType.equalsIgnoreCase("TodayByTbl")) {
+			if (queryType.equalsIgnoreCase("TodayByTbl")) {
 				list = OrderFoodDao.getSingleDetailByTableId(staff, Integer.parseInt(tableID));
 				if(orderID != null && !orderID.trim().isEmpty()){
 					final float totalPrice = OrderDao.getById(staff, Integer.parseInt(orderID), DateType.TODAY).calcTotalPrice();
@@ -71,16 +81,53 @@ public class QueryDetailAction extends Action {
 						}
 					});
 				}
-			}else {
-				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrder(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
-			}
-			
-			if(list != null){
-				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-					list = DataPaging.getPagingData(list, Boolean.parseBoolean(isPaging), start, limit);
+			}else{
+				final OrderFoodDao.ExtraCond extraCond;
+				if (queryType.equalsIgnoreCase("today")) {
+					extraCond = new OrderFoodDao.ExtraCond(DateType.TODAY);
+				}else{
+					extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY);
 				}
-				jObject.setRoot(list);
+				
+				if(foodId != null && !foodId.isEmpty()){
+					extraCond.setFood(Integer.parseInt(foodId));
+				}
+				
+				if(kitchenID != null && !kitchenID.isEmpty()){
+					extraCond.setKitchen(Integer.parseInt(kitchenID));
+				}
+				
+				if(regionId != null && !regionId.isEmpty()){
+					extraCond.setRegionId(Region.RegionId.valueOf(Integer.parseInt(regionId)));
+				}
+				
+				if(staffId != null && !staffId.isEmpty()){
+					extraCond.setStaffId(Integer.parseInt(staffId));
+				}
+				
+				if(beginDate != null && !beginDate.isEmpty() && endDate != null && !endDate.isEmpty()){
+					extraCond.setDutyRange(beginDate, endDate);
+				}
+				
+				if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
+					HourRange range = new HourRange(opening, ending);
+					extraCond.setHourRange(range);
+				}
+				
+				if(deptID != null && !deptID.isEmpty()){
+					extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+				}
+				
+				extraCond.setOrder(Integer.parseInt(orderID));
+				
+				list = OrderFoodDao.getSingleDetail(staff, extraCond, " ORDER BY OF.order_date ");
 			}
+
+			
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				list = DataPaging.getPagingData(list, Boolean.parseBoolean(isPaging), start, limit);
+			}
+			jObject.setRoot(list);
 
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

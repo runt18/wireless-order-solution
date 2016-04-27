@@ -174,7 +174,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		}
 		
 		if(couponId != null && !couponId.isEmpty()){
-			extraCond.setCoupon(Integer.parseInt(couponId));
+			extraCond.setCouponType(Integer.parseInt(couponId));
 		}
 		
 		if(branchId != null && !branchId.isEmpty()){

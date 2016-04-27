@@ -5,6 +5,10 @@ Ext.onReady(function(){
  	var queryType = Ext.WindowMgr.getActive().queryType;
  	var foodStatus = Ext.WindowMgr.getActive().foodStatus;
  	var branchId = Ext.WindowMgr.getActive().branchId;
+ 	var deptId = Ext.WindowMgr.getActive().deptID;
+ 	
+ 	
+ 	
  	
 	var billDetailpageRecordCount = 15;
 	var billDetailGrid;

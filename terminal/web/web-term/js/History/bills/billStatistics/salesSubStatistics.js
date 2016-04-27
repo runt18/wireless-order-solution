@@ -359,6 +359,7 @@ $(function(){
 	
 		var orderFoodStatPanelGridTbarItem = [{
 				xtype : 'tbtext',
+				width : 250,
 				text : String.format(Ext.ux.txtFormat.typeName, '部门选择', 'lab_salesSubDept_food', '----')
 			},
 		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品选择:'}, foodName,
@@ -454,6 +455,8 @@ $(function(){
 		});
 		
 		
+		
+		
 		orderFoodStatPanelGrid = createGridPanel(
 			'',
 			'',
@@ -468,7 +471,8 @@ $(function(){
 	         ['口味总额', 'tasteIncome', '', 'right', Ext.ux.txtFormat.gridDou], 
 	         ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou],
 	         ['赠送数量', 'giftedAmount', null, 'right', Ext.ux.txtFormat.gridDou],
-	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou]
+	         ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
+	         ['操作', 'operate', null, 'right', foodOperate]
 			//['均价','avgPrice','','right','Ext.ux.txtFormat.gridDou'], 
 			],
 			SalesSubStatRecord.getKeys().concat(['food', 'food.name', 'restaurant']),
@@ -477,6 +481,11 @@ $(function(){
 			'',
 			[orderFoodStatPanelGridTbar, Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:dateCombo,statistic : 'foodStatistic_',tbarType: 0})]
 		);
+		
+		function foodOperate(a, b, c){
+			return '<a class="foodOperate" food_id="' + c.json.food.id + '">明细</a>'
+		}
+		
 		orderFoodStatPanelGrid.keys = [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -500,7 +509,77 @@ $(function(){
 					sumRow.style.color = 'green';
 				}
 				//单位成本
-//				orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 7).innerHTML = '--';
+				orderFoodStatPanelGrid.getView().getCell(store.getCount() - 1, 9).innerHTML = '--';
+				
+				$('#divSalesSubStatistics').find('.foodOperate').each(function(index, element){
+					element.onclick = function(){
+						console.log(orderFoodStatPanelDeptTree.disabled);
+									
+						var foodDetailWin = new Ext.Window({
+							layout : 'fit',
+							width : 1100,
+							height : 440,
+							closable : false,
+							resizable : false,
+							modal : true,
+							bbar : ['->', {
+								text : '关闭',
+								iconCls : 'btn_close',
+								handler : function(){
+									//TODO 关闭
+									foodDetailWin.destroy();
+								}
+							}],
+							keys : [{
+								key : Ext.EventObject.ESC,
+								scope : this,
+								fn : function(){
+									//TODO 关闭
+									foodDetailWin.destroy();
+								}
+							}],
+							listeners : {
+								show : function(thiz){
+									var sd = Ext.ux.getSelData(orderFoodStatPanelGrid);
+									thiz.load({
+										url : '../window/history/orderDetail.jsp',
+										scripts : true,
+										method : 'post'
+									});
+									
+									thiz.center();
+									thiz.queryType = 'History';
+									
+									thiz.deptID = salesSubDeptId;
+									thiz.kitchenID = salesSubDeptId;
+									thiz.foodId = $(element).attr('food_id');
+									thiz.regionId = Ext.getCmp('foodStatistic_comboRegion').getValue();
+									thiz.staffID = foodSale_combo_staffs.getValue();
+									thiz.branchId = branch_combo_foodstatistics.getValue();
+									thiz.beginDate = beginDate.getValue().format('Y-m-d 00:00:00');
+									thiz.endDate = endDate.getValue().format('Y-m-d 23:59:59');
+
+									var opening, ending;
+									var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
+									if(parseInt(businessHour.businessHourType) != -1){
+										opening = businessHour.opening;
+										ending = businessHour.ending;
+									}else{
+										opening = '';
+										ending = '';
+									}									
+									c.
+									thiz.opening = opening;
+									thiz.ending = ending;
+									
+								}
+							}
+						});		
+						
+						foodDetailWin.show();
+					}
+				})	
+				
 			}
 		});
 		orderFoodStatPanel = new Ext.Panel({

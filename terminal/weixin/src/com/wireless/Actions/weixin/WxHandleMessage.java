@@ -555,15 +555,19 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				}else if(msg.getEventKey().equals(EventKey.I_WANT_REPRESENT.val)){
 					//TODO 我要代言
 					final Represent represent = RepresentDao.getByCond(staff, null).get(0);
-					final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-					String title = represent.getTitle().isEmpty() ? "我要代言" : represent.getTitle();
-					String desc = ("【代言规则】：成功将代言海报中【$(restaurant)】的二维码分享给您的好友，好友扫描此二维码成为您的粉丝，" +
-								  "即可获得$(recommend_money)元的充值赠额和$(recommend_point)的赠送积分。" +
-								  "\r\n点击去分享代言海报>>>>>")
-								  .replace("$(restaurant)", restaurant.getName())
-								  .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
-								  .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, desc, picUrl, createUrl(msg, WEIXIN_REPRESENT))));
+					if(represent.isProgress()){
+						final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+						String title = represent.getTitle().isEmpty() ? "我要代言" : represent.getTitle();
+						String desc = ("【代言规则】：成功将代言海报中【$(restaurant)】的二维码分享给您的好友，好友扫描此二维码成为您的粉丝，" +
+									  "即可获得$(recommend_money)元的充值赠额和$(recommend_point)的赠送积分。" +
+									  "\r\n点击去分享代言海报>>>>>")
+									  .replace("$(restaurant)", restaurant.getName())
+									  .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
+									  .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, desc, picUrl, createUrl(msg, WEIXIN_REPRESENT))));
+					}else{
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("代言活动尚未开始", "敬请留意商家公告", "", "")));
+					}
 					
 				}else{
 					

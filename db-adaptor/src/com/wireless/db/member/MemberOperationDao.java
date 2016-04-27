@@ -77,9 +77,15 @@ public class MemberOperationDao {
 		private int restaurantId;
 		private Float minChargeAmount;
 		private Float maxChargeAmount;
+		private String comment;
 		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType);
+		}
+		
+		public ExtraCond setComment(String comment){
+			this.comment = comment;
+			return this;
 		}
 		
 		public ExtraCond setMinChargeAmount(Float min){
@@ -269,6 +275,9 @@ public class MemberOperationDao {
 				extraCond.append(" AND delta_extra_money > " + minChargeAmount);
 			}else if(minChargeAmount == null && maxChargeAmount != null){
 				extraCond.append(" AND delta_extra_money < " + maxChargeAmount);
+			}
+			if(comment != null){
+				extraCond.append(" AND MO.comment LIKE '%" + comment + "%'");
 			}
 			return extraCond.toString();
 		}

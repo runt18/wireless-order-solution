@@ -1,6 +1,14 @@
 $(function(){
+	var debug = false;
+	
 	initRepresentCard();
 	function initRepresentCard(){
+		var restaurant, nickName;
+		if(debug){
+			$("#qrCode_div_representCard").attr('src', '../order/images/qrCode.jpg' );
+			$('#headingPhoto_img_representCard').attr('src', 'http://wx.qlogo.cn/mmopen/dmwVvwWRJuBdrMQylJiaxqAMjxT9bDcViaQ4Q6ybvyUUnKQKJLiakaiaDsibhgWeOquBFvNHvasOic2afurSKwFeia7sfrORo1vdY7f/0');
+			$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
+		}
 		//获取饭店的代言设置
 		$.ajax({
 			url : '../../WxOperateRepresent.do',
@@ -34,6 +42,7 @@ $(function(){
 				if(data.success){
 					$('#restaurantTips_span_representCard').html('【' + data.root[0].name + '】');
 					$('#restaurantDecoration_span_representCard').html('成为【' + data.root[0].name + '】会员');
+					restaurant = data.root[0].name;
 				}				
 			},
 			error : function(req, status, err){
@@ -56,8 +65,7 @@ $(function(){
 				if(data.success){
 					$("#qrCode_div_representCard").attr('src', 'http://qr.liantu.com/api.php?text=' + data.msg );
 				}else{
-					$("#qrCode_div_representCard").attr('src', '../order/images/qrCode.jpg' );
-					alert(data.msg);
+					alert('网络异常,请刷新页面');
 				}
 			},
 			error : function(req, status, err){
@@ -80,16 +88,12 @@ $(function(){
 					
 					if(data.root[0].headimgurl){
 						$('#headingPhoto_img_representCard').attr('src', data.root[0].headimgurl);
-					}else{
-						$('#headingPhoto_img_representCard').attr('src', 'http://wx.qlogo.cn/mmopen/dmwVvwWRJuBdrMQylJiaxqAMjxT9bDcViaQ4Q6ybvyUUnKQKJLiakaiaDsibhgWeOquBFvNHvasOic2afurSKwFeia7sfrORo1vdY7f/0');
 					}
 					
 					if(data.root[0].nickname){
-						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0] + '】推荐你');
-					}else{
-						$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
+						$('#friendDecoration_span_represetnCard').html('好友【' + data.root[0].nickname + '】推荐你');
+						nickName = data.root[0].nickname;
 					}
-					
 					
 				}else{
 					alert(data.msg);
@@ -99,6 +103,13 @@ $(function(){
 				console.log(err);
 			}
 		});
+		(function(){
+			if(restaurant && nickName){
+				document.getElementsByTagName('title')[0].innerHTML = '好友【' + nickName + '】推荐你成为【' + restaurant + '】会员';
+			}else{
+				setTimeout(arguments.callee, 500);
+			}	
+		})();
 	}
 	
 	function showPoster(data){
@@ -108,7 +119,7 @@ $(function(){
 		
 		
 		$('#container_div_representCard').css({
-			'height' : containerHeight * 0.94,
+			'height' : containerHeight * 0.95,
 			'width' : containerWidth
 		});
 		
@@ -130,11 +141,11 @@ $(function(){
 		//活动二维码
 		var qrCode = $('#qrCode_div_representCard');
 		qrCode.css({
-			'width' : '38%',
+			'width' : '30%',
 			'position' : 'absolute',
 			'left' : '0px',
 			'border-right' : '1px solid #666',
-			'padding' : '0 6%'
+			'padding' : '0 10%'
 		});
 		
 		
@@ -165,19 +176,19 @@ $(function(){
 		
 		//推荐人头像设置
 		$('#headingPhoto_img_representCard').css({
-			'width' : '27%',
+			'width' : '25%',
 			'padding' : '0 11%',
 			'border-radius' : '50%'
 		});
 		
 		$('#decoration_span_represetnCard').css({
-			'font-size' : '235%',
+			'font-size' : '214%',
 			'width' : '50%',
 			'color' : '#666'
 		});
 		
 		$('#tips_span_representCard').css({
-			'font-size' : '224%',
+			'font-size' : '214%',
 			'width' : '50%',
 			'color' : '#666'	
 		});
