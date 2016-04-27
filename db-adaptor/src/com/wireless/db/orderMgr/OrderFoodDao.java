@@ -83,11 +83,13 @@ public class OrderFoodDao {
 		
 		private int orderId;
 		private Department.DeptId deptId;
+		private Integer kitchenId;
 		private DutyRange dutyRange;
 		private HourRange hourRange;
 		private Region.RegionId regionId;
 		private int staffId;
 		private String foodName;
+		private int foodId;
 		private Boolean isGift;
 		
 		public ExtraCond(DateType dateType){
@@ -117,6 +119,11 @@ public class OrderFoodDao {
 			return this;
 		}
 		
+		public ExtraCond setDutyRange(String beginDate, String endDate){
+			this.dutyRange = new DutyRange(beginDate, endDate);
+			return this;
+		}
+		
 		public ExtraCond setHourRange(HourRange range){
 			this.hourRange = range;
 			return this;
@@ -124,6 +131,28 @@ public class OrderFoodDao {
 		
 		public ExtraCond setRegionId(Region.RegionId regionId){
 			this.regionId = regionId;
+			return this;
+		}
+		
+		
+		
+		public ExtraCond setKitchen(Kitchen kitchen){
+			this.kitchenId = Integer.valueOf(kitchen.getId());
+			return this;
+		}
+		
+		public ExtraCond setKitchen(int kitchenId){
+			this.kitchenId = Integer.valueOf(kitchenId);
+			return this;
+		}
+		
+		public ExtraCond setFood(Food food){
+			this.foodId = food.getFoodId();
+			return this;
+		}
+		
+		public ExtraCond setFood(int foodId){
+			this.foodId = foodId;
 			return this;
 		}
 		
@@ -151,6 +180,9 @@ public class OrderFoodDao {
 			if(deptId != null){
 				extraCond.append(" AND " + orderFoodTblAlias + ".dept_id = " + deptId.getVal());
 			}
+			if(kitchenId != null){
+				extraCond.append(" AND " + orderFoodTblAlias + ".kitchen_id = " + kitchenId.intValue());
+			}
 			if(dutyRange != null){
 				extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + dutyRange.getOnDutyFormat() + "' AND '" + dutyRange.getOffDutyFormat() + "'");
 			}
@@ -165,6 +197,9 @@ public class OrderFoodDao {
 			}
 			if(foodName != null){
 				extraCond.append(" AND " + orderFoodTblAlias + ".name LIKE '%" + foodName + "%'");
+			}
+			if(foodId > 0){
+				extraCond.append(" AND " + orderFoodTblAlias + ".food_id = " + foodId);
 			}
 			if(isGift != null){
 				extraCond.append(" AND " + orderFoodTblAlias + ".is_gift = " + (isGift.booleanValue() ? "1" : "0"));
