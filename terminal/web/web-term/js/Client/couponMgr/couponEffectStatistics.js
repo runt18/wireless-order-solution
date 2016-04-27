@@ -411,21 +411,13 @@ Ext.onReady(function(){
 		return '<a class="couponEffect" couponTypeId="' + c.json.couponTypeId + '">查看详细</a>'
 	};
 	
-<<<<<<< HEAD
 	function issuedAmountJump(a, b , c){
 		return '<a class="issuedAmount" couponTypeId="' + c.json.couponTypeId + '">' + c.json.issuedAmount + '</a>';
 	}
 	
 	function usedAmountJump(a, b, c){
 		return '<a class="usedAmount" couponTypeId="' + c.json.couponTypeId + '">' + c.json.usedAmount + '</a>';
-=======
-	function issuedAmountJump(v){
-		return '<a class="issuedAmount" style="cursor:pointer;">' + v + '</a>';
 	}
 	
-	function usedAmountJump(v){
-		return '<a class="usedAmount" style="cursor:pointer;">' + v + '</a>';
->>>>>>> 357a679be638e65c49d5f937c815415d87723017
-	};
 	
 });
