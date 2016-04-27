@@ -14,7 +14,7 @@ Ext.onReady(function(){
  	var endDate = Ext.WindowMgr.getActive().endDate;
  	var opening = Ext.WindowMgr.getActive().opening;
  	var ending = Ext.WindowMgr.getActive().ending;
- 	
+ 	var calcByDuty = Ext.WindowMgr.getActive().calcByDuty;
  	
  	
 	var billDetailpageRecordCount = 15;
@@ -44,8 +44,8 @@ Ext.onReady(function(){
 	    [
 		    [true, false, false, false], 
 		    ['日期','orderDateFormat',100],
-		    ['名称','name',100],
 		    ['账单号', 'orderId', 100],
+		    ['名称','name',100],
 		    ['单价','unitPrice',60, 'right', Ext.ux.txtFormat.gridDou],
 		    ['数量','count', 60, 'right', Ext.ux.txtFormat.gridDou], 
 		    ['口味','tasteGroup.tastePref'],
@@ -62,7 +62,7 @@ Ext.onReady(function(){
 		 'isGift', 'isReturn', 'isRepaid','isTransfer', 'isCommission', 'operation'],
 	    [ ['orderID', orderId], ['queryType', queryType ? queryType : 'history'], ['branchId', branchId], ['deptID', deptId ? deptId : ''], ['kitchenID', kitchenId ? kitchenId : ''],
 	    ['foodId' , foodId ? foodId : ''], ['regionId', regionId ? regionId : ''], ['staffID', staffId ? staffId : ''], ['beginDate', beginDate ? beginDate : ''],
-	    ['endDate', endDate ? endDate : ''], ['opening', opening ? opening : ''], ['ending', ending ? ending : '']],
+	    ['endDate', endDate ? endDate : ''], ['opening', opening ? opening : ''], ['ending', ending ? ending : ''], ['calcByDuty', calcByDuty ? calcByDuty : false]],
 	    billDetailpageRecordCount,
 	    ''
 	);
