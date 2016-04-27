@@ -103,7 +103,6 @@ public class Page{
 		GIFT_STATISTICS("giftStatistics", "赠送统计", "History_Module/GiftStatistics.html", "../../images/giftStatistics.png"),
 		ERASE_STATISTICS("eraseStatistics", "抹数统计", "History_Module/EraseStatistic.html", "../../images/giftStatistics.png"),
 //		MEMBE_RPRICE_STATISTICS("memberPriceStatistics", "会员价统计 ", "History_Module/memberPriceStatictics.html", "../../images/giftStatistics.png"),
-		COUPON_STATISTICS("couponStatistics", "优惠券统计 ", "History_Module/CouponStatistics.html", "../../images/giftStatistics.png"),
 //		PASSENGERFLOWSTATISTICS("passengerFlowStatistics", "History_Module/PassengerFliwStatistics.html", "../../images/giftStatistics.png");
 		PASSENGERFLOW_STATISTICS("passengerFlowStatistics", "客流统计", "History_Module/PassengerFlowStatistics.html", "../../images/giftStatistics.png");
 		
@@ -219,13 +218,14 @@ public class Page{
 		MEMBER_CONSUME_STATISTICS("memberConsumeStatistics", "消费统计", "Client_Module/memberConsumeStatistics.html", "../../images/btnConsumeDetail.png"),
 		MEMBER_CREATED_STATISTICS("memberCreatedStatistics", "开卡统计", "Client_Module/memberCreatedStatistics.html", "../../images/cancelReasonMgr1.png"),
 		MEMBER_COND("memberCond", "会员分析", "Client_Module/memberCond.html", "../../images/history.png"),
-		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png"),
+		COUPON_STATISTICS("couponStatistics", "优惠券统计 ", "History_Module/CouponStatistics.html", "../../images/giftStatistics.png"),
 		COUPON_EFFECT("couponEffect", "优惠活动效果分析", "Client_Module/couponEffectStatistics.html", "../../images/memberMgr.png"),
-		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
-		MEMBER_MENU_SET("WxMenu", "微信菜单设置", "MgrCenter_Module/weixinMenuMgr.html", "../../images/memberMgr.png"),
-		DEPUTY_MENU_SET("deputyMenu", "我要代言设置", "MgrCenter_Module/weixinRepresent.html", "../../images/memberMgr.png"),
+		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png"),
 		REPRESENT_STATISTICS("representStatistics", "代言统计", "History_Module/RepresentStatistics.html", "../../images/memberMgr.png"),
-		WXCOMMISSION_STATISTICS("wxCommissionStatistics", "佣金统计", "History_Module/WxCommissionStatistics.html", "../../images/memberMgr.png");
+		WXCOMMISSION_STATISTICS("wxCommissionStatistics", "佣金统计", "History_Module/WxCommissionStatistics.html", "../../images/memberMgr.png"),
+		DEPUTY_MENU_SET("deputyMenu", "我要代言设置", "MgrCenter_Module/weixinRepresent.html", "../../images/memberMgr.png"),
+		WX_STEPS_BIND("WXBind", "微信公众号设置", "Client_Module/WeixinAuth.html", "../../images/discountStatistics.png"),
+		MEMBER_MENU_SET("WxMenu", "微信菜单设置", "MgrCenter_Module/weixinMenuMgr.html", "../../images/memberMgr.png");
 		
 		
 //		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
