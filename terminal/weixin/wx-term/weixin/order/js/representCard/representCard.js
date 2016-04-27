@@ -1,11 +1,11 @@
 $(function(){
-	var debug = false;
+	var debug = true;
 	
 	initRepresentCard();
 	function initRepresentCard(){
 		var restaurant, nickName;
 		if(debug){
-			$("#qrCode_div_representCard").attr('src', '../order/images/qrCode.jpg' );
+			$("#qrCode_div_representCard").attr('src', 'http://qr.liantu.com/api.php?text=http://weixin.qq.com/q/anWAGufmqhTTYv-t5lv3' );
 			$('#headingPhoto_img_representCard').attr('src', 'http://wx.qlogo.cn/mmopen/dmwVvwWRJuBdrMQylJiaxqAMjxT9bDcViaQ4Q6ybvyUUnKQKJLiakaiaDsibhgWeOquBFvNHvasOic2afurSKwFeia7sfrORo1vdY7f/0');
 			$('#friendDecoration_span_represetnCard').html('来自好友【wode】的推荐');
 		}
@@ -185,13 +185,13 @@ $(function(){
 		});
 		
 		$('#decoration_span_represetnCard').css({
-			'font-size' : '214%',
+			'font-size' : '13px',
 			'width' : '50%',
 			'color' : '#666'
 		});
 		
 		$('#tips_span_representCard').css({
-			'font-size' : '214%',
+			'font-size' : '13px',
 			'width' : '50%',
 			'color' : '#666'	
 		});
