@@ -139,7 +139,7 @@ public class RepresentDao {
 			sql = " SELECT oss_image_id FROM " + Params.dbName + ".represent WHERE id = " + represent.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				if(dbCon.rs.getInt("oss_image_id") != 0){
+				if(dbCon.rs.getInt("oss_image_id") != 0 && represent.getImage().getId() != dbCon.rs.getInt("oss_image_id")){
 					try{
 						OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(dbCon.rs.getInt("oss_image_id")));
 					}catch(SQLException | BusinessException ignored){
