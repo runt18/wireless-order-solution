@@ -268,8 +268,11 @@ Ext.onReady(function(){
 							Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
 							Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
 							
-							Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
-							//设置优惠券类型
+							if($(element).attr('couponTypeId') != ''){
+								Ext.getCmp('coupon_combo_couponStatistics').setValue($(element).attr('couponTypeId'));
+							}else{
+								Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							}
 							Ext.getCmp('coupon_btnSearch').handler();
 							businessSubStatisticsLoading.hide();
 											
@@ -294,7 +297,11 @@ Ext.onReady(function(){
 							Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
 							Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
 							
-							Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							if($(element).attr('couponTypeId') != ''){
+								Ext.getCmp('coupon_combo_couponStatistics').setValue($(element).attr('couponTypeId'));
+							}else{
+								Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							}
 							Ext.getCmp('couponType_combo_couponStatistics').setValue('issue');
 							//设置优惠券类型
 							Ext.getCmp('coupon_btnSearch').handler();
@@ -320,7 +327,12 @@ Ext.onReady(function(){
 							Ext.getCmp('beginDate_combo_coupon').setValue(beginDate.getValue());
 							Ext.getCmp('endDate_combo_coupon').setValue(endDate.getValue());
 							
-							Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							if($(element).attr('couponTypeId') != ''){
+								Ext.getCmp('coupon_combo_couponStatistics').setValue($(element).attr('couponTypeId'));
+							}else{
+								Ext.getCmp('coupon_combo_couponStatistics').setValue(couponType_combo_couponEffect.getValue());
+							}
+							
 							Ext.getCmp('couponType_combo_couponStatistics').setValue('use');
 							//设置优惠券类型
 							Ext.getCmp('coupon_btnSearch').handler();
@@ -396,15 +408,15 @@ Ext.onReady(function(){
 	
 	
 	function couponEffectOperate(a, b, c){
-		return '<a class="couponEffect">查看详细</a>'
+		return '<a class="couponEffect" couponTypeId="' + c.json.couponTypeId + '">查看详细</a>'
 	};
 	
-	function issuedAmountJump(v){
-		return '<a class="issuedAmount">' + v + '</a>';
+	function issuedAmountJump(a, b , c){
+		return '<a class="issuedAmount" couponTypeId="' + c.json.couponTypeId + '">' + c.json.issuedAmount + '</a>';
 	}
 	
-	function usedAmountJump(v){
-		return '<a class="usedAmount">' + v + '</a>';
+	function usedAmountJump(a, b, c){
+		return '<a class="usedAmount" couponTypeId="' + c.json.couponTypeId + '">' + c.json.usedAmount + '</a>';
 	};
 	
 });
