@@ -34,7 +34,7 @@ public class OperateCouponEffectAction extends DispatchAction{
 		final String pin = (String)request.getAttribute("pin");
 		final String beginDate = request.getParameter("beginDate");
 		final String endDate = request.getParameter("endDate");
-		final String couponId = request.getParameter("couponId");
+		final String couponTypeId = request.getParameter("couponId");
 		final String branchId = request.getParameter("branchId");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
@@ -48,8 +48,8 @@ public class OperateCouponEffectAction extends DispatchAction{
 				extraCond.setRange(beginDate, endDate);
 			}
 			
-			if(couponId != null && !couponId.isEmpty()){
-				extraCond.setCoupon(Integer.parseInt(couponId));
+			if(couponTypeId != null && !couponTypeId.isEmpty()){
+				extraCond.setCouponType(Integer.parseInt(couponTypeId));
 			}
 			
 			if(branchId != null && !branchId.isEmpty()){

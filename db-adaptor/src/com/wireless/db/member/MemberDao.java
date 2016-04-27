@@ -45,6 +45,7 @@ import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.SQLUtil;
 
@@ -1752,8 +1753,8 @@ public class MemberDao {
 				//获取推荐人
 				Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
 				
-				//计算出佣金充额
-				float commission = consumePrice * commissionRate;
+				//计算出佣金充额(四舍五入)
+				int commission = Math.round(consumePrice * commissionRate);
 				
 				//为推荐人充值佣金 
 				if(commission > 0){
@@ -1999,7 +2000,14 @@ public class MemberDao {
 		//Perform the charge operation and get the related member operation.
 		MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
 		if(comment != null){
-			mo.setComment("账单号:" + comment + ",消费人:" + getById(staff, Integer.parseInt(comment)).getName());
+			if(chargeType != ChargeType.COMMISSION){
+				List<MemberOperation> mo4Consume = MemberOperationDao.getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY)
+																		  .setOrder(Integer.parseInt(comment))
+																		  .addOperationType(MemberOperation.OperationType.CONSUME), null);
+				mo.setComment("账单号:" + comment + ",消费人:" + (mo4Consume.isEmpty() ? "---" : mo4Consume.get(0).getMemberName()));
+			}else{
+				mo.setComment(comment);
+			}
 		}
 		
 		//Insert the member operation to this charge operation.

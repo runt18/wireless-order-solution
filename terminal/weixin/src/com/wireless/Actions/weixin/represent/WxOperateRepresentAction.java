@@ -61,7 +61,7 @@ public class WxOperateRepresentAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try {
-			User referrer = User.newInstance(Token.newInstance(wxRestaurant.getWeixinAppId(), wxRestaurant.getWeixinAppSecret()), oid);
+			User referrer = User.newInstance(Token.newInstance(AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken())), oid);
 			jObject.setRoot(referrer);
 			
 		} catch (Exception e) {
