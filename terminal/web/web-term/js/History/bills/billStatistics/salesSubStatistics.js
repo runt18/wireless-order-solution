@@ -645,7 +645,7 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-//					var data = [];
+					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -656,13 +656,13 @@ $(function(){
 							var jr = Ext.decode(res.responseText);
 							
 							if(jr.root[0].typeVal != '2'){
-								var data = [];
+//								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 								
 								thiz.store.loadData(data);
 								thiz.setValue(jr.root[0].id);
 							}else{
-								var data = [[-1, '全部']];
+								data.push([-1, '全部']);
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
@@ -843,10 +843,10 @@ $(function(){
 		     ['营业额', 'income', null,'right', Ext.ux.txtFormat.gridDou], 
 		     ['折扣额', 'discount', null,'right', Ext.ux.txtFormat.gridDou], 
 		     ['赠送额', 'gifted', null,'right', Ext.ux.txtFormat.gridDou],
-		     ['成本', 'cost','','right', Ext.ux.txtFormat.gridDou], 
-	         ['成本率', 'costRate','','right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利', 'profit','','right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利率', 'profitRate','','right', Ext.ux.txtFormat.gridDou],
+//		     ['成本', 'cost','','right', Ext.ux.txtFormat.gridDou], 
+//	         ['成本率', 'costRate','','right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利', 'profit','','right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利率', 'profitRate','','right', Ext.ux.txtFormat.gridDou],
 		     ['dept.id', 'dept.id', 10]
 			],
 			SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name', 'kitchen', 'kitchen.name']),
@@ -1282,10 +1282,10 @@ $(function(){
 		     ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
 		     ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
 		     ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
-		     ['成本', 'cost','', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['成本率', 'costRate','', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou],
+//		     ['成本', 'cost','', 'right', Ext.ux.txtFormat.gridDou], 
+//	         ['成本率', 'costRate','', 'right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou],
 	         ['操作', 'operateChart', '', 'center', function(v){
 	         	return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
 	         }]
