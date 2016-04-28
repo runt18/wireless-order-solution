@@ -42,7 +42,7 @@ public class QueryDetailAction extends Action {
 		final String orderID = request.getParameter("orderID");
 		final String tableID = request.getParameter("tableID");
 		final String deptID = request.getParameter("deptID");
-		final String kitchenID = request.getParameter("kitchenID");
+		final String kitchenId = request.getParameter("kitchenID");
 		final String queryType = request.getParameter("queryType");
 		final String staffId = request.getParameter("staffID");
 		final String isPaging = request.getParameter("isPaging");
@@ -50,13 +50,14 @@ public class QueryDetailAction extends Action {
 		final String limit = request.getParameter("limit");
 		final String foodId = request.getParameter("foodId");
 		final String regionId = request.getParameter("regionId");
+		final String calcByDuty = request.getParameter("calcByDuty");
 		final JObject jObject = new JObject();
 
 		try{
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
+			if(branchId != null && !branchId.isEmpty() && Integer.parseInt(branchId) > 0){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
 			
@@ -93,20 +94,29 @@ public class QueryDetailAction extends Action {
 					extraCond.setFood(Integer.parseInt(foodId));
 				}
 				
-				if(kitchenID != null && !kitchenID.isEmpty() && !kitchenID.equals("-1")){
-					extraCond.setKitchen(Integer.parseInt(kitchenID));
+				if(kitchenId != null && !kitchenId.isEmpty() && Integer.parseInt(kitchenId) > 0){
+					extraCond.setKitchen(Integer.parseInt(kitchenId));
 				}
 				
-				if(regionId != null && !regionId.isEmpty() && !regionId.equals("-1")){
+				if(regionId != null && !regionId.isEmpty() && Integer.parseInt(regionId) > 0){
 					extraCond.setRegionId(Region.RegionId.valueOf(Integer.parseInt(regionId)));
 				}
 				
-				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				if(staffId != null && !staffId.isEmpty() && Integer.parseInt(staffId) > 0){
 					extraCond.setStaffId(Integer.parseInt(staffId));
 				}
 				
 				if(beginDate != null && !beginDate.isEmpty() && endDate != null && !endDate.isEmpty()){
-					extraCond.setDutyRange(beginDate, endDate);
+					if(calcByDuty != null && !calcByDuty.isEmpty() && Boolean.parseBoolean(calcByDuty)){
+						DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
+						if(range != null){
+							extraCond.setDutyRange(range);
+						}else{
+							extraCond.setDutyRange(beginDate, endDate);
+						}
+					}else{
+						extraCond.setDutyRange(beginDate, endDate);
+					}
 				}
 				
 				if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){

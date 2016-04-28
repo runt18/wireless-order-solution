@@ -1,14 +1,19 @@
 
 $(function(){
 	
-	var salesSubQueryType = 0;
 	var salesSubDeptId = -1;
 	var salesSubKitchenId = -1;
 	var isLeaf = false;
 	var SALESSUB_PAGE_LIMIT = 22;
 	var titleDeptName, titleRegionName, selectDeptId;
-	var deptStatPanelGrid, salesSub_hours;
-	var salesSubWin, salesSubWinTabPanel, orderFoodStatPanel, orderFoodStatPanelDeptTree, kitchenStatPanel, deptStatPanel;
+	var deptStatPanelGrid = null;
+	var salesSub_hours = null;
+	var salesSubWin = null;
+	var salesSubWinTabPanel = null;
+	var orderFoodStatPanel = null;
+	var orderFoodStatPanelDeptTree = null;
+	var kitchenStatPanel = null;
+	var deptStatPanel = null;
 	
 	//初始化区域combo
 	function initRegionCombo(statistic){
@@ -186,7 +191,7 @@ $(function(){
 			}
 		});
 		
-		var branch_combo_foodstatistics;
+		var branch_combo_foodstatistics = null;
 		branch_combo_foodstatistics = new Ext.form.ComboBox({
 			id : 'branch_combo_foodstatistics',
 			readOnly : false,
@@ -232,7 +237,7 @@ $(function(){
 								thiz.setValue(-1);
 							}
 							
-							thiz.fireEvent('select')
+							thiz.fireEvent('select');
 							
 						},
 						failure : function(res, opt){
@@ -513,7 +518,6 @@ $(function(){
 				
 				$('#divSalesSubStatistics').find('.foodOperate').each(function(index, element){
 					element.onclick = function(){
-						console.log(orderFoodStatPanelDeptTree.disabled);
 									
 						var foodDetailWin = new Ext.Window({
 							layout : 'fit',
@@ -576,6 +580,7 @@ $(function(){
 									}									
 									thiz.opening = opening == '00:00' ? '' : opening;
 									thiz.ending = ending == '00:00' ? '' : ending;
+									thiz.calcByDuty = true;
 									
 								}
 							}
@@ -628,7 +633,7 @@ $(function(){
 		});
 		
 		//分厨统计的区域
-		var branch_combo_kitchenStatistics;
+		var branch_combo_kitchenStatistics = null;
 		branch_combo_kitchenStatistics = new  Ext.form.ComboBox({
 			readOnly : false,
 			forceSelection : true,
@@ -1031,7 +1036,8 @@ $(function(){
 		});
 		
 		//门店combo
-		var branch_combo_deptStatistics = new Ext.form.ComboBox({
+		var branch_combo_deptStatistics = null;
+		branch_combo_deptStatistics = new Ext.form.ComboBox({
 			id : 'branch_combo_deptStatistics',
 			readOnly : false,
 			forceSelection : true,
@@ -1061,7 +1067,7 @@ $(function(){
 								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 
-								thiz.store.loadData(data)
+								thiz.store.loadData(data);
 								thiz.setValue(jr.root[0].id);
 							}else{
 								var data = [[-1, '全部']];
@@ -1071,11 +1077,11 @@ $(function(){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
 								
-								thiz.store.loadData(data)
+								thiz.store.loadData(data);
 								thiz.setValue(-1);
 							}
 							
-							thiz.fireEvent('select')
+							thiz.fireEvent('select');
 							
 						}
 					});
