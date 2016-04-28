@@ -1313,9 +1313,9 @@ $(function(){
 					sumRow.style.fontWeight = 'bold';		
 					sumRow.style.color = 'green';
 				}
-				deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-				deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-				deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+//				deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+//				deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+//				deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 			}
 			
 		});
