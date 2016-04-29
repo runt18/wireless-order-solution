@@ -42,6 +42,7 @@ import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponEffectDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -75,6 +76,7 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponEffect;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
@@ -154,6 +156,95 @@ public class HistoryStatisticsAction extends DispatchAction{
 		normalNumStyle.setBorderLeft((short)1);
 		normalNumStyle.setBorderRight((short)1);
 		
+	}
+	
+	
+	public ActionForward couponDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		response.setContentType("application/vnd.ms-excel;");
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("优惠券统计.xls".getBytes("GBK"), "ISO8859_1"));
+		
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String staffId = request.getParameter("staffId");
+		final String begin = request.getParameter("beginDate");
+		final String end = request.getParameter("endDate");
+		final String isDuty = request.getParameter("isDuty");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String operate = request.getParameter("operate");
+		final String operateType = request.getParameter("operateType");
+		final String memberFuzzy = request.getParameter("memberFuzzy");
+		final String couponId = request.getParameter("couponId");
+		final String couponTypeId = request.getParameter("couponTypeId");
+		final JObject jObject = new JObject();
+			
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+
+		final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
+		
+		if(staffId != null && !staffId.isEmpty()){
+			extraCond.setStaff(Integer.parseInt(staffId));
+		}
+		
+		if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
+			if(isDuty != null && !isDuty.isEmpty() && Boolean.parseBoolean(isDuty)){
+				DutyRange range = DutyRangeDao.exec(staff, begin, end);
+				if(range != null){
+					extraCond.setRange(range);
+				}else{
+					extraCond.setRange(begin, end);
+				}
+			}else{
+				extraCond.setRange(begin, end);
+			}
+		}
+		
+		if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
+			extraCond.setHourRange(opening, ending);
+		}
+		
+		if(operate != null && !operate.isEmpty()){
+			extraCond.setOperate(CouponOperation.Operate.valueOf(Integer.parseInt(operate)));
+		}
+		
+		if(operateType != null && !operateType.isEmpty()){
+			if(operateType.equalsIgnoreCase("issue")){
+				extraCond.setOperateType(CouponOperation.OperateType.ISSUE);
+			}else if(operateType.equalsIgnoreCase("use")){
+				extraCond.setOperateType(CouponOperation.OperateType.USE);
+			}
+		}
+		
+		if(memberFuzzy != null && !memberFuzzy.isEmpty()){
+			extraCond.setMemberFuzzy(memberFuzzy);
+		}
+		
+		if(couponId != null && !couponId.isEmpty()){
+			extraCond.setCoupon(Integer.parseInt(couponId));
+		}
+		
+		if(couponTypeId != null && !couponTypeId.isEmpty()){
+			extraCond.setCouponType(Integer.parseInt(couponTypeId));
+		}
+		
+		//获取优惠券的操作记录
+		final List<CouponOperation> result = CouponOperationDao.getByCond(staff, extraCond);
+		
+		
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("优惠券统计");
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		
+		initParams(wb);
+		
+		return null;
 	}
 	
 	public ActionForward couponEffectDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
@@ -340,6 +431,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String orderType = request.getParameter("orderType");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
+		final String kitchenId = request.getParameter("kitchenId");
 		
 		final int ot = (orderType != null && !orderType.isEmpty()) ? Integer.parseInt(orderType) : SaleDetailsDao.ORDER_BY_SALES;
 		
@@ -363,6 +455,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 			extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
+		}
+		
+		if(kitchenId != null && !kitchenId.isEmpty() && !kitchenId.equals("-1")){
+			extraConds.setKitchen(Integer.parseInt(kitchenId));
 		}
 		
 		if(region != null && !region.isEmpty() && !region.equals("-1")){
