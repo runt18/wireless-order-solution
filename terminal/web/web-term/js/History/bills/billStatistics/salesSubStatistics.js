@@ -431,11 +431,11 @@ $(function(){
 					ending = '';
 				}
 				
-				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}&opening={7}&ending={8}&branchId={9}';
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}&opening={7}&ending={8}&branchId={9}&kitchenId={10}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						Ext.getCmp("foodStatistic_comboRegion").getValue(), 
+						Ext.getCmp("foodStatistic_comboRegion").getValue	(), 
 						'salesFoodDetail',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
 						endDate.getValue().format('Y-m-d 23:59:59'),
@@ -443,7 +443,8 @@ $(function(){
 						foodName.getValue(),
 						opening,
 						ending,
-						branch_combo_foodstatistics.getValue()
+						branch_combo_foodstatistics.getValue(),
+						salesSubKitchenId
 					);
 				window.location = url;
 			}

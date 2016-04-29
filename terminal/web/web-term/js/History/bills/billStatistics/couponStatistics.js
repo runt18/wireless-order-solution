@@ -307,6 +307,13 @@ Ext.onReady(function(){
 			
 
 		}
+	}, {
+		text : '导出',
+		iconCls : 'icon_tb_exoprt_excel',
+		handler : function(){
+			
+		
+		}
 	}];
 	
 	

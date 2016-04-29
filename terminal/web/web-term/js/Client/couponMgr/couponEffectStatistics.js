@@ -172,17 +172,17 @@ Ext.onReady(function(){
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
 		
-		var url = '../../{0}?dataSource={1}&beginDate={2}&endDate={3}&couponTypeId={4}&branchId={5}';
-		url = String.format(
-			url,
-			'ExportHistoryStatisticsToExecl.do',
-			'couponEffectDetail',
-			beginDate.getValue().format('Y-m-d 00:00:00'),
-			endDate.getValue().format('Y-m-d 23:59:59'),
-			couponType_combo_couponEffect.getValue(),
-			branchSelect_combo_couponEffect.getValue()
-		)
-		window.location = url;
+			var url = '../../{0}?dataSource={1}&beginDate={2}&endDate={3}&couponTypeId={4}&branchId={5}';
+			url = String.format(
+				url,
+				'ExportHistoryStatisticsToExecl.do',
+				'couponEffectDetail',
+				beginDate.getValue().format('Y-m-d 00:00:00'),
+				endDate.getValue().format('Y-m-d 23:59:59'),
+				couponType_combo_couponEffect.getValue(),
+				branchSelect_combo_couponEffect.getValue()
+			)
+			window.location = url;
 		
 		}
 		
