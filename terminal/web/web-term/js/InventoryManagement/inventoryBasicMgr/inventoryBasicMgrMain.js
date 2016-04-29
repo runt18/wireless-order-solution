@@ -402,7 +402,7 @@ function initOperateMaterialWin(){
 							id : materialId.getValue(),
 							price : materialPrice.getValue(),
 							name : materialName.getValue(),
-							alarmAmount : alarmAmount.getValue(), 
+							alarmAmount : alarmAmount.getValue() ? alarmAmount.getValue() : 0, 
 							cateId : initMaterialCate.getValue(),
 							cType : operateMaterialWin.cateType
 						},
@@ -601,7 +601,7 @@ function materialBasicGridOperateRenderer(){
 		+ '<a href=\"javascript:operateMaterialHandler({otype:Ext.ux.otype[\'delete\']})">删除</a>';
 }
 function alarmAmountRenderer(data){
-	return data ? data : '';
+	return data ? data : '无';
 }
 function initControl(){
 	var materialCateTreeTbae = new Ext.Toolbar({
@@ -760,13 +760,13 @@ function initControl(){
 			['对应菜品', 'belongFood', 220],
 			['总数量', 'stock',,'right'],
 			['单位成本', 'price',,'right'],
-			['预警数量', 'alarmAmount',,'right', 'alarmAmountRenderer'],
-			['状态', 'statusText',,'center'],
+			['预警数量', 'alarmAmount',,'center', 'alarmAmountRenderer'],
+//			['状态', 'statusText',,'center'],
 			['最后修改人', 'lastModStaff'],
 			['最后修改时间', 'lastModDateFormat', 150],
 			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']
 		],
-		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'alarmAmount', 'statusValue', 'statusText',
+		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'alarmAmount', 'statusText',
 		 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'isGood'],
 		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_25,

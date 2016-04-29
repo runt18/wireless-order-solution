@@ -8,31 +8,177 @@ import com.wireless.pojo.util.DateUtil;
 
 public class Material implements Jsonable {
 	
-	public enum Status{
-		NORMAL(1, "正常"),
-		STOP(2, "停用"),
-		WARNING(3, "预警");
+	public static class InsertBuilder{
+		private MaterialCate cate;
+		private float price;
+		private float delta;
+		private float stock;
+		private String name;
+		private String lastModStaff;
+		private long lastModDate;
+		private String pinyin;
+		private boolean isGood = false;
+		private int alarmAmount;
 		
-		private int value;
-		private String text;
-		Status(int value, String text){
-			this.value = value;
-			this.text = text;
+		public InsertBuilder(){}
+		
+		public InsertBuilder setMaterialCate(MaterialCate cate){
+			this.cate = cate;
+			return this;
 		}
-		public int getValue() {
-			return value;
+		
+		public InsertBuilder setPrice(float price){
+			this.price = price;
+			return this;
 		}
-		public String getText() {
-			return text;
+		
+		public InsertBuilder setDelta(float delta){
+			this.delta = delta;
+			return this;
 		}
-		public static Status valueOf(int value){
-			for(Status temp : values()){
-				if(temp.getValue() == value){
-					return temp;
-				}
-			}
-			throw new IllegalArgumentException("The status value(val = " + value + ") passed is invalid.");
+		
+		public InsertBuilder setStock(float stock){
+			this.stock = stock;
+			return this;
 		}
+		
+		public InsertBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public InsertBuilder setLastModStaff(String staffName){
+			this.lastModStaff = staffName;
+			return this;
+		}
+		
+		public InsertBuilder setLastModDate(long date){
+			this.lastModDate = date;
+			return this;
+		}
+		
+		public InsertBuilder setPinYin(String pinYin){
+			this.pinyin = pinYin;
+			return this;
+		}
+		
+		public InsertBuilder setIsGood(boolean isGood){
+			this.isGood = isGood;
+			return this;
+		}
+		
+		public InsertBuilder setAlarmAmount(int alarmAmount){
+			this.alarmAmount = alarmAmount;
+			return this;
+		}
+		
+		public Material build(){
+			return new Material(this);
+		}
+		
+	}
+	
+	public static class UpdateBuilder{
+		private int id;
+		private MaterialCate cate;
+		private float price;
+		private float delta;
+		private float stock;
+		private String name;
+		private String lastModStaff;
+		private long lastModDate;
+		private String pinyin;
+		private boolean isGood = false;
+		private int alarmAmount;
+		private boolean isStockChanged = false;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public boolean isStockOperation(){
+			return this.isStockChanged;
+		}
+		
+		public UpdateBuilder setIsStockOperation(boolean isStockChanged){
+			this.isStockChanged = isStockChanged;
+			return this;
+		}
+		
+		public boolean hasNameChanged(){
+			return this.name != null && !this.name.isEmpty();
+		} 
+		
+		public boolean hasCateChanged(){
+			return this.cate != null;
+		}
+		
+		public boolean hasPriceChanged(){
+			return this.price != 0;
+		}
+		
+		public boolean hasStockChanged(){
+			return this.stock != 0;
+		}
+		
+		public boolean hasAlarmChanged(){
+			return this.alarmAmount != 0;
+		}
+		
+		public UpdateBuilder setMaterialCate(MaterialCate cate){
+			this.cate = cate;
+			return this;
+		}
+		
+		public UpdateBuilder setPrice(float price){
+			this.price = price;
+			return this;
+		}
+		
+		public UpdateBuilder setDelta(float delta){
+			this.delta = delta;
+			return this;
+		}
+		
+		public UpdateBuilder setStock(float stock){
+			this.stock = stock;
+			return this;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public UpdateBuilder setLastModStaff(String staffName){
+			this.lastModStaff = staffName;
+			return this;
+		}
+		
+		public UpdateBuilder setLastModDate(long date){
+			this.lastModDate = date;
+			return this;
+		}
+		
+		public UpdateBuilder setPinYin(String pinYin){
+			this.pinyin = pinYin;
+			return this;
+		}
+		
+		public UpdateBuilder setIsGood(boolean isGood){
+			this.isGood = isGood;
+			return this;
+		}
+		
+		public UpdateBuilder setAlarmAmount(int alarmAmount){
+			this.alarmAmount = alarmAmount;
+			return this;
+		}
+		
+		public Material build(){
+			return new Material(this);
+		}
+		
 	}
 	
 	private int id;
@@ -44,27 +190,41 @@ public class Material implements Jsonable {
 	private String name;
 	private String lastModStaff;
 	private long lastModDate;
-	private Status status;
 	private String pinyin;
 	private boolean isGood = false;
 	private int alarmAmount;
-	
-	void init(int id, int restaurantId, int cateId, float price, float stock, String name, String lastModStaff, long lastModDate, Status status){
-		this.id = id;
-		this.restaurantId = restaurantId;
-		this.cate = new MaterialCate(cateId, restaurantId, "");
-		this.price = price;
-		this.stock = stock;
-		this.name = name;
-		this.lastModStaff = lastModStaff;
-		this.lastModDate = lastModDate;
-		this.status = status;
-	}
 	
 	public Material(){}
 
 	public Material(int id){
 		this.id = id;
+	}
+	
+	public Material(InsertBuilder builder){
+		this.cate = builder.cate;
+		this.price = builder.price;
+		this.delta = builder.delta;
+		this.stock = builder.stock;
+		this.name = builder.name;
+		this.lastModStaff = builder.lastModStaff;
+		this.lastModDate = builder.lastModDate;
+		this.pinyin = builder.pinyin;
+		this.isGood = builder.isGood;
+		this.alarmAmount = builder.alarmAmount;
+	}
+	
+	public Material(UpdateBuilder builder){
+		this.id = builder.id;
+		this.cate = builder.cate;
+		this.price = builder.price;
+		this.delta = builder.delta;
+		this.stock = builder.stock;
+		this.name = builder.name;
+		this.lastModStaff = builder.lastModStaff;
+		this.lastModDate = builder.lastModDate;
+		this.pinyin = builder.pinyin;
+		this.isGood = builder.isGood;
+		this.alarmAmount = builder.alarmAmount;
 	}
 	
 	/**
@@ -75,9 +235,6 @@ public class Material implements Jsonable {
 	 * @param name
 	 * @param lastModStaff
 	 */
-	public Material(int id, int restaurantId, int cateId, String name, String lastModStaff){
-		init(id, restaurantId, cateId, 0, 0, name, lastModStaff, 0, Status.NORMAL);
-	}
 	
 	/**
 	 * insert basic model
@@ -87,15 +244,11 @@ public class Material implements Jsonable {
 	 * @param lastModStaff
 	 * @param status
 	 */
-	public Material(int restaurantId, String name, int cateId, String lastModStaff, int status){
-		init(id, restaurantId, cateId, 0, 0, name, lastModStaff, 0, Status.valueOf(status));
-	}
 	
 	public Material(MonthlyChangeTypeUpdateBuilder builder){
 		setId(builder.id);
 		setDelta(builder.delta);
 		setLastModStaff(builder.lastModStaff);
-		setRestaurantId(builder.restaurantId);
 	}
 	
 	public Material(MonthlyUpdateBuilder builder){
@@ -127,11 +280,16 @@ public class Material implements Jsonable {
 	}
 	
 	public void setCate(int id, String name) {
-		this.cate = new MaterialCate(id, this.restaurantId, name);
+		this.cate = new MaterialCate(id);
+		this.cate.setRestaurantId(this.restaurantId);
+		this.cate.setName(name);
 	}
 	
 	public void setCate(int id, String name, int type) {
-		this.cate = new MaterialCate(id, this.restaurantId, name, MaterialCate.Type.valueOf(type));
+		this.cate = new MaterialCate(id);
+		this.cate.setRestaurantId(this.restaurantId);
+		this.cate.setName(name);
+		this.cate.setType(MaterialCate.Type.valueOf(type));
 	}
 	
 	public float getPrice() {
@@ -182,18 +340,6 @@ public class Material implements Jsonable {
 		this.lastModDate = lastModDate;
 	}
 	
-	public Status getStatus() {
-		return status;
-	}
-	
-	public void setStatus(Status status) {
-		this.status = status;
-	}
-	
-	public void setStatus(int status) {
-		this.status = Status.valueOf(status);
-	}
-	
 	public String getPinyin() {
 		return pinyin;
 	}
@@ -241,17 +387,8 @@ public class Material implements Jsonable {
 	
 	public static class MonthlyChangeTypeUpdateBuilder{
 		private final int id;
-		
-		private int restaurantId;
 		private float delta;
 		private String lastModStaff;
-		public int getRestaurantId() {
-			return restaurantId;
-		}
-		public MonthlyChangeTypeUpdateBuilder setRestaurantId(int restaurantId) {
-			this.restaurantId = restaurantId;
-			return this;
-		}
 		public float getDelta() {
 			return delta;
 		}
@@ -352,10 +489,6 @@ public class Material implements Jsonable {
 			jm.putInt("cateId", this.getCate().getId());
 			jm.putString("cateName", this.getCate().getName());
 			jm.putInt("cateType", this.getCate().getType().getValue());
-		}
-		if(this.status != null){
-			jm.putInt("statusValue", this.getStatus().getValue());
-			jm.putString("statusText", this.getStatus().getText());
 		}
 		//记录当前价格是否修改
 		jm.putBoolean("changed", this.delta != 0 ? true : false);

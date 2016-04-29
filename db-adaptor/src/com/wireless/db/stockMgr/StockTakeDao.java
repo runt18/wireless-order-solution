@@ -105,7 +105,7 @@ public class StockTakeDao {
 		int cateType ;
 		//盘点时选了货品小类
 		if(builder.getCateId() != 0){
-			MaterialCate materialCate = MaterialCateDao.getById(builder.getCateId());
+			MaterialCate materialCate = MaterialCateDao.getById(dbCon, staff, builder.getCateId());
 			//通过小类再一次获取大类,保证准确性
 			cateType = materialCate.getType().getValue();
 			for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
