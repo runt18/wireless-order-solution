@@ -817,8 +817,8 @@
 					text : '导出',
 					iconCls : 'icon_tb_exoprt_excel',
 					handler : function(e){
-						var url = '../../{0}?memberType={1}&MinTotalMemberCost={2}&MaxTotalMemberCost={3}&consumptionMinAmount={4}&consumptionMaxAmount={5}'+
-								'&memberMinBalance={6}&memberMaxBalance={7}&dateBegin={8}&dateEnd={9}&dataSource={10}';
+						var url = '../../{0}?memberType={1}&MinTotalMemberCost={2}&MaxTotalMemberCost={3}&consumptionMinAmount={4}&consumptionMaxAmount={5}&memberCondMinFansAmount={6}&memberCondMaxFansAmount={7}&memberCondMinCommission={8}&memberCondMaxCommission={9}'+
+								'&memberMinBalance={10}&memberMaxBalance={11}&dateBegin={12}&dateEnd={13}&dataSource={14}';
 						url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -829,11 +829,14 @@
 							Ext.getCmp('maxAmount4CondBar').getValue(),
 							Ext.getCmp('minBalance_numField_memberCond').getValue(),
 							Ext.getCmp('maxBalance_numField_memberCond').getValue(),
+							Ext.getCmp('showFansAmountMin_numberfield_memberCond').getValue(),
+							Ext.getCmp('showFansAmountMax_numberfield_memberCond').getValue(),
+							Ext.getCmp('showCommissionMin_numberfield_memberCond').getValue(),
+							Ext.getCmp('showCommissionMax_numberfield_memberCond').getValue(),
 							Ext.util.Format.date(Ext.getCmp('srchBegin_dateField_memberCond').getValue(), 'Y-m-d 00:00:00'),
 							Ext.util.Format.date(Ext.getCmp('srchEnd_dateField_memberCond').getValue(), 'Y-m-d 23:59:59'),
 							'memberList'
 						);
-						
 						window.location = url;
 					}
 				}]
@@ -1004,7 +1007,7 @@
 								Ext.getCmp('showCommissionMin_numberfield_memberCond').hide();
 								Ext.getCmp('showCommissionMax_numberfield_memberCond').hide();
 								Ext.getCmp('showCommissionLabel_label_memberCond').hide();
-							}else if(Ext.getCmp('fansAmount_combo_memberCond').getValue() == 'min'){
+							}else if(Ext.getCmp('showCommissionConfig_combo_memberCond').getValue() == 'min'){
 								Ext.getCmp('showCommissionMin_numberfield_memberCond').show();
 								Ext.getCmp('showCommissionMax_numberfield_memberCond').hide();
 								Ext.getCmp('showCommissionLabel_label_memberCond').hide();

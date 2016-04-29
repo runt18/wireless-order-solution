@@ -52,6 +52,7 @@ import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -164,8 +165,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		final String pin = (String) request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
-		final String start = request.getParameter("start");
-		final String limit = request.getParameter("limit");
 		final String staffId = request.getParameter("staffId");
 		final String begin = request.getParameter("beginDate");
 		final String end = request.getParameter("endDate");
@@ -177,7 +176,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String memberFuzzy = request.getParameter("memberFuzzy");
 		final String couponId = request.getParameter("couponId");
 		final String couponTypeId = request.getParameter("couponTypeId");
-		final JObject jObject = new JObject();
 			
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
@@ -243,6 +241,126 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		initParams(wb);
 		
+		sheet.setColumnWidth(0, 8000);
+		sheet.setColumnWidth(1, 4000);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 4500);
+		sheet.setColumnWidth(4, 4000);
+		sheet.setColumnWidth(5, 5000);
+		sheet.setColumnWidth(4, 7000);
+		sheet.setColumnWidth(5, 8500);
+		
+		// 报表头
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 10));
+		
+		
+		//冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		cell = row.createCell(0);
+		cell.setCellValue("优惠券统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		cell.setCellStyle(titleStyle);
+		
+		// 摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("统计时间: " + begin + " 至 " + end + "         共: " + result.size() + " 条");
+		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+				
+		// 导出操作相关信息
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " + staff.getName());
+		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+				
+		cell = row.createCell(0);
+		cell.setCellValue("操作日期");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("优惠券");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("面额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("关联信息");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);
+		
+		if(result != null && result.size() > 0){
+			for(CouponOperation item : result){
+				row = sheet.createRow(sheet.getLastRowNum() + 1);
+				row.setHeight((short) 350);
+				
+				cell = row.createCell(0);
+				cell.setCellValue(DateUtil.format(item.getOperateDate()));
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getCouponName());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getCouponPrice());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getOperate().getVal());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getAssociateId());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getMemberId());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getOperateStaff());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getComment());
+				cell.setCellStyle(headerStyle);
+				
+			}
+		}
+		
+		OutputStream os = response.getOutputStream();
+        wb.write(os);
+        os.flush();
+        os.close();
 		return null;
 	}
 	
@@ -3172,6 +3290,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String dateBegin = request.getParameter("dateBegin");
 		final String dateEnd = request.getParameter("dateEnd");
 		final String orderBy = request.getParameter("orderBy");
+		final String memberCondMinFansAmount =request.getParameter("memberCondMinFansAmount");
+		final String memberCondMaxFansAmount =request.getParameter("memberCondMaxFansAmount");
+		final String memberCondMinCommission = request.getParameter("memberCondMinCommission");
+		final String memebrCondMaxCommission = request.getParameter("memberCondMaxCommission");
+		
 		//是否开卡统计
 		final String create = request.getParameter("create");
 
@@ -3220,6 +3343,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 					extraCond.setRange(new DutyRange(dateBegin, dateEnd));
 				}
 			}
+			
+			
+			//粉丝数
+			if(memberCondMinFansAmount != null && !memberCondMinFansAmount.isEmpty() && memberCondMaxFansAmount != null && !memberCondMaxFansAmount.isEmpty()){
+				extraCond.setFansRange(Integer.parseInt(memberCondMinFansAmount), Integer.parseInt(memberCondMaxFansAmount));
+			}
+			
+			//佣金总额
+			if(memberCondMinCommission != null && !memberCondMinCommission.isEmpty() && memebrCondMaxCommission != null && !memebrCondMaxCommission.isEmpty()){
+				extraCond.setCommissionRange(Float.valueOf(memberCondMinCommission), Float.valueOf(memebrCondMaxCommission));
+			}
+			
 			
 		}
 		
