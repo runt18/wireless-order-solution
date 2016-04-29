@@ -42,6 +42,7 @@ import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponEffectDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -51,6 +52,7 @@ import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -74,6 +76,7 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponEffect;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
@@ -153,6 +156,212 @@ public class HistoryStatisticsAction extends DispatchAction{
 		normalNumStyle.setBorderLeft((short)1);
 		normalNumStyle.setBorderRight((short)1);
 		
+	}
+	
+	
+	public ActionForward couponDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		response.setContentType("application/vnd.ms-excel;");
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("优惠券统计.xls".getBytes("GBK"), "ISO8859_1"));
+		
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String staffId = request.getParameter("staffId");
+		final String begin = request.getParameter("beginDate");
+		final String end = request.getParameter("endDate");
+		final String isDuty = request.getParameter("isDuty");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		final String operate = request.getParameter("operate");
+		final String operateType = request.getParameter("operateType");
+		final String memberFuzzy = request.getParameter("memberFuzzy");
+		final String couponId = request.getParameter("couponId");
+		final String couponTypeId = request.getParameter("couponTypeId");
+			
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+
+		final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
+		
+		if(staffId != null && !staffId.isEmpty()){
+			extraCond.setStaff(Integer.parseInt(staffId));
+		}
+		
+		if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
+			if(isDuty != null && !isDuty.isEmpty() && Boolean.parseBoolean(isDuty)){
+				DutyRange range = DutyRangeDao.exec(staff, begin, end);
+				if(range != null){
+					extraCond.setRange(range);
+				}else{
+					extraCond.setRange(begin, end);
+				}
+			}else{
+				extraCond.setRange(begin, end);
+			}
+		}
+		
+		if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
+			extraCond.setHourRange(opening, ending);
+		}
+		
+		if(operate != null && !operate.isEmpty()){
+			extraCond.setOperate(CouponOperation.Operate.valueOf(Integer.parseInt(operate)));
+		}
+		
+		if(operateType != null && !operateType.isEmpty()){
+			if(operateType.equalsIgnoreCase("issue")){
+				extraCond.setOperateType(CouponOperation.OperateType.ISSUE);
+			}else if(operateType.equalsIgnoreCase("use")){
+				extraCond.setOperateType(CouponOperation.OperateType.USE);
+			}
+		}
+		
+		if(memberFuzzy != null && !memberFuzzy.isEmpty()){
+			extraCond.setMemberFuzzy(memberFuzzy);
+		}
+		
+		if(couponId != null && !couponId.isEmpty()){
+			extraCond.setCoupon(Integer.parseInt(couponId));
+		}
+		
+		if(couponTypeId != null && !couponTypeId.isEmpty()){
+			extraCond.setCouponType(Integer.parseInt(couponTypeId));
+		}
+		
+		//获取优惠券的操作记录
+		final List<CouponOperation> result = CouponOperationDao.getByCond(staff, extraCond);
+		
+		
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("优惠券统计");
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 8000);
+		sheet.setColumnWidth(1, 4000);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 4500);
+		sheet.setColumnWidth(4, 4000);
+		sheet.setColumnWidth(5, 5000);
+		sheet.setColumnWidth(4, 7000);
+		sheet.setColumnWidth(5, 8500);
+		
+		// 报表头
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 10));
+		
+		
+		//冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		cell = row.createCell(0);
+		cell.setCellValue("优惠券统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		cell.setCellStyle(titleStyle);
+		
+		// 摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("统计时间: " + begin + " 至 " + end + "         共: " + result.size() + " 条");
+		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+				
+		// 导出操作相关信息
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " + staff.getName());
+		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+				
+		cell = row.createCell(0);
+		cell.setCellValue("操作日期");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("优惠券");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("面额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("关联信息");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);
+		
+		if(result != null && result.size() > 0){
+			for(CouponOperation item : result){
+				row = sheet.createRow(sheet.getLastRowNum() + 1);
+				row.setHeight((short) 350);
+				
+				cell = row.createCell(0);
+				cell.setCellValue(DateUtil.format(item.getOperateDate()));
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getCouponName());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getCouponPrice());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getOperate().getVal());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getAssociateId());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getMemberId());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getOperateStaff());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getComment());
+				cell.setCellStyle(headerStyle);
+				
+			}
+		}
+		
+		OutputStream os = response.getOutputStream();
+        wb.write(os);
+        os.flush();
+        os.close();
+		return null;
 	}
 	
 	public ActionForward couponEffectDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
@@ -339,6 +548,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String orderType = request.getParameter("orderType");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
+		final String kitchenId = request.getParameter("kitchenId");
 		
 		final int ot = (orderType != null && !orderType.isEmpty()) ? Integer.parseInt(orderType) : SaleDetailsDao.ORDER_BY_SALES;
 		
@@ -362,6 +572,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 			extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
+		}
+		
+		if(kitchenId != null && !kitchenId.isEmpty() && !kitchenId.equals("-1")){
+			extraConds.setKitchen(Integer.parseInt(kitchenId));
 		}
 		
 		if(region != null && !region.isEmpty() && !region.equals("-1")){
@@ -3076,6 +3290,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String dateBegin = request.getParameter("dateBegin");
 		final String dateEnd = request.getParameter("dateEnd");
 		final String orderBy = request.getParameter("orderBy");
+		final String memberCondMinFansAmount =request.getParameter("memberCondMinFansAmount");
+		final String memberCondMaxFansAmount =request.getParameter("memberCondMaxFansAmount");
+		final String memberCondMinCommission = request.getParameter("memberCondMinCommission");
+		final String memebrCondMaxCommission = request.getParameter("memberCondMaxCommission");
+		
 		//是否开卡统计
 		final String create = request.getParameter("create");
 
@@ -3124,6 +3343,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 					extraCond.setRange(new DutyRange(dateBegin, dateEnd));
 				}
 			}
+			
+			
+			//粉丝数
+			if(memberCondMinFansAmount != null && !memberCondMinFansAmount.isEmpty() && memberCondMaxFansAmount != null && !memberCondMaxFansAmount.isEmpty()){
+				extraCond.setFansRange(Integer.parseInt(memberCondMinFansAmount), Integer.parseInt(memberCondMaxFansAmount));
+			}
+			
+			//佣金总额
+			if(memberCondMinCommission != null && !memberCondMinCommission.isEmpty() && memebrCondMaxCommission != null && !memebrCondMaxCommission.isEmpty()){
+				extraCond.setCommissionRange(Float.valueOf(memberCondMinCommission), Float.valueOf(memebrCondMaxCommission));
+			}
+			
 			
 		}
 		

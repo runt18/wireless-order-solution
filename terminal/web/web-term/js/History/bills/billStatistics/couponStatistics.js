@@ -307,6 +307,29 @@ Ext.onReady(function(){
 			
 
 		}
+	}, {
+		text : '导出',
+		iconCls : 'icon_tb_exoprt_excel',
+		handler : function(){
+			var url = '../../{0}?dataSource={1}&beginDate={2}&endDate={3}&staffId={4}&opening={5}&isDuty={6}&ending={7}&couponTypeId={8}&branchId={9}&operate={10}&operateType={11}&memberFuzzy={12}';
+			url = String.format(
+				url,
+				'ExportHistoryStatisticsToExecl.do',
+				'couponDetail',
+				Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
+				Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
+				couponStaff.getValue() < 0 ? '' : couponStaff.getValue(),
+				businessHour.opening,
+				isDuty,
+				businessHour.ending,
+				coupon.getValue(),
+				branch_combo_coupon.getValue(),
+				couponType.getValue() == 'issue' || couponType.getValue() == 'use' ? null : couponType.getValue(),
+				couponType.getValue() == 'issue' || couponType.getValue() == 'use' ? couponType.getValue() : null,
+				Ext.getCmp('memeberName_textfield').getValue()
+			);
+			window.location = url;
+		}
 	}];
 	
 	
@@ -442,7 +465,7 @@ Ext.onReady(function(){
 	}];
 	
 	var couponDetailPanel = new Ext.Panel({
-		title : '会员价明细',
+		title : '优惠券明细',
 		layout : 'border',
 		region : 'center',
 		frame : true,
