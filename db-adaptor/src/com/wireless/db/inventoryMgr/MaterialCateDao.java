@@ -2,219 +2,312 @@ package com.wireless.db.inventoryMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.SQLUtil;
 
 public class MaterialCateDao {
 	
+	public static class ExtraCond {
+		private int id;
+		private String name;
+		private MaterialCate.Type type;
+		public ExtraCond setId(int id) {
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public ExtraCond setType(MaterialCate.Type type) {
+			this.type = type;
+			return this;
+		}
+		
+		public String toString() {
+			final StringBuilder extraCond = new StringBuilder();
+			if(id > 0){
+				extraCond.append(" AND cate_id = " + this.id);
+			}
+			
+			if(name != null && !name.isEmpty()){
+				extraCond.append(" AND name = " + this.name);
+			}
+			
+			if(type != null){
+				extraCond.append(" AND type = " + this.type.getValue());
+			}
+			
+			return extraCond.toString();
+		}
+	}
+	
+	
+	
+	
 	/**
-	 * 
+	 * Insert the material category by builder.
 	 * @param dbCon
-	 * @param params
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff perform this action
+	 * @param builder
+	 * 			the builder to insert this material category
 	 * @return
 	 * @throws SQLException
+	 * 			throw if failed to execute SQL statement
 	 */
-	public static List<MaterialCate> getContent(DBCon dbCon, Map<Object, Object> params) throws SQLException{
-		List<MaterialCate> list = new ArrayList<MaterialCate>();
-		MaterialCate item = null;
-		String querySQL = "SELECT MC.cate_id, MC.restaurant_id, MC.name, MC.type"
-						+ " FROM wireless_order_db.material_cate MC"
-						+ " WHERE 1=1";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
+	public static int insert(DBCon dbCon, Staff staff, MaterialCate.InsertBuilder builder) throws SQLException{
+		MaterialCate materialCate = builder.build();
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".material_cate " 
+			  + " (`restaurant_id`, `name`, `type`)" + " VALUES(" 
+			  + staff.getRestaurantId() + ", " 
+			  + "'" + materialCate.getName()  + "', " 
+			  + materialCate.getType().getValue() + ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int id = 0;
+		if(dbCon.rs.next()){
+			id = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The materialCate id NOT generated successfully");
+		} 
 		
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new MaterialCate(dbCon.rs.getInt("cate_id"));
-			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			item.setName(dbCon.rs.getString("name"));
-			item.setType(MaterialCate.Type.valueOf(dbCon.rs.getInt("type")));
-			
-			list.add(item);
-			item = null;
+		return id;
+	}
+	
+	
+	/**
+	 * Insert the material category by builder.
+	 * @param staff
+	 * 			the staff perform this action
+	 * @param builder
+	 * 			the builder to insert this material category
+	 * @return
+	 * @throws BusinessException
+	 * 			throws if material category to this builder is NOT exist
+	 * @throws SQLException
+	 * 			throw if failed to execute SQL statement
+	 */
+	public static int insert(Staff staff, MaterialCate.InsertBuilder builder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
+	 * Update the material category by builder.
+	 * @param dbCon
+	 * 			the database to connection
+	 * @param staff
+	 * 			the staff perform this action
+	 * @param builder
+	 * 			the builder to update this material category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if material category to this builder is NOT exist 
+	 */
+	public static void update(DBCon dbCon, Staff staff, MaterialCate.UpdateBuilder builder) throws SQLException, BusinessException{
+		MaterialCate materialCate = builder.build();
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".material_cate SET "
+			  + " cate_id = cate_id "
+			  + (builder.isNameChanged() ? ", name = '" + materialCate.getName() + "' " : "" )
+			  + (builder.isTypeChanged() ? ", type = " + materialCate.getType().getValue() : "")
+			  + " WHERE cate_id = " + materialCate.getId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(MaterialError.CATE_NOT_EXIST);
+		}
+	}
+	
+	
+	
+	/**
+	 * Update the material category by builder
+	 * @param staff
+	 * 			the staff perform this action
+	 * @param builder
+	 * 			the builder to update this material category
+	 * @throws BusinessException
+	 * 			throws if material category to this builder does NOT exist
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void update(Staff staff, MaterialCate.UpdateBuilder builder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			MaterialCateDao.update(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the material category to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the id to material category
+	 * @return the material category to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the material category to this id does NOT exist
+	 */
+	public static MaterialCate getById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		List<MaterialCate> result = getByCond(dbCon, staff, new MaterialCateDao.ExtraCond().setId(id));
+		if(result.isEmpty()){
+			throw new BusinessException(MaterialError.CATE_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	
+	
+	/**
+	 * Get the material category to specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the id to material category
+	 * @return the material category to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the material category to this id does NOT exist
+	 */
+	public static MaterialCate getById(Staff staff, int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try {
+			dbCon.connect();
+			return getById(dbCon, staff, id);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
+	
+	/**
+	 * Get the material category to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition to material category
+	 * @return
+	 * @throws SQLException
+	 * 			throws if the material category to these conditions does NOT exist
+	 */
+	public static List<MaterialCate> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT * FROM " + Params.dbName + ".material_cate " + 
+			  " WHERE 1 = 1 " + 
+			  " AND restaurant_id = " + staff.getRestaurantId() + 
+			  (extraCond != null ? extraCond.toString() : "");
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		final List<MaterialCate> result = new ArrayList<>();
+		while(dbCon.rs.next()){
+			MaterialCate materialCate = new MaterialCate(dbCon.rs.getInt("cate_id"));
+			materialCate.setName(dbCon.rs.getString("name"));
+			materialCate.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			materialCate.setType(MaterialCate.Type.valueOf(dbCon.rs.getInt("type")));
+			result.add(materialCate);
 		}
 		dbCon.rs.close();
-		dbCon.rs = null;
-		
-		return list;
+		return result;
 	}
 	
+	
+	
 	/**
-	 * 
-	 * @param params
+	 * Get the material category to extra condition.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition to material category
 	 * @return
 	 * @throws SQLException
+	 * 			throws if the material category to these conditions does NOT exist
 	 */
-	public static List<MaterialCate> getContent(Map<Object, Object> params) throws SQLException{
+	public static List<MaterialCate> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
-		try{
+		try {
 			dbCon.connect();
-			return MaterialCateDao.getContent(dbCon, params);
+			return getByCond(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param id
-	 * @return
-	 * @throws SQLException
-	 */
-	public static MaterialCate getById(DBCon dbCon, int id) throws SQLException{
-		List<MaterialCate> list = null;
-		MaterialCate item = null;
-		Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MC.cate_id = " + id);
-		list = MaterialCateDao.getContent(dbCon, params);
-		if(list != null && !list.isEmpty()){
-			item = list.get(0);
-		}
-		return item;
-	}
-	
-	/**
-	 * 
-	 * @param id
-	 * @return
-	 * @throws SQLException
-	 */
-	public static MaterialCate getById(int id) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MaterialCateDao.getById(dbCon, id);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param mc
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int insert(DBCon dbCon, MaterialCate mc) throws SQLException{
-		int count = 0;
-		String insertSQL = "INSERT material_cate (restaurant_id, name, type)"
-						 + " VALUES(" + mc.getRestaurantId() + ", '" + mc.getName() + "', " + mc.getType().getValue() + ")";
-		count = dbCon.stmt.executeUpdate(insertSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param mc
-	 * @return
-	 * @throws SQLException
-	 */
-	public static void insert(MaterialCate mc) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			int count = MaterialCateDao.insert(dbCon, mc);
-			if(count == 0){
-				throw new BusinessException(MaterialError.CATE_INSERT_FAIL);
-			}
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param mc
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int update(DBCon dbCon, MaterialCate mc) throws SQLException{
-		int count = 0;
-		String updateSQL = "UPDATE material_cate SET "
-						 + " name = '" + mc.getName() + "'"
-						 + " ,type = " + mc.getType().getValue()
-						 + " WHERE cate_id = " + mc.getId();
-		count = dbCon.stmt.executeUpdate(updateSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param mc
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void update(MaterialCate mc) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			int count = MaterialCateDao.update(dbCon, mc);
-			if(count == 0){
-				throw new BusinessException(MaterialError.CATE_UPDATE_FAIL);
-			}
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param id
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static int delete(DBCon dbCon, Staff staff, int id) throws BusinessException, SQLException {
-		int count = 0;
-		String querySQL = "SELECT COUNT(*) FROM material WHERE cate_id = " + id;
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
 
-			
-			String selectFoodMaterial = "DELETE FM FROM food_material FM JOIN material M ON M.material_id = FM.material_id JOIN material_cate MC ON MC.cate_id = M.cate_id "+
-										" WHERE FM.restaurant_id = " + staff.getRestaurantId() +" AND MC.cate_id = " + id;
-			
-			dbCon.stmt.executeUpdate(selectFoodMaterial);
-			
-			
-			//throw new BusinessException(MaterialError.CATE_DELETE_FAIL_HAS_CHILD);
-			String deleteAll = "DELETE FROM material WHERE cate_id = " + id;
-			dbCon.stmt.executeUpdate(deleteAll);
-			
-		}
-		String deleteSQL = "DELETE FROM material_cate WHERE cate_id = " + id;
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		return count;
-	}
 	
 	/**
-	 * 
-	 * @param id
+	 * Delete material category by the extra condition. 
+	 * @param dbCon
+	 * 			the database to connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition to material category
+	 * @return
 	 * @throws BusinessException
+	 * 			throws if material category to these conditions does NOT exist
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void delete(Staff staff, int id) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			int count = MaterialCateDao.delete(dbCon, staff, id);
-			if(count == 0){
-				throw new BusinessException(MaterialError.CATE_DELETE_FAIL);
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws BusinessException, SQLException {
+		int amount = 0;
+		for(MaterialCate materialCate : getByCond(staff, extraCond)){
+			String sql = " DELETE FROM " + Params.dbName + ".material_cate WHERE cate_id = " + materialCate.getId();
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount ++;
 			}
+		}
+		return amount;
+	}
+	
+	
+	/**
+	 * Delete material category by the extra condition
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition to material category
+	 * @return
+	 * @throws BusinessException
+	 * 			throws if material category to these conditions does NOT exist
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws BusinessException, SQLException {
+		DBCon dbCon = new DBCon();
+		try {
+			dbCon.connect();
+			return deleteByCond(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
 }

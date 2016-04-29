@@ -88,10 +88,10 @@ public class MaterialDao {
 		final List<Material> result = new ArrayList<Material>();
 		
 		String sql;
-		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.status, M.last_mod_staff, M.last_mod_date, M.alarm_amount, " +
+		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.last_mod_staff, M.last_mod_date, M.alarm_amount, " +
 			  " MC.cate_id, MC.name cate_name, MC.type cate_type " + 
-			  " FROM material M " + 
-			  " JOIN material_cate MC ON MC.restaurant_id = M.restaurant_id AND MC.cate_id = M.cate_id "	+
+			  " FROM " + Params.dbName + ".material M " + 
+			  " JOIN " + Params.dbName + ".material_cate MC ON MC.restaurant_id = M.restaurant_id AND MC.cate_id = M.cate_id "	+
 			  " WHERE M.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond.toString() : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -105,7 +105,6 @@ public class MaterialDao {
 			item.setName(dbCon.rs.getString("name"));
 			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
 			item.setLastModStaff(dbCon.rs.getString("last_mod_staff"));
-			item.setStatus(dbCon.rs.getInt("status"));
 			item.setAlarmAmount(dbCon.rs.getInt("alarm_amount"));
 			MaterialCate cate = new MaterialCate(dbCon.rs.getInt("cate_id"));
 			cate.setName(dbCon.rs.getString("cate_name"));
@@ -187,89 +186,136 @@ public class MaterialDao {
 		}
 	}
 	
+	
 	/**
-	 * 
+	 * Insert the material by builder
 	 * @param dbCon
-	 * @param m
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff perform this action
+	 * @param builder
+	 * 			the builder to insert this material
 	 * @return
 	 * @throws SQLException
+	 * 			throw if failed to execute SQL statement
 	 */
-	public static int insert(DBCon dbCon, Material m) throws SQLException{
-		int count = 0;
-		String insertSQL = "INSERT INTO material"
-						 + " (restaurant_id, cate_id, price, stock, status, name, last_mod_staff, last_mod_date, alarm_amount)"
-						 + " values("
-						 + m.getRestaurantId() + ","
-						 + m.getCate().getId() + ","
-						 + m.getPrice() + "," 
-						 + "0,"
-						 + m.getStatus().getValue() + ","
-						 + "'" + m.getName() + "'" + ","
-						 + "'" + m.getLastModStaff() + "'" + ","
-						 + "NOW()" + ","
-						 + (m.hasAlarm() ? m.getAlarmAmount() : "")
-						 + ")";
-		count = dbCon.stmt.executeUpdate(insertSQL);
-		return count;
+	public static int insert(DBCon dbCon, Staff staff, Material.InsertBuilder builder) throws SQLException{
+		final Material material = builder.build();
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".material"
+			  + " (`restaurant_id`, `cate_id`, `price`, `stock`, `name`, `last_mod_staff`, `last_mod_date`, `alarm_amount`) values("
+			  + staff.getRestaurantId()
+			  + ", " + material.getCate().getId()
+			  + ", " + material.getPrice()
+			  + ", 0"
+			  + ", '" + material.getName() + "'"
+			  + ", '" + material.getLastModStaff() + "'"
+			  + ", NOW()" 
+			  + ", " + (material.hasAlarm() ? (material.getAlarmAmount()) : 0)
+			  + ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int id = 0;
+		if(dbCon.rs.next()){
+			id = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("The materialCate id NOT generated successfully");
+		}
+		
+		return id;
 	}
+	
+	
+	/**
+	 * Insert the material by builder
+	 * @param staff
+	 * 			the staff perform this action
+	 * @param builder
+	 * 			the builder to insert this material
+	 * @throws BusinessException
+	 * 			throws if material to this builder is NOT exist
+	 * @throws SQLException
+	 * 			throw if failed to execute SQL statement
+	 */
+	public static int insert(Staff staff, Material.InsertBuilder builder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	
 	
 	/**
 	 * 
-	 * @param m
+	 * @param dbCon
+	 * @param staff
+	 * @param builder
+	 * @return
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the material to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, Staff staff, Material.UpdateBuilder builder) throws SQLException, BusinessException{
+		final Material material = builder.build();
+		String sql;
+		sql = "UPDATE " + Params.dbName + ".material SET "
+			  + " last_mod_staff = '" + material.getLastModStaff() + "'"
+			  + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+			  + (builder.hasCateChanged() ? " ,cate_id = " + material.getCate().getId() : "") 
+			  + (builder.hasPriceChanged() ? " ,price = " + material.getPrice() : "")
+			  + (builder.hasStockChanged() || builder.isStockOperation() ? " ,stock = " + material.getStock() : "")
+			  + (builder.hasNameChanged() ?" ,name = '" + material.getName() + "'" : "")
+			  + (builder.hasAlarmChanged() ? " ,alarm_amount = " + material.getAlarmAmount() : "")
+			  + " WHERE 1 = 1 "  
+			  + " AND material_id = " + material.getId()
+			  + " AND restaurant_id = " + staff.getRestaurantId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(MaterialError.MATERIAL_NOT_EXIST);
+		}
+	}
+	
+	
+	
+	/**
+	 * 
+	 * @param staff
+	 * @param builder
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insert(Material m) throws BusinessException, SQLException{
+	public static void update(Staff staff, Material.UpdateBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			int count = MaterialDao.insert(dbCon, m);
-			if(count == 0){
-				throw new BusinessException(MaterialError.INSERT_FAIL);
-			}
+			MaterialDao.update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param m
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int update(DBCon dbCon, Material m) throws SQLException{
-		int count = 0;
-		String updateSQL;
-		updateSQL = "UPDATE " + Params.dbName + ".material SET "
-				 + (m.getCate().getId() != 0? " cate_id = " + m.getCate().getId() : "") 
-				 + (m.getPrice() != 0 ? " ,price = " + m.getPrice() : "")
-				 + (m.getStock() != 0 ? " ,stock = " + m.getStock() : "")
-				 + (m.getName() != null?" ,name = '" + m.getName() + "'" : "")
-				 + (m.hasAlarm() ? " ,alarm_amount = " + m.getAlarmAmount() : "")
-				 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
-				 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
-				 + " WHERE material_id = " + m.getId()
-				 + " AND restaurant_id = " + m.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(updateSQL);
-		return count;
-	}
+
 	
 	/**
 	 * Cancel MonthlySettle.
 	 * @param restaurantId
 	 * @throws SQLException
 	 */
-	public static void canelMonthly(int restaurantId) throws SQLException{
+	public static void canelMonthly(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			canelMonthly(dbCon, restaurantId);
+			canelMonthly(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
 	
 	/**
 	 * Cancel MonthlySettle.
@@ -277,13 +323,14 @@ public class MaterialDao {
 	 * @param restaurantId
 	 * @throws SQLException
 	 */
-	public static void canelMonthly(DBCon dbCon, int restaurantId) throws SQLException{
-		String updateSQL = "UPDATE " + Params.dbName + ".material SET "
-				 + " delta = 0 "
-				 + " WHERE restaurant_id = " + restaurantId;
+	public static void canelMonthly(DBCon dbCon, Staff staff) throws SQLException{
+		String sql = "UPDATE " + Params.dbName + ".material SET "
+				     + " delta = 0 "
+				     + " WHERE restaurant_id = " + staff.getRestaurantId();
 		
-		dbCon.stmt.executeUpdate(updateSQL);
+		dbCon.stmt.executeUpdate(sql);
 	}
+	
 	
 	/**
 	 * Update the delta when change type.
@@ -291,11 +338,11 @@ public class MaterialDao {
 	 * 				the detail of material
 	 * @throws SQLException
 	 */
-	public static void updateDelta(MonthlyChangeTypeUpdateBuilder builder) throws SQLException{
+	public static void updateDelta(Staff staff, MonthlyChangeTypeUpdateBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateDelta(dbCon, builder);
+			updateDelta(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -307,31 +354,33 @@ public class MaterialDao {
 	 * @param builder
 	 * @throws SQLException
 	 */
-	public static void updateDelta(DBCon dbCon, MonthlyChangeTypeUpdateBuilder builder) throws SQLException{
-		Material m = builder.build();
-		String updateSQL = "UPDATE " + Params.dbName + ".material SET "
-				 + " delta = " + m.getDelta()
-				 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
-				 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
-				 + " WHERE material_id = " + m.getId()
-				 + " AND restaurant_id = " + m.getRestaurantId();
-		dbCon.stmt.executeUpdate(updateSQL);
+	public static void updateDelta(DBCon dbCon, Staff staff, MonthlyChangeTypeUpdateBuilder builder) throws SQLException{
+		Material material = builder.build();
+		String sql = "UPDATE " + Params.dbName + ".material SET "
+					 + " delta = " + material.getDelta()
+					 + " ,last_mod_staff = '" + material.getLastModStaff() + "'"
+					 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+					 + " WHERE material_id = " + material.getId()
+					 + " AND restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
 	}
+	
 	
 	/**
 	 * Update the price.
 	 * @param restaurantId
 	 * @throws SQLException
 	 */
-	public static void updateMonthly(int restaurantId) throws SQLException{
+	public static void updateMonthly(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateMonthly(dbCon, restaurantId);
+			updateMonthly(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
 	
 	/**
 	 * Update the price.
@@ -339,33 +388,15 @@ public class MaterialDao {
 	 * @param restaurantId
 	 * @throws SQLException
 	 */
-	public static void updateMonthly(DBCon dbCon, int restaurantId) throws SQLException{
+	public static void updateMonthly(DBCon dbCon, Staff staff) throws SQLException{
 		String updateSQL = "UPDATE " + Params.dbName + ".material SET "
-				 + " price = (price + delta)" 
-				 + " ,delta = 0 "
-				 + " WHERE delta <> 0 " 
-				 + " AND restaurant_id = " + restaurantId;
+				 		   + " price = (price + delta)" 
+				 		   + " ,delta = 0 "
+				 		   + " WHERE delta <> 0 " 
+				 		   + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(updateSQL);
 	}
 	
-	/**
-	 * 
-	 * @param m
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void update(Material m) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			int count = MaterialDao.update(dbCon, m);
-			if(count == 0){
-				throw new BusinessException(MaterialError.UPDATE_FAIL);
-			}
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 	
 	/**
 	 * Delete the material to specific id.
@@ -541,11 +572,64 @@ public class MaterialDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static Material insertGood(DBCon dbCon, Staff term, int foodId, String foodName) throws BusinessException, SQLException{
-//		checkMaterialFoodEx(dbCon, foodId);
+//	public static Material insertGood(DBCon dbCon, Staff term, int foodId, String foodName) throws BusinessException, SQLException{
+////		checkMaterialFoodEx(dbCon, foodId);
+//		// 查找系统保留的商品类型
+//		String querySQL = "SELECT cate_id FROM material_cate " 
+//						  + " WHERE restaurant_id = " + term.getRestaurantId() 
+//						  + " AND type = " + MaterialCate.Type.GOOD.getValue();
+//		int cateId = 0;
+//		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+//		if(dbCon.rs != null && dbCon.rs.next()){
+//			cateId = dbCon.rs.getInt("cate_id");
+//		}
+//		if(cateId <= 0){
+//			throw new BusinessException(FoodError.INSERT_FAIL_NOT_FIND_GOODS_TYPE);
+//		}
+//		
+//		// 生成新商品库存信息
+//		Material good = new Material(term.getRestaurantId(), 
+//				foodName, 
+//				cateId, 
+//				term.getName(), 
+//				Material.Status.NORMAL.getValue()
+//		);
+//		try{
+//			MaterialDao.insert(dbCon, good);
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			throw new BusinessException(MaterialError.INSERT_FAIL);
+//		}
+//		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
+//		if(dbCon.rs != null && dbCon.rs.next()){
+//			good.setId(dbCon.rs.getInt(1));
+//			dbCon.rs.close();
+//			dbCon.rs = null;
+//		}
+//		
+//		// 添加菜品和库存资料之间的关系
+//		String insertSQL = "INSERT INTO food_material (food_id, material_id, restaurant_id, consumption)"
+//				  + " VALUES("
+//				  + foodId + ", "
+//				  + good.getId() + ", "
+//				  + good.getRestaurantId() + ", "
+//				  + "1"
+//				  + ")";
+//		try{
+//			dbCon.stmt.executeUpdate(insertSQL);
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			throw new BusinessException(FoodError.INSERT_FAIL_BIND_MATERIAL_FAIL);
+//		}
+//		return good;
+//	}
+	
+	public static Material insertGood(DBCon dbCon, Staff staff, int foodId, String foodName) throws BusinessException, SQLException{
 		// 查找系统保留的商品类型
 		String querySQL = "SELECT cate_id FROM material_cate " 
-				 + " WHERE restaurant_id = " + term.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue();
+						  + " WHERE restaurant_id = " + staff.getRestaurantId() 
+						  + " AND type = " + MaterialCate.Type.GOOD.getValue();
+	
 		int cateId = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
@@ -555,58 +639,127 @@ public class MaterialDao {
 			throw new BusinessException(FoodError.INSERT_FAIL_NOT_FIND_GOODS_TYPE);
 		}
 		
+		Material.InsertBuilder builder = new Material.InsertBuilder()
+				 									 .setName(foodName)
+				 									 .setMaterialCate(MaterialCateDao.getById(staff, cateId));
 		// 生成新商品库存信息
-		Material good = new Material(term.getRestaurantId(), 
-				foodName, 
-				cateId, 
-				term.getName(), 
-				Material.Status.NORMAL.getValue()
-		);
-		try{
-			MaterialDao.insert(dbCon, good);
-		}catch(SQLException e){
-			e.printStackTrace();
-			throw new BusinessException(MaterialError.INSERT_FAIL);
-		}
+		MaterialDao.insert(dbCon, staff, builder);
+		
+		Material material = builder.build();
+		
 		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
 		if(dbCon.rs != null && dbCon.rs.next()){
-			good.setId(dbCon.rs.getInt(1));
+			material.setId(dbCon.rs.getInt(1));
 			dbCon.rs.close();
 			dbCon.rs = null;
 		}
-		
+			
 		// 添加菜品和库存资料之间的关系
-		String insertSQL = "INSERT INTO food_material (food_id, material_id, restaurant_id, consumption)"
-				  + " VALUES("
-				  + foodId + ", "
-				  + good.getId() + ", "
-				  + good.getRestaurantId() + ", "
-				  + "1"
-				  + ")";
+		String insertSQL = " INSERT INTO " + Params.dbName + ".food_material "
+						   + "(`food_id`, `material_id`, `restaurant_id`, `consumption`) VALUES("
+				  		   + foodId + ", "
+				  		   + material.getId() + ", "
+				  		   + material.getRestaurantId() + ", "
+				  		   + "1"
+				  		   + ")";
 		try{
 			dbCon.stmt.executeUpdate(insertSQL);
 		}catch(SQLException e){
 			e.printStackTrace();
 			throw new BusinessException(FoodError.INSERT_FAIL_BIND_MATERIAL_FAIL);
 		}
-		return good;
+		
+		return material;
 	}
 	
-	public static Material insertGoods(DBCon dbCon, Staff term, Food food) throws BusinessException, SQLException{
-//		checkMaterialFoodEx(dbCon, foodId);
-		// 查找系统保留的商品类型
+//	public static Material insertGoods(DBCon dbCon, Staff term, Food food) throws BusinessException, SQLException{
+////		checkMaterialFoodEx(dbCon, foodId);
+//		// 查找系统保留的商品类型
+//		
+///*		String querySQL = "SELECT cate_id, kitchen_id FROM " + Params.dbName + ".material_cate " 
+//				 + " WHERE restaurant_id = " + term.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue()
+//				 + " AND kitchen_id = " + food.getKitchen().getId();*/
+//		
+//		String querySQL = " SELECT MAX(F.kitchen_id) AS kitchen, FM.material_id, M.cate_id FROM " + Params.dbName + ".food F  " 
+//						+ " JOIN " + Params.dbName + ".food_material FM ON F.food_id = FM.food_id " 
+//						+ " JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id "
+//						+ " WHERE F.kitchen_id = " + food.getKitchen().getId() +" AND F.food_id IN( "
+//						+ " SELECT FM.food_id FROM " + Params.dbName + ".food_material FM "
+//						+ " WHERE FM.restaurant_id = " + term.getRestaurantId() + " AND F.food_id = FM.food_id ) ";
+//		
+//		int cateId = 0;
+//		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+//		if(dbCon.rs != null && dbCon.rs.next()){
+//			cateId = dbCon.rs.getInt("cate_id");
+//		}
+//		if(cateId <= 0){
+//			String insertCate = "INSERT INTO " + Params.dbName + ".material_cate (restaurant_id, name, type)" 
+//						+ " VALUES("
+//						  + term.getRestaurantId() + ", "
+//						  + "'" + food.getKitchen().getName() + "', "
+//						  + MaterialCate.Type.GOOD.getValue()
+//						  + ")";
+//			dbCon.stmt.executeUpdate(insertCate, Statement.RETURN_GENERATED_KEYS);
+//			dbCon.rs = dbCon.stmt.getGeneratedKeys();
+//			if(dbCon.rs.next()){
+//				cateId = dbCon.rs.getInt(1);
+//			}
+//		}
+//		
+//		// 生成新商品库存信息
+//		Material good = new Material(term.getRestaurantId(), 
+//				food.getName(), 
+//				cateId, 
+//				term.getName(), 
+//				Material.Status.NORMAL.getValue()
+//		);
+//		try{
+//			MaterialDao.insert(dbCon, good);
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			throw new BusinessException(MaterialError.INSERT_FAIL);
+//		}
+//		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
+//		if(dbCon.rs != null && dbCon.rs.next()){
+//			good.setId(dbCon.rs.getInt(1));
+//			dbCon.rs.close();
+//			dbCon.rs = null;
+//		}
+//		
+//		// 添加菜品和库存资料之间的关系
+//		String insertSQL = "INSERT INTO " + Params.dbName + ".food_material (food_id, material_id, restaurant_id, consumption)"
+//				  + " VALUES("
+//				  + food.getFoodId() + ", "
+//				  + good.getId() + ", "
+//				  + good.getRestaurantId() + ", "
+//				  + "1"
+//				  + ")";
+//		try{
+//			dbCon.stmt.executeUpdate(insertSQL);
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			throw new BusinessException(FoodError.INSERT_FAIL_BIND_MATERIAL_FAIL);
+//		}
+//		return good;
+//	}	
+	
+	public static Material insertGoods(DBCon dbCon, Staff staff, Food food) throws BusinessException, SQLException{
+
+//		String querySQL = " SELECT MAX(F.kitchen_id) AS kitchen, FM.material_id, M.cate_id FROM " + Params.dbName + ".food F  " 
+//						+ " JOIN " + Params.dbName + ".food_material FM ON F.food_id = FM.food_id " 
+//						+ " JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id "
+//						+ " WHERE F.kitchen_id = " + food.getKitchen().getId() +" AND F.food_id IN( "
+//						+ " SELECT FM.food_id FROM " + Params.dbName + ".food_material FM "
+//						+ " WHERE FM.restaurant_id = " + staff.getRestaurantId() + " AND F.food_id = FM.food_id ) ";
 		
-/*		String querySQL = "SELECT cate_id, kitchen_id FROM " + Params.dbName + ".material_cate " 
-				 + " WHERE restaurant_id = " + term.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue()
-				 + " AND kitchen_id = " + food.getKitchen().getId();*/
 		
 		String querySQL = " SELECT MAX(F.kitchen_id) AS kitchen, FM.material_id, M.cate_id FROM " + Params.dbName + ".food F  " 
 						+ " JOIN " + Params.dbName + ".food_material FM ON F.food_id = FM.food_id " 
 						+ " JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id "
-						+ " WHERE F.kitchen_id = " + food.getKitchen().getId() +" AND F.food_id IN( "
-						+ " SELECT FM.food_id FROM " + Params.dbName + ".food_material FM "
-						+ " WHERE FM.restaurant_id = " + term.getRestaurantId() + " AND F.food_id = FM.food_id ) ";
-		
+						+ " JOIN " + Params.dbName + ".material_cate MC ON M.cate_id = MC.cate_id "
+						+ " WHERE 1 = 1"
+						+ " AND F.kitchen_id = " + food.getKitchen().getId() 
+						+ " AND F.restaurant_id = " + staff.getRestaurantId();
 		int cateId = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
@@ -614,11 +767,11 @@ public class MaterialDao {
 		}
 		if(cateId <= 0){
 			String insertCate = "INSERT INTO " + Params.dbName + ".material_cate (restaurant_id, name, type)" 
-						+ " VALUES("
-						  + term.getRestaurantId() + ", "
-						  + "'" + food.getKitchen().getName() + "', "
-						  + MaterialCate.Type.GOOD.getValue()
-						  + ")";
+								+ " VALUES("
+								+ staff.getRestaurantId() + ", "
+								+ "'" + food.getKitchen().getName() + "', "
+								+ MaterialCate.Type.GOOD.getValue()
+								+ ")";
 			dbCon.stmt.executeUpdate(insertCate, Statement.RETURN_GENERATED_KEYS);
 			dbCon.rs = dbCon.stmt.getGeneratedKeys();
 			if(dbCon.rs.next()){
@@ -626,42 +779,60 @@ public class MaterialDao {
 			}
 		}
 		
+		
+		Material.InsertBuilder builder = new Material.InsertBuilder();
+		
+		Material material = builder.build();
+		builder.setName(food.getName())
+			   .setLastModStaff(staff.getName())
+			   .setMaterialCate(MaterialCateDao.getById(staff, cateId));
 		// 生成新商品库存信息
-		Material good = new Material(term.getRestaurantId(), 
-				food.getName(), 
-				cateId, 
-				term.getName(), 
-				Material.Status.NORMAL.getValue()
-		);
+//		Material good = new Material(staff.getRestaurantId(), 
+//				food.getName(), 
+//				cateId, 
+//				staff.getName(), 
+//				Material.Status.NORMAL.getValue()
+//		);
 		try{
-			MaterialDao.insert(dbCon, good);
+			MaterialDao.insert(dbCon, staff, builder);
 		}catch(SQLException e){
 			e.printStackTrace();
 			throw new BusinessException(MaterialError.INSERT_FAIL);
 		}
 		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
 		if(dbCon.rs != null && dbCon.rs.next()){
-			good.setId(dbCon.rs.getInt(1));
+			material.setId(dbCon.rs.getInt(1));
 			dbCon.rs.close();
 			dbCon.rs = null;
 		}
 		
 		// 添加菜品和库存资料之间的关系
 		String insertSQL = "INSERT INTO " + Params.dbName + ".food_material (food_id, material_id, restaurant_id, consumption)"
-				  + " VALUES("
-				  + food.getFoodId() + ", "
-				  + good.getId() + ", "
-				  + good.getRestaurantId() + ", "
-				  + "1"
-				  + ")";
-		try{
+						   + " VALUES("
+						   + food.getFoodId() + ", "
+						   + material.getId() + ", "
+						   + staff.getRestaurantId() + ", "
+						   + "1"
+						   + ")";
+		try{		
 			dbCon.stmt.executeUpdate(insertSQL);
 		}catch(SQLException e){
 			e.printStackTrace();
 			throw new BusinessException(FoodError.INSERT_FAIL_BIND_MATERIAL_FAIL);
 		}
-		return good;
+		return material;
 	}	
+	
+	
+	public static Material insertGoods(Staff staff, Food food) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try {
+			dbCon.connect();
+			return insertGoods(dbCon, staff, food);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	/**
 	 * Get monthSettle materials  

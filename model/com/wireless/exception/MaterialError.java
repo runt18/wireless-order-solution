@@ -6,6 +6,7 @@ public class MaterialError extends ErrorEnum{
 	public static final ErrorCode CATE_UPDATE_FAIL = build(8998, "操作失败, 未修改原料类别信息, 请检查数据格式.");
 	public static final ErrorCode CATE_DELETE_FAIL = build(8997, "操作失败, 未删除指定类别, 该类别不存在或已被删除.");
 	public static final ErrorCode CATE_DELETE_FAIL_HAS_CHILD = build(8996, "操作失败, 该类别下还有物品信息, 不能删除.");
+	public static final ErrorCode CATE_NOT_EXIST = build(8995, "操作失败, 没有找到此类别.");
 	
 	/* code range : 8920 - 8959 */
 	public static final ErrorCode INSERT_FAIL = build(8959, "操作失败, 未添加新库存资料, 请检查数据格式.");

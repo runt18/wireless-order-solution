@@ -33,6 +33,65 @@ public class MaterialCate implements Jsonable {
 		}
 	}
 	
+	
+	public static class InsertBuilder {
+		private String name;
+		private Type type;
+		
+		public InsertBuilder(){}
+		
+		public InsertBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public InsertBuilder setType(Type type) {
+			this.type = type;
+			return this;
+		}
+		
+		public MaterialCate build() {
+			return new MaterialCate(this);
+		}
+	}
+	
+	
+	
+	public static class UpdateBuilder {
+		private final int id;
+		private String name;
+		private Type type;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		
+		public UpdateBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public UpdateBuilder setType(Type type) {
+			this.type = type;
+			return this;
+		}
+		
+		public boolean isNameChanged() {
+			return this.name != null;
+		}
+		
+		public boolean isTypeChanged(){
+			return this.type != null;
+		}
+		
+		public MaterialCate build() {
+			return new MaterialCate(this);
+		}
+	}
+	
+	
+	
 	private int id;
 	private int restaurantId;
 	private String name;
@@ -42,24 +101,46 @@ public class MaterialCate implements Jsonable {
 		this.id = id;
 	}
 	
-	public MaterialCate(int restaurantId, String name){
-		this(0, restaurantId, name);
+	public MaterialCate(InsertBuilder builder) {
+		this.name = builder.name;
+		this.type = builder.type;
 	}
 	
-	public MaterialCate(int id, int restaurantId, String name){
-		this(id, restaurantId, name, Type.MATERIAL);
+	public MaterialCate(UpdateBuilder builder) {
+		this.id = builder.id;
+		if(builder.isNameChanged()){
+			this.name = builder.name;
+		}
+		if(builder.isTypeChanged()){
+			this.type = builder.type;
+		}
 	}
 	
-	public MaterialCate(int id, int restaurantId, String name, Type type){
-		this.id = id;
-		this.restaurantId = restaurantId;
-		this.name = name;
-		this.type = type;
-	}
+//	public MaterialCate(int id){
+//		this.id = id;
+//	}
+	
+	
+	
+//	public MaterialCate(int restaurantId, String name){
+//		this(0, restaurantId, name);
+//	}
+//	
+//	public MaterialCate(int id, int restaurantId, String name){
+//		this(id, restaurantId, name, Type.MATERIAL);
+//	}
+//	
+//	public MaterialCate(int id, int restaurantId, String name, Type type){
+//		this.id = id;
+//		this.restaurantId = restaurantId;
+//		this.name = name;
+//		this.type = type;
+//	}
 	
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}

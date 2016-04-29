@@ -794,9 +794,8 @@ public class StockActionDao {
 							//入库单增加总库存
 							material.addStock(stockDetail.getAmount());		
 						}
-						//更新原料表
-						material.setLastModStaff(staff.getName());
-						MaterialDao.update(dbCon, material);
+						
+						MaterialDao.update(dbCon, staff, new Material.UpdateBuilder(material.getId()).setIsStockOperation(true).setStock(material.getStock()).setLastModStaff(staff.getName()));
 						
 						//更新库存明细表
 						stockDetail.setRemaining(material.getStock());
@@ -871,9 +870,7 @@ public class StockActionDao {
 						}
 						//出库单减少总库存
 						material.cutStock(stockDetail.getAmount());
-						//更新原料表
-						material.setLastModStaff(staff.getName());
-						MaterialDao.update(dbCon, material);
+						MaterialDao.update(dbCon, staff, new Material.UpdateBuilder(material.getId()).setIsStockOperation(true).setStock(material.getStock()).setLastModStaff(staff.getName()));
 						
 						//更新剩余数量
 						stockDetail.setRemaining(material.getStock());
@@ -984,10 +981,8 @@ public class StockActionDao {
 				material = MaterialDao.getById(dbCon, staff, materialDept.getMaterialId());
 				//还原总库存
 				material.cutStock(sActionDetail.getAmount());		
-				//更新原料表
-				material.setLastModStaff(staff.getName());
 				//更新material
-				MaterialDao.update(dbCon, material);
+				MaterialDao.update(dbCon, staff, new Material.UpdateBuilder(material.getId()).setIsStockOperation(true).setStock(material.getStock()).setLastModStaff(staff.getName()));
 				
 				//更新库存明细表
 				sActionDetail.setRemaining(material.getStock());
@@ -1032,10 +1027,8 @@ public class StockActionDao {
 					
 				//还原总库存
 				material.addStock(sActionDetail.getAmount());
-				//更新原料表
-				material.setLastModStaff(staff.getName());
 				//更新material
-				MaterialDao.update(dbCon, material);
+				MaterialDao.update(dbCon, staff, new Material.UpdateBuilder(material.getId()).setIsStockOperation(true).setStock(material.getStock()).setLastModStaff(staff.getName()));
 				
 				//更新剩余数量
 				sActionDetail.setRemaining(material.getStock());
@@ -1128,9 +1121,7 @@ public class StockActionDao {
 				
 				//增加总库存
 				material.addStock(sActionDetail.getAmount());		
-				//更新原料表
-				material.setLastModStaff(staff.getName());
-				MaterialDao.update(dbCon, material);
+				MaterialDao.update(dbCon, staff, new Material.UpdateBuilder(material.getId()).setIsStockOperation(true).setStock(material.getStock()).setLastModStaff(staff.getName()));
 				
 				//更新库存明细表
 				sActionDetail.setRemaining(material.getStock());
@@ -1176,9 +1167,7 @@ public class StockActionDao {
 				material = MaterialDao.getById(dbCon, staff, sActionDetail.getMaterialId());
 				//还原总库存
 				material.cutStock(sActionDetail.getAmount());
-				//更新原料表
-				material.setLastModStaff(staff.getName());
-				MaterialDao.update(dbCon, material);
+				MaterialDao.update(dbCon, staff, new Material.UpdateBuilder(material.getId()).setIsStockOperation(true).setStock(material.getStock()).setLastModStaff(staff.getName()));
 //				reCalcMaterials.add(material);
 				
 				//更新剩余数量
