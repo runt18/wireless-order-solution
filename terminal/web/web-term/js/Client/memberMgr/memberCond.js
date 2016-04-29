@@ -3,7 +3,7 @@
 	var memberCondTree;
 	var memberCondBasicGrid; 
 	var	memberCondWin;
-
+	var memberCondId;
 	/**
 	 * 修改memberCond
 	 */
@@ -104,8 +104,10 @@
 		gs.baseParams['memberCondMaxCommission'] = Ext.getCmp('showCommissionMax_numberfield_memberCond').getValue();
 			
 		if(c && c.searchByCond){
+			memberCondId = c.searchByCond;
 			gs.baseParams['memberCondId'] = c.searchByCond;
 		}else{
+			memberCondId = '';
 			gs.baseParams['memberCondId'] = '';
 		}
 		
@@ -817,8 +819,19 @@
 					text : '导出',
 					iconCls : 'icon_tb_exoprt_excel',
 					handler : function(e){
-						var url = '../../{0}?memberType={1}&MinTotalMemberCost={2}&MaxTotalMemberCost={3}&consumptionMinAmount={4}&consumptionMaxAmount={5}&memberCondMinFansAmount={6}&memberCondMaxFansAmount={7}&memberCondMinCommission={8}&memberCondMaxCommission={9}'+
-								'&memberMinBalance={10}&memberMaxBalance={11}&dateBegin={12}&dateEnd={13}&dataSource={14}';
+						var url = '../../{0}?memberType={1}&minCost4CondWin={2}&maxCost4CondWin={3}&minAmount4CondWin={4}&maxAmount4CondWin={5}&minBalance4CondWin={6}&maxBalance4CondWin={7}&' +
+						'memberCondBeginDate={8}&memberCondEndDate={9}&sex={10}&age={11}&isRaw={12}&memberCondMinCharge={13}&memberCondMaxCharge={14}&memberCondMaxFansAmount={15}&memberCondMinFansAmount={16}&' +
+						'memberCondMinCommission={17}&memberCondMaxCommission={18}&memberCondId={19}&dataSource={20}';
+						
+						var isRaw;
+						if(Ext.getCmp('isBind_checkbox_memberCond').getValue() == '0'){
+							isRaw = false;
+						}else if(Ext.getCmp('isBind_checkbox_memberCond').getValue() == '1'){
+							isRaw = true;
+						}else{
+							isRaw = Ext.getCmp('isBind_checkbox_memberCond').getValue();
+						}
+						
 						url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -829,12 +842,18 @@
 							Ext.getCmp('maxAmount4CondBar').getValue(),
 							Ext.getCmp('minBalance_numField_memberCond').getValue(),
 							Ext.getCmp('maxBalance_numField_memberCond').getValue(),
-							Ext.getCmp('showFansAmountMin_numberfield_memberCond').getValue(),
-							Ext.getCmp('showFansAmountMax_numberfield_memberCond').getValue(),
-							Ext.getCmp('showCommissionMin_numberfield_memberCond').getValue(),
-							Ext.getCmp('showCommissionMax_numberfield_memberCond').getValue(),
 							Ext.util.Format.date(Ext.getCmp('srchBegin_dateField_memberCond').getValue(), 'Y-m-d 00:00:00'),
 							Ext.util.Format.date(Ext.getCmp('srchEnd_dateField_memberCond').getValue(), 'Y-m-d 23:59:59'),
+							Ext.getCmp('memberCondSex_combo_memebercond').getValue(),
+							Ext.getCmp('memberCondAge_combo_memebercond').getValue(),
+							isRaw,
+							Ext.getCmp('memberMinCharge_numberField_memberCond').getValue(),
+							Ext.getCmp('memberMaxCharge_numberField_memberCond').getValue(),
+							Ext.getCmp('showFansAmountMax_numberfield_memberCond').getValue(),
+							Ext.getCmp('showFansAmountMin_numberfield_memberCond').getValue(),
+							Ext.getCmp('showCommissionMin_numberfield_memberCond').getValue(),
+							Ext.getCmp('showCommissionMax_numberfield_memberCond').getValue(),
+							memberCondId,
 							'memberList'
 						);
 						window.location = url;
