@@ -1,14 +1,19 @@
 
 $(function(){
 	
-	var salesSubQueryType = 0;
 	var salesSubDeptId = -1;
 	var salesSubKitchenId = -1;
 	var isLeaf = false;
 	var SALESSUB_PAGE_LIMIT = 22;
 	var titleDeptName, titleRegionName, selectDeptId;
-	var deptStatPanelGrid, salesSub_hours;
-	var salesSubWin, salesSubWinTabPanel, orderFoodStatPanel, orderFoodStatPanelDeptTree, kitchenStatPanel, deptStatPanel;
+	var deptStatPanelGrid = null;
+	var salesSub_hours = null;
+	var salesSubWin = null;
+	var salesSubWinTabPanel = null;
+	var orderFoodStatPanel = null;
+	var orderFoodStatPanelDeptTree = null;
+	var kitchenStatPanel = null;
+	var deptStatPanel = null;
 	
 	//初始化区域combo
 	function initRegionCombo(statistic){
@@ -186,7 +191,7 @@ $(function(){
 			}
 		});
 		
-		var branch_combo_foodstatistics;
+		var branch_combo_foodstatistics = null;
 		branch_combo_foodstatistics = new Ext.form.ComboBox({
 			id : 'branch_combo_foodstatistics',
 			readOnly : false,
@@ -232,7 +237,7 @@ $(function(){
 								thiz.setValue(-1);
 							}
 							
-							thiz.fireEvent('select')
+							thiz.fireEvent('select');
 							
 						},
 						failure : function(res, opt){
@@ -514,7 +519,6 @@ $(function(){
 				
 				$('#divSalesSubStatistics').find('.foodOperate').each(function(index, element){
 					element.onclick = function(){
-						console.log(orderFoodStatPanelDeptTree.disabled);
 									
 						var foodDetailWin = new Ext.Window({
 							layout : 'fit',
@@ -577,6 +581,7 @@ $(function(){
 									}									
 									thiz.opening = opening == '00:00' ? '' : opening;
 									thiz.ending = ending == '00:00' ? '' : ending;
+									thiz.calcByDuty = true;
 									
 								}
 							}
@@ -629,7 +634,7 @@ $(function(){
 		});
 		
 		//分厨统计的区域
-		var branch_combo_kitchenStatistics;
+		var branch_combo_kitchenStatistics = null;
 		branch_combo_kitchenStatistics = new  Ext.form.ComboBox({
 			readOnly : false,
 			forceSelection : true,
@@ -646,7 +651,7 @@ $(function(){
 			selectOnFocus : true,
 			listeners : {
 				render : function(thiz){
-//					var data = [];
+					var data = [];
 					Ext.Ajax.request({
 						url : '../../OperateRestaurant.do',
 						params : {
@@ -657,13 +662,13 @@ $(function(){
 							var jr = Ext.decode(res.responseText);
 							
 							if(jr.root[0].typeVal != '2'){
-								var data = [];
+//								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 								
 								thiz.store.loadData(data);
 								thiz.setValue(jr.root[0].id);
 							}else{
-								var data = [[-1, '全部']];
+								data.push([-1, '全部']);
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
@@ -844,10 +849,10 @@ $(function(){
 		     ['营业额', 'income', null,'right', Ext.ux.txtFormat.gridDou], 
 		     ['折扣额', 'discount', null,'right', Ext.ux.txtFormat.gridDou], 
 		     ['赠送额', 'gifted', null,'right', Ext.ux.txtFormat.gridDou],
-		     ['成本', 'cost','','right', Ext.ux.txtFormat.gridDou], 
-	         ['成本率', 'costRate','','right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利', 'profit','','right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利率', 'profitRate','','right', Ext.ux.txtFormat.gridDou],
+//		     ['成本', 'cost','','right', Ext.ux.txtFormat.gridDou], 
+//	         ['成本率', 'costRate','','right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利', 'profit','','right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利率', 'profitRate','','right', Ext.ux.txtFormat.gridDou],
 		     ['dept.id', 'dept.id', 10]
 			],
 			SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name', 'kitchen', 'kitchen.name']),
@@ -1032,7 +1037,8 @@ $(function(){
 		});
 		
 		//门店combo
-		var branch_combo_deptStatistics = new Ext.form.ComboBox({
+		var branch_combo_deptStatistics = null;
+		branch_combo_deptStatistics = new Ext.form.ComboBox({
 			id : 'branch_combo_deptStatistics',
 			readOnly : false,
 			forceSelection : true,
@@ -1062,7 +1068,7 @@ $(function(){
 								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 
-								thiz.store.loadData(data)
+								thiz.store.loadData(data);
 								thiz.setValue(jr.root[0].id);
 							}else{
 								var data = [[-1, '全部']];
@@ -1072,11 +1078,11 @@ $(function(){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
 								
-								thiz.store.loadData(data)
+								thiz.store.loadData(data);
 								thiz.setValue(-1);
 							}
 							
-							thiz.fireEvent('select')
+							thiz.fireEvent('select');
 							
 						}
 					});
@@ -1283,10 +1289,10 @@ $(function(){
 		     ['营业额', 'income', null, 'right', Ext.ux.txtFormat.gridDou], 
 		     ['折扣额', 'discount', null, 'right', Ext.ux.txtFormat.gridDou], 
 		     ['赠送额', 'gifted', null, 'right', Ext.ux.txtFormat.gridDou],
-		     ['成本', 'cost','', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['成本率', 'costRate','', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
-	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou],
+//		     ['成本', 'cost','', 'right', Ext.ux.txtFormat.gridDou], 
+//	         ['成本率', 'costRate','', 'right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利', 'profit', '', 'right', Ext.ux.txtFormat.gridDou], 
+//	         ['毛利率', 'profitRate', '', 'right', Ext.ux.txtFormat.gridDou],
 	         ['操作', 'operateChart', '', 'center', function(v){
 	         	return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
 	         }]
@@ -1308,9 +1314,9 @@ $(function(){
 					sumRow.style.fontWeight = 'bold';		
 					sumRow.style.color = 'green';
 				}
-				deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-				deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-				deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+//				deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+//				deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+//				deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 			}
 			
 		});

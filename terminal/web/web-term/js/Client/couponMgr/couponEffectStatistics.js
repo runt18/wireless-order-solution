@@ -408,15 +408,15 @@ Ext.onReady(function(){
 	
 	
 	function couponEffectOperate(a, b, c){
-		return '<a class="couponEffect" couponTypeId="' + c.json.couponTypeId + '">查看详细</a>'
+		return '<a class="couponEffect" couponTypeId="' + c.json.couponTypeId + '" style="cursor:pointer;">查看详细</a>'
 	};
 	
 	function issuedAmountJump(a, b , c){
-		return '<a class="issuedAmount" couponTypeId="' + c.json.couponTypeId + '">' + c.json.issuedAmount + '</a>';
+		return '<a class="issuedAmount" couponTypeId="' + c.json.couponTypeId + '" style="cursor:pointer;">' + c.json.issuedAmount + '</a>';
 	}
 	
 	function usedAmountJump(a, b, c){
-		return '<a class="usedAmount" couponTypeId="' + c.json.couponTypeId + '">' + c.json.usedAmount + '</a>';
+		return '<a class="usedAmount" couponTypeId="' + c.json.couponTypeId + '" style="cursor:pointer;">' + c.json.usedAmount + '</a>';
 	}
 	
 	

@@ -1,5 +1,5 @@
 $(function(){
-	var debug = true;
+	var debug = false;
 	
 	initRepresentCard();
 	function initRepresentCard(){
@@ -148,7 +148,8 @@ $(function(){
 			'position' : 'absolute',
 			'left' : '0px',
 			'border-right' : '1px solid #666',
-			'padding' : '0 10%'
+			'padding' : '0 10%',
+			'margin-top' : '-2%'
 		});
 		
 		

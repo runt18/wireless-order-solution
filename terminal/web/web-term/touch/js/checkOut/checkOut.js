@@ -756,6 +756,7 @@ uo.openCommentOperate = function(){
 	setTimeout(function(){
 		$('#shadowForPopup').show();
 		$('#orderFoodCommentCmp').show();
+		NumKeyBoardAttacher.instance().attach($('#inputUpdateComment'));
 		$('#inputUpdateComment').val(uo.order.comment != "----" ? uo.order.comment : "");	
 		$('#inputUpdateComment').select();
 	}, 250);
@@ -768,6 +769,7 @@ uo.openCommentOperate = function(){
 uo.closeComment = function(){
 	$('#shadowForPopup').hide();
 	$('#orderFoodCommentCmp').hide();
+	NumKeyBoardAttacher.instance().detach($('#inputUpdateComment'));
 };
 
 /**

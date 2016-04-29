@@ -52,7 +52,6 @@ import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -437,7 +436,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		if(branchId != null && !branchId.isEmpty()){
+		if(branchId != null && !branchId.isEmpty() && Integer.valueOf(branchId) >= 0){
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
@@ -1095,7 +1094,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		if(branchId != null && !branchId.isEmpty()){
+		if(branchId != null && !branchId.isEmpty() && Integer.valueOf(branchId) >= 0){
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
@@ -1178,21 +1177,21 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("赠送额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("成本");
-		cell.setCellStyle(headerStyle);
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("成本");
+//		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("成本率");
-		cell.setCellStyle(headerStyle);
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("成本率");
+//		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("毛利");
-		cell.setCellStyle(headerStyle);
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("毛利");
+//		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("毛利率");
-		cell.setCellStyle(headerStyle);
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("毛利率");
+//		cell.setCellStyle(headerStyle);
 		
 		if(list != null && list.size() > 0){
 			SalesDetail temp = null, sum = new SalesDetail();
@@ -1230,21 +1229,21 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell.setCellValue(temp.getGifted());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getCost());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getCostRate());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getProfit());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getProfitRate());
-				cell.setCellStyle(numStyle);
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getCost());
+//				cell.setCellStyle(numStyle);
+//				
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getCostRate());
+//				cell.setCellStyle(numStyle);
+//				
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getProfit());
+//				cell.setCellStyle(numStyle);
+//				
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getProfitRate());
+//				cell.setCellStyle(numStyle);
 			}
 		}
 		
@@ -1282,13 +1281,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		if(branchId != null && !branchId.isEmpty()){
+		if(branchId != null && !branchId.isEmpty() && Integer.valueOf(branchId) >= 0){
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
 		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY);
 		
-		if(region != null && !region.equals("-1")){
+		if(region != null && !region.equals("-1") && !region.isEmpty()){
 			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 		}
 		
@@ -1316,7 +1315,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(7, 3500);
 		
 		// 报表头
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 4));
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
@@ -1365,21 +1364,21 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("赠送额");
 		cell.setCellStyle(headerStyle);
 		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("成本");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("成本率");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("毛利");
-		cell.setCellStyle(headerStyle);
-		
-		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("毛利率");
-		cell.setCellStyle(headerStyle);
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("成本");
+//		cell.setCellStyle(headerStyle);
+//		
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("成本率");
+//		cell.setCellStyle(headerStyle);
+//		
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("毛利");
+//		cell.setCellStyle(headerStyle);
+//		
+//		cell = row.createCell((int)row.getLastCellNum());
+//		cell.setCellValue("毛利率");
+//		cell.setCellStyle(headerStyle);
 		
 		if(list != null && list.size() > 0){
 			SalesDetail temp = null, sum = new SalesDetail();
@@ -1415,21 +1414,21 @@ public class HistoryStatisticsAction extends DispatchAction{
 				cell.setCellValue(temp.getGifted());
 				cell.setCellStyle(numStyle);
 				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getCost());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getCostRate());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getProfit());
-				cell.setCellStyle(numStyle);
-				
-				cell = row.createCell((int)row.getLastCellNum());
-				cell.setCellValue(temp.getProfitRate());
-				cell.setCellStyle(numStyle);
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getCost());
+//				cell.setCellStyle(numStyle);
+//				
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getCostRate());
+//				cell.setCellStyle(numStyle);
+//				
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getProfit());
+//				cell.setCellStyle(numStyle);
+//				
+//				cell = row.createCell((int)row.getLastCellNum());
+//				cell.setCellValue(temp.getProfitRate());
+//				cell.setCellStyle(numStyle);
 			}
 		}
 		
