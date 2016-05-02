@@ -35,6 +35,7 @@ import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
@@ -67,6 +68,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.member.Member;
+import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
@@ -3275,101 +3277,85 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		response.setContentType("application/vnd.ms-excel;");
 		
-		final String pin = (String)request.getAttribute("pin");
-		final String branchId = request.getParameter("branchId");
-		
-		final String id = request.getParameter("id");
+		final String pin = (String) request.getAttribute("pin");
+		final String memberCondId = request.getParameter("memberCondId");
 		final String memberType = request.getParameter("memberType");
-		final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
-		final String memberMinBalance = request.getParameter("memberMinBalance");
-		final String memberMaxBalance = request.getParameter("memberMaxBalance");
-		final String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
-		final String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
-		final String consumptionMinAmount = request.getParameter("consumptionMinAmount");
-		final String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
-		final String dateBegin = request.getParameter("dateBegin");
-		final String dateEnd = request.getParameter("dateEnd");
-		final String orderBy = request.getParameter("orderBy");
+		final String memberCondMinConsume = request.getParameter("memberCondMinConsume");
+		final String memberCondMaxConsume = request.getParameter("memberCondMaxConsume");
+		final String memberCondMinAmount = request.getParameter("memberCondMinAmount");
+		final String memberCondMaxAmount = request.getParameter("memberCondMaxAmount");
+		final String memberCondMinBalance = request.getParameter("memberCondMinBalance");
+		final String memberCondMaxBalance = request.getParameter("memberCondMaxBalance");
+		final String memberCondBeginDate = request.getParameter("memberCondBeginDate");
+		final String memberCondEndDate = request.getParameter("memberCondEndDate");
 		final String memberCondMinFansAmount =request.getParameter("memberCondMinFansAmount");
 		final String memberCondMaxFansAmount =request.getParameter("memberCondMaxFansAmount");
 		final String memberCondMinCommission = request.getParameter("memberCondMinCommission");
 		final String memebrCondMaxCommission = request.getParameter("memberCondMaxCommission");
 		
-		//是否开卡统计
-		final String create = request.getParameter("create");
-
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		if(branchId != null && !branchId.isEmpty()){
-			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-		}
-
-		MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
-			extraCond.setId(Integer.parseInt(id));
+		final MemberCond memberCond;
+		if(memberCondId != null && !memberCondId.isEmpty()){
+			memberCond = MemberCondDao.getById(staff, Integer.parseInt(memberCondId));
 		}else{
-			if(memberType != null && !memberType.trim().isEmpty())
-				extraCond.setMemberType(Integer.parseInt(memberType));
+			memberCond = new MemberCond(-1);
+			int minAmount = 0, maxAmount = 0;
+			float minConsume = 0, maxConsume = 0, minBalance = 0, maxBalance = 0;
 			
-			if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
-				extraCond.setFuzzyName(memberCardOrMobileOrName);
-			if(MinTotalMemberCost != null && !MinTotalMemberCost.isEmpty()){
-				extraCond.greaterTotalConsume(Integer.parseInt(MinTotalMemberCost));
+			//设置时间段
+			memberCond.setRange(new DutyRange(memberCondBeginDate, memberCondEndDate));
+			
+			if(memberType != null && !memberType.isEmpty() && !memberType.equals("-1")){
+				memberCond.setMemberType(new MemberType(Integer.parseInt(memberType)));
+			}
+			if(memberCondMinConsume != null && !memberCondMinConsume.isEmpty()){
+				minConsume = Float.parseFloat(memberCondMinConsume);
+			}
+			if(memberCondMaxConsume != null && !memberCondMaxConsume.isEmpty()){
+				maxConsume = Float.parseFloat(memberCondMaxConsume);
+			}
+			if(memberCondMinAmount != null && !memberCondMinAmount.isEmpty()){
+				minAmount = Integer.parseInt(memberCondMinAmount);
+			}
+			if(memberCondMaxAmount != null && !memberCondMaxAmount.isEmpty()){
+				maxAmount = Integer.parseInt(memberCondMaxAmount);
+			}
+			if(memberCondMinBalance != null && !memberCondMinBalance.isEmpty()){
+				minBalance = Float.parseFloat(memberCondMinBalance);
+			}
+			if(memberCondMaxBalance != null && !memberCondMaxBalance.isEmpty()){
+				maxBalance = Float.parseFloat(memberCondMaxBalance);
 			}
 			
-			if(MaxTotalMemberCost != null && !MaxTotalMemberCost.isEmpty()){
-				extraCond.lessTotalConsume(Integer.parseInt(MaxTotalMemberCost));
-			}
-			
-			if(consumptionMinAmount != null && !consumptionMinAmount.isEmpty()){
-				extraCond.greaterConsume(Integer.parseInt(consumptionMinAmount));
-			}
-			
-			if(consumptionMaxAmount != null && !consumptionMaxAmount.isEmpty()){
-				extraCond.lessConsume(Integer.parseInt(consumptionMaxAmount));
-			}
-			if(memberMinBalance != null && !memberMinBalance.isEmpty()){
-				extraCond.greaterBalance(Float.parseFloat(memberMinBalance));
-			}
-			
-			if(memberMaxBalance != null && !memberMaxBalance.isEmpty()){
-				extraCond.lessBalance(Float.parseFloat(memberMaxBalance));
-			}
-			
-			if(dateBegin != null && !dateBegin.isEmpty()){
-				if(create != null && !create.isEmpty()){
-					extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
-				}else{
-					extraCond.setRange(new DutyRange(dateBegin, dateEnd));
-				}
-			}
-			
+			memberCond.setMaxBalance(maxBalance);
+			memberCond.setMaxConsumeAmount(maxAmount);
+			memberCond.setMaxConsumeMoney(maxConsume);
+			memberCond.setMinBalance(minBalance);
+			memberCond.setMinConsumeAmount(minAmount);
+			memberCond.setMinConsumeMoney(minConsume);
 			
 			//粉丝数
-			if(memberCondMinFansAmount != null && !memberCondMinFansAmount.isEmpty() && memberCondMaxFansAmount != null && !memberCondMaxFansAmount.isEmpty()){
-				extraCond.setFansRange(Integer.parseInt(memberCondMinFansAmount), Integer.parseInt(memberCondMaxFansAmount));
+			if(memberCondMinFansAmount != null && !memberCondMinFansAmount.isEmpty()){
+				memberCond.setMinFansAmount(Integer.valueOf(memberCondMinFansAmount));
+			}
+			
+			if(memberCondMaxFansAmount != null && !memberCondMaxFansAmount.isEmpty()){
+				memberCond.setMaxFansAmount(Integer.valueOf(memberCondMaxFansAmount));
 			}
 			
 			//佣金总额
-			if(memberCondMinCommission != null && !memberCondMinCommission.isEmpty() && memebrCondMaxCommission != null && !memebrCondMaxCommission.isEmpty()){
-				extraCond.setCommissionRange(Float.valueOf(memberCondMinCommission), Float.valueOf(memebrCondMaxCommission));
+			if(memberCondMinCommission != null && !memberCondMinCommission.isEmpty()){
+				memberCond.setMinCommissionAmount(Float.valueOf(memberCondMinCommission));
 			}
 			
+			if(memebrCondMaxCommission != null && !memebrCondMaxCommission.isEmpty()){
+				memberCond.setMaxCommissionAmount(Float.valueOf(memebrCondMaxCommission));
+			}
+		}
 			
-		}
-		
-		String orderClause = " ";
-		if(orderBy == null || orderBy.equals("create")){
-			orderClause = " ORDER BY M.member_id ";
-		}else if(orderBy.equals("consumeMoney")){
-			orderClause = " ORDER BY M.total_consumption DESC ";
-		}else if(orderBy.equals("consumeAmount")){
-			orderClause = " ORDER BY M.consumption_amount DESC ";
-		}else if(orderBy.equals("point")){
-			orderClause = " ORDER BY M.total_point DESC ";
-		}
-		
-		final List<Member> result = MemberDao.getByCond(staff, extraCond, orderClause);  
+			
+		final List<Member> result =	MemberDao.getByCond(staff, new MemberDao.ExtraCond(memberCond), null);  
 		
 		final String title = "会员列表(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
 		
@@ -3391,7 +3377,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(7, 3200);
 		sheet.setColumnWidth(8, 4000);
 		sheet.setColumnWidth(9, 4000);
-		
+		sheet.setColumnWidth(10, 3000);
+		sheet.setColumnWidth(11, 3200);
+		sheet.setColumnWidth(12, 4000);
+		sheet.setColumnWidth(13, 4000);
 		
 		//冻结行
 		sheet.createFreezePane(0, 4, 0, 4);
@@ -3434,6 +3423,22 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("年龄段");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("性别");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("粉丝数");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("创建时间");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("消费次数");
 		cell.setCellStyle(headerStyle);
 		
@@ -3469,42 +3474,72 @@ public class HistoryStatisticsAction extends DispatchAction{
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
+			//名称
 			cell = row.createCell(0);
 			cell.setCellValue(member.getName());
 			cell.setCellStyle(strStyle);
 			
+			//类型
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getMemberType().getName());
 			cell.setCellStyle(strStyle);
 			
+			//年龄段
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getAge().getVal());
+			cell.setCellStyle(normalNumStyle);
+			
+			//性别
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getSex().getDesc());
+			cell.setCellStyle(normalNumStyle);
+			
+			//粉丝数
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getFansAmount());
+			cell.setCellStyle(normalNumStyle);
+			
+			//创建时间
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getCreateDate());
+			cell.setCellStyle(normalNumStyle);
+			
+			//消费次数
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getConsumptionAmount());
 			cell.setCellStyle(normalNumStyle);
 			
+			//消费总额
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalConsumption());
 			cell.setCellStyle(numStyle);
 			
+			//累计积分
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalPoint());
 			cell.setCellStyle(normalNumStyle);
 			
+			//当前积分
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getPoint());
 			cell.setCellStyle(normalNumStyle);
 			
+			//总充值额
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(member.getBaseBalance());
+			cell.setCellValue(member.getTotalCharge());
 			cell.setCellStyle(numStyle);
 			
+			//账户余额
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalBalance());
 			cell.setCellStyle(numStyle);
 			
+			//手机号码
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getMobile());
 			cell.setCellStyle(strStyle);
 			
+			//会员卡号
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getMemberCard());
 			cell.setCellStyle(strStyle);
