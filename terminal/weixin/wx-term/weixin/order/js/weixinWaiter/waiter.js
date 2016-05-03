@@ -134,17 +134,17 @@ $(function(){
 			}
 		});
 		
-		$('#containerList_div_waiter').on('swipeleft',function(e){
- 			$('#containerList_div_waiter').css('margin-left', '-100%');
- 			$('[data-name=orderListTab_waiter]').addClass('checkTab');
-			$('[data-name=foodListTab_waiter]').removeClass('checkTab');
-		});
-		
-		$('#containerList_div_waiter').on('swiperight',function(e){
- 			$('#containerList_div_waiter').css('margin-left', '0');
- 			$('[data-name=foodListTab_waiter]').addClass('checkTab');
-			$('[data-name=orderListTab_waiter]').removeClass('checkTab');
-		});
+//		$('#containerList_div_waiter').on('swipeleft',function(e){
+// 			$('#containerList_div_waiter').css('margin-left', '-100%');
+// 			$('[data-name=orderListTab_waiter]').addClass('checkTab');
+//			$('[data-name=foodListTab_waiter]').removeClass('checkTab');
+//		});
+//		
+//		$('#containerList_div_waiter').on('swiperight',function(e){
+// 			$('#containerList_div_waiter').css('margin-left', '0');
+// 			$('[data-name=foodListTab_waiter]').addClass('checkTab');
+//			$('[data-name=orderListTab_waiter]').removeClass('checkTab');
+//		});
 	}
 	
 	
