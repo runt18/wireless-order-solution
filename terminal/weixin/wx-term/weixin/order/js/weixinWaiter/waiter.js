@@ -152,6 +152,8 @@ $(function(){
 			
 	function initFoodList(data, isWxOrder){
 		
+		
+		
 		var orderListTemplete = '<div class="main-box" style="background-color: cornsilk;">'+
 									'<ul class="m-b-list">'+
 										'<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>'+
@@ -180,7 +182,7 @@ $(function(){
 					foodUnit : temp.tasteGroup.tastePref
 				}));
 			});
-			$('#foodList_div_waiter').append(html.join(''));
+			$('#foodList_div_waiter').html(html.join(''));
 			$('#foodAmountTips_span_waiter').html((data.orderFoods.length ? data.orderFoods.length : ''));
 			$('#foodAmountTips_span_waiter').css('background', (data.orderFoods.length ? 'red' : ''));
 		}else{
@@ -195,7 +197,7 @@ $(function(){
 					foodUnit : temp.tasteGroup.tastePref + '<span style="color:red;float:right;">&nbsp;&nbsp;<strong>(待确认)</strong></span>'
 				}));
 			});
-			$('#orderList_div_waiter').prepend(html.join(''));
+			$('#orderList_div_waiter').html(html.join(''));
 			$('#orderAmountTips_span_waiter').html((data.foods.length ? data.foods.length : ''));
 			$('#orderAmountTips_span_waiter').css('background', (data.foods.length ? 'red' : ''));
 		}
@@ -204,14 +206,31 @@ $(function(){
 		//标前缀
 		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-			$('#tips_span_waiter').html('');
-			$('#tips_span_waiter').css('margin', '0');
+			hasFoods = true;
+		});
+		
+		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
+			element.innerHTML = index + 1;
 			hasFoods = true;
 		});
 		
 		if(!hasFoods){
-			$('#tips_span_waiter').css({
-				'margin' : '40% 0px'
+			$('#tipsFoods_span_waiter').css({
+				'margin' : '40% 0px',
+				'display' : 'block'
+			});
+			$('#tipsOrder_span_waiter').css({
+				'margin' : '40% 0px',
+				'display' : 'block'
+			});
+		}else{
+			$('#tipsFoods_span_waiter').css({
+				'margin' : '0px 0px',
+				'display' : 'none'
+			});
+			$('#tipsOrder_span_waiter').css({
+				'margin' : '0px 0px',
+				'display' : 'none'
 			});
 		}
 	}
