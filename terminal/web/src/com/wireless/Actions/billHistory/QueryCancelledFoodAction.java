@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -67,22 +66,31 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				return null;
 			}
 			
+			final OrderFoodDao.ExtraCond4CancelFood extraCond = (OrderFoodDao.ExtraCond4CancelFood)new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY).setCalcByDuty(true);
+			final CalcCancelStatisticsDao.ExtraCond extraCond4Total = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY).setCalcByDuty(true);
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+					extraCond4Total.setChain(true);
+				}
 			}
 
-			final OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
-			final CalcCancelStatisticsDao.ExtraCond extraCond4Total = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+//			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
+//			if(range != null){
+//				extraCond.setDutyRange(range);
+//				extraCond4Total.setRange(range);
+//			}else{
+//				extraCond.setDutyRange(new DutyRange(beginDate, endDate));
+//				extraCond4Total.setRange(range);
+//			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-			if(range != null){
-				extraCond.setDutyRange(range);
-				extraCond4Total.setRange(range);
-			}else{
-				extraCond.setDutyRange(new DutyRange(beginDate, endDate));
-				extraCond4Total.setRange(range);
-			}
+			DutyRange range = new DutyRange(beginDate, endDate);
+			extraCond.setDutyRange(range);
+			extraCond4Total.setRange(range);
 			
 			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
 				extraCond.setReasonId(Integer.parseInt(reasonId));
@@ -159,12 +167,15 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
 				extraCond.setReasonId(Integer.valueOf(reasonId));
@@ -250,12 +261,17 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
 				extraCond.setReasonId(Integer.valueOf(reasonId));

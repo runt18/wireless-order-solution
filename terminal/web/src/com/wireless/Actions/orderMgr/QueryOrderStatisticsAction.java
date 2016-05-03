@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
@@ -56,15 +55,22 @@ public class QueryOrderStatisticsAction extends Action {
 		final JObject jObject = new JObject();
 		try{
 			
+			
+			final OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)))
+														.addStatus(Order.Status.PAID)
+														.addStatus(Order.Status.REPAID)
+														.setCalcByDuty(true);
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)))
-													.addStatus(Order.Status.PAID)
-													.addStatus(Order.Status.REPAID);
 			
 			if(comboType != null && !comboType.trim().isEmpty()){
 				int comboVal = Integer.valueOf(comboType);
@@ -124,18 +130,12 @@ public class QueryOrderStatisticsAction extends Action {
 				extraCond.setStaff(Integer.parseInt(staffId));
 			}
 			
-			if(region != null && !region.equals("-1")){
+			if(region != null && !region.isEmpty() && !region.equals("-1")){
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 			}
 			
 			if(dateBeg != null && !dateBeg.isEmpty() && dateEnd != null && !dateEnd.isEmpty()){
-				DutyRange range = DutyRangeDao.exec(staff, 
-						DateUtil.format(DateUtil.parseDate(dateBeg), DateUtil.Pattern.DATE_TIME), 
-						DateUtil.format(DateUtil.parseDate(dateEnd), DateUtil.Pattern.DATE_TIME));	
-				if(range == null){
-					range = new DutyRange(dateBeg, dateEnd);
-				}
-				extraCond.setOrderRange(range);
+				extraCond.setOrderRange(new DutyRange(dateBeg, dateEnd));
 			}
 			
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){

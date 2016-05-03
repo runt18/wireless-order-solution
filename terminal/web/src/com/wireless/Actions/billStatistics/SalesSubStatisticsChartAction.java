@@ -62,10 +62,10 @@ public class SalesSubStatisticsChartAction extends Action {
 			float totalMoney = 0;
 			int count = 0;
 			for (IncomeTrendByDept e : incomesByEachDay) {
-				xAxis.add("\'"+ e.getRange().getOffDutyFormat() +"\'");
+				xAxis.add("\'" + e.getRange().getOffDutyFormat() + "\'");
 				data.add(e.getDeptIncome().getIncome());
 				totalMoney += e.getDeptIncome().getIncome();
-				count ++ ;
+				count++;
 			}
 			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + 
 					",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "}]}";
