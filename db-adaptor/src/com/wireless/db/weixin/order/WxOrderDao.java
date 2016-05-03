@@ -276,10 +276,11 @@ public class WxOrderDao {
 		
 		//Insert the weixin order.
 		sql = " INSERT INTO " + Params.dbName + ".`weixin_order` " +
-			  " (restaurant_id, table_id, member_id, birth_date, status, type, code, comment) " +
+			  " (restaurant_id, table_id, order_id, member_id, birth_date, status, type, code, comment) " +
 			  " VALUES( " +
 			  staff.getRestaurantId() + ","	+
 			  (wxOrder.hasTable() ? wxOrder.getTable().getId() : " NULL ") + "," +
+			  (wxOrder.getOrderId() != 0 ? wxOrder.getOrderId() : " NULL ") + "," +
 			  wxOrder.getMember().getId() + "," +
 			  " NOW(), " +
 			  wxOrder.getStatus().getVal() + "," +
