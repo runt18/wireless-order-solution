@@ -1207,18 +1207,14 @@ function showPanel(v){
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/2ndDisplay.jpg)';
-	}else if(v == 21){//微信店小二
-		Ext.getCmp('kitchens').hide();
-		Ext.getCmp('kitchensTree').hide();
-		Ext.getCmp('depts').hide();
-		Ext.getCmp('regions').hide();
-		Ext.getCmp('printCommentPanel').hide();
 	}else if(v == 22){//呼叫结账
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
+		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxCallPay.jpg)';
+		
 	}else{
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
@@ -1242,11 +1238,14 @@ function showPanel(v){
 		}else if(v == 16){//转菜
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/transferFood2.jpg)';
 			Ext.getCmp('printCommentPanel').hide();			
-		}else if(v == 19 ){
+		}else if(v == 19 ){//微信预订
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxOrder.jpg)';
 			Ext.getCmp('printCommentPanel').hide();		
-		}else if(v == 20){
+		}else if(v == 20){//微信订单
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxBook.jpg)';
+			Ext.getCmp('printCommentPanel').hide();		
+		}else if(v == 21){//微信店小二
+			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxWaiter.jpg)';
 			Ext.getCmp('printCommentPanel').hide();		
 		}
 	}
