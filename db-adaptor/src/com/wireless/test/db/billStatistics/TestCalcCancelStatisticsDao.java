@@ -39,7 +39,7 @@ public class TestCalcCancelStatisticsDao {
 	}
 	
 	@Test
-	public void testCalcCancelStatistics() throws SQLException, ParseException{
+	public void testCalcCancelStatistics() throws SQLException, ParseException, BusinessException{
 		List<CancelIncomeByReason> incomesByReason = CalcCancelStatisticsDao.calcCancelIncomeByReason(mStaff, mDutyRange, mExtraCond);
 		float totalIncomeByReason = 0;
 		float totalAmountByReason = 0;

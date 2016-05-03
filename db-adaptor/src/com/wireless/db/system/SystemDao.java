@@ -94,8 +94,8 @@ public class SystemDao {
 			SystemSetting item = new SystemSetting();
 			Setting setting = item.getSetting();
 			setting.setId(dbCon.rs.getInt("setting_id"));
-			setting.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
+			setting.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			setting.setPriceTail(Setting.Tail.valueOf(dbCon.rs.getInt("price_tail")));
 			setting.setReceiptStyle((int)dbCon.rs.getLong("receipt_style"));
 			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
 			result.add(item);

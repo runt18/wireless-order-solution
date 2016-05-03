@@ -8,6 +8,50 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DutyRangeDao {
+
+	
+	/**
+	 * Get the records to daily settle history whose off duty is between on and off duty(two input parameters),
+	 * The on duty to duty range is the earliest date of those daily settle history record,
+	 * and the off duty to duty range is the latest date.
+	 * @param staff
+	 * 			the terminal to query
+	 * @param range
+	 * 			the duty range
+	 * @return	the result to duty range,
+	 * 			return null if no corresponding daily settle record exist within this period
+	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements
+	 */
+	public static DutyRange exec(Staff staff, DutyRange range) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return exec(dbCon, staff, range);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the records to daily settle history whose off duty is between on and off duty(two input parameters),
+	 * The on duty to duty range is the earliest date of those daily settle history record,
+	 * and the off duty to duty range is the latest date.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the terminal to query
+	 * @param range
+	 * 			the duty range
+	 * @return	the result to duty range,
+	 * 			return null if no corresponding daily settle record exist within this period
+	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements
+	 */
+	public static DutyRange exec(DBCon dbCon, Staff staff, DutyRange range) throws SQLException{
+		DutyRange result = exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
+		return result != null ? result : range;
+	}
 	
 	/**
 	 * Get the records to daily settle history whose off duty is between on and off duty(two input parameters),

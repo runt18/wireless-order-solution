@@ -10,6 +10,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.member.MemberDao;
@@ -18,7 +19,9 @@ import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
@@ -59,7 +62,7 @@ import com.wireless.sccon.ServerConnector;
 
 public class OrderDao {
 
-	public static class ExtraCond{
+	public static class ExtraCond implements Cloneable{
 		public final String orderTblAlias;
 		private final DBTbl dbTbl;
 		private int orderId = -1;		//按账单号
@@ -75,7 +78,7 @@ public class OrderDao {
 		private int staffId;			//按员工
 		private final List<Order.Status> statusList = new ArrayList<Order.Status>();	//按状态状态
 		private int restaurantId;
-		private boolean isOnlyAmount;
+		private boolean isOnlyAmount;	//只获取数量
 		
 		private boolean isRepaid;		//是否有反结帐
 		private boolean isDiscount;		//是否有折扣
@@ -86,6 +89,9 @@ public class OrderDao {
 		private boolean isTransfer;		//是否有转菜
 		private boolean isMemberPrice;	//是否有会员价
 		
+		private boolean isChain;		//是否连锁
+		private boolean calcByDuty;		//是否按日结区间计算
+		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType); 
 			if(dateType == DateType.TODAY){
@@ -93,6 +99,16 @@ public class OrderDao {
 			}else{
 				orderTblAlias = "OH";
 			}
+		}
+		
+		public ExtraCond setCalcByDuty(boolean onOff){
+			this.calcByDuty = onOff;
+			return this;
+		}
+		
+		public ExtraCond setChain(boolean onOff){
+			this.isChain = onOff;
+			return this;
 		}
 		
 		public ExtraCond setOnlyAmount(boolean onOff){
@@ -211,6 +227,15 @@ public class OrderDao {
 		}
 		
 		@Override
+	    public Object clone() {   
+	        try {   
+	            return super.clone();   
+	        } catch (CloneNotSupportedException e) {   
+	            return null;   
+	        }   
+	    } 
+		
+		@Override
 		public String toString(){
 
 			StringBuilder filterCond = new StringBuilder();
@@ -237,7 +262,18 @@ public class OrderDao {
 				filterCond.append(" AND " + orderTblAlias + ".region_id = " + regionId.getId());
 			}
 			if(orderRange != null){
-				filterCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + orderRange.getOnDutyFormat() + "' AND '" + orderRange.getOffDutyFormat() + "'");
+				DutyRange range;
+				if(this.calcByDuty){
+					try {
+						range = DutyRangeDao.exec(StaffDao.getAdminByRestaurant(restaurantId), orderRange);
+					} catch (SQLException | BusinessException e) {
+						e.printStackTrace();
+						range = orderRange;
+					}
+				}else{
+					range = orderRange;
+				}
+				filterCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
 				filterCond.append(" AND TIME(" + orderTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
@@ -493,140 +529,163 @@ public class OrderDao {
 	 * @return the list holding the pure order
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the staff does NOT exist in case of chain
 	 */
-	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
-		String sql;
-		if(extraCond.dbTbl.dateType == DateType.TODAY){
-			sql = " SELECT " +
-				  (extraCond.isOnlyAmount ? 
-				  " COUNT(*) " : 
-				  " O.id, O.birth_date, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
-				  " O.temp_staff, O.temp_date, " +
-				  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
-				  " O.waiter, O.staff_id, " +
-				  " O.region_id, O.region_name, O.restaurant_id, " +
-				  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
-				  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
-				  " O.price_plan_id, O.member_id, " +
-				  " IF(O.coupon_price IS NULL, 0, 1) AS has_coupon, O.coupon_price, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.pure_price, O.total_price, O.actual_price ") +
-				  " FROM " + 
-				  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
-				  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
-				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
-				  " WHERE 1 = 1 " + 
-				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
-				  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
-				  (orderClause != null ? orderClause : "");
-			
-		}else if(extraCond.dbTbl.dateType == DateType.HISTORY){
-			sql = " SELECT " +
-				  (extraCond.isOnlyAmount ? 
-				  " COUNT(*) " : 
-				  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
-				  " OH.waiter, OH.staff_id, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
-				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
-				  " IF(OH.coupon_price IS NULL, 0, 1) AS has_coupon, OH.coupon_price, " +
-				  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
-				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.pure_price, OH.total_price, OH.actual_price ") +
-				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " + 
-				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
-				  " WHERE 1 = 1 " + 
-				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
-				  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
-				  (orderClause != null ? orderClause : "");
-		}else{
-			throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
-		}
+	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		
-		//Get the details to each order.
-		dbCon.rs = dbCon.stmt.executeQuery(sql);		
-
 		List<Order> result = new ArrayList<Order>();
-		if(extraCond.isOnlyAmount){
-			if(dbCon.rs.next()){
-				result = Collections.nCopies(dbCon.rs.getInt(1), null);
-			}else{
-				result = Collections.emptyList();
+		if(extraCond.isChain){
+			
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the orders to the group.
+			result.addAll(getByCond(dbCon, staff, ((ExtraCond)extraCond.clone()).setChain(false), orderClause));
+			
+			//Append orders to each branch.
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				result.addAll(getByCond(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false), orderClause));
 			}
+			
 		}else{
-			while(dbCon.rs.next()) {
-				Order order = new Order();
-				order.setId(dbCon.rs.getInt("id"));
-				order.setSeqId(dbCon.rs.getInt("seq_id"));
-				order.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-				order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-				order.setWaiter(dbCon.rs.getString("waiter"));
-				order.setStaffId(dbCon.rs.getInt("staff_id"));
-				if(dbCon.rs.getTimestamp("discount_date") != null){
-					order.setDiscounterId(dbCon.rs.getInt("discount_staff_id"));
-					order.setDiscounter(dbCon.rs.getString("discount_staff"));
-					order.setDiscountDate(dbCon.rs.getTimestamp("discount_date").getTime());
-				}
+			
+			String sql;
+			if(extraCond.dbTbl.dateType == DateType.TODAY){
+				sql = " SELECT " +
+					  (extraCond.isOnlyAmount ? 
+					  " COUNT(*) " : 
+					  " O.id, O.birth_date, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
+					  " O.temp_staff, O.temp_date, " +
+					  " R.restaurant_name, " +
+					  " T.minimum_cost, IFNULL(T.category, 1) AS tbl_category, " +
+					  " O.waiter, O.staff_id, " +
+					  " O.region_id, O.region_name, O.restaurant_id, " +
+					  " O.settle_type, O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, O.category, O.status, O.service_plan_id, O.service_rate, O.comment, " +
+					  " O.discount_id, O.discount_staff_id, O.discount_staff, O.discount_date, " +
+					  " O.price_plan_id, O.member_id, " +
+					  " IF(O.coupon_price IS NULL, 0, 1) AS has_coupon, O.coupon_price, " +
+					  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.pure_price, O.total_price, O.actual_price ") +
+					  " FROM " + 
+					  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
+					  " LEFT JOIN " + Params.dbName + ".restaurant R ON O.restaurant_id = R.id " +
+					  " LEFT JOIN " + Params.dbName + ".table T ON O.table_id = T.table_id " +
+					  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
+					  " WHERE 1 = 1 " + 
+					  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
+					  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
+					  (orderClause != null ? orderClause : "");
 				
-				order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
-				Table table = new Table(dbCon.rs.getInt("table_id"));
-				table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				if(order.isUnpaid()){
-					table.setStatus(Table.Status.IDLE);
-				}else{
-					table.setStatus(Table.Status.BUSY);
-				}
-				table.setTableAlias(dbCon.rs.getInt("table_alias"));
-				table.setTableName(dbCon.rs.getString("table_name"));
-				if(extraCond.dbTbl.dateType == DateType.TODAY){
-					table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-					table.setCategory(Table.Category.valueOf(dbCon.rs.getShort("tbl_category")));
-				}
-				order.setDestTbl(table);
-				order.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
-				order.getRegion().setName(dbCon.rs.getString("region_name"));
-
-				order.setCustomNum(dbCon.rs.getShort("custom_num"));
-				order.setCategory(Category.valueOf(dbCon.rs.getShort("category")));
-				
-				if(extraCond.dbTbl.dateType == DateType.TODAY){
-					if(dbCon.rs.getTimestamp("temp_date") != null){
-						order.setTempDate(dbCon.rs.getTimestamp("temp_date").getTime());
-						order.setTempStaff(dbCon.rs.getString("temp_staff"));
-					}
-					if(dbCon.rs.getInt("discount_id") != 0){
-						order.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-					}
-					if(dbCon.rs.getInt("service_plan_id") != 0){
-						order.setServicePlan(new ServicePlan(dbCon.rs.getInt("service_plan_id")));
-					}
-					if(dbCon.rs.getInt("price_plan_id") != 0){
-						order.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id")));
-					}
-					order.setMemberId(dbCon.rs.getInt("member_id"));
-				}
-				
-				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
-				payType.setName(dbCon.rs.getString("pay_type_name"));
-				order.setPaymentType(payType);
-				order.setSettleType(Order.SettleType.valueOf(dbCon.rs.getShort("settle_type")));
-				order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
-				order.setServiceRate(dbCon.rs.getFloat("service_rate"));
-				order.setComment(dbCon.rs.getString("comment"));
-				order.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-				order.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
-				order.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-				order.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-				order.setErasePrice(dbCon.rs.getInt("erase_price"));
-				if(dbCon.rs.getBoolean("has_coupon")){
-					order.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
-				}
-				order.setPurePrice(dbCon.rs.getFloat("pure_price"));
-				order.setTotalPrice(dbCon.rs.getFloat("total_price"));
-				order.setActualPrice(dbCon.rs.getFloat("actual_price"));
-				
-				result.add(order);
+			}else if(extraCond.dbTbl.dateType == DateType.HISTORY){
+				sql = " SELECT " +
+					  (extraCond.isOnlyAmount ? 
+					  " COUNT(*) " : 
+					  " OH.id, OH.birth_date, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
+					  " OH.waiter, OH.staff_id, OH.discount_staff_id, OH.discount_staff, OH.discount_date, " +
+					  " OH.region_id, OH.region_name, OH.restaurant_id, " +
+					  " R.restaurant_name, " +
+					  " IF(OH.coupon_price IS NULL, 0, 1) AS has_coupon, OH.coupon_price, " +
+					  " OH.settle_type, OH.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, OH.category, OH.status, OH.service_rate, OH.comment, " +
+					  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.pure_price, OH.total_price, OH.actual_price ") +
+					  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " OH " + 
+					  " LEFT JOIN " + Params.dbName + ".restaurant R ON OH.restaurant_id = R.id " + 
+					  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = OH.pay_type_id " +
+					  " WHERE 1 = 1 " + 
+					  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
+					  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()).toString() : "") + " " +
+					  (orderClause != null ? orderClause : "");
+			}else{
+				throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
 			}
-		}
+			
+			//Get the details to each order.
+			dbCon.rs = dbCon.stmt.executeQuery(sql);		
 
-		dbCon.rs.close();
+			
+			if(extraCond.isOnlyAmount){
+				if(dbCon.rs.next()){
+					result = Collections.nCopies(dbCon.rs.getInt(1), null);
+				}else{
+					result = Collections.emptyList();
+				}
+			}else{
+				while(dbCon.rs.next()) {
+					Order order = new Order();
+					order.setId(dbCon.rs.getInt("id"));
+					order.setSeqId(dbCon.rs.getInt("seq_id"));
+					order.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+					order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+					order.setWaiter(dbCon.rs.getString("waiter"));
+					order.setStaffId(dbCon.rs.getInt("staff_id"));
+					if(dbCon.rs.getTimestamp("discount_date") != null){
+						order.setDiscounterId(dbCon.rs.getInt("discount_staff_id"));
+						order.setDiscounter(dbCon.rs.getString("discount_staff"));
+						order.setDiscountDate(dbCon.rs.getTimestamp("discount_date").getTime());
+					}
+					
+					order.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+					order.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+					order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
+					Table table = new Table(dbCon.rs.getInt("table_id"));
+					table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+					if(order.isUnpaid()){
+						table.setStatus(Table.Status.IDLE);
+					}else{
+						table.setStatus(Table.Status.BUSY);
+					}
+					table.setTableAlias(dbCon.rs.getInt("table_alias"));
+					table.setTableName(dbCon.rs.getString("table_name"));
+					if(extraCond.dbTbl.dateType == DateType.TODAY){
+						table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
+						table.setCategory(Table.Category.valueOf(dbCon.rs.getShort("tbl_category")));
+					}
+					order.setDestTbl(table);
+					order.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
+					order.getRegion().setName(dbCon.rs.getString("region_name"));
+
+					order.setCustomNum(dbCon.rs.getShort("custom_num"));
+					order.setCategory(Category.valueOf(dbCon.rs.getShort("category")));
+					
+					if(extraCond.dbTbl.dateType == DateType.TODAY){
+						if(dbCon.rs.getTimestamp("temp_date") != null){
+							order.setTempDate(dbCon.rs.getTimestamp("temp_date").getTime());
+							order.setTempStaff(dbCon.rs.getString("temp_staff"));
+						}
+						if(dbCon.rs.getInt("discount_id") != 0){
+							order.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
+						}
+						if(dbCon.rs.getInt("service_plan_id") != 0){
+							order.setServicePlan(new ServicePlan(dbCon.rs.getInt("service_plan_id")));
+						}
+						if(dbCon.rs.getInt("price_plan_id") != 0){
+							order.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id")));
+						}
+						order.setMemberId(dbCon.rs.getInt("member_id"));
+					}
+					
+					PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+					payType.setName(dbCon.rs.getString("pay_type_name"));
+					order.setPaymentType(payType);
+					order.setSettleType(Order.SettleType.valueOf(dbCon.rs.getShort("settle_type")));
+					order.setStatus(Order.Status.valueOf(dbCon.rs.getInt("status")));
+					order.setServiceRate(dbCon.rs.getFloat("service_rate"));
+					order.setComment(dbCon.rs.getString("comment"));
+					order.setGiftPrice(dbCon.rs.getFloat("gift_price"));
+					order.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
+					order.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
+					order.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
+					order.setErasePrice(dbCon.rs.getInt("erase_price"));
+					if(dbCon.rs.getBoolean("has_coupon")){
+						order.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
+					}
+					order.setPurePrice(dbCon.rs.getFloat("pure_price"));
+					order.setTotalPrice(dbCon.rs.getFloat("total_price"));
+					order.setActualPrice(dbCon.rs.getFloat("actual_price"));
+					
+					result.add(order);
+				}
+			}
+
+			dbCon.rs.close();
+		}
 		
 		return result;
 	}
@@ -642,8 +701,9 @@ public class OrderDao {
 	 * @return the list holding the pure order
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -1472,8 +1532,9 @@ public class OrderDao {
 	 * @return the order amount to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -1500,8 +1561,9 @@ public class OrderDao {
 	 * @return the order amount to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		int amount = 0;
 		for(Order order : getByCond(dbCon, staff, extraCond, null)){
 			String sql;
@@ -1584,8 +1646,9 @@ public class OrderDao {
 	 * @return the archive result
 	 * @throws SQLException
 	 * 			throws if failed to execute SQL statement
+	 * @throws BusinessException 
 	 */
-	public static ArchiveResult archive4Daily(DBCon dbCon, Staff staff) throws SQLException{
+	public static ArchiveResult archive4Daily(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		String sql;
 		DBTbl fromTbl = new DBTbl(DateType.TODAY);
 		DBTbl toTbl = new DBTbl(DateType.HISTORY);
@@ -1623,8 +1686,9 @@ public class OrderDao {
 	 * @return the archive result {@link ArchiveResult}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static ArchiveResult archive4Expired(DBCon dbCon, final Staff staff) throws SQLException{
+	public static ArchiveResult archive4Expired(DBCon dbCon, final Staff staff) throws SQLException, BusinessException{
 		ExtraCond extraCond4Expired = new ExtraCond(DateType.HISTORY){
 			@Override
 			public String toString(){
@@ -1641,7 +1705,7 @@ public class OrderDao {
 		return archive(dbCon, staff, extraCond4Expired, DateType.HISTORY, DateType.ARCHIVE);
 	}
 	
-	private static ArchiveResult archive(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType archiveFrom, DateType archiveTo) throws SQLException{
+	private static ArchiveResult archive(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType archiveFrom, DateType archiveTo) throws SQLException, BusinessException{
 		DBTbl toTbl = new DBTbl(archiveTo);
 		
 		String sql;
