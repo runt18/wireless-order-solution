@@ -174,7 +174,7 @@ Ext.onReady(function(){
 				}]);
 	
 	var store = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url : '../../QueryRepresent.do'}),
+		proxy : new Ext.data.HttpProxy({url : '../../OperateRepresent.do'}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [{
 			name : 'subscribeDate'
 		},{

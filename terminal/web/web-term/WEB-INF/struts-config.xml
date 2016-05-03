@@ -16,7 +16,7 @@
 		<action path="/OperateRepresent" type="com.wireless.Actions.represent.OperateRepresentAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/QueryRepresent" type="com.wireless.Actions.represent.QueryRepresentAction"
+		<action path="/OperateRepresentChain" type="com.wireless.Actions.represent.OperateRepresentChainAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperateReply" type="com.wireless.Actions.weixin.OperateReplyAction"
