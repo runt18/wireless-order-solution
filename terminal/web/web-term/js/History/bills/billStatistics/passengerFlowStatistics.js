@@ -117,6 +117,7 @@ Ext.onReady(function(){
 						if(jr.root[0].typeVal != '2'){
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
 						}else{
+							data.push([-1, '全部']);
 							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 							 
 							for(var i = 0; i < jr.root[0].branches.length; i++){
@@ -130,51 +131,62 @@ Ext.onReady(function(){
 				});
 			},
 			select : function(isJump){
-				//加载区域
-				var data = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../OperateRegion.do',
-					params :{
-						dataSource : 'getByCond',
-						branchId : branchSelect_combo_passengerFlow.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						for(var i = 0; i < jr.root.length; i++){
-							data.push([jr.root[i]['id'], jr.root[i]['name']]);
-						}
-						
-						regionSelect_combo_passengerFlow.store.loadData(data);
-						regionSelect_combo_passengerFlow.setValue(-1);
-					}
-				});
-				
-				//加载市别
-				var hour = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../OperateBusinessHour.do',
-					params : {
-						dataSource : 'getByCond',
-						branchId : branchSelect_combo_passengerFlow.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-						}
-						
-						hour.push([-2, '自定义']);
-						
-						Ext.getCmp('passengerFlow_comboBusinessHour').store.loadData(hour);
-						Ext.getCmp('passengerFlow_comboBusinessHour').setValue(-1);
+				if(branchSelect_combo_passengerFlow.getValue() == -1){
+					//【全部门店】是【区域】、【市别】不可选
+					regionSelect_combo_passengerFlow.setDisabled(true);
+					regionSelect_combo_passengerFlow.setValue(-1);
 					
-						if(!isJump){
-							Ext.getCmp('businessReceipt_btnSearch').handler();	
+					Ext.getCmp('passengerFlow_comboBusinessHour').setDisabled(true);
+					Ext.getCmp('passengerFlow_comboBusinessHour').setValue(-1);
+				}else{
+					//加载区域
+					var data = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params :{
+							dataSource : 'getByCond',
+							branchId : branchSelect_combo_passengerFlow.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							
+							regionSelect_combo_passengerFlow.setDisabled(false);;
+							regionSelect_combo_passengerFlow.store.loadData(data);
+							regionSelect_combo_passengerFlow.setValue(-1);
 						}
+					});
 					
-					}
-				});
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branchSelect_combo_passengerFlow.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('passengerFlow_comboBusinessHour').setDisabled(false);
+							Ext.getCmp('passengerFlow_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('passengerFlow_comboBusinessHour').setValue(-1);
+						
+						}
+					});
+				}
+	
+				if(!isJump){
+					Ext.getCmp('businessReceipt_btnSearch').handler();	
+				}
 			}
 		}
 		

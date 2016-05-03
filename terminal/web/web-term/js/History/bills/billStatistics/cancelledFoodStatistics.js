@@ -1,7 +1,11 @@
 
 Ext.onReady(function(){
-	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
-	var cfdsGrid;
+	var cancelFoodStatWin = null;
+	var cancelFoodStatWinTabPanel = null;
+	var cancelFoodDetailsStatPanel = null;
+	var cancelFoodByDeptStatPanel = null;
+	var cancelFoodByReasonStatPanel = null;
+	var cfdsGrid = null;
 	var cancel_FOOD_PAGE_LIMIT = 22;
 	
 	function cancelFoodDetailsStatPanelInit(){
@@ -195,6 +199,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 							}else{
+								data.push([-1, '全部']);
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
@@ -209,86 +214,92 @@ Ext.onReady(function(){
 					});
 				},
 				select : function(){
-					//加载员工
-					var staff = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../QueryStaff.do',
-						params : {
-							branchId : branch_combo_cancelledFood.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+					if(branch_combo_cancelledFood.getValue() == -1){
+						//TODO【全部门店】下【员工】、【部门】、【退菜原因】、【市别】不可选
+						
+					}else{
+						//加载员工
+						var staff = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../QueryStaff.do',
+							params : {
+								branchId : branch_combo_cancelledFood.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+								}
+								
+								cancel_combo_staffs.store.loadData(staff);
+								cancel_combo_staffs.setValue(-1);
 							}
-							
-							cancel_combo_staffs.store.loadData(staff);
-							cancel_combo_staffs.setValue(-1);
-						}
-					});
-					
-					//加载部门
-					var dept = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateDept.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_cancelledFood.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								dept.push([jr.root[i]['id'], jr.root[i]['name']]);
+						});
+						
+						//加载部门
+						var dept = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateDept.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_cancelledFood.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									dept.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								
+								cancel_deptCombo.store.loadData(dept);
+								cancel_deptCombo.setValue(-1);
 							}
-							
-							cancel_deptCombo.store.loadData(dept);
-							cancel_deptCombo.setValue(-1);
-						}
-					});
-					
-					//加载退菜原因
-					var cancelReason = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateCancelReason.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_cancelledFood.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								cancelReason.push([jr.root[i]['id'], jr.root[i]['reason']]);
+						});
+						
+						//加载退菜原因
+						var cancelReason = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateCancelReason.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_cancelledFood.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									cancelReason.push([jr.root[i]['id'], jr.root[i]['reason']]);
+								}
+								
+								reasonCombo.store.loadData(cancelReason);
+								reasonCombo.setValue(-1);
 							}
-							
-							reasonCombo.store.loadData(cancelReason);
-							reasonCombo.setValue(-1);
-						}
-					});
-					
-					//加载市别
-					var hour = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateBusinessHour.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_cancelledFood.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						});
+						
+						//加载市别
+						var hour = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateBusinessHour.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_cancelledFood.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								
+								hour.push([-2, '自定义']);
+								
+								Ext.getCmp('cancel_comboBusinessHour').store.loadData(hour);
+								Ext.getCmp('cancel_comboBusinessHour').setValue(-1);
 							}
-							
-							hour.push([-2, '自定义']);
-							
-							Ext.getCmp('cancel_comboBusinessHour').store.loadData(hour);
-							Ext.getCmp('cancel_comboBusinessHour').setValue(-1);
-						}
-					});
+						});
+					}
+
 					
 					Ext.getCmp('cancel_btnSearch').handler();
 				}
@@ -470,6 +481,7 @@ Ext.onReady(function(){
 			'',
 			'../../QueryCancelledFood.do',
 			[[true, false, false, true], 
+			 ['门店名称', 'restaurantName', 70],
 			 ['日期','orderDateFormat',150], 
 			 ['菜名','name',180],
 	         ['部门','kitchen.dept.name'], 
@@ -482,7 +494,7 @@ Ext.onReady(function(){
 	         ['操作人','waiter'], 
 	         ['退菜原因','cancelReason.reason', 200]
 			],
-			['orderDateFormat', 'name', 'kitchen.dept.name', 'orderId', 'unitPrice', 'count', 'totalPrice', 'waiter', 'cancelReason.reason'],
+			['restaurantName', 'orderDateFormat', 'name', 'kitchen.dept.name', 'orderId', 'unitPrice', 'count', 'totalPrice', 'waiter', 'cancelReason.reason', 'rid'],
 			[ ['dataSource', 'getDetail']],
 			cancel_FOOD_PAGE_LIMIT,
 			null,
@@ -524,8 +536,9 @@ Ext.onReady(function(){
 									method : 'post'
 								});
 								thiz.center();	
-								thiz.orderId = orderID;
-								thiz.branchId = branch_combo_cancelledFood.getValue();
+								var sd = Ext.ux.getSelData(cfdsGrid);
+								thiz.orderId = sd.orderId;
+								thiz.branchId = sd.rid;
 								thiz.foodStatus = 'isReturn';
 								
 							}
@@ -882,9 +895,9 @@ Ext.onReady(function(){
 	}
 
 	var cancel_cutAfterDrag=70, cancel_cutBeforeDrag=40;
-	var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight, cancel_hours;
+	var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight = null, cancel_hours = null;
 	var cancel_detailChart, cancel_staffPieChart, cancel_staffColumnChart, cancel_deptPieChart, cancel_deptColumnChart, cancel_reasonPieChart, cancel_reasonColumnChart;
-	var cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel, cancelFoodStatChartTabPanel;
+	var cancelledDetailChartPanel = null, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel, cancelFoodStatChartTabPanel;
 	var colors = Highcharts.getOptions().colors;
 	var reasonChartData = Wireless.chart.initChartData({priceName:'退菜原因金额', countName:'退菜原因数量'});
 	var cancel_staffChartData = Wireless.chart.initChartData({priceName:'员工退菜金额', countName:'员工退菜数量'});

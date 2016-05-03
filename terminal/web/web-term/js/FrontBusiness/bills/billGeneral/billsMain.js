@@ -714,6 +714,7 @@ Ext.onReady(function(){
 		'../../QueryOrderStatistics.do',
 		[
 			[true, false, false, true], 
+			['门店名称', 'restaurantName', 70],
 			['帐单号', 'id'],
 			['流水号', 'seqId'],
 			['台号', 'table.alias', 120, null, function(v,m,r){

@@ -63,7 +63,7 @@ $(function(){
 
 	//退出餐台选择界面
 	$('#tableSelectMgr').on('pagebeforehide', function(){
-		//关闭跑马灯
+		//隐藏跑马灯
 		if(runHorseDiv){
 			runHorseDiv.hide();
 		}
@@ -92,7 +92,7 @@ $(function(){
 		$(document).off('keydown');
 		//设置快捷键
 		$(document).on('keydown', function(event){
-			if(event.which == "107"){//加号
+			if(event.which == '107'){//加号
 				$('#searchTable_a_tableSelect').click();
 		    } 	
 		});
