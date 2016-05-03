@@ -18,6 +18,9 @@
 		var sendToStatisticsOperateType = c.operateType;
 		var sendToStatisticsOperatePayType = c.payType;
 		
+		
+		
+		
 		if(!sendToStatisticsPageHours.opening){
 			sendToStatisticsPageHours.openingText = "00:00";
 			sendToStatisticsPageHours.endingText = "00:00";

@@ -3373,7 +3373,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(3, 3500);
 		sheet.setColumnWidth(4, 3500);
 		sheet.setColumnWidth(5, 3000);
-		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(6, 4000);
 		sheet.setColumnWidth(7, 3200);
 		sheet.setColumnWidth(8, 4000);
 		sheet.setColumnWidth(9, 4000);
@@ -3501,7 +3501,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			//创建时间
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(member.getCreateDate());
+			cell.setCellValue(DateUtil.format(member.getCreateDate()));
 			cell.setCellStyle(normalNumStyle);
 			
 			//消费次数
