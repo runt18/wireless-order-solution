@@ -2,7 +2,6 @@ package com.wireless.pojo.promotion;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.util.DateUtil;
 
 public class CouponEffect implements Jsonable{
 	private int couponTypeId;        //优惠券类型
