@@ -9,6 +9,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
@@ -16,6 +17,8 @@ import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Price;
 import com.wireless.db.menuMgr.FoodUnitDao;
 import com.wireless.db.menuMgr.PricePlanDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -32,6 +35,7 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.DateType;
@@ -74,7 +78,7 @@ public class OrderFoodDao {
 		}
 	}
 	
-	public static class ExtraCond{
+	public static class ExtraCond implements Cloneable{
 		private final DateType dateType;
 		final String orderFoodTblAlias = "OF";
 		final String orderTblAlias = "O";
@@ -92,11 +96,31 @@ public class OrderFoodDao {
 		private int foodId;
 		private Boolean isGift;
 		
+		private boolean isChain;		//是否连锁
+		private boolean calcByDuty;		//是否按日结区间计算
+		
+		private Staff staff;
+		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
 			DBTbl dbTbl = new DBTbl(dateType);
 			orderTbl = dbTbl.orderTbl;
 			orderFoodTbl = dbTbl.orderFoodTbl;
+		}
+		
+		private ExtraCond setStaff(Staff staff){
+			this.staff = staff;
+			return this;
+		}
+		
+		public ExtraCond setCalcByDuty(boolean onOff){
+			this.calcByDuty = onOff;
+			return this;
+		}
+		
+		public ExtraCond setChain(boolean onOff){
+			this.isChain = onOff;
+			return this;
 		}
 		
 		public ExtraCond setOrder(Order order){
@@ -134,8 +158,6 @@ public class OrderFoodDao {
 			return this;
 		}
 		
-		
-		
 		public ExtraCond setKitchen(Kitchen kitchen){
 			this.kitchenId = Integer.valueOf(kitchen.getId());
 			return this;
@@ -172,6 +194,15 @@ public class OrderFoodDao {
 		}
 		
 		@Override
+	    public Object clone() {   
+	        try {   
+	            return super.clone();   
+	        } catch (CloneNotSupportedException e) {   
+	            return null;   
+	        }   
+	    } 
+	    
+		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(orderId > 0){
@@ -183,8 +214,20 @@ public class OrderFoodDao {
 			if(kitchenId != null){
 				extraCond.append(" AND " + orderFoodTblAlias + ".kitchen_id = " + kitchenId.intValue());
 			}
-			if(dutyRange != null){
-				extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + dutyRange.getOnDutyFormat() + "' AND '" + dutyRange.getOffDutyFormat() + "'");
+			if(this.dutyRange != null){
+				DutyRange range;
+				if(calcByDuty){
+					try {
+						range = DutyRangeDao.exec(staff, this.dutyRange);
+					} catch (SQLException e) {
+						range = this.dutyRange;
+						e.printStackTrace();
+					}
+				}else{
+					range = this.dutyRange;
+				}
+				
+				extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(" + orderFoodTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
@@ -260,15 +303,14 @@ public class OrderFoodDao {
 	 * @param orderClause
 	 *            the order clause to search the foods
 	 * @return the list of order holding each single detail
-	 * @throws SQLException
-	 *             throws if fail to execute the SQL statement.
+	 * @throws Exception 
 	 */
-	public static List<OrderFood> getSingleDetail(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getSingleDetail(Staff staff, ExtraCond extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return OrderFoodDao.getSingleDetail(dbCon, staff, extraCond, orderClause);
-		}catch(Exception e){
+		}catch(SQLException | BusinessException e){
 			throw e;
 		}finally{
 			dbCon.disconnect();
@@ -288,133 +330,137 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement.
+	 * @throws BusinessException 
 	 */
-	public static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException {
-		return getSingleDetail(dbCon, staff, extraCond.toString(), orderClause, extraCond.dateType);
+	public static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException {
+		
+		List<OrderFood> result = new ArrayList<OrderFood>();
+		
+		if(extraCond.isChain){
+			
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the single order food detail to group.
+			result.addAll(getSingleDetail(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false).setCalcByDuty(true), orderClause));
+
+			//Append the single order food detail to each branch.
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				result.addAll(getSingleDetail(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false).setCalcByDuty(true), orderClause));
+			}
+			
+		}else{
+			
+			String sql;
+
+			if(extraCond.dateType.isHistory()){
+				sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
+						" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
+						" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+						" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
+						" IFNULL(OF.plan_price, -1) AS plan_price, " +
+						" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
+						" IFNULL(R.restaurant_name, '已删除餐厅') AS restaurant_name, " +
+						" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
+						" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
+						" FROM " + Params.dbName + ".order_food_history OF " +
+						" JOIN " + Params.dbName + ".order_history O ON O.id = OF.order_id " +
+						" LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = OF.restaurant_id " +
+						" LEFT JOIN " + Params.dbName + ".kitchen K ON OF.kitchen_id = K.kitchen_id " +
+						" LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
+						" WHERE 1 = 1 " +
+						" AND O.restaurant_id = " + staff.getRestaurantId() +
+						(extraCond == null ? "" : extraCond.setStaff(staff)) +
+						(orderClause == null ? "" : " " + orderClause);
+			
+			}else if(extraCond.dateType.isToday()){
+				sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
+						" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
+						" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+						" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
+						" IFNULL(OF.plan_price, -1) AS plan_price, " +
+						" OF.cancel_reason_id, OF.cancel_reason, " +
+						" IFNULL(R.restaurant_name, '已删除餐厅') AS restaurant_name, " +
+						" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
+						" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
+						" FROM " + Params.dbName + ".order_food OF " +
+						" JOIN " + Params.dbName + ".order O ON OF.order_id = O.id " +
+						" LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = OF.restaurant_id " +
+						" LEFT JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id " +
+						" LEFT JOIN " + Params.dbName + ".department D " + " ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
+						" WHERE 1 = 1 " +
+						" AND O.restaurant_id = " + staff.getRestaurantId() +
+						(extraCond == null ? "" : extraCond) +
+						(orderClause == null ? "" : " " + orderClause);
+			}else{
+				throw new IllegalArgumentException("The date type is invalid.");
+			}
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while (dbCon.rs.next()) {
+				OrderFood of = new OrderFood();
+				of.setOrderId(dbCon.rs.getInt("order_id"));
+				of.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+				of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
+				of.asFood().setName(dbCon.rs.getString("name"));
+				of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				of.asFood().setStatus(dbCon.rs.getShort("food_status"));
+				of.asFood().setCommission(dbCon.rs.getFloat("commission"));
+				of.setRepaid(dbCon.rs.getBoolean("is_paid"));
+				of.setGift(dbCon.rs.getBoolean("is_gift"));
+				of.setOperation(OrderFood.Operation.valueOf(dbCon.rs.getInt("operation")));
+				
+				if(dbCon.rs.getInt("food_unit_id") != 0){
+					FoodUnit foodUnit = new FoodUnit(dbCon.rs.getInt("food_unit_id"));
+					foodUnit.setFoodId(dbCon.rs.getInt("food_id"));
+					foodUnit.setPrice(dbCon.rs.getFloat("food_unit_price"));
+					foodUnit.setUnit(dbCon.rs.getString("food_unit"));
+					of.setFoodUnit(foodUnit);
+				}
+				
+				int tasteGroupId = dbCon.rs.getInt("taste_group_id");
+				//Get the detail to taste group.
+				if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
+					try{
+						of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, extraCond.dateType));
+					}catch(BusinessException ignored){
+						ignored.printStackTrace();
+					}
+				}
+				
+				of.setCount(dbCon.rs.getFloat("order_count"));
+				of.setPlanPrice(dbCon.rs.getFloat("plan_price"));
+				of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
+				of.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+				of.setStaffId(dbCon.rs.getInt("staff_id"));
+				of.setWaiter(dbCon.rs.getString("waiter"));
+				
+				Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+				kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				kitchen.setName(dbCon.rs.getString("kitchen_name"));
+				
+				Department dept = new Department(dbCon.rs.getShort("dept_id"));
+				dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				dept.setName(dbCon.rs.getString("dept_name"));
+				
+				kitchen.setDept(dept);
+				of.asFood().setKitchen(kitchen);
+				
+				of.setDiscount(dbCon.rs.getFloat("discount"));
+				of.setTemp(dbCon.rs.getBoolean("is_temporary"));
+				
+				CancelReason cr = new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
+												   dbCon.rs.getString("cancel_reason"),
+												   dbCon.rs.getInt("restaurant_id"));
+				of.setCancelReason(cr);
+				
+				result.add(of);
+			}
+			dbCon.rs.close();
+		}
+		
+		return result;
 	}
 	
-	/**
-	 * Get each single detail from order to history. 
-	 * @param dbCon
-	 *            the database connection
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param extraCond
-	 *            the extra condition to search the foods
-	 * @param orderClause
-	 *            the order clause to search the foods
-	 * @param dateType the date type {@link DateType}
-	 * @return the list of order holding each single detail
-	 * @throws SQLException
-	 *             throws if fail to execute the SQL statement.
-	 */
-	private static List<OrderFood> getSingleDetail(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException {
-		String sql;
-
-		if(dateType.isHistory()){
-			sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
-					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
-					" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
-					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
-					" IFNULL(OF.plan_price, -1) AS plan_price, " +
-					" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
-					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
-					" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
-					" FROM " + Params.dbName + ".order_food_history OF " +
-					" JOIN " + Params.dbName + ".order_history O ON O.id = OF.order_id " +
-					" LEFT JOIN " + Params.dbName + ".kitchen K ON OF.kitchen_id = K.kitchen_id " +
-					" LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
-					" WHERE 1 = 1 " +
-					" AND O.restaurant_id = " + staff.getRestaurantId() +
-					(extraCond == null ? "" : extraCond) +
-					(orderClause == null ? "" : " " + orderClause);
-		
-		}else if(dateType.isToday()){
-			sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, OF.operation, " +
-					" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.commission, OF.is_paid, " +
-					" OF.unit_price, OF.order_count, OF.staff_id, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
-					" OF.food_unit_id, OF.food_unit, OF.food_unit_price, " +
-					" IFNULL(OF.plan_price, -1) AS plan_price, " +
-					" OF.cancel_reason_id, OF.cancel_reason, " +
-					" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
-					" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
-					" FROM " + Params.dbName + ".order_food OF " +
-					" JOIN " + Params.dbName + ".order O ON OF.order_id = O.id " +
-					" LEFT JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id " +
-					" LEFT JOIN " + Params.dbName + ".department D " + " ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
-					" WHERE 1 = 1 " +
-					" AND O.restaurant_id = " + staff.getRestaurantId() +
-					(extraCond == null ? "" : extraCond) +
-					(orderClause == null ? "" : " " + orderClause);
-		}else{
-			throw new IllegalArgumentException("The date type is invalid.");
-		}
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<OrderFood> orderFoods = new ArrayList<OrderFood>();
-		while (dbCon.rs.next()) {
-			OrderFood of = new OrderFood();
-			of.setOrderId(dbCon.rs.getInt("order_id"));
-			of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
-			of.asFood().setName(dbCon.rs.getString("name"));
-			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
-			of.asFood().setCommission(dbCon.rs.getFloat("commission"));
-			of.setRepaid(dbCon.rs.getBoolean("is_paid"));
-			of.setGift(dbCon.rs.getBoolean("is_gift"));
-			of.setOperation(OrderFood.Operation.valueOf(dbCon.rs.getInt("operation")));
-			
-			if(dbCon.rs.getInt("food_unit_id") != 0){
-				FoodUnit foodUnit = new FoodUnit(dbCon.rs.getInt("food_unit_id"));
-				foodUnit.setFoodId(dbCon.rs.getInt("food_id"));
-				foodUnit.setPrice(dbCon.rs.getFloat("food_unit_price"));
-				foodUnit.setUnit(dbCon.rs.getString("food_unit"));
-				of.setFoodUnit(foodUnit);
-			}
-			
-			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
-			//Get the detail to taste group.
-			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				try{
-					of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, dateType));
-				}catch(BusinessException ignored){
-					ignored.printStackTrace();
-				}
-			}
-			
-			of.setCount(dbCon.rs.getFloat("order_count"));
-			of.setPlanPrice(dbCon.rs.getFloat("plan_price"));
-			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
-			of.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			of.setStaffId(dbCon.rs.getInt("staff_id"));
-			of.setWaiter(dbCon.rs.getString("waiter"));
-			
-			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
-			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			kitchen.setName(dbCon.rs.getString("kitchen_name"));
-			
-			Department dept = new Department(dbCon.rs.getShort("dept_id"));
-			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			dept.setName(dbCon.rs.getString("dept_name"));
-			
-			kitchen.setDept(dept);
-			of.asFood().setKitchen(kitchen);
-			
-			of.setDiscount(dbCon.rs.getFloat("discount"));
-			of.setTemp(dbCon.rs.getBoolean("is_temporary"));
-			
-			CancelReason cr = new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
-											   dbCon.rs.getString("cancel_reason"),
-											   dbCon.rs.getInt("restaurant_id"));
-			of.setCancelReason(cr);
-			
-			orderFoods.add(of);
-		}
-		dbCon.rs.close();
-		
-		return orderFoods;
-	}
-
 	/**
 	 * Get the detail according to extra condition
 	 * @param dbCon
@@ -832,7 +878,7 @@ public class OrderFoodDao {
 		}
 	}
 	
-	static ArchiveResult archive(DBCon dbCon, Staff staff, Order order, DateType archiveFrom, DateType archiveTo) throws SQLException{
+	static ArchiveResult archive(DBCon dbCon, Staff staff, Order order, DateType archiveFrom, DateType archiveTo) throws SQLException, BusinessException{
 		int ofAmount = 0, tgAmount = 0;
 		DBTbl toTbl = new DBTbl(archiveTo);
 		Map<Integer, Integer> tgMap = new HashMap<>();

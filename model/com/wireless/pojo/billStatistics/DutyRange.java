@@ -45,6 +45,11 @@ public class DutyRange implements Jsonable{
 	}
 
 	@Override
+	public int hashCode(){
+		return getOnDutyFormat().hashCode() + getOffDutyFormat().hashCode();
+	}
+	
+	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof DutyRange)){
 			return false;

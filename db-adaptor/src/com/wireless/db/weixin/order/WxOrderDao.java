@@ -612,8 +612,9 @@ public class WxOrderDao {
 	 * @return the amount to wx order deleted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		int amount = 0;
 		for(WxOrder wxOrder : getByCond(dbCon, staff, extraCond, null)){
 			if(OrderDao.getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(wxOrder.getOrderId()), null).isEmpty()){

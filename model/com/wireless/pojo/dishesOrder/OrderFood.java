@@ -70,6 +70,9 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the order id associated with this order food
 	private int mOrderId;
 	
+	//the restaurant name to this order food
+	private String mRestaurantName;
+	
 	//the order date to this order food
 	private long mOrderDate;
 
@@ -133,6 +136,17 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public Food asFood(){
 		return mFood;
+	}
+	
+	public String getRestaurantName(){
+		if(this.mRestaurantName == null){
+			return "";
+		}
+		return this.mRestaurantName;
+	}
+	
+	public void setRestaurantName(String name){
+		this.mRestaurantName = name;
 	}
 	
 	public Operation getOperation(){
@@ -933,6 +947,8 @@ public class OrderFood implements Parcelable, Jsonable {
 	public static enum Key4Json{
 		ORDER_FOOD_ID("orderFoodId", ""),
 		ORDER_ID("orderId", "账单id"),
+		RESTAURANT_ID("rid", "餐厅编号"),
+		RESTAURANT_NAME("restaurantName", "餐厅名称"),
 		ORDER_DATE("orderDateFormat", "账单日期"),
 		FOOD_NAME("foodName", "菜品名称"),
 		WAITER("waiter", "服务员"),
@@ -979,6 +995,8 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putJsonable(this.mFood, 0);
 		jm.putLong(Key4Json.ORDER_FOOD_ID.key, this.id);
 		jm.putInt(Key4Json.ORDER_ID.key, this.mOrderId);
+		jm.putInt(Key4Json.RESTAURANT_ID.key, this.getRestaurantId());
+		jm.putString(Key4Json.RESTAURANT_NAME.key, this.mRestaurantName);
 		jm.putString(Key4Json.FOOD_NAME.key, this.getName());
 		jm.putString(Key4Json.ORDER_DATE.key, DateUtil.format(this.mOrderDate));
 		jm.putString(Key4Json.WAITER.key, this.mWaiter);

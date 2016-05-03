@@ -196,10 +196,11 @@ public class CalcBillStatisticsDao {
 		IncomeByPay incomeByPay;
 		
 		if(extraCond.isChain()){
-			//append the income in case of chain.
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the pay type income to group.
 			incomeByPay = calcIncomeByPayType(dbCon, groupStaff, range, extraCond.setChain(false));
-			
+
+			//Append the pay type income to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
 				IncomeByPay branchIncome = calcIncomeByPayType(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false));
 				for(IncomeByPay.PaymentIncome incomeByPayType : branchIncome.getPaymentIncomes()){

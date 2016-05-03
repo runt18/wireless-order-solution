@@ -43,6 +43,20 @@ public class CancelIncomeByReason implements Jsonable{
 	}
 	
 	@Override
+	public int hashCode(){
+		return this.mCancelReason.getReason().hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof CancelIncomeByReason)){
+			return false;
+		}else{
+			return ((CancelIncomeByReason)obj).mCancelReason.getReason().equals(this.mCancelReason.getReason());
+		}
+	}
+	
+	@Override
 	public String toString(){
 		return "[" + mCancelReason.getReason() + "," + mCancelAmount + ",￥" + mCancelPrice + "]";
 	}

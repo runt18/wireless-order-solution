@@ -4,11 +4,11 @@ Ext.onReady(function() {
 	//历史账单
 	var searchAdditionFilter = 'searchAdditionFilterAll';
 	
-	var billsGrid;
+	var billsGrid = null;
 	var foodStatus;
 	var historyExtraBar;
-	var historyPayTypes;
-	var billDetailWin, viewBillWin;
+	var billDetailWin = null;
+	var viewBillWin = null;
 	
 	//------------------lib
 	function billQueryHandler(c) {
@@ -233,7 +233,7 @@ Ext.onReady(function() {
 					thiz.center();	
 					
 					thiz.orderId = sd.id;
-					thiz.branchId = Ext.getCmp('branch_combo_history').getValue();
+					thiz.branchId = sd.rid;
 				}
 			}
 		});
@@ -301,7 +301,7 @@ Ext.onReady(function() {
 					
 					thiz.orderId = sd.id;
 					thiz.foodStatus = foodStatus;
-					thiz.branchId = Ext.getCmp('branch_combo_history').getValue();
+					thiz.branchId = sd.rid;
 				}
 			}
 		});
@@ -556,6 +556,7 @@ Ext.onReady(function() {
 						if(jr.root[0].typeVal != '2'){
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
 						}else{
+							data.push([-1, '全部']);
 							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 							 
 							for(var i = 0; i < jr.root[0].branches.length; i++){
@@ -570,84 +571,105 @@ Ext.onReady(function() {
 				});
 			},
 			select : function(isJump){
-				//加载区域
-				var region = [[-1, '全部']]
-				Ext.Ajax.request({
-					url : '../../OperateRegion.do',
-					params : {
-						dataSource : 'getByCond',
-						branchId : branch_combo_history.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							region.push([jr.root[i]['id'], jr.root[i]['name']]);
+				//
+				if(branch_combo_history.getValue() == -1){
+					//【全部门店】时【区域】、【操作人】、【收款方式】、【市别】不可选
+					Ext.getCmp('history_comboRegion').setDisabled(true);
+					Ext.getCmp('history_comboRegion').setValue(-1);
+					
+					historyBill_combo_staffs.setDisabled(true);
+					historyBill_combo_staffs.setValue(-1);
+					
+					Ext.getCmp('comboPayType').setDisabled(true);
+					Ext.getCmp('comboPayType').setValue(-1);
+					
+					Ext.getCmp('history_comboBusinessHour').setDisabled(true);
+					Ext.getCmp('history_comboBusinessHour').setValue(-1);
+				}else{
+					//加载区域
+					var region = [[-1, '全部']]
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_history.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							
+							Ext.getCmp('history_comboRegion').setDisabled(false);
+							Ext.getCmp('history_comboRegion').getStore().loadData(region);
+							Ext.getCmp('history_comboRegion').setValue(-1);
 						}
-						
-						Ext.getCmp('history_comboRegion').getStore().loadData(region);
-						Ext.getCmp('history_comboRegion').setValue(-1);
-					}
-				});
-				
-				//加载操作人员
-				var staff = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../QueryStaff.do',
-					params : {
-						branchId : branch_combo_history.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+					});
+					
+					//加载操作人员
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_history.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							historyBill_combo_staffs.setDisabled(false);
+							historyBill_combo_staffs.store.loadData(staff);
+							historyBill_combo_staffs.setValue(-1);
 						}
-						
-						historyBill_combo_staffs.store.loadData(staff);
-						historyBill_combo_staffs.setValue(-1);
-					}
-				})
-				
-				
-				//加载收款方式
-				var payType = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../OperatePayType.do',
-					params : {
-						dataSource : 'getByCond',
-						branchId : branch_combo_history.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						jr.root.unshift({id:-1, name:'全部'});
-						Ext.getCmp('comboPayType').getStore().loadData(jr.root);
-						Ext.getCmp('comboPayType').setValue(-1);			
-					}
-				});
-				
-				//加载市别
-				var hour = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../OperateBusinessHour.do',
-					params : {
-						dataSource : 'getByCond',
-						branchId : branch_combo_history.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+					})
+					
+					
+					//加载收款方式
+					var payType = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperatePayType.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_history.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							jr.root.unshift({id:-1, name:'全部'});
+							Ext.getCmp('comboPayType').setDisabled(false);
+							Ext.getCmp('comboPayType').getStore().loadData(jr.root);
+							Ext.getCmp('comboPayType').setValue(-1);			
 						}
-						
-						hour.push([-2, '自定义']);
-						
-						Ext.getCmp('history_comboBusinessHour').getStore().loadData(hour);
-						Ext.getCmp('history_comboBusinessHour').setValue(-1);
-					}
-				});
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_history.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('history_comboBusinessHour').setDisabled(false);
+							Ext.getCmp('history_comboBusinessHour').getStore().loadData(hour);
+							Ext.getCmp('history_comboBusinessHour').setValue(-1);
+						}
+					});
+				}
+
 				if(!isJump){
 					Ext.getCmp('btnSreachForMainOrderGrid').handler();	
 				}
@@ -698,7 +720,6 @@ Ext.onReady(function() {
 							},
 							async : false,
 							success : function(jr){
-								historyPayTypes = jr.root;
 								jr.root.unshift({id:-1, name:'全部'});
 								thiz.getStore().loadData(jr.root);
 								thiz.setValue(-1);								
@@ -1150,8 +1171,9 @@ Ext.onReady(function() {
 		'../../QueryOrderStatistics.do',
 		[
 			[true, false, false, true], 
+			['门店名称', 'restaurantName', 70],
 			['帐单号', 'id'],
-			['流水号', 'seqId',70],
+			['流水号', 'seqId', 70],
 			['台号', 'table.alias', 120, null, function(v,m,r){
 				if(r.get('table.name') != ''){
 					return v + '(' + r.get("table.name") + ')';
@@ -1203,13 +1225,13 @@ Ext.onReady(function() {
 		$('#grid_panel_historOrders').find('.detailOrder').each(function(index, element){
 			element.onclick = function(){
 				billDetailHandler($(element).attr('orderId'));
-			}
+			};
 		});
 		//账单查看
 		$('#grid_panel_historOrders').find('.checkOrder').each(function(index, element){
 			element.onclick = function(){
 				billViewHandler();
-			}
+			};
 		});
 	});
 	
@@ -1260,7 +1282,8 @@ Ext.onReady(function() {
 	//--------------------------------------------------------------------
 	
 	//-----------------交班记录---------------------------------
-	var dutyRangeStatWin = null, dutyRangeStatPanel = null;
+	var dutyRangeStatWin = null;
+	var dutyRangeStatPanel = null;
 	var statType;
 	function dutyRangeStatPrintHandler(rowIndex) {
 		var gs = Ext.ux.getSelData(dutyRangeStatPanel);
@@ -1572,8 +1595,8 @@ Ext.onReady(function() {
 	}
 	
 	//-----------------日结记录------------------------
-	var dailySettleStatGrid;
-	var dailySettleStatWin;
+	var dailySettleStatGrid = null;
+	var dailySettleStatWin = null;
 	function dailySettleStatDetalHandler(){
 		var gs = Ext.ux.getSelData(dailySettleStatGrid);
 		if(gs != false){

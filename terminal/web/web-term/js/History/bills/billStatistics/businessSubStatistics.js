@@ -1,35 +1,48 @@
 	function linkToBusinessStatistics(c){
 		var dateBegin = Ext.getCmp('businessSub_dateSearchDateBegin');
 		var dateEnd = Ext.getCmp('businessSub_dateSearchDateEnd');
-		var sendToStatisticsPageHours;
+		
 		if(!dateBegin.isValid() || !dateEnd.isValid()){
 			return;
 		}
 		
-		//传递给统计页面的时间段
+		//传递给统计页面的日期段
 		var sendToStatisticsPageBeginDate = dateBegin.getValue();
 		var sendToStatisticsPageEndDate = dateEnd.getValue();
 		
-		sendToStatisticsPageHours = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data; 
+		//传递给统计页面的时间段
+		var sendToStatisticsPageHours = null;
+		if(Ext.getCmp('businessSub_comboBusinessHour').getValue() !== ''){
+			sendToStatisticsPageHours = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data;
+
+		}else{
+			sendToStatisticsPageHours = {
+				opening : null,
+				ending : null
+			}
+		}
+		if(sendToStatisticsPageHours.opening){
+			sendToStatisticsPageHours.openingText = sendToStatisticsPageHours.opening;
+		}else{
+			sendToStatisticsPageHours.openingText = '00:00';
+		}
+		if(sendToStatisticsPageHours.ending){
+			sendToStatisticsPageHours.endingText = sendToStatisticsPageHours.ending;
+		}else{
+			sendToStatisticsPageHours.endingText = '00:00';
+		}
 		sendToStatisticsPageHours.hourComboValue = Ext.getCmp('businessSub_comboBusinessHour').getValue();
 		
-		var sendToStatisticsRegion = Ext.getCmp('businessSub_comboRegion').getValue();
+		//传递给统计页面的区域
+		var sendToStatisticsRegion = -1;
+		if(Ext.getCmp('businessSub_comboRegion').getValue() !== ''){
+			sendToStatisticsRegion = Ext.getCmp('businessSub_comboRegion').getValue();
+		};
 		
 		var sendToStatisticsOperateType = c.operateType;
 		var sendToStatisticsOperatePayType = c.payType;
 		
-		
-		
-		
-		if(!sendToStatisticsPageHours.opening){
-			sendToStatisticsPageHours.openingText = "00:00";
-			sendToStatisticsPageHours.endingText = "00:00";
-		}else{
-			sendToStatisticsPageHours.openingText = sendToStatisticsPageHours.opening;
-			sendToStatisticsPageHours.endingText = sendToStatisticsPageHours.ending;
-		}
-		
-//		sendToPageOperation = true;
+		//		sendToPageOperation = true;
 		
 		var businessSubStatisticsLoading = new Ext.LoadMask(document.body, {
 			msg : '正在获取数据...'
@@ -558,25 +571,24 @@
 						
 						var isJump = true;
 						Ext.getCmp('branchSelect_combo_passengerFlow').fireEvent('select', this, null, null, isJump);
-						
 								
-								(function(){
-									if(Ext.getCmp('passengerFlow_comboBusinessHour').getValue() ){
-										Ext.getCmp('beginDate_combo_passengerFlow').setValue(sendToStatisticsPageBeginDate);
-										Ext.getCmp('endDate_combo_passengerFlow').setValue(sendToStatisticsPageEndDate);
-										Ext.getCmp('regionSelect_combo_passengerFlow').setValue(sendToStatisticsRegion);
-										hours = sendToStatisticsPageHours;
-										
-										Ext.getCmp('passengerFlow_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
-										Ext.getCmp('passengerFlow_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
-										Ext.getCmp('passengerFlow_comboBusinessHour').setValue(hours.hourComboValue);	
-										
-										Ext.getCmp('passengerFlow_btnSearch').handler();
-										businessSubStatisticsLoading.hide();
-									}else{
-										setTimeout(arguments.callee, 500);
-									}
-								})();
+							(function(){
+								if(Ext.getCmp('passengerFlow_comboBusinessHour').getValue() ){
+									Ext.getCmp('beginDate_combo_passengerFlow').setValue(sendToStatisticsPageBeginDate);
+									Ext.getCmp('endDate_combo_passengerFlow').setValue(sendToStatisticsPageEndDate);
+									Ext.getCmp('regionSelect_combo_passengerFlow').setValue(sendToStatisticsRegion);
+									hours = sendToStatisticsPageHours;
+									
+									Ext.getCmp('passengerFlow_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
+									Ext.getCmp('passengerFlow_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
+									Ext.getCmp('passengerFlow_comboBusinessHour').setValue(hours.hourComboValue);	
+									
+									Ext.getCmp('passengerFlow_btnSearch').handler();
+									businessSubStatisticsLoading.hide();
+								}else{
+									setTimeout(arguments.callee, 500);
+								}
+							})();
 					}else{
 						setTimeout(arguments.callee, 500);
 					}
