@@ -50,16 +50,6 @@ public class Setting implements Jsonable{
 			}
 			throw new IllegalArgumentException("The tail value(val = " + value + ") passed is invalid.");
 		}
-		public static boolean isDecimalCut(Tail t){
-			if(t == null)
-				throw new NullPointerException("The tail is null.");
-			return t == Tail.DECIMAL_CUT;
-		}
-		public static boolean isDecimalRound(Tail t){
-			if(t == null)
-				throw new NullPointerException("The tail is null.");
-			return t == Tail.DECIMAL_ROUND;
-		}
 	}
 	
 	/**
@@ -111,7 +101,7 @@ public class Setting implements Jsonable{
 	}
 	
 	private int id;
-	private int restaurantID;
+	private int restaurantId;
 	private Tail priceTail = Tail.NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
 	private int receiptStyle;  
 	private int eraseQuota;
@@ -119,23 +109,17 @@ public class Setting implements Jsonable{
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public int getRestaurantId() {
-		return restaurantID;
+		return restaurantId;
 	}
 	
-	public void setRestaurantID(int restaurantID) {
-		this.restaurantID = restaurantID;
-	}
-	
-	public String getPriceTailText(){
-		return this.priceTail == null ? null : this.priceTail.getText();
-	}
-	
-	public int getPriceTailValue(){
-		return this.priceTail == null ? null : this.priceTail.getValue();
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 	
 	public Tail getPriceTail() {
@@ -144,10 +128,6 @@ public class Setting implements Jsonable{
 	
 	public void setPriceTail(Tail priceTail) {
 		this.priceTail = priceTail;
-	}
-	
-	public void setPriceTail(int priceTail) {
-		this.priceTail = Tail.valueOf(priceTail);
 	}
 	
 	public int getReceiptStyle() {
@@ -175,12 +155,13 @@ public class Setting implements Jsonable{
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.getId());
 		jm.putInt("restaurantID", this.getRestaurantId());
-		jm.putString("priceTailText", this.getPriceTailText());
-		jm.putInt("priceTailValue", this.getPriceTailValue());
+		jm.putString("priceTailText", this.priceTail != null ? this.priceTail.text : null);
+		jm.putInt("priceTailValue", this.priceTail != null ? this.priceTail.value : 0);
 		jm.putInt("receiptStyle", this.getReceiptStyle());
 		jm.putInt("eraseQuota", this.getEraseQuota());
 		return jm;
 	}
+	
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		

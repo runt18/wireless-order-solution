@@ -68,6 +68,9 @@ public class IncomeByEachDay implements Jsonable{
 		
 		//Append the income by pay.
 		for(IncomeByPay.PaymentIncome payIncome : appendIncome.getIncomeByPay().getPaymentIncomes()){
+			if(this.incomeByPay == null){
+				this.incomeByPay = new IncomeByPay(0);
+			}
 			this.incomeByPay.addIncome4Chain(payIncome);
 		}
 		

@@ -106,7 +106,7 @@ public class Material implements Jsonable {
 		}
 		
 		public boolean hasNameChanged(){
-			return this.name != null && !this.name.isEmpty();
+			return this.name != null && this.name.length() != 0;
 		} 
 		
 		public boolean hasCateChanged(){
