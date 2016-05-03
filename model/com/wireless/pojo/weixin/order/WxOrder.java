@@ -155,6 +155,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		private final Type type;
 		private final Status status;
 		private Table table;
+		private int orderId;
 		private final WxOrder order = new WxOrder(0);
 		
 		InsertBuilder(String weixinSerial, Type type, Status status){
@@ -182,6 +183,16 @@ public class WxOrder implements Jsonable, Parcelable{
 		
 		public InsertBuilder setTable(Table table){
 			this.table = table;
+			return this;
+		}
+		
+		public InsertBuilder setOrder(int orderId){
+			this.orderId = orderId;
+			return this;
+		}
+		
+		public InsertBuilder setOrder(Order order){
+			this.orderId = order.getId();
 			return this;
 		}
 		
@@ -261,6 +272,7 @@ public class WxOrder implements Jsonable, Parcelable{
 		setComment(builder.order.comment);
 		setFoods(builder.order.getFoods());
 		setTable(builder.table);
+		setOrderId(builder.orderId);
 		if(builder.type == Type.TAKE_OUT){
 			setTakoutAddress(((InsertBuilder4Takeout)builder).address);
 		}

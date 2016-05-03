@@ -945,6 +945,9 @@ WirelessOrder.Order = function(){
 	
 	//增加OrderFood菜品
 	_orderFoods.addOrderFood = function(orderFood){
+		if(typeof orderFood.tasteGroup !== 'undefined'){
+			orderFood.tasteGroup = new WirelessOrder.TasteGroup(orderFood.tasteGroup, orderFood);
+		}
 		this.push(new WirelessOrder.OrderFood(orderFood));
 		this.select(-1);
 	};
