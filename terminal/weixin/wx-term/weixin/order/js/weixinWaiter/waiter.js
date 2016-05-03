@@ -1,31 +1,14 @@
 $(function(){
+	
 	var fastFoodWaiterData = {
 		_tableAlias : null,		//餐桌号
 		_orderData : null,		//点菜资料
-		_commentData : null		//备注资料
+		_commentData : null,	//备注资料
+		_orderId : null			//账单Id
 	};
+	
 	initWaiterOrder();
 	function initWaiterOrder(){
-		$.ajax({
-			url : '../../WxOperateOrder.do',
-			type : 'post',
-			datatype : 'json',
-			data : {
-				dataSource : 'getByCond',
-				sessionId : Util.mp.params.sessionId, 
-				status : '2'
-			},
-			success : function(data, status, xhr){
-				if(data.success){
-					if(data.root.length > 0){
-						initFoodList(data.root[0], true);
-					}
-					
-				}else{
-					location.href = 'waiterTimeout.html';
-				}
-			}
-		});
 		
 		//获取门店信息
 		$.ajax({
@@ -53,6 +36,27 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
+					
+					fastFoodWaiterData._orderId = data.root[0].id;
+					
+					//获取【待确认】的菜品信息
+					$.ajax({
+						url : '../../WxOperateOrder.do',
+						type : 'post',
+						datatype : 'json',
+						data : {
+							dataSource : 'getByCond',
+							sessionId : Util.mp.params.sessionId, 
+							status : '2',
+							orderId : data.root[0].id
+						},
+						success : function(data, status, xhr){
+							if(data.success && data.root.length > 0){
+								initFoodList(data.root[0], true);
+							}
+						}
+					});
+					
 					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
 					///赋值账单号
 					$('#orderId_font_waiter').text(data.root[0].id);
@@ -320,7 +324,6 @@ $(function(){
 		});
 	});
 	
-	//TODO
 	//返回按钮
 	$('#closeFastFood_a_waiter').click(function(){
 		orderFoodPopup.close(function(){
@@ -469,6 +472,7 @@ $(function(){
 				comment : fastFoodWaiterData._commentData ? fastFoodWaiterData._commentData : '',
 				branchId : Util.mp.params.branchId,
 				tableAlias : fastFoodWaiterData._tableAlias,
+				orderId : fastFoodWaiterData._orderId,
 				print : true
 			},
 			success : function(response, status, xhr){

@@ -40,7 +40,7 @@ public class TestCalcCancelStatisticsDao {
 	
 	@Test
 	public void testCalcCancelStatistics() throws SQLException, ParseException, BusinessException{
-		List<CancelIncomeByReason> incomesByReason = CalcCancelStatisticsDao.calcCancelIncomeByReason(mStaff, mDutyRange, mExtraCond);
+		List<CancelIncomeByReason> incomesByReason = CalcCancelStatisticsDao.calcCancelIncomeByReason(mStaff, mExtraCond.setRange(mDutyRange));
 		float totalIncomeByReason = 0;
 		float totalAmountByReason = 0;
 		for(CancelIncomeByReason each : incomesByReason){
@@ -48,7 +48,7 @@ public class TestCalcCancelStatisticsDao {
 			totalAmountByReason += each.getCancelAmount();
 		}
 		
-		List<CancelIncomeByStaff> incomesByStaff = CalcCancelStatisticsDao.calcCancelIncomeByStaff(mStaff, mDutyRange, mExtraCond);
+		List<CancelIncomeByStaff> incomesByStaff = CalcCancelStatisticsDao.calcCancelIncomeByStaff(mStaff, mExtraCond.setRange(mDutyRange));
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(CancelIncomeByStaff each : incomesByStaff){
@@ -59,7 +59,7 @@ public class TestCalcCancelStatisticsDao {
 		Assert.assertEquals("cancel income by reason is different from the one by staff", totalIncomeByReason, totalIncomeByStaff, 0.01);
 		Assert.assertEquals("cancel amount by reason is different from the one by staff", totalAmountByReason, totalAmountByStaff, 0.01);
 		
-		List<CancelIncomeByDept> incomesByDept = CalcCancelStatisticsDao.calcCancelIncomeByDept(mStaff, mDutyRange, mExtraCond);
+		List<CancelIncomeByDept> incomesByDept = CalcCancelStatisticsDao.calcCancelIncomeByDept(mStaff, mExtraCond.setRange(mDutyRange));
 		float totalIncomeByDept = 0;
 		float totalAmountByDept = 0;
 		for(CancelIncomeByDept each : incomesByDept){

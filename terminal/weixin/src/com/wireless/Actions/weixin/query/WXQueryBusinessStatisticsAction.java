@@ -484,7 +484,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY)
+																					 .setCalcByDuty(true)
+																					 .setRange(new DutyRange(dateBeg, dateEnd));
 			
 			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
 				extraCond.setReasonId(Integer.valueOf(reasonID));
@@ -499,7 +501,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByReason(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByReason(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			
@@ -535,7 +537,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY)
+																					 .setRange(new DutyRange(dateBeg, dateEnd))
+																					 .setCalcByDuty(true);
 			
 			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
 				extraCond.setReasonId(Integer.valueOf(reasonID));
@@ -550,7 +554,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			

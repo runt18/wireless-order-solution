@@ -157,6 +157,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String qrCode = request.getParameter("qrCode");
 		final String sessionId = request.getParameter("sessionId");
 		final String print = request.getParameter("print");
+		final String orderId = request.getParameter("orderId");
 		final JObject jObject = new JObject();
 		try{
 			
@@ -204,6 +205,10 @@ public class WxOperateOrderAction extends DispatchAction {
 			
 			if(comment != null && !comment.isEmpty()){
 				builder.setComment(comment);
+			}
+			
+			if(orderId != null && !orderId.isEmpty()){
+				builder.setOrder(Integer.parseInt(orderId));
 			}
 			
 			if(foods != null && !foods.isEmpty()){
@@ -322,6 +327,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String status = request.getParameter("status");
 		final String includeBranch = request.getParameter("includeBranch");
 		final String sessionId = request.getParameter("sessionId");
+		final String orderId = request.getParameter("orderId");
 		final JObject jObject = new JObject();
 		
 		try {
@@ -346,6 +352,10 @@ public class WxOperateOrderAction extends DispatchAction {
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
 			final WxOrderDao.ExtraCond extraCond = new WxOrderDao.ExtraCond().setWeixin(oid);
+			
+			if(orderId != null && !orderId.isEmpty()){
+				extraCond.setOrder(Integer.valueOf(orderId));
+			}
 			
 			if(orderType != null && !orderType.isEmpty()){
 				extraCond.setType(WxOrder.Type.valueOf(Integer.parseInt(orderType)));

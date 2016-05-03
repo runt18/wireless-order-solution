@@ -148,7 +148,7 @@ public class CalcCancelStatisticsDao {
 			}
 			if(this.range != null){
 				DutyRange dutyRange;
-				if(this.calcByDuty && this.range != null){
+				if(this.calcByDuty){
 					try {
 						dutyRange = DutyRangeDao.exec(staff, range);
 					} catch (SQLException e) {
@@ -224,13 +224,13 @@ public class CalcCancelStatisticsDao {
 			Map<DutyRange, CancelIncomeByEachDay> result = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the cancel income by each day to the group.
-			for(CancelIncomeByEachDay groupIncome : calcCancelIncomeByEachDay(dbCon, staff, dutyRange, extraCond.setChain(false))){
+			for(CancelIncomeByEachDay groupIncome : calcCancelIncomeByEachDay(dbCon, staff, dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
 				result.put(groupIncome.getDutyRange(), groupIncome);
 			}
 			
 			//Append cancel income by each day to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(CancelIncomeByEachDay branchIncome : calcCancelIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), dutyRange, extraCond.setChain(false))){
+				for(CancelIncomeByEachDay branchIncome : calcCancelIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
 					CancelIncomeByEachDay cancelIncome = result.get(branchIncome.getDutyRange());
 					if(cancelIncome != null){
 						final float cancelAmount = branchIncome.getCancelAmount() + cancelIncome.getCancelAmount();
@@ -241,9 +241,6 @@ public class CalcCancelStatisticsDao {
 					}
 				}
 			}
-			
-			//Restore the chain status to extra condition.
-			extraCond.setChain(true);
 			
 			return new ArrayList<>(result.values());
 		}else{
@@ -291,19 +288,18 @@ public class CalcCancelStatisticsDao {
 	 * Calculate the cancel income by department according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CancelIncomeByDept}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByDept> calcCancelIncomeByDept(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static List<CancelIncomeByDept> calcCancelIncomeByDept(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelIncomeByDept(dbCon, staff, range, extraCond);
+			return calcCancelIncomeByDept(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -315,43 +311,74 @@ public class CalcCancelStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CancelIncomeByDept}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
-		String sql;
-		sql = " SELECT " +
-			  " D.dept_id, MAX(D.name) AS dept_name, D.type, " +
-			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
-			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
-			  " FROM (" +
-			  makeSql4CancelFood(staff, extraCond.setRange(range)) +
-			  " ) AS TMP " +
-			  " JOIN " + Params.dbName + ".department D ON TMP.dept_id = D.dept_id AND D.restaurant_id = " + staff.getRestaurantId() + 
-			  " GROUP BY TMP.dept_id ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
-		List<CancelIncomeByDept> result = new ArrayList<CancelIncomeByDept>();
-		while(dbCon.rs.next()){
-			Department dept = new Department(dbCon.rs.getInt("dept_id"));
-			dept.setType(dbCon.rs.getInt("type"));
-			if(dept.isIdle()){
-				dept.setName(dept.getName().isEmpty() ? "已删除部门" : dept.getName() + "(已删除)");
-			}else{
-				dept.setName(dbCon.rs.getString("dept_name"));
+		
+		if(extraCond.isChain){
+			
+			Map<String, CancelIncomeByDept> result = new HashMap<>();
+			
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the cancel income by department to the group.
+			for(CancelIncomeByDept groupIncome : calcCancelIncomeByDept(dbCon, staff, ((ExtraCond)extraCond.clone()).setChain(false).setCalcByDuty(true))){
+				result.put(groupIncome.getDepartment().getName(), groupIncome);
 			}
-			result.add(new CancelIncomeByDept(dept, 
-											  dbCon.rs.getFloat("cancel_amount"), 
-											  dbCon.rs.getFloat("cancel_price")));
+			
+			//Append cancel income by department to each branch.
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				for(CancelIncomeByDept branchIncome : calcCancelIncomeByDept(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false).setCalcByDuty(true))){
+					CancelIncomeByDept income = result.get(branchIncome.getDepartment().getName());
+					if(income != null){
+						final float cancelPrice = income.getCancelPrice() + branchIncome.getCancelPrice();
+						final float cancelAmount = income.getCancelAmount() + branchIncome.getCancelAmount();
+						result.put(income.getDepartment().getName(), new CancelIncomeByDept(income.getDepartment(), cancelAmount, cancelPrice));
+					}else{
+						result.put(branchIncome.getDepartment().getName(), branchIncome);
+					}
+				}
+			}
+			
+			return new ArrayList<>(result.values());
+			
+		}else{
+			
+			final List<CancelIncomeByDept> result = new ArrayList<CancelIncomeByDept>();
+			String sql;
+			sql = " SELECT " +
+				  " D.dept_id, MAX(D.name) AS dept_name, D.type, " +
+				  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
+				  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
+				  " FROM (" +
+				  makeSql4CancelFood(staff, extraCond) +
+				  " ) AS TMP " +
+				  " JOIN " + Params.dbName + ".department D ON TMP.dept_id = D.dept_id AND D.restaurant_id = " + staff.getRestaurantId() + 
+				  " GROUP BY TMP.dept_id ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while(dbCon.rs.next()){
+				Department dept = new Department(dbCon.rs.getInt("dept_id"));
+				dept.setType(dbCon.rs.getInt("type"));
+				if(dept.isIdle()){
+					dept.setName(dept.getName().isEmpty() ? "已删除部门" : dept.getName() + "(已删除)");
+				}else{
+					dept.setName(dbCon.rs.getString("dept_name"));
+				}
+				result.add(new CancelIncomeByDept(dept, 
+												  dbCon.rs.getFloat("cancel_amount"), 
+												  dbCon.rs.getFloat("cancel_price")));
+			}
+			dbCon.rs.close();
+			
+			return result;
 		}
-		dbCon.rs.close();
 		
-		return result;
 	}
 	
 	/**
@@ -365,12 +392,13 @@ public class CalcCancelStatisticsDao {
 	 * @return the result list {@link CancelIncomeByStaff}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByStaff> calcCancelIncomeByStaff(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static List<CancelIncomeByStaff> calcCancelIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelIncomeByStaff(dbCon, staff, range, extraCond);
+			return calcCancelIncomeByStaff(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -382,33 +410,49 @@ public class CalcCancelStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link ExtraCond}
 	 * @return the result list {@link CancelIncomeByStaff}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByStaff> calcCancelIncomeByStaff(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
-		String sql;
-		sql = " SELECT " +
-			  " TMP.staff_id, MAX(TMP.waiter) AS staff_name, " +
-			  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
-			  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
-			  " FROM (" +
-			  makeSql4CancelFood(staff, extraCond.setRange(range)) +
-			  " ) AS TMP " +
-			  " GROUP BY TMP.staff_id ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+	public static List<CancelIncomeByStaff> calcCancelIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		List<CancelIncomeByStaff> result = new ArrayList<CancelIncomeByStaff>();
-		while(dbCon.rs.next()){
-			result.add(new CancelIncomeByStaff(dbCon.rs.getString("staff_name"), 
-											   dbCon.rs.getFloat("cancel_amount"), 
-											   dbCon.rs.getFloat("cancel_price")));
+		
+		if(extraCond.isChain){
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the cancel income by staff to the group.
+			result.addAll(calcCancelIncomeByStaff(dbCon, staff, ((ExtraCond)extraCond.clone()).setChain(false).setCalcByDuty(true)));
+			
+			//Append cancel income by staff to each branch.
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				result.addAll(calcCancelIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false).setCalcByDuty(true)));
+			}
+			
+		}else{
+			
+			String sql;
+			sql = " SELECT " +
+				  " TMP.staff_id, MAX(TMP.waiter) AS staff_name, " +
+				  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
+				  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
+				  " FROM (" +
+				  makeSql4CancelFood(staff, extraCond) +
+				  " ) AS TMP " +
+				  " GROUP BY TMP.staff_id ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while(dbCon.rs.next()){
+				result.add(new CancelIncomeByStaff(dbCon.rs.getString("staff_name"), 
+												   dbCon.rs.getFloat("cancel_amount"), 
+												   dbCon.rs.getFloat("cancel_price")));
+			}
+			dbCon.rs.close();
 		}
-		dbCon.rs.close();
+		
+
 		
 		return result;
 	}
@@ -417,8 +461,6 @@ public class CalcCancelStatisticsDao {
 	 * Calculate the cancel income by reason according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CancelIncomeByReason}
@@ -426,11 +468,11 @@ public class CalcCancelStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByReason> calcCancelIncomeByReason(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<CancelIncomeByReason> calcCancelIncomeByReason(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelIncomeByReason(dbCon, staff, range, extraCond);
+			return calcCancelIncomeByReason(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -442,8 +484,6 @@ public class CalcCancelStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CancelIncomeByReason}
@@ -451,19 +491,19 @@ public class CalcCancelStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		if(extraCond.isChain){
 			Map<String, CancelIncomeByReason> result = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the cancel income by reason to group.
-			for(CancelIncomeByReason groupIncome : calcCancelIncomeByReason(dbCon, groupStaff, range, extraCond.setChain(false))){
+			for(CancelIncomeByReason groupIncome : calcCancelIncomeByReason(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				result.put(groupIncome.getCancelReason().getReason(), groupIncome);
 			}
 
 			//Append the cancel income by reason to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(CancelIncomeByReason branchIncome : calcCancelIncomeByReason(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false))){
+				for(CancelIncomeByReason branchIncome : calcCancelIncomeByReason(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					CancelIncomeByReason cancelIncome = result.get(branchIncome.getCancelReason().getReason());
 					if(cancelIncome != null){
 						final float cancelPrice = cancelIncome.getCancelPrice() + branchIncome.getCancelPrice();
@@ -474,9 +514,6 @@ public class CalcCancelStatisticsDao {
 					}
 				}
 			}
-			
-			//Restore the chain status to extra condition.
-			extraCond.setChain(true);
 			
 			return new ArrayList<>(result.values());
 			
@@ -490,7 +527,7 @@ public class CalcCancelStatisticsDao {
 				  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
 				  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
 				  " FROM (" +
-				  makeSql4CancelFood(staff, extraCond.setRange(range)) +
+				  makeSql4CancelFood(staff, extraCond) +
 				  " ) AS TMP " +
 				  " GROUP BY TMP.cancel_reason_id ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -659,7 +696,7 @@ public class CalcCancelStatisticsDao {
 			  " WHERE 1 = 1 " +
 			  " AND OF.order_count < 0 " +
 			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +
-			  extraCond;
+			  (extraCond != null ? extraCond.setStaff(staff).toString() : "");
 		
 		return sql.replace("$(unit_price)", "IFNULL(OF.plan_price, IFNULL(OF.food_unit_price, OF.unit_price))");
 	}
