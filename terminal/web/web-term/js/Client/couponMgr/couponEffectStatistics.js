@@ -210,8 +210,8 @@ Ext.onReady(function(){
 		{header : '优惠券成本', dataIndex : 'issuedPrice', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '共使用张数', dataIndex : 'usedAmount', renderer : usedAmountJump},
 		{header : '使用的优惠券总面额', dataIndex : 'usedPrice', renderer : Ext.ux.txtFormat.gridDou},
-		{header : '拉动消费次数', dataIndex : 'salesAmount'},
-		{header : '拉动消费额', dataIndex : 'effectSales', renderer : effectSalesJump},
+		{header : '拉动消费次数', dataIndex : 'salesAmount', renderer : salesAmountJump},
+		{header : '拉动消费额', dataIndex : 'effectSales'},
 		{header : '操作', dataIndex : 'operate', renderer : couponEffectOperate}
 	]);
 	
@@ -453,8 +453,8 @@ Ext.onReady(function(){
 		return '<a class="usedAmount" couponTypeId="' + c.json.couponTypeId + '" style="cursor:pointer;">' + c.json.usedAmount + '</a>';
 	}
 	
-	function effectSalesJump(a, b, c){
-		return '<a class="effectSales" couponTypeId="' + c.json.couponTypeId + '" style="cursor:pointer;">' + c.json.effectSales + '</a>';
+	function salesAmountJump(a, b, c){
+		return '<a class="effectSales" couponTypeId="' + c.json.couponTypeId + '" style="cursor:pointer;">' + c.json.salesAmount + '</a>';
 	}
 	
 });
