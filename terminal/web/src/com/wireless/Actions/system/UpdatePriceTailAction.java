@@ -12,6 +12,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
 
 public class UpdatePriceTailAction extends Action{
@@ -45,7 +46,7 @@ public class UpdatePriceTailAction extends Action{
 			}
 			
 			set = new SystemSetting();
-			set.getSetting().setPriceTail(Integer.parseInt(priceTail));
+			set.getSetting().setPriceTail(Setting.Tail.valueOf(Integer.parseInt(priceTail)));
 			set.getSetting().setEraseQuota(Integer.parseInt(eraseQuota));
 			set.setRestaurantID(Integer.parseInt(restaurantID));
 			
