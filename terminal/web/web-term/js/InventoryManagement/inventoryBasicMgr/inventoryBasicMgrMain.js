@@ -148,6 +148,7 @@
 			});
 		}
 	}
+	
 	/**
 	 * 操作原料类别
 	 * @param c
@@ -984,9 +985,6 @@
 	
 	}
 	
-	var material_bar = {treeId : 'materialCateTree',option : [{name : '修改', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['update']})"}, {name : '删除', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['delete']})"}]};
-
-	
 	initControl();
 	
 	inventory_materialBasicGrid.getStore().on('load', function(){
@@ -1016,5 +1014,9 @@
 		})*/
 	});
 	
+	var material_bar = {treeId : 'materialCateTree',
+						option : [{name : '修改', fn : operateMaterialCateHandler, param : {otype:Ext.ux.otype['update']}}, 
+								  {name : '删除', fn : operateMaterialCateHandler, param : {otype:Ext.ux.otype['delete']}}]
+						};
 	showFloatOption(material_bar);
 });

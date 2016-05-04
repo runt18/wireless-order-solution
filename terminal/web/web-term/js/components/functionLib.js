@@ -538,7 +538,9 @@ function showFloatOption(obj_b){
 				if(typeof fn.fn == 'string'){
 					$("#div_floatBar").append('<a href="javascript:void(0)" onclick=' + fn.fn + '>' + fn.name +'</a>&nbsp;');
 				}else if(typeof fn.fn == 'function'){
-					$("#div_floatBar").append($('<a href="javascript:void(0)">' + fn.name + '</a>&nbsp').click(fn.fn));
+					$("#div_floatBar").append($('<a href="javascript:void(0)">' + fn.name + '</a>&nbsp').click(function(){
+						fn.fn(fn.param);
+					}));
 				}
 			});
 		}		
