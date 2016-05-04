@@ -353,6 +353,39 @@ Ext.ux.statistic_oBusinessHourData = function(c){
 		}
 
 		c.data = data;
+	}else if(c.type == 'setValue'){
+		data = c.data || {
+			hourId : null,
+			opening : null,
+			ending : null
+		}
+		
+		beginTimes = c.data.opening.split(':');
+		endTimes = c.data.ending.split(':');
+		
+		if(parseInt(beginTimes[0]) > 12){
+			apmBegin.setValue(1);
+			var openingHourValue = parseInt(beginTimes[0]) - 12;
+			openingHourValue = openingHourValue > 9 ? openingHourValue+'' : '0'+openingHourValue;
+			openingHour.setValue(openingHourValue);			
+		}else{
+			apmBegin.setValue(0);
+			openingHour.setValue(beginTimes[0]);
+		}
+		
+		if(parseInt(endTimes[0]) > 12){
+			apmEnd.setValue(1);
+			var endingHourValue = parseInt(endTimes[0]) - 12;
+			endingHourValue = endingHourValue > 9 ? endingHourValue+'' : '0'+endingHourValue;
+			endingHour.setValue(endingHourValue);		
+		}else{
+			apmEnd.setValue(0);
+			endingHour.setValue(endTimes[0]);
+		}
+		
+		openingMin.setValue(beginTimes[1]);
+		
+		endingMin.setValue(endTimes[1]);
 	}
 	return c;
 };

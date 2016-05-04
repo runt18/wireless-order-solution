@@ -149,81 +149,100 @@ Ext.onReady(function(){
 							var jr = Ext.decode(res.responseText);
 							
 							if(jr.root[0].typeVal != '2'){
+								var data = [];
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
+								thiz.store.loadData(data);
+								thiz.setValue(jr.root[0].id);
+								thiz.fireEvent('select');
 							}else{
+								var data = [[-1, '全部']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 								}
+								
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+								thiz.fireEvent('select');
 							}
-							
-							thiz.store.loadData(data);
-							thiz.setValue(jr.root[0].id);
-							thiz.fireEvent('select');
 						}
 					});
 				},
 				select : function(isJump){
+					if(branch_combo_discount.getValue() ==  -1){
+						Ext.getCmp('discount_comboBusinessHour').setDisabled(true);
+						Ext.getCmp('discount_comboBusinessHour').setValue(-1);
+						
+						discount_combo_staffs.setDisabled(true);
+						discount_combo_staffs.setValue(-1);
+						
+						discount_deptCombo.setDisabled(true);
+						discount_deptCombo.setValue(-1);
+						
+						
 					
-					//加载员工
-					var staff = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../QueryStaff.do',
-						params : {
-							branchId : branch_combo_discount.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+					}else{
+						//加载员工
+						var staff = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../QueryStaff.do',
+							params : {
+								branchId : branch_combo_discount.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+								}
+								
+								discount_combo_staffs.store.loadData(staff);
+								discount_combo_staffs.setValue(-1);
 							}
-							
-							discount_combo_staffs.store.loadData(staff);
-							discount_combo_staffs.setValue(-1);
-						}
-					});
-					
-					//加载部门
-					var region = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateRegion.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_discount.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							for(var i = 0; i < jr.root.length; i++){
-								region.push([jr.root[i]['id'], jr.root[i]['name']]);
+						});
+						
+						//加载部门
+						var region = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateRegion.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_discount.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									region.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								discount_deptCombo.store.loadData(region);
+								discount_deptCombo.setValue(-1);
 							}
-							discount_deptCombo.store.loadData(region);
-							discount_deptCombo.setValue(-1);
-						}
-					});
-					
-					//加载市别
-					var hour = [[-1, '全部']];
-					Ext.Ajax.request({
-						url : '../../OperateBusinessHour.do',
-						params : {
-							dataSource : 'getByCond',
-							branchId : branch_combo_discount.getValue()
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							
-							for(var i = 0; i < jr.root.length; i++){
-								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+						});
+						
+						//加载市别
+						var hour = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateBusinessHour.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_discount.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								
+								hour.push([-2, '自定义']);
+								
+								Ext.getCmp('discount_comboBusinessHour').store.loadData(hour);
+								Ext.getCmp('discount_comboBusinessHour').setValue(-1);
 							}
-							
-							hour.push([-2, '自定义']);
-							
-							Ext.getCmp('discount_comboBusinessHour').store.loadData(hour);
-							Ext.getCmp('discount_comboBusinessHour').setValue(-1);
-						}
-					});
+						});
+						
+					}
 					
 					//是否跳转
 					if(!isJump){
@@ -251,12 +270,7 @@ Ext.onReady(function(){
 						return;
 					}
 					
-					var businessHour;
-					if(discount_hours){
-						businessHour = discount_hours;
-					}else{
-						businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'discount_'}).data;
-					}	
+					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'discount_'}).data;
 					
 					var store = discountStatisticsGrid.getStore();
 					store.baseParams['dataSource'] = 'normal',
@@ -264,8 +278,8 @@ Ext.onReady(function(){
 					store.baseParams['endDate'] = Ext.util.Format.date(discount_endDate.getValue(), 'Y-m-d 23:59:59');
 					store.baseParams['staffID'] = discount_combo_staffs.getValue();
 					store.baseParams['deptID'] = discount_deptCombo.getValue();
-					store.baseParams['opening'] = businessHour.opening;
-					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : null;
+					store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : null;	
 					store.baseParams['branchId'] = branch_combo_discount.getValue();
 					
 					store.load({
@@ -293,8 +307,8 @@ Ext.onReady(function(){
 						dateEnd : Ext.util.Format.date(discount_endDate.getValue(), 'Y-m-d 23:59:59'),
 						deptID : discount_deptCombo.getValue(),
 						staffId : discount_combo_staffs.getValue(),
-						opening : businessHour.opening,
-						ending : businessHour.ending,
+						opening : businessHour.opening != '00:00' ? businessHour.opening : null,
+						ending : businessHour.ending != '00:00' ? businessHour.ending : null,
 						branchId : branch_combo_discount.getValue()
 					};
 					discount_chartLoadMarsk.show();

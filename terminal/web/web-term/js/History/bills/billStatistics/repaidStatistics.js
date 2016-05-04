@@ -100,62 +100,79 @@ Ext.onReady(function(){
 						var jr = Ext.decode(res.responseText);
 						
 						if(jr.root[0].typeVal != '2'){
+							var data = [];
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
 						}else{
+							var data = [[-1, '全部']];
 							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 							
 							for(var i = 0; i < jr.root[0].branches.length; i++){
 								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							thiz.fireEvent('select');
 						}
-						
-						thiz.store.loadData(data);
-						thiz.setValue(jr.root[0].id);
-						thiz.fireEvent('select');
 					}
 				});
 			},
 			select : function(isJump){
-				//加载员工
-				var staff = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../QueryStaff.do',
-					params : {
-						branchId : branch_combo_repaidStatistics.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
-						}
-						
-						repaid_combo_staffs.store.loadData(staff);
-						repaid_combo_staffs.setValue(-1);
-					}
-				});
 				
-				//加载市别
-				var hour = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../OperateBusinessHour.do',
-					params : {
-						dataSource : 'getByCond',
-						branchId : branch_combo_repaidStatistics.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+				if(branch_combo_repaidStatistics.getValue() == -1){
+					Ext.getCmp('repaid_comboBusinessHour').setDisabled(true);
+					Ext.getCmp('repaid_comboBusinessHour').setValue(-1);
+					
+					repaid_combo_staffs.setDisabled(true);
+					repaid_combo_staffs.setValue(-1);
+					
+				}else{
+					//加载员工
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_repaidStatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							repaid_combo_staffs.store.loadData(staff);
+							repaid_combo_staffs.setValue(-1);
 						}
-						
-						hour.push([-2, '自定义']);
-						
-						Ext.getCmp('repaid_comboBusinessHour').store.loadData(hour);
-						Ext.getCmp('repaid_comboBusinessHour').setValue(-1);
-					}
-				});
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_repaidStatistics.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('repaid_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('repaid_comboBusinessHour').setValue(-1);
+						}
+					});
+				}
+				
+				
 				
 				if(!isJump){
 					Ext.getCmp('repaid_btnSearch').handler();
