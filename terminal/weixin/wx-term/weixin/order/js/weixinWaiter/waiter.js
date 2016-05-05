@@ -9,18 +9,18 @@ $(function(){
 	
 	initWaiterOrder();
 	function initWaiterOrder(){
-		checkMove();
+//		checkMove();
 		
-		function checkMove(){
-			$('#foodViewList_div_waiter').on('touchmove', function(e){
-				var lastX = e.screenX;
-				alert(e.X);
-			});
-			$('#foodViewList_div_waiter').on('touchend', function(e){
-				var currentX = e.screenX;
-				alert('up');
-			});
-		}
+//		function checkMove(){
+//			$('#foodViewList_div_waiter').on('touchmove', function(e){
+//				var lastX = e.screenX;
+//				alert(e.X);
+//			});
+//			$('#foodViewList_div_waiter').on('touchend', function(e){
+//				var currentX = e.screenX;
+//				alert('up');
+//			});
+//		}
 		
 		//获取门店信息
 		$.ajax({
