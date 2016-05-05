@@ -356,9 +356,16 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward getGiftStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 获取赠送数据（按员工）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getGiftStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
 		String region = request.getParameter("region");
@@ -375,7 +382,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																				 .setCalcByDuty(true)
+																				 .setDutyRange(new DutyRange(dateBeg, dateEnd));
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -392,7 +401,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<GiftIncomeByStaff> giftList = CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<GiftIncomeByStaff> giftList = CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(giftList);
 			
@@ -409,9 +418,16 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward getGiftDeptChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 获取赠送数据（按部门）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getGiftDeptChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
 		String region = request.getParameter("region");
@@ -428,7 +444,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																				 .setCalcByDuty(true)
+																				 .setDutyRange(new DutyRange(dateBeg, dateEnd));
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -444,7 +462,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<GiftIncomeByDept> giftList = CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<GiftIncomeByDept> giftList = CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, extraCond);
 			
 			jobject.setRoot(giftList);
 			
@@ -614,9 +632,16 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward getRepaidStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 获取反结账数据（按员工）
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getRepaidStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
 		String staffID = request.getParameter("staffID");
@@ -631,7 +656,9 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY)
+																					 .setDutyRange(new DutyRange(dateBeg, dateEnd))
+																					 .setCalcByCond(true);
 			
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
@@ -641,7 +668,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<RepaidIncomeByStaff> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<RepaidIncomeByStaff> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			

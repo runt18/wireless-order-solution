@@ -10,8 +10,8 @@ import org.apache.struts.action.ActionMapping;
 import org.marker.weixin.auth.AuthParam;
 import org.marker.weixin.session.WxAuthSession;
 
-import com.wireless.Actions.weixin.WxHandleMessage;
 import com.wireless.Actions.weixin.WxAccessHandleMessage;
+import com.wireless.Actions.weixin.WxHandleMessage;
 
 public class WxRecEventAction extends Action {
 	@Override
