@@ -700,7 +700,46 @@ function PickFoodComponent(param){
 		
 		//点菜
 		Util.getDom('sumCount_span_fastOrderFood').innerHTML = count;
-		Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);
+		
+		if(_orderData.length > 0 && Util.mp.params.sessionId){
+			var foods = '';
+			var unitId = 0; 
+			_orderData.forEach(function(element, index){
+				if(index > 0){
+					foods += '&';
+				}
+				
+				if(element.unitPriceId){
+					unitId = element.unitPriceId;
+					
+				}else{
+					unitId = 0;
+				}
+					
+				foods += element.id + ',' + element.count + ',' + unitId;
+			});
+			$.ajax({
+				url : '../../WxOperateOrder.do',
+				type : 'post',
+				dataType : 'json',
+				data : {
+					dataSource : 'calcOrder',
+					sessionId : Util.mp.params.sessionId,
+					foods : foods
+				},
+				success : function(data, status, req){
+					if(data.success){
+						Util.getDom('sumPrice_div_fastOrderFood').innerHTML = data.actualPrice;
+					}
+				},
+				error : function(req, status, err){
+					Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);
+				}
+			});
+			
+		}else{
+			Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);		
+		}
 
 		if(param.onCartChange && typeof param.onCartChange == 'function'){
 			param.onCartChange(_orderData);

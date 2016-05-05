@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.beeCloud.BeeCloud;
+import com.wireless.beeCloud.Bill;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
@@ -299,6 +302,85 @@ public class WxOperateOrderAction extends DispatchAction {
 			e.printStackTrace();
 			jObject.initTip(e);
 		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * 微信支付下单
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward wxPayOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		final String sessionId = request.getParameter("sessionId");
+		final String cost = request.getParameter("cost");
+		final String foods = request.getParameter("foods");
+		final String tableAlias = request.getParameter("tableAlias");
+		final JObject jObject = new JObject();
+		try {
+			final HttpSession session = SessionListener.sessions.get(sessionId);
+			if(session != null){
+				final String branchId = (String)session.getAttribute("branchId");
+				final String oid = (String)session.getAttribute("oid");
+				final String fid = (String)session.getAttribute("fid");
+				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				Restaurant restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+				if(restaurant.hasBeeCloud()){
+					BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
+					final String billNo = System.currentTimeMillis() + "";
+					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI)
+																									  .setOpenId(oid)
+																									  //FIXME
+//																									  .setTotalFee(Integer.parseInt(cost))
+																									  .setTotalFee(1)
+																									  .setBillNo(billNo)
+																									  .setTitle(restaurant.getName() + "微信支付"), 
+					new Callable<ProtocolPackage>(){
+						@Override
+						public ProtocolPackage call() throws Exception {
+							final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)).getId()));
+							try{
+								if(foods != null && !foods.isEmpty()){
+									for (String of : foods.split("&")) {
+										String orderFoods[] = of.split(",");
+										OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
+										orderFood.setCount(Float.parseFloat(orderFoods[1]));
+										//food unit多单位
+										if(orderFoods.length > 2 && Integer.parseInt(orderFoods[2]) != 0){
+											orderFood.setFoodUnit(FoodUnitDao.getById(staff, Integer.parseInt(orderFoods[2])));
+										}
+										builder.add(orderFood, staff);
+									}
+								}
+							}catch(BusinessException e){
+								e.printStackTrace();
+							}
+							
+							final ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, PrintOption.DO_PRINT));
+							return resp;
+						}
+					});
+					if(beeCloudResponse.isOk()){
+						jObject.setExtra(beeCloudResponse);
+					}else{
+						throw new BusinessException(beeCloudResponse.getErrDetail() + "," + beeCloudResponse.getResultMsg());
+					}
+				}else{
+					throw new BusinessException("对不起，你的公众号还没开通微信支付");
+				}
+			}else{
+				throw new BusinessException("微信支付金额不能小于0");
+			}
+		} finally {
 			response.getWriter().print(jObject.toString());
 		}
 		return null;

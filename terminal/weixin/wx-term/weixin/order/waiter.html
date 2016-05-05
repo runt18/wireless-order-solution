@@ -6,6 +6,7 @@
 <title>微信店小二</title>
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/food.css">
+<link rel="stylesheet" href="./css/weixinUi/weui.css" type="text/css">
 <link type="text/css" rel="stylesheet" href="./css/mbar.css">
 <link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
 <script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
@@ -13,13 +14,14 @@
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
 <script type="text/javascript" src="./js/dialog/dialog.js"></script>
+<script type="text/javascript" src="./js/dialog/weDialog.js"></script>
 <script type="text/javascript" src="./js/weixinWaiter/waiter.js"></script>
 <script type="text/javascript" src="./js/fastOrderFood/fastOrderFood.js"></script>
 <script type="text/javascript" src="./js/completeMemberMsg/completeMemberMsg.js"></script>
 </head>
 <body>
-<div id="weixinWaiter_div_waiter" style="overflow-y:auto;">
-	<div class="main-box" style="background-color: cornsilk;">
+<div id="weixinWaiter_div_waiter">
+	<div class="main-box" style="background-color: cornsilk;" id="orderHeader_div_waiter">
 		<ul class="m-b-list">
 			<li class="box-horizontal" style="border-bottom:0px;line-height:10px;">&nbsp;</li>
 			<li  class="box-horizontal" style="border-bottom:0px;line-height:10px;">
@@ -70,10 +72,10 @@
 	 -->
 	 
 <!-- 餐桌列表 -->
-		<div style="width:100%;overflow:hidden;margin-top:-5px;">
+		<div style="width:100%;overflow-x:hidden;margin-top:-5px;" id="foodViewList_div_waiter">
 			<div style="width:200%;transition:margin 0.5s;" id="containerList_div_waiter">
-				<div id="foodList_div_waiter" style="display:inline-block;width:50%;"><span style="display:block;text-align:center;color:#666;font-size:28px;" id='tipsFoods_span_waiter'>客官，你还没点菜</span></div>
-				<div id="orderList_div_waiter" style="display:inline-block;width:50%;float:right;"><span style="display:block;text-align:center;color:#666;font-size:28px;" id='tipsOrder_span_waiter'>客官，你还没点菜</span></div>
+				<div id="foodList_div_waiter" style="display:inline-block;width:50%;overflow-y:auto;"><span style="display:block;text-align:center;color:#666;font-size:28px;" id='tipsFoods_span_waiter'>客官，你还没点菜</span></div>
+				<div id="orderList_div_waiter" style="display:inline-block;width:50%;float:right;overflow-y:auto;"><span style="display:block;text-align:center;color:#666;font-size:28px;" id='tipsOrder_span_waiter'>客官，你还没点菜</span></div>
 				<div style="clear:both;"></div>
 			</div>
 		</div>	

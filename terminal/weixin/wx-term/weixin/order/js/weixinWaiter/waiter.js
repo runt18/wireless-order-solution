@@ -9,6 +9,18 @@ $(function(){
 	
 	initWaiterOrder();
 	function initWaiterOrder(){
+		checkMove();
+		
+		function checkMove(){
+			$('#foodViewList_div_waiter').on('touchmove', function(e){
+				var lastX = e.screenX;
+				alert(e.X);
+			});
+			$('#foodViewList_div_waiter').on('touchend', function(e){
+				var currentX = e.screenX;
+				alert('up');
+			});
+		}
 		
 		//获取门店信息
 		$.ajax({
@@ -50,9 +62,9 @@ $(function(){
 							status : '2',
 							orderId : data.root[0].id
 						},
-						success : function(data, status, xhr){
-							if(data.success && data.root.length > 0){
-								initFoodList(data.root[0], true);
+						success : function(res, status, xhr){
+							if(res.success && res.root.length > 0){
+								initFoodList(res.root[0], true);
 							}
 						}
 					});
@@ -149,6 +161,7 @@ $(function(){
 // 			$('[data-name=foodListTab_waiter]').addClass('checkTab');
 //			$('[data-name=orderListTab_waiter]').removeClass('checkTab');
 //		});
+//		$().css();
 	}
 	
 	
@@ -191,6 +204,12 @@ $(function(){
 			$('#foodAmountTips_span_waiter').css('background', (data.orderFoods.length ? 'red' : ''));
 		}else{
 			var html = [];
+			if(data.code){
+				var orderCodeTips = '<div class="main-box" style="background-color: cornsilk;">'+
+											'<span style="font-weight:bold; display:block;text-align:center;color:#666;">微订订单号：' + data.code + '</span>' + 
+										'</div>';
+				html.push(orderCodeTips);
+			}
 			data.foods.forEach(function(temp, i){
 				html.push(orderListTemplete.format({
 					index : i+1,
@@ -243,8 +262,18 @@ $(function(){
 	//设置菜品视图大小
 	function setView(){
 		var height = document.documentElement.clientHeight;
+		var headerHeight = document.getElementById('orderHeader_div_waiter').offsetHeight;
 		var bottomHeight = document.getElementById('bottom_div_waiter').offsetHeight;
-		$('#weixinWaiter_div_waiter').css('height', height - bottomHeight);
+		$('#foodViewList_div_waiter').css({
+			'height' : (height - headerHeight - bottomHeight)
+		});
+		var viewHeight = $('#foodViewList_div_waiter').height();
+		$('#foodList_div_waiter').css({
+			'height' : viewHeight * 0.98
+		});
+		$('#orderList_div_waiter').css({
+			'height' : viewHeight * 0.98
+		});
 	}
 	
 	window.onresize = setView;
@@ -293,7 +322,7 @@ $(function(){
 									commit();
 								}
 							}else{
-								Util.dialog.show({msg : response.msg});	
+								Util.dialog.show({msg : data.msg});	
 							}
 						},
 						
@@ -343,12 +372,12 @@ $(function(){
 	$('#reviewService_a_waiter').click(function(){
 //		var completeMemberDialog = new CompleteMemberMsg();
 //		completeMemberDialog.open();
-		var remindDialog = new DialogPopup({
+		var remindDialog = new WeDialogPopup({
 			leftText : '确定',
 			left : function(){
 				remindDialog.close();
 			},
-			content : '<span style="display: block;text-align: center;font-size: 22px;font-weight: bold;color:#666;">尽请期待...<span>',
+			content : '<span style="display: block;text-align: center;font-size: 16px;">尽请期待<span>',
 			titleText : '温磬提示'
 		});
 		remindDialog.open();
@@ -356,19 +385,20 @@ $(function(){
 	
 	//呼叫结账按钮
 	$('#callPay_li_waiter').click(function(){
-		var callPayDialog = new DialogPopup({
+		var callPayDialog;
+		callPayDialog = new WeDialogPopup({
 			titleText : '呼叫结账',
 			content : '<div>选择付款方式:</div>'+ 
 					'<div style="margin-left:-10px;">' +
 					'<ul class="m-b-list">' +
 					'<li class="box-horizontal" style="line-height: 40px;font-size:18px;">' +
-					'<div data-type="payType" data-value="现金" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">'+
+					'<div data-type="payType" data-value="现金" class="region_css_book weSelectedRegion_css_book" style="width:31%;border:1px solid #C3994B;" href="#">'+
 					'<ul class="m-b-list">现金</ul>' +
 					'</div>' +
-					'<div data-type="payType" data-value="刷卡" class="region_css_book" style="width:31%;" href="#">' +
+					'<div data-type="payType" data-value="刷卡" class="region_css_book" style="width:31%;border:1px solid #C3994B;" href="#">' +
 					'<ul class="m-b-list">刷卡</ul>'+
 					'</div>' +
-					'<div data-type="payType" data-value="其他" class="region_css_book" style="width:%;" href>' +
+					'<div data-type="payType" data-value="其他" class="region_css_book" style="width:%;border:1px solid #C3994B;" href>' +
 					'<ul class="m-b-list">其他</ul>' +
 					'</div>' +
 					'</li>' +
@@ -377,62 +407,77 @@ $(function(){
 			contentCallback : function(self){
 				self.find('[data-type="payType"]').each(function(index, element){
 					element.onclick = function(){
-						if($(element).hasClass('selectedRegion_css_book')){
-							$(element).addClass('selectedRegion_css_book');
+						if($(element).hasClass('weSelectedRegion_css_book')){
+							$(element).addClass('weSelectedRegion_css_book');
 						}else{
-							self.find('[data-type="payType"]').removeClass('selectedRegion_css_book');
-							$(element).addClass('selectedRegion_css_book');
+							self.find('[data-type="payType"]').removeClass('weSelectedRegion_css_book');
+							$(element).addClass('weSelectedRegion_css_book');
 						}
 					}
 				});
 			},
-			leftText : '确认',
-			left : function(self){
-				var payType = null;
-				self.find('[data-type="payType"]').each(function(index, element){
-					if($(element).hasClass('selectedRegion_css_book')){
-						payType = $(element).attr('data-value');
-					}
-				});
+			leftText : '取消',
+			left : function(){
+				callPayDialog.close();
+			},
+			rightText : '确认',
+			right : function(self){
 				
-				$.ajax({
-					url : '../../WxOperateWaiter.do',
-					data : {
-						dataSource : 'callPay',
-						sessionId : Util.mp.params.sessionId,
-						orderId : Util.mp.params.orderId,
-						payType : payType
-					},
-					type : 'post',
-					dataType : 'json',
-					success : function(data){
-						if(data.success){
-							callPayDialog.close(function(){
-								var callSuccess = new DialogPopup({
-									titleText : '温馨提示',
-									content : '呼叫成功',
-									leftText : '确认',
-									left : function(){
-										callSuccess.close();
-									}
-								});
-								callSuccess.open();
-							}, 200);
-						}else{
-							callPayDialog.close(function(){
-								var callFailure = new DialogPopup({
-									titleText : '温馨提示',
-									content : '呼叫失败',
-									leftText : '确认',
-									left : function(){
-										callFailure.close();
-									}
-								});
-								callFailure.open();
-							}, 200);
+				//防止连点
+				var isProcessing = false;
+				if(!isProcessing){
+					isProcessing = true;
+					setTimeout(function(){
+						isProcessing = false;
+					}, 200);
+					
+					var payType = null;
+					self.find('[data-type="payType"]').each(function(index, element){
+						if($(element).hasClass('selectedRegion_css_book')){
+							payType = $(element).attr('data-value');
 						}
-					}
-				});
+					});
+					
+					$.ajax({
+						url : '../../WxOperateWaiter.do',
+						data : {
+							dataSource : 'callPay',
+							sessionId : Util.mp.params.sessionId,
+							orderId : Util.mp.params.orderId,
+							payType : payType
+						},
+						type : 'post',
+						dataType : 'json',
+						success : function(data){
+							if(data.success){
+								callPayDialog.close(function(){
+									var callSuccess = new WeDialogPopup({
+										titleText : '温馨提示',
+										content : '<span style="display:block;text-align:center;">呼叫成功</span>',
+										leftText : '确认',
+										left : function(){
+											callSuccess.close();
+										}
+									});
+									callSuccess.open();
+								}, 200);
+							}else{
+								callPayDialog.close(function(){
+									var callFailure = new WeDialogPopup({
+										titleText : '温馨提示',
+										content : '呼叫失败',
+										leftText : '确认',
+										left : function(){
+											callFailure.close();
+										}
+									});
+									callFailure.open();
+								}, 200);
+							}
+						}
+					});
+				}
+				
 			}
 		});
 		callPayDialog.open();
@@ -459,53 +504,220 @@ $(function(){
 			foods += element.id + ',' + element.count + ',' + unitId;
 		});
 		
-		$.ajax({
-			url : '../../WxOperateOrder.do',
-			type : 'post',
-			dataType : 'json',
-			data : {
-				dataSource : 'insertOrder',
-//				oid : Util.mp.oid,
-//				fid : Util.mp.fid,
-				sessionId : Util.mp.params.sessionId,
-				foods : foods,
-				comment : fastFoodWaiterData._commentData ? fastFoodWaiterData._commentData : '',
-				branchId : Util.mp.params.branchId,
-				tableAlias : fastFoodWaiterData._tableAlias,
-				orderId : fastFoodWaiterData._orderId,
-				print : true
+		var checkPayTypeDialog;
+		checkPayTypeDialog = new WeDialogPopup({
+			titleText : '请选择下单方式',
+			content : (		'<div class="weui_cells weui_cells_radio">'
+            			+		'<label class="weui_cell weui_check_label" for="payByWeiXin_input_waiter">'
+             		  	+				'<div class="weui_cell_bd weui_cell_primary">'
+                  		+					'<p>微信支付下单</p>'
+                		+				'</div>'
+                		+			'<div class="weui_cell_ft">'
+                		+   			'<input type="radio" class="weui_check" name="payType_input_waiter" id="payByWeiXin_input_waiter" data-type="payByWeiXin">'
+                    	+				'<span class="weui_icon_checked"></span>'
+                		+			'</div>'
+            			+		'</label>'
+           				+		'<label class="weui_cell weui_check_label" for="waiterCheck_input_waiter">'
+			            +    		'<div class="weui_cell_bd weui_cell_primary">'
+            		    +   			'<p>服务员下单</p>'
+           			    +   		'</div>'
+            			+  			'<div class="weui_cell_ft">'
+                   		+				'<input type="radio" name="payType_input_waiter" class="weui_check" id="waiterCheck_input_waiter" checked="checked" data-type="waiterCheck">'
+                  		+				'<span class="weui_icon_checked"></span>'
+            			+   		'</div>'
+          				+		'</label>'
+          				+		'<label class="weui_cell weui_check_label" for="fastOrder_input_waiter">'
+             		  	+			'<div class="weui_cell_bd weui_cell_primary">'
+                  		+				'<p>直接下单</p>'
+                		+			'</div>'
+                		+			'<div class="weui_cell_ft">'
+                		+   			'<input type="radio" class="weui_check" name="payType_input_waiter" id="fastOrder_input_waiter" data-type="fastOrder">'
+                    	+				'<span class="weui_icon_checked"></span>'
+                		+			'</div>'
+            			+		'</label>'		
+       			 		+	'</div>') ,
+			leftText : '取消',
+			left : function(){
+				checkPayTypeDialog.close();
 			},
-			success : function(response, status, xhr){
-				if(response.success){
-					//提示框设置
-					var finishOrderDialog = new DialogPopup({
-						titleText : '温馨提示',
-						content : '下单成功,确认返回账单',
-						leftText : '确认',
-						left : function(){
-							finishOrderDialog.close();								
+			rightText : '确认',
+			right : function(){
+				var payType = null;
+				$('[name=payType_input_waiter]').each(function(index, el){
+					if(el.checked == true){
+						payType = el.getAttribute('data-type');
+					}
+				});
+				//微信支付下单
+				if(payType == 'payByWeiXin'){
+					Util.lm.show();
+					$.ajax({
+						url : '../../WxOperateOrder.do',
+						type : 'post',
+						dataType : 'json',
+						data : {
+							dataSource : 'wxPayOrder',
+							sessionId : Util.mp.params.sessionId,
+							foods : foods,
+							cost : '',
+							tableAlias : fastFoodWaiterData._tableAlias
 						},
-						afterClose : function(){
-							//关闭后回调
-							orderFoodPopup.closeShopping();
-							$('#closeFastFood_a_waiter').click();
-							$('#foodList_div_waiter').html('');
-							initWaiterOrder();
+						success : function(data, status, req){
+							checkPayTypeDialog.close();
+							Util.lm.hide();
+							if(data.success){
+								payParam = data.other;
+								if(typeof WeixinJSBridge == 'undefined'){
+									if (document.addEventListener) {
+										document.addEventListener('WeixinJSBridgeReady', onBridgeReady,	false);
+									} else if (document.attachEvent) {
+										document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+										document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+									}
+								}else{
+									onBridgeReady();
+								} 
+							}else{
+								payParam = null;
+								var dialog = new WeDialogPopup({
+									content : result.msg,
+									titleText : '微信支付失败',
+									left : function(){
+										dialog.close();
+									}
+								})
+								dialog.open();
+							}
+						},
+						error : function(req, status, error){
+							alert(error);
 						}
 					});
-					
-					finishOrderDialog.open();
-					
-				}else{
-					Util.dialog.show({msg : response.msg});	
+				}else if(payType == 'waiterCheck'){
+					$.ajax({
+						url : '../../WxOperateOrder.do',
+						type : 'post',
+						dataType : 'json',
+						data : {
+							dataSource : 'insertOrder',
+			//				oid : Util.mp.oid,
+			//				fid : Util.mp.fid,
+							sessionId : Util.mp.params.sessionId,
+							foods : foods,
+							comment : fastFoodWaiterData._commentData ? fastFoodWaiterData._commentData : '',
+							branchId : Util.mp.params.branchId,
+							tableAlias : fastFoodWaiterData._tableAlias,
+							orderId : fastFoodWaiterData._orderId,
+							print : true
+						},
+						success : function(response, status, xhr){
+							checkPayTypeDialog.close();
+							if(response.success){
+								//提示框设置
+								var finishOrderDialog = new WeDialogPopup({
+									titleText : '温馨提示',
+									content : '<span style="display:block;text-align:center;">下单成功,确认返回账单</span>',
+									leftText : '确认',
+									left : function(){
+										finishOrderDialog.close();								
+									},
+									afterClose : function(){
+										//关闭后回调
+										orderFoodPopup.closeShopping();
+										$('#closeFastFood_a_waiter').click();
+										$('#foodList_div_waiter').html('');
+										initWaiterOrder();
+									}
+								});
+								
+								finishOrderDialog.open();
+								
+							}else{
+								Util.dialog.show({msg : response.msg});	
+							}
+							
+						},
+						
+						error : function(xhr, status, err){
+							Util.dialog.show({msg : err.msg});
+						}
+					});
+				}else if(payType == 'fastOrder'){
+					$.ajax({
+						url : '../../WxOperateOrder.do',
+						type : 'post',
+						dataType : 'json',
+						data : {
+							dataSource : 'insert',
+							foods : foods,
+							sessionId : Util.mp.params.sessionId,
+							tableAlias : fastFoodWaiterData._tableAlias,
+							orderId : fastFoodWaiterData._orderId,
+							force : true
+						},
+						success : function(data, status, req){
+							if(data.success){
+								checkPayTypeDialog.close();
+								//提示框设置
+								var finishOrderDialog = new WeDialogPopup({
+									titleText : '温馨提示',
+									content : '<span style="display:block;text-align:center;">下单成功,确认返回账单</span>',
+									leftText : '确认',
+									left : function(){
+										finishOrderDialog.close();								
+									},
+									afterClose : function(){
+										//关闭后回调
+										orderFoodPopup.closeShopping();
+										$('#closeFastFood_a_waiter').click();
+										$('#foodList_div_waiter').html('');
+										initWaiterOrder();
+									}
+								});
+								
+								finishOrderDialog.open();
+							}
+						},
+						error : function(req, status, err){
+							var errDialog;
+							errDialog = new WeDialogPopup({
+								titleText : '温磬提示',
+								content : ('<span style="display:block;text-align:center;">' + err.msg + '</span>'),
+								leftText : '确认',
+								left : function(){
+									errDialog.close();
+								}
+							});
+						}
+					});
 				}
-				
 			},
-			
-			error : function(xhr, status, err){
-				Util.dialog.show({msg : err.msg});
-			}
+			dismissible : true
 		});
-	
+		checkPayTypeDialog.open();
+		
 	}
+	
+	
+	//微信支付的参数
+	var payParam = null;
+	//微信支付回调函数
+	function onBridgeReady(){
+		if(payParam){
+			WeixinJSBridge.invoke('getBrandWCPayRequest', {
+				// 以下参数的值由BCPayByChannel方法返回来的数据填入即可
+				"appId" : payParam.appId,
+				"timeStamp" : payParam.timeStamp,
+				"nonceStr" : payParam.nonceStr,
+				"package" : payParam.package,
+				"signType" : payParam.signType,
+				"paySign" : payParam.paySign
+			}, function(res) {
+				if (res.err_msg == "get_brand_wcpay_request:ok") {
+					// 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+				} 
+			});
+		}
+	}
+	
 })

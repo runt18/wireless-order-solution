@@ -149,6 +149,10 @@ z-index: 99999;
 	margin-bottom:5px;
 	}
 
+.weSelectedRegion_css_book{
+	background-color:rgb(178, 228, 251);
+}
+
 .selectedRegion_css_book{
 	background-color:#ffff00;
 }

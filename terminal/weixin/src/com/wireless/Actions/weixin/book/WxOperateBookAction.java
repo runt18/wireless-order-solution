@@ -172,7 +172,7 @@ public class WxOperateBookAction extends DispatchAction {
 																					  .setOpenId(openId)
 																					  .setBillNo(billNo)
 																					  .setTotalFee(Float.valueOf((book.getOrder().calcTotalPrice() * 100)).intValue())
-																					  .setTotalFee(1)
+																					  //.setTotalFee(1)
 																					  .setTitle(restaurant.getName() + "微信预订支付(" + bookId + ")"), 
 					new Callable<ProtocolPackage>(){
 
