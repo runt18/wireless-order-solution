@@ -63,7 +63,12 @@ $(function(){
 									'<td>{tel}</td>' +
 									'<td>{tableName}</td>' +
 									'<td>{status}</td>' +
-									'<td><div data-role="controlgroup" data-type="horizontal"><a href="#" data-table={tableId} data-role="button" data-value={wxOrderNumber} data-status={orderStatus} data-type="wxOrderConfirm_a_wxOrder" data-theme="b">{button}</a></div></td>' +
+									'<td>' +
+										'<div data-role="controlgroup" data-type="horizontal">' +
+											'<a href="#" data-table={tableId} data-role="button" data-value={wxOrderNumber} data-status={orderStatus} data-type="wxOrderConfirm_a_wxOrder" data-theme="b">{confirm}</a>' +
+											'<a href="#"  data-role="button" data-number={wxOrderNumber} data-value={wxOrderId} data-status={orderStatus} data-type="wxOrderDelete_a_wxOrder" data-theme="b">{del}</a>' +
+										'</div>' +
+									'</td>' +
 								'</tr>';
 		
 		var html = [];
@@ -74,7 +79,8 @@ $(function(){
 				wxOrderNumber : data[i].code,
 				wxOrderTime : data[i].date,
 				orderStatus : data[i].statusVal,
-				button : data[i].statusVal == WxStatus.COMMITTED.val ? '下单' : '账单已处理(' + data[i].orderId + ')',
+				confirm : data[i].statusVal == WxStatus.COMMITTED.val ? '下单' : '账单已处理(' + data[i].orderId + ')',
+				del : '删除', 
 				memberName : data[i].member.name,
 				tel : data[i].member.mobile,
 				tableName : data[i].table ? data[i].table.name : '---',
@@ -84,6 +90,51 @@ $(function(){
 		}
 		$('#wxOrderList_tbody_wxOrder').html(html.join("")).trigger('create');
 		
+		//删除操作
+		$('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderDelete_a_wxOrder"]').each(function(index, element){
+			element.onclick = function(){
+				var id = $(element).attr('data-value');
+				
+				Util.msg.alert({
+					title : '提示',
+					msg : '是否删除订单编号为 ' + $(element).attr('data-number') + '的微定账单?',
+					buttons : 'YESBACK',
+					renderTo : 'bookOrderListMgr',
+					certainCallback : function(btn){
+						if(btn == 'yes'){
+							Util.LM.show();
+							$.ajax({
+								url : '../QueryWxOrder.do',
+								type : 'post',
+								async : false,
+								dataType : 'json',
+								data : {
+									dataSource : 'delectById',
+									id : id
+								},
+								success : function(result, status, xhr){
+									if(result.success){
+										Util.msg.tip(result.msg);
+										Util.LM.hide();
+										searchList();
+									}else{
+										Util.msg.tip(result.msg);
+									}
+								}
+							});
+						}
+					}
+				});
+				
+				
+				
+			}
+			
+			
+			
+		});	
+		
+		//下单操作
 		$('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderConfirm_a_wxOrder"]').each(function(index, element){
 			element.onclick = function(){
 				if($(element).attr('data-status') == WxStatus.COMMITTED.val){

@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.book.BookDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
@@ -73,4 +74,26 @@ public class QueryWxOrderAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	public ActionForward delectById(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String id = request.getParameter("id");
+		JObject jobject = new JObject();		
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		try{
+			WxOrderDao.deleteById(staff, Integer.parseInt(id));
+			jobject.initTip(true, "删除成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}		
+		
+		return null;
+	}
+	
 }
