@@ -14,9 +14,26 @@ public class RepaidStatistics implements Jsonable{
 	private float mTotalPrice = 0;	
 	private float mActualPrice = 0;
 	private float mRepaidPrice = 0;
-	private PayType mPaymentType = PayType.CASH;	
+	private PayType mPaymentType = PayType.CASH;
+	private String restaurantName;
+	private int restaurantId;
 	private Staff staff;
 	
+	public void setRestaurantName(String name){
+		this.restaurantName = name;
+	}
+
+	public String getRestaurantName(){
+		return this.restaurantName;
+	}
+	
+	public void setRestaurantId(int restaurantId){
+		this.restaurantId = restaurantId;
+	}
+	
+	public int getRestaurantId(){
+		return this.restaurantId;
+	}
 	
 	public Staff getStaff() {
 		if(staff == null){
@@ -101,6 +118,8 @@ public class RepaidStatistics implements Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("orderId", this.mId);
+		jm.putInt("rid", this.restaurantId);
+		jm.putString("restaurantName", this.restaurantName);
 		jm.putString("orderDateFormat", DateUtil.format(this.mOrderDate));
 		jm.putFloat("actualPrice", this.mActualPrice);
 		jm.putFloat("totalPrice", this.mTotalPrice);
