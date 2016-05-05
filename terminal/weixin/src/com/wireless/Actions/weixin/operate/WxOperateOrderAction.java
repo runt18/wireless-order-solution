@@ -19,9 +19,11 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodUnitDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -43,6 +45,7 @@ import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ws.waiter.WxWaiter;
@@ -142,6 +145,96 @@ public class WxOperateOrderAction extends DispatchAction {
 		return null;
 	}
 
+	/**
+	 * 微信计算账单的信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward calcOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		final String sessionId = request.getParameter("sessionId");
+		final String foods = request.getParameter("foods");
+		final String coupons = request.getParameter("coupons");
+		final JObject jObject= new JObject();
+		try{
+			final HttpSession session = SessionListener.sessions.get(sessionId);
+			if(session != null){
+				final String branchId = (String)session.getAttribute("branchId");
+				final String oid = (String)session.getAttribute("oid");
+				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				Order order = new Order(0);
+				
+				if(foods != null && !foods.isEmpty()){
+					for (String of : foods.split("&")) {
+						String orderFoods[] = of.split(",");
+						OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
+						orderFood.setCount(Float.parseFloat(orderFoods[1]));
+						//food unit多单位
+						if(orderFoods.length > 2 && Integer.parseInt(orderFoods[2]) != 0){
+							orderFood.setFoodUnit(FoodUnitDao.getById(staff, Integer.parseInt(orderFoods[2])));
+						}
+						order.addFood(orderFood, staff);
+					}
+				}
+				
+				//设置折扣
+				Member member = MemberDao.getByWxSerial(staff, oid);
+				order.setDiscount(member.getMemberType().getDefaultDiscount());
+
+				//使用coupon
+				if(coupons != null && !coupons.isEmpty()){
+					float couponPrice = 0;
+					for(String couponId : coupons.split(",")){
+						couponPrice += CouponDao.getById(staff, Integer.parseInt(couponId)).getCouponType().getPrice();
+					}
+					order.setCouponPrice(couponPrice);
+				}
+				
+				float totalPrice = order.calcTotalPrice();
+				float actualPrice = 0;
+				//Get the setting.
+				Setting setting = SystemDao.getByCond(staff, null).get(0).getSetting();
+				//Deal with the decimal according to setting.
+				if(setting.getPriceTail().isDecimalCut()){
+					//小数抹零
+					actualPrice = Float.valueOf(totalPrice).intValue();
+				}else if(setting.getPriceTail().isDecimalRound()){
+					//四舍五入
+					actualPrice = Math.round(totalPrice);
+				}else{
+					//不处理
+					actualPrice = totalPrice;
+				}
+
+				//Minus the erase & coupon price.
+				actualPrice = actualPrice - order.getCouponPrice();
+				actualPrice = actualPrice > 0 ? actualPrice : 0;
+				
+				order.setActualPrice(actualPrice);
+				
+				jObject.setRoot(order);
+			}else{
+				//TODO
+			}
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		
+		return null;
+	}
 	/**
 	 * 微信直接下单
 	 * @param mapping
