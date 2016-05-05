@@ -25,16 +25,22 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorCode;
 import com.wireless.exception.TableError;
 import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
 import com.wireless.listener.SessionListener;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.req.ReqPrintContent;
+import com.wireless.parcel.Parcel;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.order.WxOrder;
@@ -130,6 +136,75 @@ public class WxOperateOrderAction extends DispatchAction {
 		}catch(Exception e){
 			e.printStackTrace();
 			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * 微信直接下单
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		final String sessionId = request.getParameter("sessionId");
+		final String foods = request.getParameter("foods");
+		final String tableAlias = request.getParameter("tableAlias");
+		final String force = request.getParameter("force");
+		final JObject jObject= new JObject();
+		
+		try{
+			final HttpSession session = SessionListener.sessions.get(sessionId);
+			if(session != null){
+				final String branchId = (String)session.getAttribute("branchId");
+				//FIXME 
+				final String oid = (String)session.getAttribute("oid");
+				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				
+				final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)).getId()));
+				if(foods != null && !foods.isEmpty()){
+					for (String of : foods.split("&")) {
+						String orderFoods[] = of.split(",");
+						OrderFood orderFood = new OrderFood(FoodDao.getById(staff, Integer.parseInt(orderFoods[0])));
+						orderFood.setCount(Float.parseFloat(orderFoods[1]));
+						//food unit多单位
+						if(orderFoods.length > 2 && Integer.parseInt(orderFoods[2]) != 0){
+							orderFood.setFoodUnit(FoodUnitDao.getById(staff, Integer.parseInt(orderFoods[2])));
+						}
+						builder.add(orderFood, staff);
+					}
+				}
+
+				if(force != null && !force.isEmpty() && Boolean.parseBoolean(force)){
+					builder.setForce(true);
+				}
+				
+				final ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, PrintOption.DO_PRINT));
+				if(resp.header.type == Type.ACK){
+					jObject.initTip(true, ("下单成功."));
+				}else{
+					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+					jObject.initTip(false, errCode.getCode(), errCode.getDesc());
+				}
+				
+			}else{
+				throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+			}
+			
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip(e);
 		}finally{
 			response.getWriter().print(jObject.toString());
 		}

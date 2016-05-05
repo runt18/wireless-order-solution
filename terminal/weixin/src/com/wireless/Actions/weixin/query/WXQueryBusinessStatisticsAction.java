@@ -26,6 +26,7 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.finance.WeixinFinanceDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -211,39 +212,34 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			Integer qt = Integer.valueOf(queryType), ot = (orderType != null && !orderType.isEmpty()) ? Integer.parseInt(orderType) : SaleDetailsDao.ORDER_BY_SALES;
 			DateType dt = DateType.valueOf(Integer.valueOf(dataType));
 			
-			CalcBillStatisticsDao.ExtraCond extraConds = new ExtraCond(dt);
+			CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(dt);
 				
 			if(dt.isHistory()){
+				extraCond.setCalcByDuty(true);
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
 			}
 			
-			DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
+			extraCond.setDutyRange(new DutyRange(dateBeg, dateEnd));
 			
 			if(region != null && !region.equals("-1")){
-				extraConds.setRegion(RegionId.valueOf(Integer.parseInt(region)));
+				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 				
 			}
 			
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				
-				salesDetailList = SaleDetailsDao.getByDept(
-						staff, 
-						dutyRange,
-						extraConds);
+				salesDetailList = SaleDetailsDao.getByDept(staff, extraCond);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				Department dept = DepartmentDao.getByCond(staff, new DepartmentDao.ExtraCond().setName(deptName), null).get(0);
 				if(deptName != null && dept.getId() >= 0){
-					extraConds.setDept(Department.DeptId.valueOf(dept.getId()));
+					extraCond.setDept(Department.DeptId.valueOf(dept.getId()));
 				} 
-				salesDetailList = SaleDetailsDao.getByFood(staff, dutyRange, extraConds, ot);
+				salesDetailList = SaleDetailsDao.getByFood(staff, extraCond, ot);
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
 				
-				List<SalesDetail> result = SaleDetailsDao.getByKitchen(
-						staff, 
-						dutyRange,
-						extraConds);
+				List<SalesDetail> result = SaleDetailsDao.getByKitchen(staff, extraCond);
 				
 				for (SalesDetail salesDetail : result) {
 					if(salesDetail.getDept().getName().equals(deptName)){
@@ -252,7 +248,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				}
 			}
 				
-		} catch(SQLException e){
+		} catch(SQLException | BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 			
