@@ -31,7 +31,7 @@ public class TestCalcRepaidStatisticsDao {
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
 		 mDutyRange = new DutyRange("2014-6-10 00:40:04", "2014-6-26 23:59:36"); 
-		 mExtraCond = new ExtraCond(DateType.HISTORY);
+		 mExtraCond = new ExtraCond(DateType.HISTORY).setDutyRange(mDutyRange);
 //		 mExtraCond.setHourRange(new HourRange("06:00:00", "12:00:00"));
 	}
 	
@@ -51,7 +51,7 @@ public class TestCalcRepaidStatisticsDao {
 		}
 		
 		mExtraCond.setStaffId(mStaff.getId());
-		List<RepaidIncomeByStaff> incomesByStaff = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(mStaff, mDutyRange, mExtraCond);
+		List<RepaidIncomeByStaff> incomesByStaff = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(mStaff, mExtraCond);
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(RepaidIncomeByStaff each : incomesByStaff){

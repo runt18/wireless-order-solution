@@ -31,7 +31,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
-import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class CalcCancelStatisticsDao {
 	
@@ -184,8 +184,6 @@ public class CalcCancelStatisticsDao {
 	 * Calculate the cancel income by each day according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CancelIncomeByEachDay}
@@ -195,11 +193,11 @@ public class CalcCancelStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByEachDay> calcCancelIncomeByEachDay(Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<CancelIncomeByEachDay> calcCancelIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelIncomeByEachDay(dbCon, staff, dutyRange, extraCond);
+			return calcCancelIncomeByEachDay(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -211,8 +209,6 @@ public class CalcCancelStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CancelIncomeByEachDay}
@@ -222,19 +218,19 @@ public class CalcCancelStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<CancelIncomeByEachDay> calcCancelIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<CancelIncomeByEachDay> calcCancelIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
 		if(extraCond.isChain){
 			Map<DutyRange, CancelIncomeByEachDay> result = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the cancel income by each day to the group.
-			for(CancelIncomeByEachDay groupIncome : calcCancelIncomeByEachDay(dbCon, staff, dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
+			for(CancelIncomeByEachDay groupIncome : calcCancelIncomeByEachDay(dbCon, staff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				result.put(groupIncome.getDutyRange(), groupIncome);
 			}
 			
 			//Append cancel income by each day to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(CancelIncomeByEachDay branchIncome : calcCancelIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
+				for(CancelIncomeByEachDay branchIncome : calcCancelIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					CancelIncomeByEachDay cancelIncome = result.get(branchIncome.getDutyRange());
 					if(cancelIncome != null){
 						final float cancelAmount = branchIncome.getCancelAmount() + cancelIncome.getCancelAmount();
@@ -246,40 +242,34 @@ public class CalcCancelStatisticsDao {
 				}
 			}
 			
-			return new ArrayList<>(result.values());
+			return SortedList.newInstance(result.values());
 		}else{
 			
 			List<CancelIncomeByEachDay> result = new ArrayList<CancelIncomeByEachDay>();
 			Calendar c = Calendar.getInstance();
-			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
-			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
+			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOnDutyFormat());
+			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOffDutyFormat());
 			c.setTime(dateBegin);
 			while (dateBegin.compareTo(dateEnd) <= 0) {
 				c.add(Calendar.DATE, 1);
 				
-				DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-						DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
-						DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
-				
-				if(range != null){
-					String sql;
-					sql = " SELECT " +
-						  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
-						  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
-					      " FROM (" +
-						  makeSql4CancelFood(staff, extraCond.setRange(range)) + 
-						  " ) AS TMP ";
-				    dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						result.add(new CancelIncomeByEachDay(new DutyRange(dateBegin.getTime(), c.getTimeInMillis()),
-															 dbCon.rs.getFloat("cancel_amount"),
-															 dbCon.rs.getFloat("cancel_price")));
-					}
-					dbCon.rs.close();
-
+				DutyRange rangeByEachDay = new DutyRange(dateBegin.getTime(), c.getTimeInMillis());
+				String sql;
+				sql = " SELECT " +
+					  " ROUND(SUM(TMP.cancel_amount), 2) AS cancel_amount, " +
+					  " ROUND(SUM(TMP.cancel_price), 2) AS cancel_price " +
+				      " FROM (" +
+					  makeSql4CancelFood(staff, ((ExtraCond)extraCond.clone()).setCalcByDuty(true).setRange(rangeByEachDay)) + 
+					  " ) AS TMP ";
+			    dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					result.add(new CancelIncomeByEachDay(rangeByEachDay,
+														 dbCon.rs.getFloat("cancel_amount"),
+														 dbCon.rs.getFloat("cancel_price")));
 				}else{
-					result.add(new CancelIncomeByEachDay(new DutyRange(dateBegin.getTime(), c.getTimeInMillis()), 0, 0)); 
+					result.add(new CancelIncomeByEachDay(rangeByEachDay, 0, 0)); 
 				}
+				dbCon.rs.close();
 				
 				dateBegin = c.getTime();
 			}

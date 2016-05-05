@@ -32,7 +32,7 @@ public class TestCalcCancelStatisticsDao {
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
 		 mDutyRange = new DutyRange("2014-2-10 23:40:04", "2014-2-26 23:49:36"); 
-		 mExtraCond = new ExtraCond(DateType.HISTORY);
+		 mExtraCond = new ExtraCond(DateType.HISTORY).setRange(mDutyRange);
 //		 mExtraCond.setDeptId(Department.DeptId.DEPT_2);
 //		 mExtraCond.setRegionId(Region.RegionId.REGION_1);
 //		 mExtraCond.setHourRange(new HourRange("10:00:00", "12:00:00"));
@@ -70,7 +70,7 @@ public class TestCalcCancelStatisticsDao {
 		Assert.assertEquals("cancel income by department is different from the one by staff", totalIncomeByDept, totalIncomeByStaff, 0.01);
 		Assert.assertEquals("cancel amount by department is different from the one by staff", totalAmountByDept, totalAmountByStaff, 0.01);
 		
-		List<CancelIncomeByEachDay> incomesByEachDay = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(mStaff, mDutyRange, mExtraCond);
+		List<CancelIncomeByEachDay> incomesByEachDay = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(mStaff, mExtraCond);
 		@SuppressWarnings("unused")
 		float totalIncomeByEachDay = 0;
 		@SuppressWarnings("unused")

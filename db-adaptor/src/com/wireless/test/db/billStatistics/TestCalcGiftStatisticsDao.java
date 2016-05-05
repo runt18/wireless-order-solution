@@ -30,16 +30,16 @@ public class TestCalcGiftStatisticsDao {
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
 		 mDutyRange = new DutyRange("2014-2-10 23:40:04", "2014-5-26 23:49:36"); 
-		 mExtraCond = new ExtraCond(DateType.HISTORY);
+		 mExtraCond = new ExtraCond(DateType.HISTORY).setDutyRange(mDutyRange);
 //		 mExtraCond.setDeptId(Department.DeptId.DEPT_2);
 //		 mExtraCond.setRegionId(Region.RegionId.REGION_1);
 //		 mExtraCond.setHourRange(new HourRange("10:00:00", "12:00:00"));
 	}
 	
 	@Test
-	public void testCalcGiftStatistics() throws SQLException, ParseException{
+	public void testCalcGiftStatistics() throws SQLException, ParseException, BusinessException{
 		
-		List<GiftIncomeByStaff> incomesByStaff = CalcGiftStatisticsDao.calcGiftIncomeByStaff(mStaff, mDutyRange, mExtraCond);
+		List<GiftIncomeByStaff> incomesByStaff = CalcGiftStatisticsDao.calcGiftIncomeByStaff(mStaff, mExtraCond);
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(GiftIncomeByStaff each : incomesByStaff){
@@ -47,7 +47,7 @@ public class TestCalcGiftStatisticsDao {
 			totalAmountByStaff += each.getGiftAmount();
 		}
 		
-		List<GiftIncomeByDept> incomesByDept = CalcGiftStatisticsDao.calcGiftIncomeByDept(mStaff, mDutyRange, mExtraCond);
+		List<GiftIncomeByDept> incomesByDept = CalcGiftStatisticsDao.calcGiftIncomeByDept(mStaff, mExtraCond);
 		float totalIncomeByDept = 0;
 		float totalAmountByDept = 0;
 		for(GiftIncomeByDept each : incomesByDept){

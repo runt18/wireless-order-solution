@@ -25,6 +25,7 @@ import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
+import com.wireless.pojo.util.SortedList;
 
 public class CalcRepaidStatisticsDao {
 	
@@ -290,7 +291,7 @@ public class CalcRepaidStatisticsDao {
 				}
 			}
 			
-			return new ArrayList<>(chainResult.values());
+			return SortedList.newInstance(chainResult.values());
 			
 		}else{
 			List<RepaidIncomeByEachDay> result = new ArrayList<RepaidIncomeByEachDay>();
