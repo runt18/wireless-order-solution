@@ -4,7 +4,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 
-public class RepaidIncomeByEachDay implements Jsonable{
+public class RepaidIncomeByEachDay implements Jsonable, Comparable<RepaidIncomeByEachDay>{
 	
 	private final DutyRange range;
 	private final float mRepaidAmount;
@@ -47,6 +47,9 @@ public class RepaidIncomeByEachDay implements Jsonable{
 		return "[" + this.range.getOffDutyFormat() + ", " + mRepaidAmount + ", " + mRepaidPrice + "]"  ;
 	}
 
-
+	@Override
+	public int compareTo(RepaidIncomeByEachDay o) {
+		return this.getDutyRange().compareTo(o.getDutyRange());
+	}
 
 }

@@ -4,7 +4,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
 
-public class DutyRange implements Jsonable{
+public class DutyRange implements Jsonable, Comparable<DutyRange>{
 	
 	private final long onDuty;		// 开始时间
 	private final long offDuty;		// 结束时间
@@ -77,6 +77,17 @@ public class DutyRange implements Jsonable{
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
+	}
+
+	@Override
+	public int compareTo(DutyRange o) {
+		if(this.onDuty < o.onDuty){
+			return -1;
+		}else if(this.onDuty > o.onDuty){
+			return 1;
+		}else{
+			return 0;
+		}
 	}
 	
 }

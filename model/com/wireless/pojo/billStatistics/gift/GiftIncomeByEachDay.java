@@ -4,7 +4,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 
-public class GiftIncomeByEachDay implements Jsonable {
+public class GiftIncomeByEachDay implements Jsonable, Comparable<GiftIncomeByEachDay> {
 	private final DutyRange range;
 	private final float mGiftAmount;		//赠送数量
 	private final float mGiftPrice;			//赠送金额
@@ -44,5 +44,10 @@ public class GiftIncomeByEachDay implements Jsonable {
 	@Override
 	public String toString(){
 		return "[" + range.getOffDutyFormat() + "," + mGiftAmount + ",￥" + mGiftPrice + "]";
+	}
+
+	@Override
+	public int compareTo(GiftIncomeByEachDay o) {
+		return this.getRange().compareTo(o.getRange());
 	}
 }
