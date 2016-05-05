@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -26,12 +25,13 @@ import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class QueryRepaidReportAction extends DispatchAction{
 
 	/**
-	 * 获取反结账数据
+	 * 获取反结账明细
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -51,13 +51,20 @@ public class QueryRepaidReportAction extends DispatchAction{
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
 		try{
+			
+			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY)
+																			.setDutyRange(new DutyRange(beginDate, endDate))
+																			.setCalcByCond(true);
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
@@ -67,13 +74,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
 			
-			List<RepaidStatistics> result;
-			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-			if(range != null){
-				result = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, range, extraCond);
-			}else{
-				result = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, new DutyRange(beginDate, endDate), extraCond);
-			}
+			List<RepaidStatistics> result = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, extraCond);
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				jObject.setTotalProperty(result.size());
@@ -85,7 +86,8 @@ public class QueryRepaidReportAction extends DispatchAction{
 				result.add(total);
 			}
 			jObject.setRoot(result);
-		}catch (SQLException e) {
+			
+		}catch (SQLException | BusinessException e) {
 			e.printStackTrace();
 			jObject.initTip(e);
 		} catch (Exception e) {
@@ -118,12 +120,16 @@ public class QueryRepaidReportAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
@@ -139,7 +145,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			List<Float> amountData = new ArrayList<Float>();
 			float totalMoney = 0, totalCount = 0;
 			for (RepaidIncomeByEachDay c : repaidIncomeByEachDay) {
-				xAxis.add("\'"+c.getDutyRange().getOffDutyFormat()+"\'");
+				xAxis.add("\'" + c.getDutyRange().getOnDutyFormat() + "\'");
 				data.add(c.getRepaidPrice());
 				amountData.add(c.getRepaidAmount());
 				
@@ -147,7 +153,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 				totalCount += c.getRepaidAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/repaidIncomeByEachDay.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/repaidIncomeByEachDay.size())*100)/100 +
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + NumericUtil.roundFloat(totalMoney) + ",\"avgMoney\" : " + Math.round((totalMoney/repaidIncomeByEachDay.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/repaidIncomeByEachDay.size())*100)/100 +
 					",\"ser\":[{\"name\":\'反结账金额\', \"data\" : " + data + "}, {\"name\":\'反结账数量\', \"data\" : " + amountData + "}]}";
 			jObject.setExtra(new Jsonable(){
 				@Override
@@ -164,7 +170,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 			});
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -198,13 +204,20 @@ public class QueryRepaidReportAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY)
+																						   .setDutyRange(new DutyRange(dateBeg, dateEnd))
+																						   .setCalcByCond(true);
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffId));
@@ -214,9 +227,9 @@ public class QueryRepaidReportAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond));
+			jObject.setRoot(CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, extraCond));
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){

@@ -559,32 +559,32 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		DutyRange dutyRange = new DutyRange(onDuty, offDuty);
-		
-		final CalcBillStatisticsDao.ExtraCond extraConds = new ExtraCond(DateType.HISTORY);
+		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY).setCalcByDuty(true);
 		
 		if(opening != null && !opening.isEmpty()){
-			extraConds.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 		}
 		
 		if(foodName != null && !foodName.isEmpty()){
-			extraConds.setFoodName(foodName);
+			extraCond.setFoodName(foodName);
 		}
 		
 		if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-			extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
+			extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
 		}
 		
 		if(kitchenId != null && !kitchenId.isEmpty() && !kitchenId.equals("-1")){
-			extraConds.setKitchen(Integer.parseInt(kitchenId));
+			extraCond.setKitchen(Integer.parseInt(kitchenId));
 		}
 		
 		if(region != null && !region.isEmpty() && !region.equals("-1")){
-			extraConds.setRegion(RegionId.valueOf(Integer.parseInt(region)));
+			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 			
 		}
 		
-		final List<SalesDetail> saleDetails = SaleDetailsDao.getByFood(staff, dutyRange, extraConds, ot);
+		extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
+		
+		final List<SalesDetail> saleDetails = SaleDetailsDao.getByFood(staff, extraCond, ot);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("菜品销售统计");
@@ -1217,7 +1217,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY);
+		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY).setCalcByDuty(true);
 		
 		if(opening != null && !opening.isEmpty()){
 			HourRange hr = new HourRange(opening, ending, DateUtil.Pattern.HOUR);
@@ -1228,7 +1228,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 		}
 		
-		List<SalesDetail> list = SaleDetailsDao.getByKitchen(staff,	new DutyRange(onDuty, offDuty),	extraCond);
+		extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
+		
+		List<SalesDetail> list = SaleDetailsDao.getByKitchen(staff,	extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计");
@@ -1404,7 +1406,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY);
+		final CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.HISTORY).setCalcByDuty(true);
 		
 		if(region != null && !region.equals("-1") && !region.isEmpty()){
 			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
@@ -1415,7 +1417,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setHourRange(hr);
 		}
 		
-		List<SalesDetail> list = SaleDetailsDao.getByDept(staff, new DutyRange(onDuty, offDuty), extraCond);
+		extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
+		
+		List<SalesDetail> list = SaleDetailsDao.getByDept(staff, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计");
@@ -4284,7 +4288,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+		final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY)
+																					   .setDutyRange(new DutyRange(beginDate, endDate))
+																					   .setCalcByCond(true);
 		
 		if(opening != null && !opening.isEmpty()){
 			extraCond.setHourRange(new HourRange(opening, ending));
@@ -4294,12 +4300,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setStaffId(Integer.valueOf(staffId));
 		}
 		
-		DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-		if(range == null){
-			range = new DutyRange(beginDate, endDate);
-		}
-		
-		final List<RepaidStatistics> list = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, range, extraCond);
+		final List<RepaidStatistics> list = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, extraCond);
 		
 		final String title = "反结账统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
 		

@@ -65,11 +65,11 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 			final CalcBillStatisticsDao.ExtraCond extraCond;
 			if(branchId != null && !branchId.isEmpty()){
-				if(branchId.equals("-1")){
-					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setChain(true);
-				}else{
+				if(Integer.parseInt(branchId) > 0){
 					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+				}else{
+					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setChain(true);
 				}
 			}else{
 				extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);

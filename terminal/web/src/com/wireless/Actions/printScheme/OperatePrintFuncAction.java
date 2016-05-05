@@ -32,25 +32,25 @@ public class OperatePrintFuncAction extends DispatchAction{
 
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String printFuncId = request.getParameter("printFuncId");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String printFuncId = request.getParameter("printFuncId");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			PrintFuncDao.deleteById(staff, Integer.parseInt(printFuncId));
 			
-			jobject.initTip(true, "操作成功, 已删除方案");
+			jObject.initTip(true, "操作成功, 已删除方案");
 			
-		}catch(BusinessException e){
-			jobject.initTip(e);
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -372,7 +372,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}
 		
 			jobject.initTip(true, "操作成功, 已修改方案");
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			jobject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){

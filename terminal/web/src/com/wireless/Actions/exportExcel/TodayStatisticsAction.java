@@ -112,28 +112,28 @@ public class TodayStatisticsAction extends DispatchAction{
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		DutyRange dutyRange = new DutyRange(onDuty, offDuty);
-		
-		CalcBillStatisticsDao.ExtraCond extraConds = new ExtraCond(DateType.TODAY);
+		CalcBillStatisticsDao.ExtraCond extraCond = new ExtraCond(DateType.TODAY);
 		
 		if(opening != null && !opening.isEmpty()){
 			HourRange hr = new HourRange(opening, ending, DateUtil.Pattern.HOUR);
-			extraConds.setHourRange(hr);
+			extraCond.setHourRange(hr);
 		}
 		
 		if(foodName != null && !foodName.isEmpty()){
-			extraConds.setFoodName(foodName);
+			extraCond.setFoodName(foodName);
 		}
 		
 		if(deptID != null && !deptID.equals("-1")){
-			extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
+			extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
 		}
 		
 		if(region != null && !region.equals("-1")){
-			extraConds.setRegion(RegionId.valueOf(Integer.parseInt(region)));
-			
+			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 		}
-		List<SalesDetail> saleDetails = SaleDetailsDao.getByFood(staff, dutyRange, extraConds, ot);
+		
+		extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
+		
+		List<SalesDetail> saleDetails = SaleDetailsDao.getByFood(staff, extraCond, ot);
 		
 		
 		
@@ -340,10 +340,10 @@ public class TodayStatisticsAction extends DispatchAction{
 		if(region != null && !region.equals("-1")){
 			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 		}
-		List<SalesDetail> list = SaleDetailsDao.getByKitchen(
-				staff, 
-				dutyRange,
-				extraCond);
+		
+		extraCond.setDutyRange(dutyRange);
+		
+		List<SalesDetail> list = SaleDetailsDao.getByKitchen(staff, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.TODAY.getDesc() + ")");
@@ -526,14 +526,9 @@ public class TodayStatisticsAction extends DispatchAction{
 			extraCond.setHourRange(hr);
 		}
 		
-		DutyRange dutyRange = new DutyRange(onDuty, offDuty);
+		extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
 		
-
-		
-		List<SalesDetail> list = SaleDetailsDao.getByDept(
-				staff, 
-				dutyRange,
-				extraCond);
+		List<SalesDetail> list = SaleDetailsDao.getByDept(staff, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(历史)");

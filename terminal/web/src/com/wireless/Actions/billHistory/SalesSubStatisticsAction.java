@@ -100,7 +100,7 @@ public class SalesSubStatisticsAction extends Action {
 			
 			final DateType dt;
 			if(dataType != null && !dataType.isEmpty()){
-				dt = DateType.valueOf(Integer.valueOf(dataType));
+				dt = DateType.valueOf(Integer.parseInt(dataType));
 			}else{
 				dt = DateType.HISTORY;
 			}
@@ -124,7 +124,11 @@ public class SalesSubStatisticsAction extends Action {
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
 			}
 			
-			final DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
+			//final DutyRange dutyRange = new DutyRange(dateBeg, dateEnd);
+			extraCond.setDutyRange(new DutyRange(dateBeg, dateEnd));
+			if(dt.isHistory()){
+				extraCond.setCalcByDuty(true);
+			}
 			
 			if(region != null && !region.isEmpty() && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
@@ -139,7 +143,7 @@ public class SalesSubStatisticsAction extends Action {
 			
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				
-				salesDetailList = SaleDetailsDao.getByDept(staff, dutyRange, extraCond);
+				salesDetailList = SaleDetailsDao.getByDept(staff, extraCond);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				if(foodName != null && !foodName.isEmpty()){
@@ -156,10 +160,10 @@ public class SalesSubStatisticsAction extends Action {
 				if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
 					extraCond.setStaffId4OrderFood(Integer.parseInt(staffId));
 				}
-				salesDetailList = SaleDetailsDao.getByFood(staff, dutyRange, extraCond, ot);
+				salesDetailList = SaleDetailsDao.getByFood(staff, extraCond, ot);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
-				salesDetailList = SaleDetailsDao.getByKitchen(staff, dutyRange, extraCond);
+				salesDetailList = SaleDetailsDao.getByKitchen(staff, extraCond);
 				
 			}else{
 				salesDetailList = Collections.emptyList();
