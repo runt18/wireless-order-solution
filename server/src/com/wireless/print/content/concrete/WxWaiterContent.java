@@ -58,8 +58,8 @@ public class WxWaiterContent extends ConcreteContent {
 									  mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X));
 		content.append(SEP).append(mSeperatorLine);
 
-		content.append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP)
-			   .append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP);
+		content.append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP)
+			   .append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(SEP);
 		
 		//Generate the qrcode associated with the order id.
 		content.append(mSeperatorLine).append(SEP);
