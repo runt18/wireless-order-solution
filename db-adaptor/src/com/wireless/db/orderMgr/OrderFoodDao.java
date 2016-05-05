@@ -227,7 +227,11 @@ public class OrderFoodDao {
 					range = this.dutyRange;
 				}
 				
-				extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+				if(range != null){
+					extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+				}else{
+					extraCond.append(" AND 0 ");
+				}
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(" + orderFoodTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");

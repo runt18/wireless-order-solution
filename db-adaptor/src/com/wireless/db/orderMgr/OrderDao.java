@@ -273,7 +273,12 @@ public class OrderDao {
 				}else{
 					range = orderRange;
 				}
-				filterCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+				
+				if(range != null){
+					filterCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+				}else{
+					filterCond.append(" AND 0 ");
+				}
 			}
 			if(hourRange != null){
 				filterCond.append(" AND TIME(" + orderTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");

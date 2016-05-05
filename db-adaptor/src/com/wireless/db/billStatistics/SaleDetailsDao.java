@@ -13,7 +13,6 @@ import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
@@ -34,8 +33,6 @@ public class SaleDetailsDao {
 	 * Get the sales details to each department.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @return the result list {@link SalesDetail}
@@ -43,11 +40,11 @@ public class SaleDetailsDao {
 	 * 			throws if any error occurred while execute any SQL statements
 	 * @throws BusinessException 
 	 */
-	public static List<SalesDetail> getByDept(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<SalesDetail> getByDept(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByDept(dbCon, staff, range, extraCond);
+			return getByDept(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -59,8 +56,6 @@ public class SaleDetailsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @return the result list {@link SalesDetail}
@@ -68,7 +63,7 @@ public class SaleDetailsDao {
 	 * 			throws if any error occurred while execute any SQL statements
 	 * @throws BusinessException 
 	 */
-	public static List<SalesDetail> getByDept(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<SalesDetail> getByDept(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		final List<SalesDetail> result = new ArrayList<SalesDetail>();
 		if(extraCond.isChain()){
@@ -76,11 +71,11 @@ public class SaleDetailsDao {
 			//key : value - deptName : salesDetail
 			final Map<String, SalesDetail> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
-			for(SalesDetail groupDetail : getByDept(dbCon, groupStaff, range, extraCond.setChain(false))){
+			for(SalesDetail groupDetail : getByDept(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupDetail.getDept().getName(), groupDetail);
 			}
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(SalesDetail branchDetail : getByDept(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false))){
+				for(SalesDetail branchDetail : getByDept(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchDetail.getDept().getName())){
 						SalesDetail salesDetail = chainResult.get(branchDetail.getDept().getName());
 						salesDetail.setGifted(branchDetail.getGifted() + salesDetail.getGifted());
@@ -98,26 +93,27 @@ public class SaleDetailsDao {
 			
 			result.addAll(chainResult.values());
 			
-			//Restore the chain status to extra condition.
-			extraCond.setChain(true);
 		}else{
 			final List<IncomeByDept> deptIncomes;
 
-			if(extraCond.dateType.isHistory()){
-				
-				//Get the duty range between on and off duty date
-				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
-				
-				//Calculate the incomes to each department.
-				if(dutyRange != null){
-					deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond);
-				}else{
-					deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
-				}
-			}else{
-				//Calculate the incomes to each department.
-				deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
-			}
+//			if(extraCond.dateType.isHistory()){
+//				
+//				//Get the duty range between on and off duty date
+//				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
+//				
+//				//Calculate the incomes to each department.
+//				if(dutyRange != null){
+//					deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond);
+//				}else{
+//					deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
+//				}
+//			}else{
+//				//Calculate the incomes to each department.
+//				deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
+//			}
+			
+			//Calculate the incomes to each department.
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, extraCond);
 			
 			for(IncomeByDept deptIncome : deptIncomes){
 				SalesDetail salesDetail = new SalesDetail(deptIncome.getDept());
@@ -159,8 +155,6 @@ public class SaleDetailsDao {
 	 * Get the sales detail to each kitchen according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link SalesDetail}
@@ -168,11 +162,11 @@ public class SaleDetailsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<SalesDetail> getByKitchen(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<SalesDetail> getByKitchen(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByKitchen(dbCon, staff, range, extraCond);
+			return getByKitchen(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -184,8 +178,6 @@ public class SaleDetailsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link SalesDetail}
@@ -193,7 +185,7 @@ public class SaleDetailsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<SalesDetail> getByKitchen(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<SalesDetail> getByKitchen(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		final List<SalesDetail> result = new ArrayList<SalesDetail>();
 		if(extraCond.isChain()){
@@ -201,11 +193,11 @@ public class SaleDetailsDao {
 			//key : value - deptName + kitchenName : salesDetail
 			final Map<String, SalesDetail> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
-			for(SalesDetail groupDetail : getByKitchen(dbCon, groupStaff, range, extraCond.setChain(false))){
+			for(SalesDetail groupDetail : getByKitchen(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupDetail.getKitchen().getDept().getName() + groupDetail.getKitchen().getName(), groupDetail);
 			}
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(SalesDetail branchDetail : getByKitchen(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false))){
+				for(SalesDetail branchDetail : getByKitchen(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchDetail.getKitchen().getDept().getName() + branchDetail.getKitchen().getName())){
 						SalesDetail salesDetail = chainResult.get(branchDetail.getKitchen().getDept().getName() + branchDetail.getKitchen().getName());
 						salesDetail.setGifted(branchDetail.getGifted() + salesDetail.getGifted());
@@ -229,22 +221,24 @@ public class SaleDetailsDao {
 		}else{
 			List<IncomeByKitchen> kitchenIncomes;
 
-			if(extraCond.dateType.isHistory()){
-				
-				//Get the duty range between on and off duty date
-				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
-				
-				//Calculate the incomes to each kitchen.
-				if(dutyRange != null){
-					kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, dutyRange, extraCond);
-				}else{
-					kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, range, extraCond);
-				}
-				
-			}else{
-				//Calculate the incomes to each kitchen.
-				kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, range, extraCond);
-			}
+//			if(extraCond.dateType.isHistory()){
+//				
+//				//Get the duty range between on and off duty date
+//				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
+//				
+//				//Calculate the incomes to each kitchen.
+//				if(dutyRange != null){
+//					kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, dutyRange, extraCond);
+//				}else{
+//					kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, range, extraCond);
+//				}
+//				
+//			}else{
+//				//Calculate the incomes to each kitchen.
+//				kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, range, extraCond);
+//			}
+			
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, extraCond);
 			
 			for(IncomeByKitchen kitchenIncome : kitchenIncomes){
 				SalesDetail salesDetail = new SalesDetail(kitchenIncome.getKitchen());
@@ -272,8 +266,6 @@ public class SaleDetailsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @param orderType
@@ -282,11 +274,11 @@ public class SaleDetailsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<SalesDetail> getByFood(Staff staff, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException, BusinessException{
+	public static List<SalesDetail> getByFood(Staff staff, ExtraCond extraCond, int orderType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByFood(dbCon, staff, range, extraCond, orderType);
+			return getByFood(dbCon, staff, extraCond, orderType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -298,8 +290,6 @@ public class SaleDetailsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @param orderType
@@ -308,38 +298,36 @@ public class SaleDetailsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<SalesDetail> getByFood(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException, BusinessException{
+	public static List<SalesDetail> getByFood(DBCon dbCon, Staff staff, ExtraCond extraCond, int orderType) throws SQLException, BusinessException{
 		
 		final List<SalesDetail> result = new ArrayList<SalesDetail>();
 
 		if(extraCond.isChain()){
 			//append the food sales detail in case of chain.
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
-			result.addAll(getByFood(dbCon, groupStaff, range, extraCond.setChain(false), orderType));
+			result.addAll(getByFood(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false), orderType));
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				result.addAll(getByFood(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false), orderType));
+				result.addAll(getByFood(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false), orderType));
 			}
 			
-			//Restore the chain status to extra condition.
-			extraCond.setChain(true);
 		}else{
 			final List<IncomeByFood> foodIncomes;
 			
-			if(extraCond.dateType.isHistory()){
-				
-				//Get the duty range between on and off duty date
-				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
-				
-				if(dutyRange != null){
-					foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	staff, dutyRange, extraCond);
-				}else{
-					foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	staff, range, extraCond);
-				}
-			}else{
-				foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, staff, range, extraCond);
-			}
+//			if(extraCond.dateType.isHistory()){
+//				
+//				//Get the duty range between on and off duty date
+//				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
+//				
+//				if(dutyRange != null){
+//					foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	staff, dutyRange, extraCond);
+//				}else{
+//					foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	staff, range, extraCond);
+//				}
+//			}else{
+//				foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, staff, range, extraCond);
+//			}
 			
-			
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, staff, extraCond);
 			for(IncomeByFood foodIncome : foodIncomes){
 				SalesDetail detail = new SalesDetail(foodIncome.getFood());
 				detail.setResturant(foodIncome.getRestaurant());

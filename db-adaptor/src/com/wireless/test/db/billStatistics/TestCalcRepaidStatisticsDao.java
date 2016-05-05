@@ -36,7 +36,7 @@ public class TestCalcRepaidStatisticsDao {
 	}
 	
 	@Test
-	public void testCalcRepaidStatistics() throws SQLException, ParseException{
+	public void testCalcRepaidStatistics() throws SQLException, ParseException, BusinessException{
 		float totalIncomeByReason = 0;
 		float totalAmountByReason = 0;
 		

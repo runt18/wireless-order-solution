@@ -48,9 +48,8 @@ public class DutyRangeDao {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements
 	 */
-	public static DutyRange exec(DBCon dbCon, Staff staff, DutyRange range) throws SQLException{
-		DutyRange result = exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
-		return result != null ? result : range;
+	private static DutyRange exec(DBCon dbCon, Staff staff, DutyRange range) throws SQLException{
+		return exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
 	}
 	
 	/**

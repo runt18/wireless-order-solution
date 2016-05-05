@@ -42,7 +42,7 @@ public class CalcCancelStatisticsDao {
 		private int staffId;
 		private int reasonId;
 		private Region.RegionId regionId;
-		private DutyRange range;
+		private DutyRange dutyRange;
 		private HourRange hourRange;
 		private String foodName;
 		private int orderId;
@@ -98,7 +98,7 @@ public class CalcCancelStatisticsDao {
 		}
 		
 		public ExtraCond setRange(DutyRange range){
-			this.range = range;
+			this.dutyRange = range;
 			return this;
 		}
 		
@@ -146,19 +146,23 @@ public class CalcCancelStatisticsDao {
 			if(regionId != null){
 				extraCond.append(" AND O.region_id = " + regionId.getId());
 			}
-			if(this.range != null){
-				DutyRange dutyRange;
+			if(this.dutyRange != null){
+				DutyRange range;
 				if(this.calcByDuty){
 					try {
-						dutyRange = DutyRangeDao.exec(staff, range);
+						range = DutyRangeDao.exec(staff, dutyRange);
 					} catch (SQLException e) {
-						dutyRange = this.range;
+						range = this.dutyRange;
 						e.printStackTrace();
 					}
 				}else{
-					dutyRange = this.range;
+					range = this.dutyRange;
 				}
-				extraCond.append(" AND O.order_date BETWEEN '" + dutyRange.getOnDutyFormat() + "' AND '" + dutyRange.getOffDutyFormat() + "'");
+				if(range != null){
+					extraCond.append(" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+				}else{
+					extraCond.append(" AND 0 ");
+				}
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
@@ -385,7 +389,7 @@ public class CalcCancelStatisticsDao {
 	 * Calculate the cancel income by staff according to duty range and extra condition
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
+	 * @param dutyRange
 	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link ExtraCond}

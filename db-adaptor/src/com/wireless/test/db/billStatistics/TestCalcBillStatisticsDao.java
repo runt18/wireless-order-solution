@@ -36,7 +36,7 @@ public class TestCalcBillStatisticsDao {
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
 		 mDutyRange = new DutyRange("2014-2-10 23:40:04", "2014-2-26 23:49:36"); 
-		 mExtraCond = new ExtraCond(DateType.HISTORY);
+		 mExtraCond = new ExtraCond(DateType.HISTORY).setDutyRange(mDutyRange);
 		 //mExtraCond.setDept(Department.DeptId.DEPT_2);
 		 //mExtraCond.setRegion(Region.RegionId.REGION_1);
 		 //mExtraCond.setFoodName("菜");
@@ -46,7 +46,7 @@ public class TestCalcBillStatisticsDao {
 	@Test 
 	public void testCalcIncomeByKitchenAndDept() throws BusinessException, SQLException{
 		
-		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(mStaff, mDutyRange, mExtraCond);
+		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(mStaff, mExtraCond);
 		
 		Map<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
@@ -64,7 +64,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, mExtraCond);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mExtraCond);
 		
 		if(deptIncomeByKitchen.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -89,7 +89,7 @@ public class TestCalcBillStatisticsDao {
 	@Test 
 	public void testCalcIncomeByFood() throws BusinessException, SQLException{
 		
-		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(mStaff, mDutyRange, mExtraCond);
+		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(mStaff, mExtraCond);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
 		for(IncomeByFood foodIncome : foodIncomes){
@@ -107,7 +107,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, mExtraCond);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mExtraCond);
 		
 		if(deptIncomeByFood.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
