@@ -329,6 +329,7 @@ Ext.onReady(function(){
 		var cm = new Ext.grid.ColumnModel([
 			new Ext.grid.RowNumberer(),
 			{header : '反结账时间', dataIndex : 'orderDateFormat'},
+			{header : '门店名称', dataIndex : 'restaurantName'},
 			{header : '人员', dataIndex : 'operateStaff'},
 			{header : '账单号', dataIndex : 'orderId', renderer : linkOrderId},
 			{header : '原应收', dataIndex : 'oldTotalPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
@@ -345,6 +346,7 @@ Ext.onReady(function(){
 			proxy : new Ext.data.HttpProxy({url : '../../QueryRepaidStatistics.do'}),
 			reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [
 			{name : 'orderDateFormat'},
+			{name : 'restaurantName'},
 			{name : 'operateStaff'},
 			{name : 'orderId'},
 			{name : 'oldTotalPrice'},
@@ -353,7 +355,8 @@ Ext.onReady(function(){
 			{name : 'totalPrice'},
 			{name : 'actualPrice'},
 			{name : 'payTypeValue'},
-			{name : 'payTypeText'}
+			{name : 'payTypeText'},
+			{name : 'rid'}
 			])
 			
 		});
@@ -515,14 +518,16 @@ Ext.onReady(function(){
 						}],
 						listeners : {
 							show : function(thiz) {
+								var sd = Ext.ux.getSelData(repaidStatisticsGrid);
 								thiz.load({
 									url : '../window/history/orderDetail.jsp', 
 									scripts : true,
 									method : 'post'
 								});
 								thiz.center();	
-								thiz.orderId = orderID;
-								thiz.branchId = branch_combo_repaidStatistics.getValue();
+								thiz.orderId = sd.orderId;
+								//FIXME
+								thiz.branchId = sd.rid;
 								thiz.foodStatus = 'isRepaid';
 							}
 						}
@@ -544,13 +549,14 @@ Ext.onReady(function(){
 					sumCell.style.color = 'green';
 				}
 				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';			//门店名称
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';			//人员
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';			//账单号
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';			//原应收
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';			//原实收
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';			//现应收
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';			//现实收
+				repaidStatisticsGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';		//付款方式
 				
 				Ext.getCmp('repaidStatisticsPanel')
 				$('#repaidStatisticsPanel').find('.orderLinkId').each(function(index, element){
