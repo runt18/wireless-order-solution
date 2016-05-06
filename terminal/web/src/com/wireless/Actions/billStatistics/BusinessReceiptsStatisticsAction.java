@@ -81,7 +81,9 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				extraCond.setRegion(Region.RegionId.valueOf(Integer.parseInt(region)));
 			}
 			
-			List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond);
+			extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
+			
+			List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
 				jObject.setRoot(new ArrayList<Jsonable>(0));
@@ -168,7 +170,12 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)));
+			
+			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			extraCond.setDutyRange(new DutyRange(DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())));
+			
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond));
 			
 //			jobject.setRoot(incomesByEachDay);
 			

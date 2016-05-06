@@ -84,12 +84,14 @@ public class BusinessStatisticsAction extends DispatchAction {
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 			}
 			
+			extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
+			
 			List<IncomeByEachDay> incomesByEachDay;
 			String chartData = null ;
 			if(chart != null && !chart.isEmpty()){
 				incomesByEachDay = new ArrayList<IncomeByEachDay>();
 				
-				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond));
+				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond));
 				
 				List<String> xAxis = new ArrayList<String>();
 				List<Float> data = new ArrayList<Float>();

@@ -1591,13 +1591,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+		final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+																				.setDutyRange(new DutyRange(onDuty, offDuty));
 		
 		if(regionId != null && !regionId.isEmpty()){
 			extraCond.setRegion(Region.RegionId.valueOf(Integer.parseInt(regionId)));
 		}
 		
-		final List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond);
+		final List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 		
 		// 创建excel主页
 		HSSFWorkbook wb = new HSSFWorkbook();
