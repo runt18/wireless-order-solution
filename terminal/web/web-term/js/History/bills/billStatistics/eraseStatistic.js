@@ -238,6 +238,7 @@ Ext.onReady(function(){
 									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 								}
 								
+								erase_combo_staffs.setDisabled(false);
 								erase_combo_staffs.store.loadData(staff);
 								erase_combo_staffs.setValue(-1);
 							}
@@ -256,6 +257,8 @@ Ext.onReady(function(){
 								for(var i = 0; i < jr.root.length; i++){
 									dept.push([jr.root[i]['id'], jr.root[i]['name']]);
 								}
+								
+								erase_deptCombo.setDisabled(false);
 								erase_deptCombo.store.loadData(dept);
 								erase_deptCombo.setValue(-1);
 							}
@@ -278,6 +281,7 @@ Ext.onReady(function(){
 								
 								hour.push([-2, '自定义']);
 								
+								Ext.getCmp('erase_comboBusinessHour').setDisabled(false);
 								Ext.getCmp('erase_comboBusinessHour').store.loadData(hour);
 								Ext.getCmp('erase_comboBusinessHour').setValue(-1);
 							}

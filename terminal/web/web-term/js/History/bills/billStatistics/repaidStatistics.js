@@ -144,6 +144,7 @@ Ext.onReady(function(){
 								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 							}
 							
+							repaid_combo_staffs.setDisabled(false);
 							repaid_combo_staffs.store.loadData(staff);
 							repaid_combo_staffs.setValue(-1);
 						}
@@ -166,6 +167,7 @@ Ext.onReady(function(){
 							
 							hour.push([-2, '自定义']);
 							
+							Ext.getCmp('repaid_comboBusinessHour').setDisabled(false);
 							Ext.getCmp('repaid_comboBusinessHour').store.loadData(hour);
 							Ext.getCmp('repaid_comboBusinessHour').setValue(-1);
 						}

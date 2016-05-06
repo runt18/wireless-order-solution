@@ -19,6 +19,7 @@ of.entry = function(c){
 	c = c || {
 		orderFoodOperateType : null,			//操作类型
 		table : null,							//餐台
+		customNum : null,                       //开台人数
 		comment : null,							//开台备注
 		initFoods : null,						//初始菜品
 		wxCode : null,							//微信账单号							
@@ -41,6 +42,10 @@ of.entry = function(c){
 		if(c.comment){
 			param += '&comment=' + c.comment;	
 		}
+		
+		if(c.customNum){
+			param += '&customNum=' + c.customNum;
+		}
 	}
 	
 	//初始化菜品
@@ -56,6 +61,7 @@ of.entry = function(c){
 	}else{
 		of.wxCode = null;
 	}
+	
 	
 	//去点餐界面
 	location.href = '#orderFoodMgr' + (param || '');
@@ -458,6 +464,10 @@ $(function(){
 						of.table = data.root[0];
 						if(param.comment){
 							of.table.comment = param.comment;
+						}
+						
+						if(param.customNum){
+							of.table.customNum = param.customNum;
 						}
 	
 						//获取沽清菜品的数据
@@ -1505,18 +1515,37 @@ $(function(){
 			closePopTastePopup();
 			
 			if(!of.selectedOrderFood.isTemporary){
-				seajs.use('taste', function(taste){
-					popTastePopup = taste.newInstance({
-						selectedFood : of.selectedOrderFood,
-						postTasteChanged : function(){
-							initNewFoodContent();
-						},
-						postUnitClick : function(){
-							initNewFoodContent();
-						}
+				if(of.selectedOrderFood.isCombo() || of.selectedOrderFood.hasPopTastes() || of.selectedOrderFood.hasFoodUnit()){
+					seajs.use('taste', function(taste){
+						popTastePopup = taste.newInstance({
+							selectedFood : of.selectedOrderFood,
+							postTasteChanged : function(){
+								initNewFoodContent();
+							},
+							postUnitClick : function(){
+								initNewFoodContent();
+							}
+						});
+						popTastePopup.open();
 					});
-					popTastePopup.open();
-				});
+				}else{
+					seajs.use('moreTastes', function(moreTastes){
+						var moreTaste = null;
+						moreTaste = moreTastes.newInstance({
+							selectedFood : of.selectedOrderFood,
+							postTasteClick : function(taste, chooseFood){
+								of.selectedOrderFood.addTaste(taste);
+								initNewFoodContent();
+							},
+							postTasteCancel : function(taste, chooseFood){
+								of.selectedOrderFood.removeTaste(taste);
+								initNewFoodContent();	
+							}
+						});
+						
+						moreTaste.open();
+					});
+				}
 			}else{
 				Util.msg.tip('临时菜不能使用口味');
 			}
@@ -1783,20 +1812,21 @@ $(function(){
 				popTastePopup.close();
 			}
 			
-		
-			seajs.use('taste', function(taste){
-			
-				popTastePopup = taste.newInstance({
-					selectedFood : of.selectedOrderFood,
-					postTasteChanged : function(){
-						initNewFoodContent();
-					},
-					postUnitClick : function(){
-						initNewFoodContent();
-					}
+			if(of.selectedOrderFood.isCombo() || of.selectedOrderFood.hasPopTastes() || of.selectedOrderFood.hasFoodUnit()){
+				seajs.use('taste', function(taste){
+				
+					popTastePopup = taste.newInstance({
+						selectedFood : of.selectedOrderFood,
+						postTasteChanged : function(){
+							initNewFoodContent();
+						},
+						postUnitClick : function(){
+							initNewFoodContent();
+						}
+					});
+					popTastePopup.open();
 				});
-				popTastePopup.open();
-			});
+			}
 			
 			//判断拼音键盘是否显示来清空
 			if($("#orderPinyinCmp").is(":visible")){

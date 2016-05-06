@@ -197,6 +197,7 @@ Ext.onReady(function(){
 									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 								}
 								
+								discount_combo_staffs.setDisabled(false);
 								discount_combo_staffs.store.loadData(staff);
 								discount_combo_staffs.setValue(-1);
 							}
@@ -215,6 +216,8 @@ Ext.onReady(function(){
 								for(var i = 0; i < jr.root.length; i++){
 									region.push([jr.root[i]['id'], jr.root[i]['name']]);
 								}
+								
+								discount_deptCombo.setDisabled(false);
 								discount_deptCombo.store.loadData(region);
 								discount_deptCombo.setValue(-1);
 							}
@@ -237,6 +240,7 @@ Ext.onReady(function(){
 								
 								hour.push([-2, '自定义']);
 								
+								Ext.getCmp('discount_comboBusinessHour').setDisabled(false);
 								Ext.getCmp('discount_comboBusinessHour').store.loadData(hour);
 								Ext.getCmp('discount_comboBusinessHour').setValue(-1);
 							}
@@ -422,13 +426,11 @@ Ext.onReady(function(){
 							thiz.load({
 								url : '../window/history/viewBillDetail.jsp', 
 								scripts : true,
-								params : {
-									orderId : sd.id,
-									queryType : 'History'
-								},
 								method : 'post'
 							});
 							thiz.center();	
+							thiz.orderId = sd.id;
+							thiz.queryType = 'History';
 						}
 					}
 				});

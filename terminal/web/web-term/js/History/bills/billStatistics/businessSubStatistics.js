@@ -56,6 +56,7 @@
 									opening : sendToStatisticsPageHours.opening,
 									ending : sendToStatisticsPageHours.ending
 								}
+								
 								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'discount_'});
 								discount_hours = sendToStatisticsPageHours;
 								

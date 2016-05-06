@@ -205,6 +205,7 @@ Ext.onReady(function(){
 									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 								}
 								
+								gift_combo_staffs.setDisabled(false);
 								gift_combo_staffs.store.loadData(staff);
 								gift_combo_staffs.setValue(-1);
 							}
@@ -223,6 +224,8 @@ Ext.onReady(function(){
 								for(var i = 0; i < jr.root.length; i++){
 									region.push([jr.root[i]['id'], jr.root[i]['name']]);
 								}
+								
+								Ext.getCmp('giftStatistic_comboRegion').setDisabled(false);
 								Ext.getCmp('giftStatistic_comboRegion').store.loadData(region);
 								Ext.getCmp('giftStatistic_comboRegion').setValue(-1);
 							}
@@ -245,6 +248,7 @@ Ext.onReady(function(){
 								
 								hour.push([-2, '自定义']);
 								
+								Ext.getCmp('giftStatistic_comboBusinessHour').setDisabled(false);
 								Ext.getCmp('giftStatistic_comboBusinessHour').store.loadData(hour);
 								Ext.getCmp('giftStatistic_comboBusinessHour').setValue(-1);
 							}

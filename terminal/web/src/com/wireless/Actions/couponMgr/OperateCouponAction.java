@@ -61,17 +61,21 @@ public class OperateCouponAction extends DispatchAction{
 		final String couponTypeId = request.getParameter("couponTypeId");
 		final JObject jObject = new JObject();
 		try{
+			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				extraCond.setBranch(Integer.parseInt(branchId));
 			}
 
-			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
 			
 			if(staffId != null && !staffId.isEmpty()){
 				extraCond.setStaff(Integer.parseInt(staffId));
+			}
+			
+			if(branchId != null && !branchId.isEmpty()){
+				extraCond.setBranch(Integer.parseInt(branchId));
 			}
 			
 			if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
