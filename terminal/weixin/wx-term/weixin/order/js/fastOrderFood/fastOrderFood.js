@@ -3,7 +3,7 @@ function PickFoodComponent(param){
 	
 	param = param || {
 		orderDataCount : null,
-		confirm : function(selectedFoods, comment, container){},
+		confirm : function(selectedFoods, comment, container, _calcOrderCost){},
 		onCartChange : function(selectedFoods){},
 		bottomId : null              //尾部栏
 	};
@@ -20,6 +20,8 @@ function PickFoodComponent(param){
 	var _orderData = [];
 	//备注信息
 	var _commentData = null;
+	//后台计算出来的价格
+	var _calcOrderCost = null;
 	
 	this.open = function(afterOpen){
 		$('#WXCmp_div_member').hide();
@@ -71,8 +73,10 @@ function PickFoodComponent(param){
 			+'<div id="shoppingCart_div_fastOrderFood" class="box-vertical">'
 		  	+'<div id="shoppingCartFood_div_fastOrderFood"></div>'
 		  	+'<div id="shoppingFoodsum_div_fastOrderFood">'
-		  		+'菜品数量:&nbsp;<span id="sumCount_span_fastOrderFood">--.--</span> &nbsp;&nbsp;'
-		  		+'合计:&nbsp;<span id="sumPrice_div_fastOrderFood">--.--</span>'
+		  		+'<span style="display"><span style="color:#000;display:inline-block;width:49%;">原价:&nbsp;<span id="sumPrice_div_fastOrderFood" style="color:#26a9d0;">--.--</span></span>'
+		  		+'<span style="color:#000;display:inline-block;width:49%;">会员价:&nbsp;<span id="actualPrice_div_fastOrderFood" style="color:#26a9d0;">--.--</span></span></span>'
+		  		+'<span style="display"><span style="color:#000;display:inline-block;width:44%;">菜品数量:&nbsp;<span id="sumCount_span_fastOrderFood" style="color:#26a9d0;">--.--</span></span>'
+		  		+'<span style="color:#000;display:inline-block;width:54%;"><span id="sumCount_span_fastOrderFood" style="color:#26a9d0;"></span></span></span>'
 		  	+'</div>'
 		  	+'<div id="cartComment_div_fastOrderFood"> </div>'
 			+'<div id="shoppingBtn_div_fastOrderFood" class="hewarp">'
@@ -177,7 +181,7 @@ function PickFoodComponent(param){
 		
 		//购物车的选好了
 		_container.find('[id="shoppingCarSelect_li_fastOrderFood"]').click(function(){
-			param.confirm(_orderData, _commentData, _container);
+			param.confirm(_orderData, _commentData, _container, _calcOrderCost);
 		});
 		
 		_container.after($('#' + param.bottomId));
@@ -702,43 +706,10 @@ function PickFoodComponent(param){
 		Util.getDom('sumCount_span_fastOrderFood').innerHTML = count;
 		
 		if(_orderData.length > 0 && Util.mp.params.sessionId){
-			var foods = '';
-			var unitId = 0; 
-			_orderData.forEach(function(element, index){
-				if(index > 0){
-					foods += '&';
-				}
-				
-				if(element.unitPriceId){
-					unitId = element.unitPriceId;
-					
-				}else{
-					unitId = 0;
-				}
-					
-				foods += element.id + ',' + element.count + ',' + unitId;
-			});
-			$.ajax({
-				url : '../../WxOperateOrder.do',
-				type : 'post',
-				dataType : 'json',
-				data : {
-					dataSource : 'calcOrder',
-					sessionId : Util.mp.params.sessionId,
-					foods : foods
-				},
-				success : function(data, status, req){
-					if(data.success){
-						Util.getDom('sumPrice_div_fastOrderFood').innerHTML = data.actualPrice;
-					}
-				},
-				error : function(req, status, err){
-					Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);
-				}
-			});
-			
+			calcOrderCost();
 		}else{
-			Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);		
+			Util.getDom('sumPrice_div_fastOrderFood').innerHTML = sumPrice.toFixed(2);	
+			_calcOrderCost = sumPrice.toFixed(2);
 		}
 
 		if(param.onCartChange && typeof param.onCartChange == 'function'){
@@ -758,6 +729,49 @@ function PickFoodComponent(param){
 		
 		
 	}
+	
+	//计算折扣后所花费的钱
+	
+	function calcOrderCost(){
+		var foods = '';
+		var unitId = 0; 
+		_orderData.forEach(function(element, index){
+			if(index > 0){
+				foods += '&';
+			}
+			
+			if(element.unitPriceId){
+				unitId = element.unitPriceId;
+				
+			}else{
+				unitId = 0;
+			}
+				
+			foods += element.id + ',' + element.count + ',' + unitId;
+		});
+		
+		$.ajax({
+			url : '../../WxOperateOrder.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				dataSource : 'calcOrder',
+				sessionId : Util.mp.params.sessionId,
+				foods : foods
+			},
+			success : function(data, status, req){
+				if(data.success){
+					$('#sumPrice_div_fastOrderFood').html(data.root[0].totalPrice.toFixed(2));
+					$('#actualPrice_div_fastOrderFood').html(data.root[0].actualPrice.toFixed(2));
+					_calcOrderCost = data.root[0].actualPrice;
+				}
+			},
+			error : function(req, status, err){
+				$('#actualPrice_div_fastOrderFood').html('----');
+			}
+		});
+	}
+	
 	
 	//打开购物车
 	
@@ -828,6 +842,7 @@ function PickFoodComponent(param){
 			shoppingCarMainView.find('[data-type="cut"]').each(function(index, element){
 				element.onclick = function(){
 					operateFood({otype:'cut', id : $(element).attr('shoppingFoodId'), event : element});
+					calcOrderCost();
 				};
 			});
 			
@@ -835,11 +850,13 @@ function PickFoodComponent(param){
 			shoppingCarMainView.find('[data-type="plus"]').each(function(index, element){
 				element.onclick = function(){
 					operateFood({otype : 'plus', id : $(element).attr('shoppingFoodId'), event : element});
+					calcOrderCost();
 				}
 			});
 			
 			sumCountView.html(_orderData.length);
-			sumPriceView.html(sumPrice.toFixed(2));
+//			sumPriceView.html(sumPrice.toFixed(2));
+			calcOrderCost();
 			
 			//当菜品列表高过屏幕高度时, 固定列表div的高度
 			shoppingCarMainView.height('auto');
