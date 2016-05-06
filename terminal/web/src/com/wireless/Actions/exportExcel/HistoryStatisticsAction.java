@@ -3769,7 +3769,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
+		final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY)
+																				    .setDutyRange(new DutyRange(beginDate, endDate))
+																				    .setCalcByDuty(true);
 		
 		if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 			extraCond.setStaffId(Integer.valueOf(staffId));
@@ -3783,13 +3785,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 		}
 		
-		List<Order> result;
-		final DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-		if(range != null){
-			result = CalcEraseStatisticsDao.getDetail(staff, range, extraCond);
-		}else{
-			result = CalcEraseStatisticsDao.getDetail(staff, new DutyRange(beginDate, endDate), extraCond);
-		}
+		List<Order> result = CalcEraseStatisticsDao.getDetail(staff, extraCond);
 		
 		String title = "抹数统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")"; 
 		
