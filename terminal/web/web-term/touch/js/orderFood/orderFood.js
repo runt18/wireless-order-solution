@@ -1505,18 +1505,37 @@ $(function(){
 			closePopTastePopup();
 			
 			if(!of.selectedOrderFood.isTemporary){
-				seajs.use('taste', function(taste){
-					popTastePopup = taste.newInstance({
-						selectedFood : of.selectedOrderFood,
-						postTasteChanged : function(){
-							initNewFoodContent();
-						},
-						postUnitClick : function(){
-							initNewFoodContent();
-						}
+				if(of.selectedOrderFood.isCombo() || of.selectedOrderFood.hasPopTastes() || of.selectedOrderFood.hasFoodUnit()){
+					seajs.use('taste', function(taste){
+						popTastePopup = taste.newInstance({
+							selectedFood : of.selectedOrderFood,
+							postTasteChanged : function(){
+								initNewFoodContent();
+							},
+							postUnitClick : function(){
+								initNewFoodContent();
+							}
+						});
+						popTastePopup.open();
 					});
-					popTastePopup.open();
-				});
+				}else{
+					seajs.use('moreTastes', function(moreTastes){
+						var moreTaste = null;
+						moreTaste = moreTastes.newInstance({
+							selectedFood : of.selectedOrderFood,
+							postTasteClick : function(taste, chooseFood){
+								of.selectedOrderFood.addTaste(taste);
+								initNewFoodContent();
+							},
+							postTasteCancel : function(taste, chooseFood){
+								of.selectedOrderFood.removeTaste(taste);
+								initNewFoodContent();	
+							}
+						});
+						
+						moreTaste.open();
+					});
+				}
 			}else{
 				Util.msg.tip('临时菜不能使用口味');
 			}
@@ -1783,20 +1802,21 @@ $(function(){
 				popTastePopup.close();
 			}
 			
-		
-			seajs.use('taste', function(taste){
-			
-				popTastePopup = taste.newInstance({
-					selectedFood : of.selectedOrderFood,
-					postTasteChanged : function(){
-						initNewFoodContent();
-					},
-					postUnitClick : function(){
-						initNewFoodContent();
-					}
+			if(of.selectedOrderFood.isCombo() || of.selectedOrderFood.hasPopTastes() || of.selectedOrderFood.hasFoodUnit()){
+				seajs.use('taste', function(taste){
+				
+					popTastePopup = taste.newInstance({
+						selectedFood : of.selectedOrderFood,
+						postTasteChanged : function(){
+							initNewFoodContent();
+						},
+						postUnitClick : function(){
+							initNewFoodContent();
+						}
+					});
+					popTastePopup.open();
 				});
-				popTastePopup.open();
-			});
+			}
 			
 			//判断拼音键盘是否显示来清空
 			if($("#orderPinyinCmp").is(":visible")){
