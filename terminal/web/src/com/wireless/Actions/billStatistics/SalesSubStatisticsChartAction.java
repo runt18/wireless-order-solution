@@ -37,32 +37,42 @@ public class SalesSubStatisticsChartAction extends Action {
 		final String ending = request.getParameter("ending");
 		final String region = request.getParameter("region");
 		final String deptId = request.getParameter("deptId");
-		
+		final String branchId = request.getParameter("branchId");
 		final JObject jObject = new JObject();
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+																						.setDutyRange(new DutyRange(onDuty, offDuty))
+																						.setCalcByDuty(true);
+			
+			if(branchId != null && !branchId.isEmpty()){
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
+			}
+			
 			if(opening != null && !opening.isEmpty()){
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
 				extraCond.setHourRange(hr);
 			}
 			if(region != null && !region.isEmpty() && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
-				
 			}
 
 			if(deptId != null && !deptId.equals("-1")){
 				extraCond.setDept(Department.DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			final List<IncomeTrendByDept> incomesByEachDay = CalcBillStatisticsDao.calcIncomeTrendByDept(staff, new DutyRange(onDuty, offDuty), extraCond);
+			final List<IncomeTrendByDept> incomesByEachDay = CalcBillStatisticsDao.calcIncomeTrendByDept(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			float totalMoney = 0;
 			int count = 0;
 			for (IncomeTrendByDept e : incomesByEachDay) {
-				xAxis.add("\'" + e.getRange().getOffDutyFormat() + "\'");
+				xAxis.add("\'" + e.getRange().getOnDutyFormat() + "\'");
 				data.add(e.getDeptIncome().getIncome());
 				totalMoney += e.getDeptIncome().getIncome();
 				count++;

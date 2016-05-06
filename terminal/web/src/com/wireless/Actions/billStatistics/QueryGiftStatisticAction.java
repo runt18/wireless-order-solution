@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcGiftStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -28,6 +27,7 @@ import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class QueryGiftStatisticAction extends DispatchAction{
@@ -57,15 +57,20 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		try{
 			
+			final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY)
+																	 .setDutyRange(new DutyRange(onDuty, offDuty))
+																	 .setCalcByDuty(true)
+																	 .setGift(true);
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY);
-			
-			extraCond.setGift(true);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -82,12 +87,6 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
-			if(range != null){
-				extraCond.setDutyRange(range);
-			}else{
-				extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
-			}
 			List<OrderFood> orderFoodList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
 			
 			jobject.setTotalProperty(orderFoodList.size());
@@ -133,14 +132,20 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																					   .setDutyRange(new DutyRange(dateBeg, dateEnd))
+																					   .setCalcByDuty(true);
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -157,19 +162,14 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd);
-			}
-			
-			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, range, extraCond);
+			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			List<Float> amountData = new ArrayList<Float>();
 			float totalMoney = 0, totalCount = 0;
 			for (GiftIncomeByEachDay c : giftList) {
-				xAxis.add("\'"+c.getRange().getOffDutyFormat()+"\'");
+				xAxis.add("\'" + c.getRange().getOnDutyFormat() + "\'");
 				data.add(c.getGiftPrice());
 				amountData.add(c.getGiftAmount());
 				
@@ -177,7 +177,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				totalCount += c.getGiftAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/giftList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/giftList.size())*100)/100 + 
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + NumericUtil.roundFloat(totalMoney) + ",\"avgMoney\" : " + Math.round((totalMoney/giftList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/giftList.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'赠送金额\', \"data\" : " + data + "}, {\"name\":\'赠送数量\', \"data\" : " + amountData + "}]}";
 			jObject.setExtra(new Jsonable(){
 				@Override
@@ -230,13 +230,20 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																						.setCalcByDuty(true)
+																						.setDutyRange(new DutyRange(dateBeg, dateEnd));
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -253,12 +260,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd);
-			}
-			
-			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, range, extraCond));
+			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -296,14 +298,20 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																					   .setCalcByDuty(true)
+																					   .setDutyRange(new DutyRange(dateBeg, dateEnd));
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -320,12 +328,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd);
-			}
-			
-			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, range, extraCond));
+			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

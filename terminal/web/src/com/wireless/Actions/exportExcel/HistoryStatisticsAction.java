@@ -4126,7 +4126,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 		}
 		
-		final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+		final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																					.setDutyRange(new DutyRange(beginDate, endDate))
+																					;
 		
 		if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 			extraCond.setStaffId(Integer.valueOf(staffId));
@@ -4136,7 +4138,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 		}
 		
-		List<Order> list = CalcDiscountStatisticsDao.getDiscountStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+		List<Order> list = CalcDiscountStatisticsDao.getDetail(staff, extraCond);
 		
 		float totalDiscountPrice = 0;
 		if(!list.isEmpty()){
