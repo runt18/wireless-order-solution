@@ -2,6 +2,7 @@ package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -157,10 +158,12 @@ public class InsertOrder {
 			}
 
 		}else if(orderToInsert.getDestTbl().isBusy()){
-			OrderFood of = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(orderToInsert.getDestTbl().getOrderId()), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
-			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
-			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 是否继续提交?", FrontBusinessError.ORDER_EXPIRED);
-			
+			List<OrderFood> orderFoods = OrderFoodDao.getSingleDetail(dbCon, staff, new OrderFoodDao.ExtraCond(DateType.TODAY).setOrder(orderToInsert.getDestTbl().getOrderId()), " ORDER BY OF.id DESC LIMIT 1 ");
+			if(!orderFoods.isEmpty()){
+				OrderFood of = orderFoods.get(0);
+				long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
+				throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 是否继续提交?", FrontBusinessError.ORDER_EXPIRED);
+			}			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ProtocolError.UNKNOWN);
 		}

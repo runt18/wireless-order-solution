@@ -24,8 +24,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.HttpContext;
 
-import sun.misc.BASE64Encoder;
-
 import com.alibaba.fastjson.JSON;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -37,6 +35,8 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sms.msg.Msg;
+
+import sun.misc.BASE64Encoder;
 
 @SuppressWarnings("restriction")
 public final class SMS {

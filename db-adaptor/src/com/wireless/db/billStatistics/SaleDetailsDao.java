@@ -96,22 +96,6 @@ public class SaleDetailsDao {
 		}else{
 			final List<IncomeByDept> deptIncomes;
 
-//			if(extraCond.dateType.isHistory()){
-//				
-//				//Get the duty range between on and off duty date
-//				DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
-//				
-//				//Calculate the incomes to each department.
-//				if(dutyRange != null){
-//					deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond);
-//				}else{
-//					deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
-//				}
-//			}else{
-//				//Calculate the incomes to each department.
-//				deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
-//			}
-			
 			//Calculate the incomes to each department.
 			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, extraCond);
 			

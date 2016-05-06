@@ -54,6 +54,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class CalcBillStatisticsDao {
 
@@ -244,18 +245,16 @@ public class CalcBillStatisticsDao {
 		if(extraCond.isChain()){
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the pay type income to group.
-			incomeByPay = calcIncomeByPayType(dbCon, groupStaff, range, extraCond.setChain(false));
+			incomeByPay = calcIncomeByPayType(dbCon, groupStaff, range, ((ExtraCond)extraCond.clone()).setChain(false));
 
 			//Append the pay type income to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				IncomeByPay branchIncome = calcIncomeByPayType(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, extraCond.setChain(false));
+				IncomeByPay branchIncome = calcIncomeByPayType(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, ((ExtraCond)extraCond.clone()).setChain(false));
 				for(IncomeByPay.PaymentIncome incomeByPayType : branchIncome.getPaymentIncomes()){
 					incomeByPay.addIncome4Chain(incomeByPayType);
 				}
 			}
 			
-			//Restore the chain status to extra condition.
-			extraCond.setChain(true);
 		}else{
 			
 			String sql;
@@ -1265,8 +1264,6 @@ public class CalcBillStatisticsDao {
 	 * Calculate the income trend according to specific duty range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition 
 	 * @return the result to income trend {@link IncomeTrendByDept}
@@ -1274,12 +1271,13 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the duty range
+	 * @throws BusinessException 
 	 */
-	public static List<IncomeTrendByDept> calcIncomeTrendByDept(Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
+	public static List<IncomeTrendByDept> calcIncomeTrendByDept(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeTrendByDept(dbCon, staff, dutyRange, extraCond);
+			return calcIncomeTrendByDept(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1292,8 +1290,6 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition 
 	 * @return the result to income trend {@link IncomeTrendByDept}
@@ -1301,37 +1297,61 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the duty range
+	 * @throws BusinessException 
 	 */
-	public static List<IncomeTrendByDept> calcIncomeTrendByDept(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
+	public static List<IncomeTrendByDept> calcIncomeTrendByDept(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
-		List<IncomeTrendByDept> result = new ArrayList<IncomeTrendByDept>();
-		
-		Calendar c = Calendar.getInstance();
-		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
-		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
-		c.setTime(dateBegin);
-		while (dateBegin.compareTo(dateEnd) <= 0) {
-			c.add(Calendar.DATE, 1);
+		if(extraCond.isChain){
 			
-			DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-												DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
-												DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
-			
-			if(range != null){
-				List<IncomeByDept> deptIncomes = calcIncomeByDept(dbCon, staff, extraCond);
-				if(deptIncomes.isEmpty()){
-					result.add(new IncomeTrendByDept(new DutyRange(dateBegin.getTime(), c.getTime().getTime()), IncomeByDept.DUMMY));
-				}else{
-					result.add(new IncomeTrendByDept(new DutyRange(dateBegin.getTime(), c.getTime().getTime()), deptIncomes.get(0)));
-				}
-			}else{
-				result.add(new IncomeTrendByDept(new DutyRange(dateBegin.getTime(), c.getTime().getTime()), IncomeByDept.DUMMY));
+			final Map<DutyRange, IncomeTrendByDept> chainResult = new HashMap<>();
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			//Append the department trend income to the group.
+			for(IncomeTrendByDept groupIncome : calcIncomeTrendByDept(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
+				chainResult.put(groupIncome.getRange(), groupIncome);
 			}
 			
-			dateBegin = c.getTime();
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				//Append the department trend income to each branch.
+				for(IncomeTrendByDept branchIncome : calcIncomeTrendByDept(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
+					if(chainResult.containsKey(branchIncome.getRange())){
+						IncomeTrendByDept deptTrendIncome = chainResult.get(branchIncome.getRange());
+						deptTrendIncome.getDeptIncome().setDiscount(deptTrendIncome.getDeptIncome().getDiscount() + branchIncome.getDeptIncome().getDiscount());
+						deptTrendIncome.getDeptIncome().setGift(deptTrendIncome.getDeptIncome().getGift() + branchIncome.getDeptIncome().getGift());
+						deptTrendIncome.getDeptIncome().setIncome(deptTrendIncome.getDeptIncome().getIncome() + branchIncome.getDeptIncome().getIncome());
+
+					}else{
+						chainResult.put(branchIncome.getRange(), branchIncome);
+					}
+				}
+			}
+			
+			return SortedList.newInstance(chainResult.values());
+			
+		}else{
+			List<IncomeTrendByDept> result = new ArrayList<IncomeTrendByDept>();
+			
+			Calendar c = Calendar.getInstance();
+			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOnDutyFormat());
+			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOffDutyFormat());
+			c.setTime(dateBegin);
+			while (dateBegin.compareTo(dateEnd) <= 0) {
+				c.add(Calendar.DATE, 1);
+				
+				DutyRange rangeByEachDay = new DutyRange(dateBegin.getTime(), c.getTime().getTime());
+				List<IncomeByDept> deptIncomes = calcIncomeByDept(dbCon, staff, ((ExtraCond)extraCond.clone()).setDutyRange(rangeByEachDay).setCalcByDuty(true));
+				if(deptIncomes.isEmpty()){
+					result.add(new IncomeTrendByDept(rangeByEachDay, new IncomeByDept()));
+				}else{
+					result.add(new IncomeTrendByDept(rangeByEachDay, deptIncomes.get(0)));
+				}
+				
+				dateBegin = c.getTime();
+			}
+			
+			return result;
+			
 		}
 		
-		return result;
 	}
 	
 	/**
@@ -1353,7 +1373,6 @@ public class CalcBillStatisticsDao {
 	 */
 	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
-		final List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
 		
 		if(extraCond.isChain()){
 			//Group by the date in case of chain.
@@ -1376,9 +1395,10 @@ public class CalcBillStatisticsDao {
 				}
 			}
 			
-			result.addAll(chainResult.values());
-			
+			return SortedList.newInstance(chainResult.values());
 		}else{
+			final List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
+
 			Calendar c = Calendar.getInstance();
 			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
 			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
@@ -1428,9 +1448,11 @@ public class CalcBillStatisticsDao {
 				
 				dateBegin = c.getTime();
 			}
+			
+			return result;
+
 		}
 		
-		return result;
 	}
 
 	/**
