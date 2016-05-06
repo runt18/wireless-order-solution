@@ -177,62 +177,78 @@ Ext.onReady(function(){
 						var jr = Ext.decode(res.responseText);
 						
 						if(jr.root[0].typeVal != '2'){
+							var data = [];
 							data.push([jr.root[0]['id'], jr.root[0]['name']]);
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+							thiz.fireEvent('select');
 						}else{
-							data.push(['', '全部'],[jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
-							 
+							var data = [[-1, '全部']];
+							data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+							
 							for(var i = 0; i < jr.root[0].branches.length; i++){
 								data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
 							}
+							
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							thiz.fireEvent('select');
 						}
-						
-						thiz.store.loadData(data);
-						thiz.setValue(jr.root[0].id);
-						thiz.fireEvent('select');
 					}
 				});
 			},
 			select : function(isJump){
-				//加载操作人员
-				var staff = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../QueryStaff.do',
-					params : {
-						branchId : branch_combo_coupon.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+				if(branch_combo_coupon.getValue() == -1){
+					couponStaff.setDisabled(true);
+					couponStaff.setValue(-1);
+					
+					Ext.getCmp('coupon_comboBusinessHour').setDisabled(true);
+					Ext.getCmp('coupon_comboBusinessHour').setValue(-1);
+					
+				}else{
+					//加载操作人员
+					var staff = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../QueryStaff.do',
+						params : {
+							branchId : branch_combo_coupon.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							}
+							
+							couponStaff.setDisabled(false);
+							couponStaff.store.loadData(staff);
+							couponStaff.setValue(-1);
 						}
-						
-						couponStaff.store.loadData(staff);
-						couponStaff.setValue(-1);
-					}
-				});
-				
-				//加载市别
-				var hour = [[-1, '全部']];
-				Ext.Ajax.request({
-					url : '../../OperateBusinessHour.do',
-					params : {
-						dataSource : 'getByCond',
-						branchId : branch_combo_coupon.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						for(var i = 0; i < jr.root.length; i++){
-							hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+					});
+					
+					//加载市别
+					var hour = [[-1, '全部']];
+					Ext.Ajax.request({
+						url : '../../OperateBusinessHour.do',
+						params : {
+							dataSource : 'getByCond',
+							branchId : branch_combo_coupon.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							for(var i = 0; i < jr.root.length; i++){
+								hour.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+							}
+							
+							hour.push([-2, '自定义']);
+							
+							Ext.getCmp('coupon_comboBusinessHour').setDisabled(false);
+							Ext.getCmp('coupon_comboBusinessHour').store.loadData(hour);
+							Ext.getCmp('coupon_comboBusinessHour').setValue(-1);
 						}
-						
-						hour.push([-2, '自定义']);
-						
-						Ext.getCmp('coupon_comboBusinessHour').store.loadData(hour);
-						Ext.getCmp('coupon_comboBusinessHour').setValue(-1);
-					}
-				});
+					});
+				}
 				
 				if(!isJump){
 					isDuty = false;
@@ -350,6 +366,7 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	    new Ext.grid.RowNumberer(),
 	    {header : '操作日期', dataIndex : 'operateDate'},
+	    {header : '门店名称', dataIndex : 'restaurantName'},
 	    {header : '优惠券', dataIndex : 'couponName'},
 	    {header : '面额', dataIndex : 'couponPrice', renderer : Ext.ux.txtFormat.gridDou},
 	    {header : '操作类型', dataIndex : 'operateText'},
@@ -367,6 +384,7 @@ Ext.onReady(function(){
 		proxy : new Ext.data.HttpProxy({url : '../../OperateCoupon.do'}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root', idProperty : ''}, [
              {name : 'operateDate'},
+             {name : 'restaurantName'},
              {name : 'couponName'},
              {name : 'couponPrice'},
              {name : 'operateText'},

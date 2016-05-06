@@ -7,7 +7,10 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.CalcRepaidStatisticsDao.ExtraCond;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -15,6 +18,7 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
@@ -34,9 +38,15 @@ public class CouponOperationDao {
 		private int memberId;
 		private String memberFuzzy;
 		private Staff internalStaff;
+		private Integer branchId;
 		
 		private ExtraCond setInternalStaff(Staff staff){
 			this.internalStaff = staff;
+			return this;
+		}
+		
+		public ExtraCond setBranch(int branchId){
+			this.branchId = branchId;
 			return this;
 		}
 		
@@ -133,7 +143,7 @@ public class CouponOperationDao {
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
 			if(id != 0){
-				extraCond.append(" AND id = " + id);
+				extraCond.append(" AND CO.id = " + id);
 			}
 			final StringBuilder operateCond = new StringBuilder();
 			for(CouponOperation.Operate operation : operations){
@@ -143,29 +153,53 @@ public class CouponOperationDao {
 				operateCond.append(operation.getVal());
 			}
 			if(operateCond.length() > 0){
-				extraCond.append(" AND operate IN ( " + operateCond + ")");
+				extraCond.append(" AND CO.operate IN ( " + operateCond + ")");
+			}
+			if(branchId != null){
+				if(branchId > 0){
+					extraCond.append(" AND CO.branch_id = " + branchId);
+				}else{
+					try{
+						final StringBuilder branches = new StringBuilder();
+						final Restaurant group = RestaurantDao.getById(internalStaff.isBranch() ? internalStaff.getGroupId() : internalStaff.getRestaurantId());
+						branches.append(group.getId());
+						
+						//Append repaid details to each branch.
+						for(Restaurant branch : RestaurantDao.getById(group.getId()).getBranches()){
+							if(branches.length() > 0){
+								branches.append(",");
+							}
+							branches.append(branch.getId());
+							
+						}
+						
+						extraCond.append(" AND CO.branch_id IN (" + branches + ")");
+					}catch(BusinessException | SQLException ignored){
+						ignored.printStackTrace();
+					}
+				}
 			}
 			if(associateId != 0){
-				extraCond.append(" AND associate_id = " + associateId);
+				extraCond.append(" AND CO.associate_id = " + associateId);
 			}
 			if(couponId != 0){
-				extraCond.append(" AND coupon_id = " + couponId);
+				extraCond.append(" AND CO.coupon_id = " + couponId);
 			}
 			if(couponTypeId != 0){
 				String sql = " SELECT coupon_id FROM " + Params.dbName + ".coupon WHERE coupon_type_id = " + couponTypeId;
-				extraCond.append(" AND coupon_id IN (" + sql + ")");
+				extraCond.append(" AND CO.coupon_id IN (" + sql + ")");
 			}
 			if(range != null){
-				extraCond.append(" AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+				extraCond.append(" AND CO.operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
-				extraCond.append(" AND operate_date BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+				extraCond.append(" AND CO.operate_date BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(staffId != 0){
-				extraCond.append(" AND operate_staff_id = " + staffId);
+				extraCond.append(" AND CO.operate_staff_id = " + staffId);
 			}
 			if(operate != null){
-				extraCond.append(" AND operate = " + operate.getVal());
+				extraCond.append(" AND CO.operate = " + operate.getVal());
 			}
 			if(operateType != null){
 				StringBuilder operateTypeCond = new StringBuilder();
@@ -175,10 +209,10 @@ public class CouponOperationDao {
 					}
 					operateTypeCond.append(operate.getVal());
 				}
-				extraCond.append(" AND operate IN (" + operateTypeCond + ")");
+				extraCond.append(" AND CO.operate IN (" + operateTypeCond + ")");
 			}
 			if(memberId != 0){
-				extraCond.append(" AND member_id = " + memberId);
+				extraCond.append(" AND CO.member_id = " + memberId);
 			}
 			if(memberFuzzy != null){
 				final StringBuilder fuzzyCond = new StringBuilder();
@@ -190,9 +224,9 @@ public class CouponOperationDao {
 						fuzzyCond.append(member.getId());
 					}
 					if(fuzzyCond.length() > 0){
-						extraCond.append(" AND member_id IN ( " + fuzzyCond + ")");
+						extraCond.append(" AND CO.member_id IN ( " + fuzzyCond + ")");
 					}else{
-						extraCond.append(" AND member_id = -1");
+						extraCond.append(" AND CO.member_id = -1");
 					}
 				} catch (SQLException | BusinessException ignored) {
 					ignored.printStackTrace();
@@ -278,7 +312,8 @@ public class CouponOperationDao {
 	 */
 	public static List<CouponOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		String sql;
-		sql = " SELECT * FROM " + Params.dbName + ".coupon_operation " + 
+		sql = " SELECT CO.*, R.restaurant_name FROM " + Params.dbName + ".coupon_operation CO " +
+			  " LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = CO.branch_id " +
 			  " WHERE 1 = 1 " + 
 			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond.setInternalStaff(staff) : "") +
@@ -291,6 +326,7 @@ public class CouponOperationDao {
 			CouponOperation operation = new CouponOperation(dbCon.rs.getInt("id"));
 			operation.setCouponId(dbCon.rs.getInt("coupon_id"));
 			operation.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			operation.setRestaurantName(dbCon.rs.getString("restaurant_name"));
 			operation.setBranchId(dbCon.rs.getInt("branch_id"));
 			operation.setCouponName(dbCon.rs.getString("coupon_name"));
 			operation.setCouponPrice(dbCon.rs.getFloat("coupon_price"));

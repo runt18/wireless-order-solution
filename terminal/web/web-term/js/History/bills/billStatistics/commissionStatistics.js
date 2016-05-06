@@ -191,6 +191,7 @@ Ext.onReady(function(){
 									dept.push([jr.root[i]['id'], jr.root[i]['name']]);
 								}
 								
+								commission_deptCombo.setDisabled(false);
 								commission_deptCombo.store.loadData(dept);
 								commission_deptCombo.setValue(-1);
 							}
@@ -210,6 +211,7 @@ Ext.onReady(function(){
 									staff.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 								}
 								
+								commission_combo_staffs.setDisabled(false);
 								commission_combo_staffs.store.loadData(staff);
 								commission_combo_staffs.setValue(-1);
 							}
@@ -232,6 +234,7 @@ Ext.onReady(function(){
 								
 								hour.push([-2, '自定义']);
 								
+								Ext.getCmp('commission_comboBusinessHour').setDisabled(false);
 								Ext.getCmp('commission_comboBusinessHour').store.loadData(hour);
 								Ext.getCmp('commission_comboBusinessHour').setValue(-1);
 							}
