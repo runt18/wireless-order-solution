@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcEraseStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -27,6 +26,7 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class QueryEraseStatisticAction extends DispatchAction{
@@ -55,12 +55,19 @@ public class QueryEraseStatisticAction extends DispatchAction{
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY)
+																		.setDutyRange(new DutyRange(beginDate, endDate))
+																		.setCalcByDuty(true);
+			
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
+				
 			}
-			
-			final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				extraCond.setStaffId(Integer.valueOf(staffId));
@@ -73,13 +80,7 @@ public class QueryEraseStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<Order> result;
-			final DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-			if(range != null){
-				result = CalcEraseStatisticsDao.getEraseStatisticsDetail(staff, range, extraCond);
-			}else{
-				result = CalcEraseStatisticsDao.getEraseStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
-			}
+			List<Order>	result = CalcEraseStatisticsDao.getDetail(staff, extraCond);
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				jObject.setTotalProperty(result.size());
@@ -128,12 +129,18 @@ public class QueryEraseStatisticAction extends DispatchAction{
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY)
+																	.setDutyRange(new DutyRange(dateBeg, dateEnd))
+																	.setCalcByDuty(true);
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
+		
 			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
@@ -145,19 +152,14 @@ public class QueryEraseStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd);
-			}
-			
-			final List<EraseIncomeByEachDay> result = CalcEraseStatisticsDao.calcEraseIncomeByEachDay(staff, range, extraCond);
+			final List<EraseIncomeByEachDay> result = CalcEraseStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			List<Float> amountData = new ArrayList<Float>();
 			float totalMoney = 0, totalCount = 0;
 			for (EraseIncomeByEachDay c : result) {
-				xAxis.add("\'"+c.getRange().getOffDutyFormat()+"\'");
+				xAxis.add("\'"+c.getRange().getOnDutyFormat()+"\'");
 				data.add(c.getErasePrice());
 				amountData.add(c.getEraseAmount());
 				
@@ -165,7 +167,7 @@ public class QueryEraseStatisticAction extends DispatchAction{
 				totalCount += c.getEraseAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + NumericUtil.roundFloat(totalMoney) + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'抹数金额\', \"data\" : " + data + "}, {\"name\":\'抹数数量\', \"data\" : " + amountData + "}]}";
 			jObject.setExtra(new Jsonable(){
 				@Override
@@ -218,12 +220,19 @@ public class QueryEraseStatisticAction extends DispatchAction{
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
+			final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY)
+																	.setDutyRange(new DutyRange(dateBeg, dateEnd))
+																	.setCalcByDuty(true);
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
+				
 			}
 			
-			final CalcEraseStatisticsDao.ExtraCond extraCond = new CalcEraseStatisticsDao.ExtraCond(DateType.HISTORY);
+			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
@@ -234,12 +243,7 @@ public class QueryEraseStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd);
-			}
-			
-			jObject.setRoot(CalcEraseStatisticsDao.calcEraseIncomeByStaff(staff, range, extraCond));
+			jObject.setRoot(CalcEraseStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

@@ -3786,9 +3786,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		List<Order> result;
 		final DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
 		if(range != null){
-			result = CalcEraseStatisticsDao.getEraseStatisticsDetail(staff, range, extraCond);
+			result = CalcEraseStatisticsDao.getDetail(staff, range, extraCond);
 		}else{
-			result = CalcEraseStatisticsDao.getEraseStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+			result = CalcEraseStatisticsDao.getDetail(staff, new DutyRange(beginDate, endDate), extraCond);
 		}
 		
 		String title = "抹数统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")"; 

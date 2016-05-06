@@ -34,6 +34,7 @@ Ext.onReady(function(){
 					});
 					thiz.center();	
 					thiz.orderId = sd.id;
+					thiz.branchId = sd.rid;
 					thiz.queryType = 'History';
 				}
 			}
@@ -421,7 +422,8 @@ Ext.onReady(function(){
 			'',
 			'',
 			'../../QueryEraseStatistics.do',
-			[[true, false, false, true], 
+			[[true, false, false, true],
+			 ['门店名称', 'restaurantName'],
 			 ['日期','orderDateFormat'], 
 			 ['账单号', 'id', null, null, function(v){
 			 	return '<a class="orderLinkId">' + v + '</a>';
@@ -431,7 +433,7 @@ Ext.onReady(function(){
 	         ['操作人','waiter'], 
 	         ['备注','comment', 200]
 			],
-			['orderDateFormat', 'id', 'erasePrice', 'actualPrice', 'waiter', 'comment'],
+			['orderDateFormat', 'restaurantName', 'id', 'erasePrice', 'actualPrice', 'waiter', 'comment', 'rid'],
 			[ ['dataSource', 'getDetail']],
 			GRID_PADDING_LIMIT_20,
 			null,
@@ -451,6 +453,7 @@ Ext.onReady(function(){
 				}
 				eraseStatisticsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 				eraseStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+				eraseStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 				eraseStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				eraseStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 				
