@@ -1681,7 +1681,7 @@ ts.stopSellMgr = function(){
 };
 
 //进入点菜界面
-ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
+ts.renderToCreateOrder = function(tableNo, customNum, comment){
 	if(tableNo > 0){
 		
 		setTimeout(function(){
@@ -1694,9 +1694,9 @@ ts.renderToCreateOrder = function(tableNo, peopleNo, comment){
 					orderFoodOperateType : 'normal'
 				});
 			}else{
-				tableToAlias.customNum = peopleNo;
 				of.entry({
 					table : tableToAlias,
+					customNum : customNum,
 					comment : comment,
 					orderFoodOperateType : 'normal'
 				});
