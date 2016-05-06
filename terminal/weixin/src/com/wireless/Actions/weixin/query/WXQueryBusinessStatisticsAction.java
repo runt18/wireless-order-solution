@@ -283,7 +283,8 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																						.setDutyRange(new DutyRange(dateBeg, dateEnd));
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 			}
@@ -293,7 +294,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<DiscountIncomeByStaff> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<DiscountIncomeByStaff> cancelList = CalcDiscountStatisticsDao.calcIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			
@@ -328,7 +329,8 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		
 		try{
-			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+			CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																						.setDutyRange(new DutyRange(dateBeg, dateEnd));
 			
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
@@ -339,7 +341,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<DiscountIncomeByDept> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByDept(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<DiscountIncomeByDept> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByDept(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			
@@ -668,7 +670,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<RepaidIncomeByStaff> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, extraCond);
+			List<RepaidIncomeByStaff> cancelList = CalcRepaidStatisticsDao.calcIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			
