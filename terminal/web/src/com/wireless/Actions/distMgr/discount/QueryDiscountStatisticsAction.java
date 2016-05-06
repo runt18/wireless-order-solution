@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -27,12 +26,13 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class QueryDiscountStatisticsAction extends DispatchAction{
 
 	/**
-	 * 获取折扣数据
+	 * 获取折扣数据（明细）
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -54,13 +54,19 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		final String ending = request.getParameter("ending");
 		
 		try{
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																							   .setDutyRange(new DutyRange(beginDate, endDate))
+																							   .setCalcByDuty(true);
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
-			
-			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				extraCond.setStaffId(Integer.valueOf(staffId));
@@ -73,13 +79,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<Order> result;
-			final DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-			if(range != null){
-				result = CalcDiscountStatisticsDao.getDiscountStatisticsDetail(staff, range, extraCond);
-			}else{
-				result = CalcDiscountStatisticsDao.getDiscountStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
-			}
+			List<Order> result = CalcDiscountStatisticsDao.getDetail(staff, extraCond);
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				jobject.setTotalProperty(result.size());
@@ -128,13 +128,20 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																							   .setDutyRange(new DutyRange(dateBeg, dateEnd))
+																							   .setCalcByDuty(true)
+																							   ;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
@@ -145,22 +152,22 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<DiscountIncomeByEachDay> result = CalcDiscountStatisticsDao.calcDiscountIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<DiscountIncomeByEachDay> result = CalcDiscountStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
 			List<Float> amountData = new ArrayList<Float>();
 			float totalMoney = 0, totalCount = 0;
 			for (DiscountIncomeByEachDay c : result) {
-				xAxis.add("\'" + c.getRange().getOffDutyFormat() + "\'");
-				data.add(c.getmDiscountPrice());
-				amountData.add(c.getmDiscountAmount());
+				xAxis.add("\'" + c.getRange().getOnDutyFormat() + "\'");
+				data.add(c.getPrice());
+				amountData.add(c.getAmount());
 				
-				totalMoney += c.getmDiscountPrice();
-				totalCount += c.getmDiscountAmount();
+				totalMoney += c.getPrice();
+				totalCount += c.getAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + NumericUtil.roundFloat(totalMoney) + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'折扣金额\', \"data\" : " + data + "}, {\"name\":\'折扣数量\', \"data\" : " + amountData + "}]}";
 			jObject.setExtra(new Jsonable(){
 				@Override
@@ -212,13 +219,22 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																							   .setDutyRange(new DutyRange(dateBeg, dateEnd))
+																							   .setCalcByDuty(true)
+																							   ;
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
@@ -232,7 +248,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcDiscountStatisticsDao.calcDiscountIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond));
+			jObject.setRoot(CalcDiscountStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -269,13 +285,20 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
+			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY)
+																							   .setDutyRange(new DutyRange(dateBeg, dateEnd))
+																							   .setCalcByDuty(true)
+																							   ;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
@@ -287,7 +310,7 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcDiscountStatisticsDao.calcDiscountIncomeByDept(staff, new DutyRange(dateBeg, dateEnd), extraCond));
+			jObject.setRoot(CalcDiscountStatisticsDao.calcDiscountIncomeByDept(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

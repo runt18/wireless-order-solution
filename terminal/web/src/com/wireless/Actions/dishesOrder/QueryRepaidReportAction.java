@@ -120,7 +120,9 @@ public class QueryRepaidReportAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
-			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY)
+																						.setDutyRange(new DutyRange(dateBeg, dateEnd))
+																						;
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
@@ -138,7 +140,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<RepaidIncomeByEachDay> repaidIncomeByEachDay = CalcRepaidStatisticsDao.calcRepaidIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<RepaidIncomeByEachDay> repaidIncomeByEachDay = CalcRepaidStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -227,7 +229,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(staff, extraCond));
+			jObject.setRoot(CalcRepaidStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

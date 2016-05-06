@@ -10,7 +10,7 @@ Ext.onReady(function(){
 		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
-				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
+				Ext.ux.checkDuft(true, thiz.getId(), discount_endDate.getId());
 			}
 		}
 	});
@@ -23,7 +23,7 @@ Ext.onReady(function(){
 		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
-				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
+				Ext.ux.checkDuft(false, discount_beginDate.getId(), thiz.getId());
 			}
 		}
 	});
@@ -378,6 +378,7 @@ Ext.onReady(function(){
 			'',
 			'../../QueryDiscountStatistics.do',
 			[[true, false, false, true], 
+			 ['门店名称', 'restaurantName', 60],
 			 ['日期','orderDateFormat'], 
 			 ['账单号', 'id', null, null, function(v){
 			 	return '<a class="orderLinkId">' + v + '</a>';
@@ -387,7 +388,7 @@ Ext.onReady(function(){
 	         ['操作人', 'discounter'], 
 	         ['备注', 'comment', 200]
 			],
-			['orderDateFormat', 'id', 'discountPrice', 'actualPrice', 'waiter', 'comment'],
+			['restaurantName', 'orderDateFormat', 'id', 'discountPrice', 'actualPrice', 'waiter', 'comment', 'rid'],
 			[ ['dataSource', 'getDetail']],
 			GRID_PADDING_LIMIT_20,
 			null,
@@ -430,6 +431,7 @@ Ext.onReady(function(){
 							});
 							thiz.center();	
 							thiz.orderId = sd.id;
+							thiz.branchId = sd.rid;
 							thiz.queryType = 'History';
 						}
 					}
@@ -448,10 +450,13 @@ Ext.onReady(function(){
 					sumRow.style.fontWeight = 'bold';
 					sumRow.style.color = 'green';
 				}
-				discountStatisticsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-				discountStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-				discountStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-				discountStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+				discountStatisticsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';		//门店名称
+				discountStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';		//日期
+				discountStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';		//账单号
+				//discountStatisticsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';		//折扣额
+				//discountStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';		//实收金额
+				discountStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';		//操作人
+				discountStatisticsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';		//备注
 				
 				$('#discountStatisticsPanel').find('.orderLinkId').each(function(index, element){
         			element.onclick = function(){

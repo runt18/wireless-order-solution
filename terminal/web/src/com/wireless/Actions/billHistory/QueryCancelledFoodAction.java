@@ -28,6 +28,7 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class QueryCancelledFoodAction extends DispatchAction{
@@ -167,7 +168,9 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		
 		try{
-			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY)
+																						   .setRange(new DutyRange(dateBeg, dateEnd))
+																						   ;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
 				if(Integer.parseInt(branchId) > 0){
@@ -190,7 +193,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			final List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			final List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -199,7 +202,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			float totalMoney = 0, totalCount = 0;
 			for (CancelIncomeByEachDay c : cancelList) {
-				xAxis.add("\'"+c.getDutyRange().getOffDutyFormat()+"\'");
+				xAxis.add("\'" + c.getDutyRange().getOnDutyFormat() + "\'");
 				data.add(c.getCancelPrice());
 				amountData.add(c.getCancelAmount());
 				
@@ -208,7 +211,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 +
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + NumericUtil.roundFloat(totalMoney) + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 +
 					",\"ser\":[{\"name\":\'退菜金额\', \"data\" : " + data + "},{\"name\":\'退菜数量\', \"data\" : " + amountData + "}]}";
 			jObject.setExtra(new Jsonable(){
 				@Override

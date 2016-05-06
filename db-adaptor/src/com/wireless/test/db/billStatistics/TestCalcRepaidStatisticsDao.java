@@ -40,7 +40,7 @@ public class TestCalcRepaidStatisticsDao {
 		float totalIncomeByReason = 0;
 		float totalAmountByReason = 0;
 		
-		List<RepaidIncomeByEachDay> incomesByEachDay = CalcRepaidStatisticsDao.calcRepaidIncomeByEachDay(mStaff, mDutyRange, mExtraCond);
+		List<RepaidIncomeByEachDay> incomesByEachDay = CalcRepaidStatisticsDao.calcIncomeByEachDay(mStaff, mExtraCond);
 		@SuppressWarnings("unused")
 		float totalIncomeByEachDay = 0;
 		@SuppressWarnings("unused")
@@ -51,7 +51,7 @@ public class TestCalcRepaidStatisticsDao {
 		}
 		
 		mExtraCond.setStaffId(mStaff.getId());
-		List<RepaidIncomeByStaff> incomesByStaff = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(mStaff, mExtraCond);
+		List<RepaidIncomeByStaff> incomesByStaff = CalcRepaidStatisticsDao.calcIncomeByStaff(mStaff, mExtraCond);
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(RepaidIncomeByStaff each : incomesByStaff){

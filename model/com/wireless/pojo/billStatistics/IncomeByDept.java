@@ -57,6 +57,13 @@ public class IncomeByDept implements Jsonable{
 	}
 
 	@Override
+	public String toString(){
+		return "income : " + this.mIncome +
+			   ",gift : " + this.mGiftPrice +
+			   ",discount : " + this.mDiscountPrice;
+	}
+	
+	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putJsonable("dept", this.mDept, Department.DEPT_JSONABLE_COMPLEX);

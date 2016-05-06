@@ -489,7 +489,7 @@ $(function(){
 		);
 		
 		function foodOperate(a, b, c){
-			return '<a class="foodOperate" food_id="' + c.json.food.id + '">明细</a>'
+			return '<a class="foodOperate" food_id="' + c.json.food.id + '">明细</a>';
 		}
 		
 		orderFoodStatPanelGrid.keys = [{
@@ -588,8 +588,8 @@ $(function(){
 						});		
 						
 						foodDetailWin.show();
-					}
-				})	
+					};
+				});	
 				
 			}
 		});
@@ -679,7 +679,7 @@ $(function(){
 								thiz.setValue(-1);
 							}
 							
-							thiz.fireEvent('select')
+							thiz.fireEvent('select');
 							
 						},
 						failure : function(res, opt){
@@ -892,9 +892,10 @@ $(function(){
 				dateBeg : c.dateBeg,
 				dateEnd : c.dateEnd,
 				region : c.region,
-				opening : c.opening,
-				ending : c.ending,
-				deptId : c.deptId
+				opening : c.opening == '00:00' ? null : c.opening,
+				ending : c.ending == '00:00' ? null : c.ending,
+				deptId : c.deptId,
+				branchId : c.branchId
 			},
 			success : function(res, opt){
 				var jdata = Ext.util.JSON.decode(res.responseText);
@@ -1194,12 +1195,15 @@ $(function(){
 						var gn = Ext.ux.getSelData(deptStatPanelGrid);
 						titleDeptName = gn.dept.name;
 						selectDeptId = gn.dept.id;
-						loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
+						loadDeptStatisticChartData({
+							dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 							dateEnd : endDate.getRawValue() + ' 23:59:59', 
 							region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
 							opening : data.opening,
 							ending : data.ending,
-							deptId : selectDeptId});
+							deptId : selectDeptId,
+							branchId :branch_combo_deptStatistics.getValue()
+						});
 					}else{
 						
 						titleDeptName = '';
@@ -1219,12 +1223,15 @@ $(function(){
 						
 						if(selectDeptId){
 							Ext.getCmp('southDeptChartPanel').expand();
-							loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
+							loadDeptStatisticChartData({
+								dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 								dateEnd : endDate.getRawValue() + ' 23:59:59', 
 								region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
 								opening : branch_combo_deptStatistics.getValue() == -1 ? '' : data.opening,
 								ending : branch_combo_deptStatistics.getValue() == -1 ? '' : data.ending,
-								deptId : selectDeptId});						
+								deptId : selectDeptId,
+								branchId : branch_combo_deptStatistics.getValue()
+							});						
 						}else{
 							Ext.getCmp('southDeptChartPanel').collapse();
 						}

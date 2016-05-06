@@ -20,11 +20,11 @@ public class DiscountIncomeByDept implements Jsonable{
 		return mDept;
 	}
 	
-	public float getDiscountAmount(){
+	public float getAmount(){
 		return this.mDiscountAmount;
 	}
 	
-	public float getDiscountPrice(){
+	public float getPrice(){
 		return this.mDiscountPrice;
 	}
 

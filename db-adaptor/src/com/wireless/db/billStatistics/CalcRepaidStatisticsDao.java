@@ -12,7 +12,6 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.billStatistics.CalcEraseStatisticsDao.ExtraCond;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -230,8 +229,6 @@ public class CalcRepaidStatisticsDao {
 	 * Calculate the repaid income by each day according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link RepaidIncomeByEachDay}
@@ -241,11 +238,11 @@ public class CalcRepaidStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<RepaidIncomeByEachDay> calcRepaidIncomeByEachDay(Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<RepaidIncomeByEachDay> calcIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidIncomeByEachDay(dbCon, staff, dutyRange, extraCond);
+			return calcIncomeByEachDay(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -257,8 +254,6 @@ public class CalcRepaidStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link RepaidIncomeByEachDay}
@@ -268,19 +263,21 @@ public class CalcRepaidStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<RepaidIncomeByEachDay> calcRepaidIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<RepaidIncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
 		if(extraCond.isChain){
 			//Group by the date in case of chain.
 			//key : value - date : repaidIncomeByEachDay
+			//Append the repaid income by each day to the group.
 			final Map<DutyRange, RepaidIncomeByEachDay> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
-			for(RepaidIncomeByEachDay groupIncome : calcRepaidIncomeByEachDay(dbCon, groupStaff, dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
+			for(RepaidIncomeByEachDay groupIncome : calcIncomeByEachDay(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupIncome.getDutyRange(), groupIncome);
 			}
 			
+			//Append the repaid income by each day to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(RepaidIncomeByEachDay branchIncome : calcRepaidIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
+				for(RepaidIncomeByEachDay branchIncome : calcIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchIncome.getDutyRange())){
 						RepaidIncomeByEachDay repaidIncome = chainResult.get(branchIncome.getDutyRange());
 						final float repaidAmount = branchIncome.getRepaidAmount() + repaidIncome.getRepaidAmount();
@@ -298,35 +295,11 @@ public class CalcRepaidStatisticsDao {
 			List<RepaidIncomeByEachDay> result = new ArrayList<RepaidIncomeByEachDay>();
 			
 			Calendar c = Calendar.getInstance();
-			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
-			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
+			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOnDutyFormat());
+			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOffDutyFormat());
 			c.setTime(dateBegin);
 			while (dateBegin.compareTo(dateEnd) <= 0) {
 				c.add(Calendar.DATE, 1);
-				
-//				DutyRange range = DutyRangeDao.exec(dbCon, staff, 
-//						DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
-//						DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
-//				
-//				if(range != null){
-//					String sql;
-//					sql = " SELECT " +
-//						  " ROUND(SUM(TMP.repaid_amount), 2) AS repaid_amount, " +
-//						  " ROUND(SUM(TMP.repaid_price), 2) AS repaid_price " +
-//					      " FROM (" +
-//						  makeSql4RepaidFood(staff, extraCond.setDutyRange(range).setCalcByCond(true)) + 
-//						  " ) AS TMP ";
-//				    dbCon.rs = dbCon.stmt.executeQuery(sql);
-//					if(dbCon.rs.next()){
-//						result.add(new RepaidIncomeByEachDay(new DutyRange(dateBegin.getTime(), c.getTimeInMillis()),
-//															 dbCon.rs.getFloat("repaid_amount"),
-//															 dbCon.rs.getFloat("repaid_price")));
-//					}
-//					dbCon.rs.close();
-	//
-//				}else{
-//					result.add(new RepaidIncomeByEachDay(new DutyRange(dateBegin.getTime(), c.getTimeInMillis()), 0, 0)); 
-//				}
 				
 				final DutyRange range = new DutyRange(dateBegin.getTime(), c.getTimeInMillis());
 				String sql;
@@ -366,11 +339,11 @@ public class CalcRepaidStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<RepaidIncomeByStaff> calcRepaidIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<RepaidIncomeByStaff> calcIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidIncomeByStaff(dbCon, staff, extraCond);
+			return calcIncomeByStaff(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -389,18 +362,18 @@ public class CalcRepaidStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<RepaidIncomeByStaff> calcRepaidIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<RepaidIncomeByStaff> calcIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		final List<RepaidIncomeByStaff> result = new ArrayList<RepaidIncomeByStaff>();
 		
 		if(extraCond.isChain){
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the repaid details to the group.
-			result.addAll(calcRepaidIncomeByStaff(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
+			result.addAll(calcIncomeByStaff(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
 			
 			//Append repaid details to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				result.addAll(calcRepaidIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
+				result.addAll(calcIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
 			}
 			
 		}else{

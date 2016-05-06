@@ -396,8 +396,8 @@ Ext.onReady(function(){
 						deptID : cancel_deptCombo.getValue(),
 						reasonID : reasonCombo.getValue(),
 						staffID : cancel_combo_staffs.getValue(),
-						opening : opening,
-						ending : ending,
+						opening : businessHour.opening != '00:00' ? businessHour.opening : null,
+						ending : businessHour.ending != '00:00' ? businessHour.ending : null,
 						branchId : branch_combo_cancelledFood.getValue()
 					};
 					cancel_chartLoadMarsk.show();
@@ -482,6 +482,7 @@ Ext.onReady(function(){
 			'',
 			'../../QueryCancelledFood.do',
 			[[true, false, false, true], 
+			 ['门店名称', 'restaurantName', 50],
 			 ['日期','orderDateFormat',150], 
 			 ['菜名','name',180],
 	         ['部门','kitchen.dept.name'], 
@@ -494,7 +495,7 @@ Ext.onReady(function(){
 	         ['操作人','waiter'], 
 	         ['退菜原因','cancelReason.reason', 200]
 			],
-			['orderDateFormat', 'name', 'kitchen.dept.name', 'orderId', 'unitPrice', 'count', 'totalPrice', 'waiter', 'cancelReason.reason'],
+			['restaurantName', 'orderDateFormat', 'name', 'kitchen.dept.name', 'orderId', 'unitPrice', 'count', 'totalPrice', 'waiter', 'cancelReason.reason', 'rid'],
 			[ ['dataSource', 'getDetail']],
 			cancel_FOOD_PAGE_LIMIT,
 			null,
@@ -530,6 +531,7 @@ Ext.onReady(function(){
 						}],
 						listeners : {
 							show : function(thiz) {
+								var sd = Ext.ux.getSelData(cfdsGrid);
 								thiz.load({
 									url : '../window/history/orderDetail.jsp', 
 									scripts : true,
@@ -537,7 +539,7 @@ Ext.onReady(function(){
 								});
 								thiz.center();	
 								thiz.orderId = orderID;
-								thiz.branchId = branch_combo_cancelledFood.getValue();
+								thiz.branchId = sd.rid;
 								thiz.foodStatus = 'isReturn';
 								
 							}
