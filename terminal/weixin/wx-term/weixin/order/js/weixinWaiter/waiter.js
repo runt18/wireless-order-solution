@@ -6,21 +6,26 @@ $(function(){
 		_commentData : null,	//备注资料
 		_orderId : null			//账单Id
 	};
-	
+	var checkPayTypeDialog;		//下单方式选择框
+	var orderFoodPopup;			//点菜container
 	initWaiterOrder();
 	function initWaiterOrder(){
-//		checkMove();
+		checkMove();
 		
-//		function checkMove(){
-//			$('#foodViewList_div_waiter').on('touchmove', function(e){
-//				var lastX = e.screenX;
-//				alert(e.X);
-//			});
-//			$('#foodViewList_div_waiter').on('touchend', function(e){
-//				var currentX = e.screenX;
-//				alert('up');
-//			});
-//		}
+		function checkMove(){
+			var lastX;
+			var currentX;
+			$('#foodViewList_div_waiter').on('swpieleft', function(e){
+				var event = e || window.event;
+				lastX = event.screenX;
+				alert(e.offsetX);
+//				$('#foodViewList_div_waiter').on('touchend', function(ev){
+//					var eventUp = ev || window.event;
+//					currentX = eventUp.screenX;
+//					alert(lastX + '-------------' + currentX);
+//				});
+			});
+		}
 		
 		//获取门店信息
 		$.ajax({
@@ -281,7 +286,6 @@ $(function(){
 		
 	
 	//店小二自助点餐功能弹出按钮
-	var orderFoodPopup = null;
 	$('#orderBySelf_a_waiter').click(function(){
 		
 		//防止连点下单
@@ -290,7 +294,7 @@ $(function(){
 		orderFoodPopup = new PickFoodComponent({
 			bottomId : 'fastFoodBottom_div_waiter',
 			//下单键回调  能调用的三个参数_orderData, _commentData, _container
-			confirm : function(_orderData, _commentData){
+			confirm : function(_orderData, _commentData, _container, _calcOrderCost){
 				if(!isProcessing){
 					isProcessing = true;
 					setTimeout(function(){
@@ -314,12 +318,12 @@ $(function(){
 								if(data.root[0].isRaw){
 									var completeMemberMsgDialog = new CompleteMemberMsg({
 										sessionId : Util.mp.params.sessionId,
-										completeFinish : commit
+										completeFinish : function(){ commit(_calcOrderCost); }
 									});
 									completeMemberMsgDialog.open();
 									
 								}else{
-									commit();
+									commit(_calcOrderCost);
 								}
 							}else{
 								Util.dialog.show({msg : data.msg});	
@@ -392,13 +396,13 @@ $(function(){
 					'<div style="margin-left:-10px;">' +
 					'<ul class="m-b-list">' +
 					'<li class="box-horizontal" style="line-height: 40px;font-size:18px;">' +
-					'<div data-type="payType" data-value="现金" class="region_css_book weSelectedRegion_css_book" style="width:31%;border:1px solid #C3994B;" href="#">'+
+					'<div data-type="payType" data-value="现金" class="region_css_book weSelectedRegion_css_book" style="width:31%;border:1px solid #666;" href="#">'+
 					'<ul class="m-b-list">现金</ul>' +
 					'</div>' +
-					'<div data-type="payType" data-value="刷卡" class="region_css_book" style="width:31%;border:1px solid #C3994B;" href="#">' +
+					'<div data-type="payType" data-value="刷卡" class="region_css_book" style="width:31%;border:1px solid #666;" href="#">' +
 					'<ul class="m-b-list">刷卡</ul>'+
 					'</div>' +
-					'<div data-type="payType" data-value="其他" class="region_css_book" style="width:%;border:1px solid #C3994B;" href>' +
+					'<div data-type="payType" data-value="其他" class="region_css_book" style="width:%;border:1px solid #666;" href>' +
 					'<ul class="m-b-list">其他</ul>' +
 					'</div>' +
 					'</li>' +
@@ -485,7 +489,7 @@ $(function(){
 	
 	
 	//下单功能数据传递
-	function commit(){
+	function commit(calcOrderCost){
 		var foods = '';
 		var unitId = 0; 
 		
@@ -504,7 +508,6 @@ $(function(){
 			foods += element.id + ',' + element.count + ',' + unitId;
 		});
 		
-		var checkPayTypeDialog;
 		checkPayTypeDialog = new WeDialogPopup({
 			titleText : '请选择下单方式',
 			content : (		'<div class="weui_cells weui_cells_radio">'
@@ -559,11 +562,10 @@ $(function(){
 							dataSource : 'wxPayOrder',
 							sessionId : Util.mp.params.sessionId,
 							foods : foods,
-							cost : '',
+							cost : calcOrderCost,
 							tableAlias : fastFoodWaiterData._tableAlias
 						},
 						success : function(data, status, req){
-							checkPayTypeDialog.close();
 							Util.lm.hide();
 							if(data.success){
 								payParam = data.other;
@@ -577,11 +579,14 @@ $(function(){
 								}else{
 									onBridgeReady();
 								} 
+								
 							}else{
+								checkPayTypeDialog.close();
 								payParam = null;
 								var dialog = new WeDialogPopup({
-									content : result.msg,
+									content : data.msg,
 									titleText : '微信支付失败',
+									leftText : '确认',
 									left : function(){
 										dialog.close();
 									}
@@ -715,6 +720,14 @@ $(function(){
 			}, function(res) {
 				if (res.err_msg == "get_brand_wcpay_request:ok") {
 					// 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+					checkPayTypeDialog.close();
+					orderFoodPopup.closeShopping();
+					$('#closeFastFood_a_waiter').click();
+					$('#foodList_div_waiter').html('');
+					initWaiterOrder();
+					setTimeout(function(){
+						window.location.reload();
+					}, 2500);
 				} 
 			});
 		}

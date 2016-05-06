@@ -1,5 +1,6 @@
 package com.wireless.Actions.weixin.operate;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodUnitDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -38,10 +40,13 @@ import com.wireless.listener.SessionListener;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
+import com.wireless.pack.req.ReqOrderDiscount;
+import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.TakeoutAddress;
@@ -49,6 +54,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.order.WxOrder;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ws.waiter.WxWaiter;
@@ -199,6 +205,7 @@ public class WxOperateOrderAction extends DispatchAction {
 				}
 				
 				float totalPrice = order.calcTotalPrice();
+				order.setTotalPrice(totalPrice);
 				float actualPrice = 0;
 				//Get the setting.
 				Setting setting = SystemDao.getByCond(staff, null).get(0).getSetting();
@@ -333,21 +340,33 @@ public class WxOperateOrderAction extends DispatchAction {
 				final String oid = (String)session.getAttribute("oid");
 				final String fid = (String)session.getAttribute("fid");
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-				Restaurant restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+				final Member member = MemberDao.getByWxSerial(staff, oid);
+				final Restaurant restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+				final Table table = TableDao.getByAlias(staff, Integer.parseInt(tableAlias));
+				
+				if(table.isBusy()){
+					Order order = OrderDao.getById(staff, table.getOrderId(), DateType.TODAY);
+					if(!order.getOrderFoods().isEmpty()){
+						throw new BusinessException("餐桌上已经有点菜,不能进行微信支付下单");
+					}
+					
+				}
+				
+				
 				if(restaurant.hasBeeCloud()){
 					BeeCloud app = BeeCloud.registerApp(restaurant.getBeeCloudAppId(), restaurant.getBeeCloudAppSecret());
 					final String billNo = System.currentTimeMillis() + "";
 					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI)
 																									  .setOpenId(oid)
-																									  //FIXME
-//																									  .setTotalFee(Integer.parseInt(cost))
-																									  .setTotalFee(1)
+																									  .setTotalFee((int)((Float.valueOf(cost) * 100)))
+//																									  .setTotalFee(1)
 																									  .setBillNo(billNo)
 																									  .setTitle(restaurant.getName() + "微信支付"), 
 					new Callable<ProtocolPackage>(){
 						@Override
 						public ProtocolPackage call() throws Exception {
-							final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)).getId()));
+							
+							final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(table.getId()));
 							try{
 								if(foods != null && !foods.isEmpty()){
 									for (String of : foods.split("&")) {
@@ -361,12 +380,30 @@ public class WxOperateOrderAction extends DispatchAction {
 										builder.add(orderFood, staff);
 									}
 								}
-							}catch(BusinessException e){
-								e.printStackTrace();
+								builder.setForce(true);
+								ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, PrintOption.DO_PRINT));
+								if(resp.header.type == Type.ACK){
+									//TODO 账单注入此微信会员
+									Order.DiscountBuilder discountBuilder = Order.DiscountBuilder.build4Member(table.getOrderId(), member);
+									resp = ServerConnector.instance().ask(new ReqOrderDiscount(staff, discountBuilder));
+									if(resp.header.type == Type.NAK){
+										throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+									}
+
+									//TODO 用微信支付的方式结账
+									Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(table.getOrderId(), PayType.WX, true);
+									resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
+									if(resp.header.type == Type.NAK){
+										throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+									}
+								}else{
+									throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+								}
+								return resp;
+							}catch(BusinessException | SQLException | IOException e){
+								System.out.println(e.getMessage());
+								return null;
 							}
-							
-							final ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, PrintOption.DO_PRINT));
-							return resp;
 						}
 					});
 					if(beeCloudResponse.isOk()){
@@ -380,6 +417,9 @@ public class WxOperateOrderAction extends DispatchAction {
 			}else{
 				throw new BusinessException("微信支付金额不能小于0");
 			}
+		}catch(BusinessException | SQLException e){
+			jObject.initTip(e);
+			e.printStackTrace();
 		} finally {
 			response.getWriter().print(jObject.toString());
 		}
