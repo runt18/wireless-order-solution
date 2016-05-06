@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.CalcEraseStatisticsDao.ExtraCond;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -333,15 +334,15 @@ public class CalcRepaidStatisticsDao {
 					  " ROUND(SUM(TMP.repaid_amount), 2) AS repaid_amount, " +
 					  " ROUND(SUM(TMP.repaid_price), 2) AS repaid_price " +
 				      " FROM (" +
-					  makeSql4RepaidFood(staff, extraCond.setDutyRange(range).setCalcByCond(true)) + 
+					  makeSql4RepaidFood(staff, ((ExtraCond)extraCond.clone()).setDutyRange(range).setCalcByCond(true)) + 
 					  " ) AS TMP ";
 			    dbCon.rs = dbCon.stmt.executeQuery(sql);
 				if(dbCon.rs.next()){
-					result.add(new RepaidIncomeByEachDay(new DutyRange(dateBegin.getTime(), c.getTimeInMillis()),
+					result.add(new RepaidIncomeByEachDay(range,
 														 dbCon.rs.getFloat("repaid_amount"),
 														 dbCon.rs.getFloat("repaid_price")));
 				}else{
-					result.add(new RepaidIncomeByEachDay(new DutyRange(dateBegin.getTime(), c.getTimeInMillis()), 0, 0)); 
+					result.add(new RepaidIncomeByEachDay(range, 0, 0)); 
 				}
 				dbCon.rs.close();
 				
