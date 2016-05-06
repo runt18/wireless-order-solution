@@ -1360,8 +1360,6 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the income by each during on & off duty
@@ -1371,7 +1369,7 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to parse the on or off duty string
 	 * @throws BusinessException 
 	 */
-	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
 		
 		if(extraCond.isChain()){
@@ -1379,12 +1377,12 @@ public class CalcBillStatisticsDao {
 			//key : value - date : incomeByEachDay
 			final Map<String, IncomeByEachDay> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
-			for(IncomeByEachDay groupIncome : calcIncomeByEachDay(dbCon, groupStaff, dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
+			for(IncomeByEachDay groupIncome : calcIncomeByEachDay(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupIncome.getDate(), groupIncome);
 			}
 			
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(IncomeByEachDay branchIncome : calcIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), dutyRange, ((ExtraCond)extraCond.clone()).setChain(false))){
+				for(IncomeByEachDay branchIncome : calcIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchIncome.getDate())){
 						IncomeByEachDay incomeByEachDay = chainResult.get(branchIncome.getDate());
 						//Append the branch income.
@@ -1400,8 +1398,8 @@ public class CalcBillStatisticsDao {
 			final List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
 
 			Calendar c = Calendar.getInstance();
-			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
-			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
+			Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOnDutyFormat());
+			Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(extraCond.dutyRange.getOffDutyFormat());
 			c.setTime(dateBegin);
 			while (dateBegin.compareTo(dateEnd) <= 0) {
 				c.add(Calendar.DATE, 1);
@@ -1459,8 +1457,6 @@ public class CalcBillStatisticsDao {
 	 * Get income to each day during on & off duty.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the income by each during on & off duty
@@ -1470,11 +1466,11 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to parse the on or off duty string
 	 * @throws BusinessException 
 	 */
-	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByEachDay(dbCon, staff, range, extraCond);
+			return calcIncomeByEachDay(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
