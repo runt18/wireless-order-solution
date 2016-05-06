@@ -4,7 +4,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 
-public class DiscountIncomeByEachDay implements Jsonable{
+public class DiscountIncomeByEachDay implements Jsonable, Comparable<DiscountIncomeByEachDay>{
 	
 	private final DutyRange range;
 	private final float mDiscountAmount;
@@ -22,13 +22,13 @@ public class DiscountIncomeByEachDay implements Jsonable{
 
 
 
-	public float getmDiscountAmount() {
+	public float getAmount() {
 		return mDiscountAmount;
 	}
 
 
 
-	public float getmDiscountPrice() {
+	public float getPrice() {
 		return mDiscountPrice;
 	}
 
@@ -51,6 +51,11 @@ public class DiscountIncomeByEachDay implements Jsonable{
 	@Override
 	public String toString(){
 		return "[" + this.range.getOffDutyFormat() + ", " + mDiscountAmount + ", " + mDiscountPrice + "]"  ;
+	}
+
+	@Override
+	public int compareTo(DiscountIncomeByEachDay o) {
+		return this.range.compareTo(o.range);
 	}
 
 }

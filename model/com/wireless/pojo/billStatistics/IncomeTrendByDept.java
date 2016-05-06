@@ -3,7 +3,7 @@ package com.wireless.pojo.billStatistics;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
-public class IncomeTrendByDept implements Jsonable{
+public class IncomeTrendByDept implements Jsonable, Comparable<IncomeTrendByDept>{
 
 	private final DutyRange range;
 	private final IncomeByDept deptIncome;
@@ -32,6 +32,11 @@ public class IncomeTrendByDept implements Jsonable{
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
+	}
+
+	@Override
+	public int compareTo(IncomeTrendByDept o) {
+		return this.range.compareTo(o.range);
 	}
 	
 }

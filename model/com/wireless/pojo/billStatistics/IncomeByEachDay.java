@@ -5,7 +5,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.member.IncomeByCharge;
 import com.wireless.pojo.util.DateUtil;
 
-public class IncomeByEachDay implements Jsonable{
+public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 
 	private final String date;
 	
@@ -317,5 +317,18 @@ public class IncomeByEachDay implements Jsonable{
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
+	}
+
+	@Override
+	public int compareTo(IncomeByEachDay o) {
+		final long thisDate = DateUtil.parseDate(this.date);
+		final long anotherDate = DateUtil.parseDate(o.date);
+		if(thisDate < anotherDate){
+			return -1;
+		}else if(thisDate > anotherDate){
+			return 1;
+		}else{
+			return 0;
+		}
 	}
 }
