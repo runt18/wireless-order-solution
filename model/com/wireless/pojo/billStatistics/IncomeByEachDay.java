@@ -67,12 +67,10 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 		this.customerAmount += appendIncome.customerAmount;
 		
 		//Append the income by pay.
-		for(IncomeByPay.PaymentIncome payIncome : appendIncome.getIncomeByPay().getPaymentIncomes()){
-			if(this.incomeByPay == null){
-				this.incomeByPay = new IncomeByPay(0);
-			}
-			this.incomeByPay.addIncome4Chain(payIncome);
+		if(this.incomeByPay == null){
+			this.incomeByPay = new IncomeByPay(0);
 		}
+		this.incomeByPay.append(appendIncome.incomeByPay);
 		
 		//Append the total & amount to erase price.
 		append(appendIncome.getIncomeByErase());

@@ -74,7 +74,7 @@ public class IncomeByPay implements Jsonable{
 		}
 	}
 	
-	private final int orderAmount;
+	private int orderAmount;
 	private final List<PaymentIncome> paymentIncomes = SortedList.newInstance();
 	
 	public IncomeByPay(int orderAmount){
@@ -85,7 +85,14 @@ public class IncomeByPay implements Jsonable{
 		return Collections.unmodifiableList(paymentIncomes);
 	}
 	
-	public void addIncome4Chain(PaymentIncome income){
+	public void append(IncomeByPay appendIncome){
+		for(IncomeByPay.PaymentIncome payIncome : appendIncome.getPaymentIncomes()){
+			addIncome4Chain(payIncome);
+		}
+		this.orderAmount += appendIncome.orderAmount;
+	}
+	
+	private void addIncome4Chain(PaymentIncome income){
 		if(income != null){
 			boolean isExist = false;
 			for(int i = 0; i < paymentIncomes.size(); i++){
