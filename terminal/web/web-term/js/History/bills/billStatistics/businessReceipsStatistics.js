@@ -267,7 +267,24 @@ $(function(){
 				totalProperty : "totalProperty",
 				root : "root"
 			},
-			receivablesStatResultStoreRecords.concat(receivablesStatResultStoreRecords2))
+			receivablesStatResultStoreRecords.concat(receivablesStatResultStoreRecords2)),
+			listeners : {
+				load : function(store, records, options){
+					if(store.getCount() > 0){
+		     			var sumRow = receivablesStatResultGrid.getView().getRow(store.getCount() - 1);
+		     			sumRow.style.backgroundColor = '#EEEEEE';
+						for(var i = 0; i < receivablesStatResultGrid.getColumnModel().getColumnCount(); i++){
+							var sumCell = receivablesStatResultGrid.getView().getCell(store.getCount() -1, i);
+							sumCell.style.fontSize = '15px';
+		    				sumCell.style.fontWeight = 'bold';
+		    				sumCell.style.color= 'green';
+						}
+						
+						receivablesStatResultGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+		     			
+		     		}
+				}
+			}
 		});
 		
 	

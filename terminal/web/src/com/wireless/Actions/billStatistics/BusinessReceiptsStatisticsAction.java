@@ -49,7 +49,6 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		final String offDuty = request.getParameter("dateEnd");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
-		final String isPaging = request.getParameter("isPaging");
 		final String region = request.getParameter("region");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
@@ -84,18 +83,22 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
 			
 			List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond);
+
+			 jObject.setTotalProperty(incomesByEachDay.size());
+			 IncomeByEachDay total = new IncomeByEachDay("2050-01-01");
+			 
+			 for(IncomeByEachDay item : incomesByEachDay){
+				 total.append(item);
+			 }
+			 
+			 if(start != null && !start.isEmpty() && limit != null && ! limit.isEmpty()){
+				 incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, true, start, limit);
+			 }
+			 
+			 incomesByEachDay.add(total);
 			
-			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
-				jObject.setRoot(new ArrayList<Jsonable>(0));
-				
-			}else{
-				
-				jObject.setTotalProperty(incomesByEachDay.size());
-				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, Boolean.parseBoolean(isPaging), start, limit);
-				
-//				incomesByEachDay.add(total);
-				jObject.setRoot(incomesByEachDay);
-			}
+			 jObject.setRoot(incomesByEachDay);
+			
 			if(includingChart != null && !includingChart.isEmpty()){
 				final List<String> xAxis = new ArrayList<String>();
 				final List<Float> incomes = new ArrayList<Float>();

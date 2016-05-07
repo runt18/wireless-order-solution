@@ -89,10 +89,19 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			List<OrderFood> orderFoodList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
 			
-			jobject.setTotalProperty(orderFoodList.size());
+			
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				jobject.setTotalProperty(orderFoodList.size());
+				OrderFood total = new OrderFood();
+				for(OrderFood item : orderFoodList){
+					total.setCount(item.getCount() + total.getCount());
+					total.setPlanPrice(item.getPlanPrice() + total.getPlanPrice());
+					total.asFood().setPrice(item.asFood().getPrice() + total.asFood().getPrice());
+				}
+				
 				orderFoodList = DataPaging.getPagingData(orderFoodList, true, Integer.parseInt(start), Integer.parseInt(limit));
+				orderFoodList.add(total);
 			}
 			jobject.setRoot(orderFoodList);
 			

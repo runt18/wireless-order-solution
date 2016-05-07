@@ -276,6 +276,23 @@ Ext.onReady(function(){
 		      {name : 'customerAmount'},
 		      {name : 'averageCost'}
          ]),
+         listeners : {
+         	load : function(store, records, options){
+         		if(store.getCount() > 0){
+         			var sumRow = passengerFlowStatistics.getView().getRow(store.getCount() - 1);
+         			sumRow.style.backgroundColor = '#EEEEEE';
+					for(var i = 0; i < passengerFlowStatistics.getColumnModel().getColumnCount(); i++){
+						var sumCell = passengerFlowStatistics.getView().getCell(store.getCount() -1, i);
+						sumCell.style.fontSize = '15px';
+        				sumCell.style.fontWeight = 'bold';
+        				sumCell.style.color= 'green';
+					}
+					
+					passengerFlowStatistics.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+         		
+         		}
+         	}
+         },
          baseParams : {
         	 start : 0,
         	 limit : 10

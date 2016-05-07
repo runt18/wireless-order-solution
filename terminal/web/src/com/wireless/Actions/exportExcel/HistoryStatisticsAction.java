@@ -2563,15 +2563,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String isRefund = request.getParameter("isRefund");
 
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		if(branchId != null && !branchId.isEmpty()){
-			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-		}
-		
 		final MemberOperationDao.ExtraCond extraCond;
+		
+		
+		
 		if(dataSource.equalsIgnoreCase("today")){
 			extraCond = new MemberOperationDao.ExtraCond(DateType.TODAY);
 		}else{
 			extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+		}
+		
+		if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
+			extraCond.setBranch(Integer.parseInt(branchId));
 		}
 		
 		if(fuzzy != null && !fuzzy.trim().isEmpty()){
@@ -2659,6 +2662,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(6, 3000);
 		sheet.setColumnWidth(7, 6000);
 		sheet.setColumnWidth(8, 4000);
+		sheet.setColumnWidth(9, 3000);
 		
 		//冻结行
 		sheet.createFreezePane(0, 5, 0, 5);
@@ -2722,6 +2726,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员卡号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("手机号码");
 		cell.setCellStyle(headerStyle);		
 		
@@ -2749,6 +2757,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("操作类型");
 		cell.setCellStyle(headerStyle);
 		
+		
 		for (MemberOperation mo : list) {
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
@@ -2759,6 +2768,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMember().getMemberType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getMemberCard());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell((int)row.getLastCellNum());
@@ -2788,6 +2801,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getOperationType().getName());
 			cell.setCellStyle(strStyle);
+
 		}
 		
 		OutputStream os = response.getOutputStream();
@@ -2827,9 +2841,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		if(branchId != null && branchId.isEmpty()){
-			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-		}
+		
 		
 		DateType dy;
 		if(dataSource.equalsIgnoreCase("today")){
@@ -2848,6 +2860,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		}else{
 			extraCond = new MemberOperationDao.ExtraCond(dy);
 		}
+		
+		if(branchId != null && branchId.isEmpty() && !branchId.equals("-1")){
+			extraCond.setBranch(Integer.parseInt(branchId));
+		}
+		
 		
 		if(fuzzy != null && !fuzzy.trim().isEmpty()){
 			List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
@@ -2918,6 +2935,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(7, 3000);
 		sheet.setColumnWidth(8, 3000);
 		sheet.setColumnWidth(9, 6000);
+		sheet.setColumnWidth(10, 6000);
 		
 		//冻结行
 		sheet.createFreezePane(0, 5, 0, 5);
@@ -2979,6 +2997,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("会员名称");
 		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员卡号");
+		cell.setCellStyle(headerStyle);
+		
 		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("手机号");
 		cell.setCellStyle(headerStyle);
@@ -3021,6 +3044,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(mo.getMemberName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getMemberCard());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell((int)row.getLastCellNum());

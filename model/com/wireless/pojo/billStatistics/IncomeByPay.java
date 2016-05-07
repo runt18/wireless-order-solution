@@ -86,10 +86,12 @@ public class IncomeByPay implements Jsonable{
 	}
 	
 	public void append(IncomeByPay appendIncome){
-		for(IncomeByPay.PaymentIncome payIncome : appendIncome.getPaymentIncomes()){
-			addIncome4Chain(payIncome);
+		if(appendIncome != null){
+			for(IncomeByPay.PaymentIncome payIncome : appendIncome.getPaymentIncomes()){
+				addIncome4Chain(payIncome);
+			}
+			this.orderAmount += appendIncome.orderAmount;
 		}
-		this.orderAmount += appendIncome.orderAmount;
 	}
 	
 	public void addIncome4Chain(PaymentIncome income){
