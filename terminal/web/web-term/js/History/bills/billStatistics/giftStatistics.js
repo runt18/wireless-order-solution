@@ -401,6 +401,7 @@ Ext.onReady(function(){
 		    '../../QueryGiftStatistic.do',
 		    [
 			    [true, false, false, false], 
+			    ['门店名称', 'restaurantName', 60],
 			    ['单据编号', 'orderId', 100, null, function(v){
 			    	return '<a class="orderLinkId">' + v + '</a>';
 			    }],
@@ -411,7 +412,7 @@ Ext.onReady(function(){
 			    ['总价','totalPrice', 60, 'right', giftTotalPrice],
 			    ['赠送人','waiter', null,'center']
 			],
-			['orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter'],
+			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter', 'rid'],
 		    [ ['dataSource', 'normal']],
 		    GRID_PADDING_LIMIT_20,
 		    '',
@@ -479,6 +480,7 @@ Ext.onReady(function(){
 							});
 							thiz.orderId = sd.orderId;
 							thiz.queryType = 'History';
+							thiz.branchId = sd.rid;
 							thiz.center();	
 						}
 					}
