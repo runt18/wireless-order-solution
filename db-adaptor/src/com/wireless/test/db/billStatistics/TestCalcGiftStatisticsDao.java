@@ -39,7 +39,7 @@ public class TestCalcGiftStatisticsDao {
 	@Test
 	public void testCalcGiftStatistics() throws SQLException, ParseException, BusinessException{
 		
-		List<GiftIncomeByStaff> incomesByStaff = CalcGiftStatisticsDao.calcGiftIncomeByStaff(mStaff, mExtraCond);
+		List<GiftIncomeByStaff> incomesByStaff = CalcGiftStatisticsDao.calcIncomeByStaff(mStaff, mExtraCond);
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(GiftIncomeByStaff each : incomesByStaff){
@@ -47,7 +47,7 @@ public class TestCalcGiftStatisticsDao {
 			totalAmountByStaff += each.getGiftAmount();
 		}
 		
-		List<GiftIncomeByDept> incomesByDept = CalcGiftStatisticsDao.calcGiftIncomeByDept(mStaff, mExtraCond);
+		List<GiftIncomeByDept> incomesByDept = CalcGiftStatisticsDao.calcIncomeByDept(mStaff, mExtraCond);
 		float totalIncomeByDept = 0;
 		float totalAmountByDept = 0;
 		for(GiftIncomeByDept each : incomesByDept){
