@@ -162,7 +162,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, extraCond);
+			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -260,7 +260,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, extraCond));
+			jObject.setRoot(CalcGiftStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -328,7 +328,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, extraCond));
+			jObject.setRoot(CalcGiftStatisticsDao.calcIncomeByDept(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
