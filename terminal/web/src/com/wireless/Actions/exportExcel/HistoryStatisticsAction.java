@@ -45,7 +45,6 @@ import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponEffectDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
-import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
@@ -1856,12 +1855,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
 		}		
 		
-		DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
-		if(range == null){
-			range = new DutyRange(onDuty, offDuty);
-		}
+		extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
 		
-		final ShiftDetail	business = ShiftDao.getByRange(staff, range, extraCond);
+		final ShiftDetail business = CalcBillStatisticsDao.calcSalesIncome(staff, extraCond);
 		
 		// 创建excel主页
 		HSSFWorkbook wb = new HSSFWorkbook();
