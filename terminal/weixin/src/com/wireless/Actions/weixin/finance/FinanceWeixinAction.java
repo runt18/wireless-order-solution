@@ -533,11 +533,9 @@ public class FinanceWeixinAction extends Action {
 			long endDate = c.getTimeInMillis();
 			
 			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(staff, 
-														new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE),
-																	  DateUtil.format(endDate, DateUtil.Pattern.DATE)),
-																	  //"2014-08-18",
-																	  //"2014-08-18"),
-														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setDutyRange(
+																new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE),
+																			  DateUtil.format(endDate, DateUtil.Pattern.DATE))));
 			
 			final String associatedSerial = "trend_chart_thisWeek_" + msg.getFromUserName();
 			final String fileNameJpg = associatedSerial + ".jpg";
@@ -610,12 +608,10 @@ public class FinanceWeixinAction extends Action {
 			long endDate = c.getTimeInMillis();
 			
 			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(staff, 
-														new DutyRange(
-														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
-														DateUtil.format(endDate, DateUtil.Pattern.DATE)),
-														//"2013-08-1",
-														//"2013-08-5"
-														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+															.setDutyRange(new DutyRange(
+																DateUtil.format(beginDate, DateUtil.Pattern.DATE),
+																DateUtil.format(endDate, DateUtil.Pattern.DATE))));
 			
 			final String associatedSerial = "trend_chart_lastWeek_" + msg.getFromUserName();
 			final String fileNameJpg = associatedSerial + ".jpg";

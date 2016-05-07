@@ -87,7 +87,8 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			
 			final String chart = request.getParameter("chart");
 			
-			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY); 
+			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+																				  .setDutyRange(new DutyRange(onDuty, offDuty)); 
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
@@ -98,7 +99,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			if(chart != null && !chart.isEmpty()){
 				incomesByEachDay = new ArrayList<IncomeByEachDay>();
 				
-				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, new DutyRange(onDuty, offDuty), extraCond));
+				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond));
 				
 				List<String> xAxis = new ArrayList<String>();
 				List<Float> data = new ArrayList<Float>();

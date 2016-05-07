@@ -66,6 +66,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.PromotionDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.action.WxKeywordDao;
@@ -81,6 +82,7 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.promotion.Promotion;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -96,7 +98,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	public static enum QrCodeType{
 		WAITER(1, "微信店小二"),
 		TEMP_PAY(2, "账单暂结"),
-		REPRESENT(3, "我要代言");
+		REPRESENT(3, "我要代言"),
+		SCAN_ORDER(4, "扫码下单");
 		
 		public final int val;
 		public final String desc;
@@ -139,6 +142,10 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		
 		public static QrCodeParam newRepresent(int memberId){
 			return new QrCodeParam(QrCodeType.REPRESENT, memberId);
+		}
+		
+		public static QrCodeParam newScanOrder(int tableId){
+			return new QrCodeParam(QrCodeType.SCAN_ORDER, tableId);
 		}
 		
 		public static QrCodeParam parse(String qrParam){
@@ -704,6 +711,19 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					ignored.printStackTrace();
 				}
 			}
+			
+		}else if(qrParam.type == QrCodeType.SCAN_ORDER){
+			//TODO 扫码下单
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final Table table = TableDao.getById(staff, qrParam.param);
+			
+			HttpSession httpSession = request.getSession(true);
+			httpSession.setAttribute("fid", msg.getToUserName());
+			httpSession.setAttribute("oid", msg.getFromUserName());
+			session.callback(new Msg4ImageText(msg).addItem(
+					new Data4Item(title, desc, picUrl,
+								  createUrl4Session(WEIXIN_FOOD + "?tableId=" + table.getId() + "&branchId=" + branchId, httpSession))));
 		}
 	}
 	
