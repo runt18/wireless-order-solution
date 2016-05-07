@@ -92,7 +92,7 @@ public class IncomeByPay implements Jsonable{
 		this.orderAmount += appendIncome.orderAmount;
 	}
 	
-	private void addIncome4Chain(PaymentIncome income){
+	public void addIncome4Chain(PaymentIncome income){
 		if(income != null){
 			boolean isExist = false;
 			for(int i = 0; i < paymentIncomes.size(); i++){
