@@ -31,16 +31,16 @@ public class TestCalcCommissionStatisticsDao {
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
 		 mDutyRange = new DutyRange("2014-6-10 00:40:04", "2014-6-26 23:59:36"); 
-		 mExtraCond = new ExtraCond(DateType.HISTORY);
+		 mExtraCond = new ExtraCond(DateType.HISTORY).setDutyRange(mDutyRange);
 //		 mExtraCond.setHourRange(new HourRange("06:00:00", "12:00:00"));
 	}
 	
 	@Test
-	public void testCalcCommissionStatistics() throws SQLException, ParseException{
+	public void testCalcCommissionStatistics() throws SQLException, ParseException, BusinessException{
 		float totalIncome = 0;
 		float totalAmount = 0;
 		
-		List<CommissionIncomeByEachDay> incomesByEachDay = CalcCommissionStatisticsDao.calcCommissionIncomeByEachDay(mStaff, mDutyRange, mExtraCond);
+		List<CommissionIncomeByEachDay> incomesByEachDay = CalcCommissionStatisticsDao.calcIncomeByEachDay(mStaff, mExtraCond);
 		@SuppressWarnings("unused")
 		float totalIncomeByEachDay = 0;
 		@SuppressWarnings("unused")
@@ -51,7 +51,7 @@ public class TestCalcCommissionStatisticsDao {
 		}
 		
 //		mExtraCond.setStaffId(mStaff.getId());
-		List<CommissionIncomeByStaff> incomesByStaff = CalcCommissionStatisticsDao.calcCommissionIncomeByStaff(mStaff, mDutyRange, mExtraCond);
+		List<CommissionIncomeByStaff> incomesByStaff = CalcCommissionStatisticsDao.calcIncomeByStaff(mStaff,  mExtraCond);
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(CommissionIncomeByStaff each : incomesByStaff){

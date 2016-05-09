@@ -129,6 +129,10 @@ public class CalcBillStatisticsDao {
 			return this;
 		}
 		
+		public DutyRange getDutyRange(){
+			return this.dutyRange;
+		}
+		
 		public ExtraCond setHourRange(HourRange range){
 			this.hourRange = range;
 			return this;
@@ -204,8 +208,6 @@ public class CalcBillStatisticsDao {
 	 * Calculate the income by pay type.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the income by pay {@link IncomeByPayType}
@@ -213,11 +215,11 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static IncomeByPay calcIncomeByPayType(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{	
+	public static IncomeByPay calcIncomeByPayType(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{	
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByPayType(dbCon, staff, range, extraCond);
+			return calcIncomeByPayType(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -229,8 +231,6 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the income by pay {@link IncomeByPayType}
@@ -238,18 +238,18 @@ public class CalcBillStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{		
+	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{		
 		
 		IncomeByPay incomeByPay;
 		
 		if(extraCond.isChain()){
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the pay type income to group.
-			incomeByPay = calcIncomeByPayType(dbCon, groupStaff, range, ((ExtraCond)extraCond.clone()).setChain(false));
+			incomeByPay = calcIncomeByPayType(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false));
 
 			//Append the pay type income to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				IncomeByPay branchIncome = calcIncomeByPayType(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, ((ExtraCond)extraCond.clone()).setChain(false));
+				IncomeByPay branchIncome = calcIncomeByPayType(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false));
 				for(IncomeByPay.PaymentIncome incomeByPayType : branchIncome.getPaymentIncomes()){
 					incomeByPay.addIncome4Chain(incomeByPayType);
 				}
@@ -257,13 +257,15 @@ public class CalcBillStatisticsDao {
 			
 		}else{
 			
+			extraCond.setStaff(staff);
+			
 			String sql;
 			//Calculate the order amount.
 			sql = " SELECT COUNT(*) FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " + 
 				  " WHERE 1 = 1 " +
 				  (extraCond != null ? extraCond.toString() : "") +
 				  " AND O.restaurant_id = " + staff.getRestaurantId() +
-				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				  //" AND O.order_date BETWEEN '" + extraCond.dutyRange.getOnDutyFormat() + "' AND '" + extraCond.dutyRange.getOffDutyFormat() + "'" +
 				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
@@ -283,7 +285,7 @@ public class CalcBillStatisticsDao {
 				  (extraCond != null ? extraCond.toString() : "") +
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
 				  " AND O.pay_type_id <> " + PayType.MIXED.getId() +
-				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				  //" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
 				  " GROUP BY O.pay_type_id ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -308,7 +310,7 @@ public class CalcBillStatisticsDao {
 				  (extraCond != null ? extraCond.toString() : "") +
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
 				  " AND O.pay_type_id = " + PayType.MIXED.getId() +
-				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+				  //" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
 				  " GROUP BY MP.pay_type_id ";
 			
@@ -336,19 +338,17 @@ public class CalcBillStatisticsDao {
 	 * Calculate the erase price according to extra condition
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to income by erase {@link IncomeByErase}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByErase calcErasePrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByErase calcErasePrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcErasePrice(dbCon, staff, range, extraCond);
+			return calcErasePrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -360,15 +360,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the customer amount
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int calcCustomerAmount(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static int calcCustomerAmount(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -378,9 +376,8 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "") +
-			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+			  (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
+			  " AND restaurant_id = " + staff.getRestaurantId();
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int customAmount = 0;
@@ -398,15 +395,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to income by erase {@link IncomeByErase}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByErase calcErasePrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByErase calcErasePrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -416,9 +411,9 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "") +
+			  (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  //" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND erase_price > 0 ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -436,18 +431,16 @@ public class CalcBillStatisticsDao {
 	 * Calculate the discount price according to extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extra condition
 	 * @return the result to income by discount {@link IncomeByDiscount}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByDiscount calcDiscountPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByDiscount calcDiscountPrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcDiscountPrice(dbCon, staff, range, extraCond);
+			return calcDiscountPrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -459,14 +452,12 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extra condition
 	 * @return the result to income by discount {@link IncomeByDiscount}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByDiscount calcDiscountPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByDiscount calcDiscountPrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -477,7 +468,7 @@ public class CalcBillStatisticsDao {
 			  " WHERE 1 = 1 " +
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  //" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND discount_price > 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -495,19 +486,17 @@ public class CalcBillStatisticsDao {
 	 * Calculate the gift price according to extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to income by gift {@link IncomeByGift}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByGift calcGiftPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByGift calcGiftPrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcGiftPrice(dbCon, staff, range, extraCond);
+			return calcGiftPrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -519,15 +508,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to income by gift {@link IncomeByGift}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByGift calcGiftPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByGift calcGiftPrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		sql = " SELECT " +
@@ -535,9 +522,9 @@ public class CalcBillStatisticsDao {
 		      " FROM " +
 		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
-		      (extraCond != null ? extraCond.toString() : "") +
+		      (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
-		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		      //" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND gift_price > 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -555,19 +542,17 @@ public class CalcBillStatisticsDao {
 	 * Calculate the cancel price to specific duty range.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range 
 	 * @param queryType
 	 * 			the query type
 	 * @return the income by cancel pricee
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCancel calcCancelPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByCancel calcCancelPrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelPrice(dbCon, staff, range, extraCond);
+			return calcCancelPrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -579,15 +564,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range 
 	 * @param queryType
 	 * 			the query type
 	 * @return the income by cancel price
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -596,9 +579,9 @@ public class CalcBillStatisticsDao {
 		      " FROM " +
 		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
-		      (extraCond != null ? extraCond.toString() : "") +
+		      (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
-		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		      //" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND cancel_price > 0 ";
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -616,19 +599,17 @@ public class CalcBillStatisticsDao {
 	 * Calculate the coupon price to specific duty range.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param queryType 
 	 * 			the query type
 	 * @return the income by coupon price
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCoupon calcCouponPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByCoupon calcCouponPrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCouponPrice(dbCon, staff, range, extraCond);
+			return calcCouponPrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -640,15 +621,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param queryType 
 	 * 			the query type
 	 * @return the income by coupon price
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCoupon calcCouponPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByCoupon calcCouponPrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -658,9 +637,9 @@ public class CalcBillStatisticsDao {
 			      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			      " JOIN " + Params.dbName + ".coupon_operation CO ON O.id = CO.associate_id AND CO.operate = " + CouponOperation.Operate.ORDER_USE.getVal() + 
 			      " WHERE 1 = 1 " +
-			      (extraCond != null ? extraCond.toString() : "") +
+			      (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
 			      " AND O.restaurant_id = " + staff.getRestaurantId() +
-			      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			      //" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			      " GROUP BY O.id " +
 			   " ) AS TMP ";
 			
@@ -679,19 +658,17 @@ public class CalcBillStatisticsDao {
 	 * Calculate the repaid price according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to income by repaid {@link IncomeByRepaid}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByRepaid calcRepaidPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByRepaid calcRepaidPrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidPrice(dbCon, staff, range, extraCond);
+			return calcRepaidPrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -703,15 +680,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to income by repaid {@link IncomeByRepaid}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByRepaid calcRepaidPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByRepaid calcRepaidPrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		sql = " SELECT " +
@@ -720,8 +695,9 @@ public class CalcBillStatisticsDao {
 		      Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
-		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND status = " + Order.Status.REPAID.getVal();
+		      //" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " AND status = " + Order.Status.REPAID.getVal() +
+			  (extraCond != null ? extraCond.setStaff(staff).toString() : "");
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		IncomeByRepaid repaidIncome = new IncomeByRepaid();
@@ -748,7 +724,7 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByRound calcRoundPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByRound calcRoundPrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		sql = " SELECT " +
@@ -756,7 +732,8 @@ public class CalcBillStatisticsDao {
 		      " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      " AND O.restaurant_id = " + staff.getRestaurantId() +
-		      " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		      //" AND O.order_date BETWEEN '" + extraCond.dutyRange.getOnDutyFormat() + "' AND '" + extraCond.dutyRange.getOffDutyFormat() + "'" +
+		      (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
 		      " GROUP BY O.id " +
 		      " HAVING round_price <> 0 ";
 		
@@ -813,19 +790,17 @@ public class CalcBillStatisticsDao {
 	 * Calculate the service income.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param queryType
 	 * 			the date type
 	 * @return the service income {@link IncomeByService}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByService calcServicePrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByService calcServicePrice(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcServicePrice(dbCon, staff, range, extraCond);
+			return calcServicePrice(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -837,15 +812,13 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param queryType
 	 * 			the date type
 	 * @return the service income {@link IncomeByService}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByService calcServicePrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
+	public static IncomeByService calcServicePrice(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -854,9 +827,9 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond.toString() : "") +
+			  (extraCond != null ? extraCond.setStaff(staff).toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  //" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND service_rate > 0 ";
 				
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -1411,32 +1384,34 @@ public class CalcBillStatisticsDao {
 				IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
 				if(range != null){
 					
+					extraCond.setDutyRange(range);
+					
 					//Calculate the customer amount
-					income.setCustomerAmount(calcCustomerAmount(dbCon, staff, range, extraCond));
+					income.setCustomerAmount(calcCustomerAmount(dbCon, staff, extraCond));
 					
 					//Calculate the income by pay
-					income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, extraCond));
+					income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, extraCond));
 					
 					//Calculate the total & amount to erase price
-					income.setIncomeByErase(calcErasePrice(dbCon, staff, range, extraCond));
+					income.setIncomeByErase(calcErasePrice(dbCon, staff, extraCond));
 					
 					//Get the total & amount to discount price
-					income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, extraCond));
+					income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, extraCond));
 		
 					//Get the total & amount to gift price
-					income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, extraCond));
+					income.setIncomeByGift(calcGiftPrice(dbCon, staff, extraCond));
 					
 					//Get the total & amount to cancel price
-					income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, extraCond));
+					income.setIncomeByCancel(calcCancelPrice(dbCon, staff, extraCond));
 					
 					//Get the total & amount to coupon price
-					income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, extraCond));
+					income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, extraCond));
 					
 					//Get the total & amount to repaid order
-					income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, extraCond));
+					income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, extraCond));
 					
 					//Get the total & amount to order with service
-					income.setIncomeByService(calcServicePrice(dbCon, staff, range, extraCond));
+					income.setIncomeByService(calcServicePrice(dbCon, staff, extraCond));
 					
 					//Get the charge income by both cash and credit card
 					income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaff(extraCond.staffId)));
@@ -1480,8 +1455,6 @@ public class CalcBillStatisticsDao {
 	 * calculate the sales income (营业统计) according to specific extra condition {@link ExtraCond}.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to sales income {@link ShiftDetail}
@@ -1490,11 +1463,11 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throws if the branches does NOT exist in case of chain
 	 */
-	public static ShiftDetail calcSalesIncome(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static ShiftDetail calcSalesIncome(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcSalesIncome(dbCon, staff, range, extraCond);
+			return calcSalesIncome(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1507,8 +1480,6 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result to sales income {@link ShiftDetail}
@@ -1517,24 +1488,24 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throws if the branches does NOT exist in case of chain
 	 */
-	public static ShiftDetail calcSalesIncome(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static ShiftDetail calcSalesIncome(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		final ShiftDetail result;
 		
 		if(extraCond.isChain()){
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the sales income to the group.
-			result = calcSalesIncome(dbCon, groupStaff, range, ((ExtraCond)extraCond.clone()).setChain(false));
+			result = calcSalesIncome(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false));
 			//Append the sales income to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				result.append(calcSalesIncome(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), range, ((ExtraCond)extraCond.clone()).setChain(false)));
+				result.append(calcSalesIncome(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
 			}
 			
 		}else{
-			final DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
+			final DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, extraCond.dutyRange);
 			if(dutyRange == null){
-				result = ShiftDao.getByRange(dbCon, staff, range, extraCond);
+				result = ShiftDao.getByRange(dbCon, staff, extraCond);
 			}else{
-				result = ShiftDao.getByRange(dbCon, staff, dutyRange, extraCond);
+				result = ShiftDao.getByRange(dbCon, staff, extraCond);
 			}
 		}
 		

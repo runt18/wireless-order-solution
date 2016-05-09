@@ -125,7 +125,7 @@ public class ShiftDao {
 		}
 		dbCon.rs.close();
 		
-		return getByRange(dbCon, staff, new DutyRange(onDuty, System.currentTimeMillis()), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
+		return getByRange(dbCon, staff, new CalcBillStatisticsDao.ExtraCond(DateType.TODAY).setDutyRange(new DutyRange(onDuty, System.currentTimeMillis())));
 	}
 	
 	/**
@@ -162,7 +162,7 @@ public class ShiftDao {
 	 * 	 			throws if the restaurant does NOT exist 
 	 */
 	private static ShiftDetail getCurrentShift(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
+		return getByRange(dbCon, staff, new CalcBillStatisticsDao.ExtraCond(DateType.TODAY).setDutyRange(getCurrentShiftRange(dbCon, staff)));
 	}
 	
 	/**
@@ -212,8 +212,6 @@ public class ShiftDao {
 	 * Get the details to shift within the duty range
 	 * @param staff
 	 * 			the staff to request
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @return the shift detail information
@@ -221,11 +219,11 @@ public class ShiftDao {
 	 * 			throws if fail to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static ShiftDetail getByRange(Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException, BusinessException{
+	public static ShiftDetail getByRange(Staff staff, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByRange(dbCon, staff, range, extraCond);
+			return getByRange(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -237,8 +235,6 @@ public class ShiftDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to request
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @return the shift detail information
@@ -246,55 +242,55 @@ public class ShiftDao {
 	 * 			throws if fail to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException, BusinessException{
+	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, CalcBillStatisticsDao.ExtraCond extraCond) throws SQLException, BusinessException{
 		
-		ShiftDetail result = new ShiftDetail(range);
+		ShiftDetail result = new ShiftDetail(extraCond.getDutyRange());
 		
 		//Calculate the customer amount
-		result.setCustomerAmount(CalcBillStatisticsDao.calcCustomerAmount(dbCon, staff, range, extraCond));
+		result.setCustomerAmount(CalcBillStatisticsDao.calcCustomerAmount(dbCon, staff, extraCond));
 		
 		//Calculate the general income
-		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));
+		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, extraCond));
 		
 		//Calculate the total & amount to erase price
-		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, extraCond));
+		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, extraCond));
 		//-----------------------------
 		
 		//Get the total & amount to discount price
-		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, extraCond));
+		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, extraCond));
 		
 		//Get the total & amount to gift price
-		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, extraCond));
+		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, extraCond));
 		
 		//Get the total & amount to cancel price
-		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, extraCond));
+		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, extraCond));
 		
 		//Get the total & amount to coupon price
-		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, extraCond));
+		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, extraCond));
 		
 		//Get the total & amount to repaid order
-		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, extraCond));
+		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, extraCond));
 		
 		//Get the total & amount to order with service
-		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
+		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, extraCond));
 		
 		//Get the total & amount to member price
 		//result.setMemberPriceIncome(CalcBillStatisticsDao.calcMemberPrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to round price
-		result.setRoundIncome(CalcBillStatisticsDao.calcRoundPrice(dbCon, staff, range, extraCond));
+		result.setRoundIncome(CalcBillStatisticsDao.calcRoundPrice(dbCon, staff, extraCond));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setBranch(staff.getRestaurantId())));
+		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, extraCond.getDutyRange(), new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setBranch(staff.getRestaurantId())));
 		
 		//Get the income by book
-		result.setIncomeByBook(CalcBillStatisticsDao.calcIncomeByBook(dbCon, staff, range));
+		result.setIncomeByBook(CalcBillStatisticsDao.calcIncomeByBook(dbCon, staff, extraCond.getDutyRange()));
 		
 		//Get the coupon usage
-		result.setCouponUsage(CalcCouponStatisticsDao.calcUsage(dbCon, staff, new CalcCouponStatisticsDao.ExtraCond().setRange(range)));
+		result.setCouponUsage(CalcCouponStatisticsDao.calcUsage(dbCon, staff, new CalcCouponStatisticsDao.ExtraCond().setRange(extraCond.getDutyRange())));
 		
 		//FIXME Get the gift, discount & total to each department during this period.
-		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, extraCond.setDutyRange(range)));
+		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, extraCond));
 		
 		return result;
 	}

@@ -149,29 +149,28 @@ public class CalcCommissionStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	public static List<CommissionStatistics> getCommissionStatisticsDetail(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> getDetail(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionStatisticsDetail(dbCon, staff, extraCond);
+			return getDetail(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static List<CommissionStatistics> getCommissionStatisticsDetail(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> getDetail(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		List<CommissionStatistics> result = new ArrayList<CommissionStatistics>();
 		
 		if(extraCond.isChain){
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			
-			//Append the commission to the group
-			result.addAll(getCommissionStatisticsDetail(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
+			//Append the commission detail to the group.
+			result.addAll(getDetail(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
 			
-			//Append the commission to the branch
+			//Append the commission detail to each branch.
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				
-				result.addAll(getCommissionStatisticsDetail(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
+				result.addAll(getDetail(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
 			}
 			
 		}else{
@@ -184,7 +183,7 @@ public class CalcCommissionStatisticsDao {
 				c.setOrderId(dbCon.rs.getInt("order_id"));
 				c.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 				c.setFoodName(dbCon.rs.getString("name"));
-				c.setDept( new Department(dbCon.rs.getInt("restaurant_id"), dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name")));
+				c.setDept(new Department(dbCon.rs.getInt("restaurant_id"), dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name")));
 				c.setUnitPrice(dbCon.rs.getFloat("unit_price"));
 				c.setAmount(dbCon.rs.getFloat("order_count"));
 				c.setTotalPrice(dbCon.rs.getFloat("total_price"));
@@ -205,8 +204,6 @@ public class CalcCommissionStatisticsDao {
 	 * Calculate the commission income by each day according to specific range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CommissionIncomeByEachDay}
@@ -216,11 +213,11 @@ public class CalcCommissionStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<CommissionIncomeByEachDay> calcCommissionIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<CommissionIncomeByEachDay> calcIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionIncomeByEachDay(dbCon, staff, extraCond);
+			return calcIncomeByEachDay(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -232,8 +229,6 @@ public class CalcCommissionStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param dutyRange
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition
 	 * @return the result list {@link CommissionIncomeByEachDay}
@@ -243,17 +238,17 @@ public class CalcCommissionStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<CommissionIncomeByEachDay> calcCommissionIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<CommissionIncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
 		if(extraCond.isChain){
 			final Map<DutyRange, CommissionIncomeByEachDay> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
-			for(CommissionIncomeByEachDay groupIncome : calcCommissionIncomeByEachDay(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
+			for(CommissionIncomeByEachDay groupIncome : calcIncomeByEachDay(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupIncome.getRange(), groupIncome);
 			}
 			
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				for(CommissionIncomeByEachDay branchIncome : calcCommissionIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
+				for(CommissionIncomeByEachDay branchIncome : calcIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchIncome.getRange())){
 						CommissionIncomeByEachDay commissionIncome = chainResult.get(branchIncome.getRange());
 						final float commissionAmount = branchIncome.getmCommissionAmount() + commissionIncome.getmCommissionAmount();
@@ -311,8 +306,6 @@ public class CalcCommissionStatisticsDao {
 	 * Calculate the commission income by staff according to duty range and extra condition
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link ExtraCond}
 	 * @return the result list {@link CommissionIncomeByStaff}
@@ -320,11 +313,11 @@ public class CalcCommissionStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<CommissionIncomeByStaff> calcCommissionIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<CommissionIncomeByStaff> calcIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionIncomeByStaff(dbCon, staff, extraCond);
+			return calcIncomeByStaff(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -336,8 +329,6 @@ public class CalcCommissionStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param range
-	 * 			the duty range
 	 * @param extraCond
 	 * 			the extra condition {@link ExtraCond}
 	 * @return the result list {@link CommissionIncomeByStaff}
@@ -345,7 +336,7 @@ public class CalcCommissionStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<CommissionIncomeByStaff> calcCommissionIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<CommissionIncomeByStaff> calcIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		List<CommissionIncomeByStaff> result = new ArrayList<CommissionIncomeByStaff>();
 		
 		if(extraCond.isChain){
@@ -353,11 +344,11 @@ public class CalcCommissionStatisticsDao {
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			
 			//Append the commission to the group
-			result.addAll(calcCommissionIncomeByStaff(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
+			result.addAll(calcIncomeByStaff(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
 			
 			//Append the commission to the branch
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
-				result.addAll(calcCommissionIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
+				result.addAll(calcIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
 			}
 			
 		}else{

@@ -336,31 +336,31 @@ public class PaymentDao {
 	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, BusinessException{
 		ShiftDetail result = new ShiftDetail(range);
 		
-		CalcBillStatisticsDao.ExtraCond extraCond4CalcBill = new CalcBillStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId);
+		CalcBillStatisticsDao.ExtraCond extraCond4CalcBill = new CalcBillStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId).setDutyRange(range);
 		//Calculate the general income
-		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond4CalcBill));
+		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, extraCond4CalcBill));
 		
 		//Calculate the total & amount to erase price
-		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, extraCond4CalcBill));
 		//-----------------------------
 		
 		//Get the total & amount to discount price
-		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, extraCond4CalcBill));
 		
 		//Get the total & amount to gift price
-		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, extraCond4CalcBill));
 		
 		//Get the total & amount to cancel price
-		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, extraCond4CalcBill));
 		
 		//Get the total & amount to coupon price
-		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, extraCond4CalcBill));
 		
 		//Get the total & amount to repaid order
-		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, extraCond4CalcBill));
 		
 		//Get the total & amount to order with service
-		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond4CalcBill));
+		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, extraCond4CalcBill));
 		
 		//Get the income by charge
 		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setStaff(extraCond.staffId)));
