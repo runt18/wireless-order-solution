@@ -293,12 +293,7 @@ Ext.onReady(function(){
 						return;
 					}
 					
-					var businessHour;
-					if(giftStatistic_hours){
-						businessHour = giftStatistic_hours;
-					}else{
-						businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'giftStatistic_'}).data;
-					}					
+					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'giftStatistic_'}).data;
 					
 					var gs = grid_giftStatistics.getStore();
 					gs.baseParams['onDuty'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
@@ -306,8 +301,8 @@ Ext.onReady(function(){
 					gs.baseParams['region'] = Ext.getCmp('giftStatistic_comboRegion').getValue();
 					gs.baseParams['foodName'] = Ext.getCmp('gift_foodName').getValue();
 					gs.baseParams['giftStaffId'] = gift_combo_staffs.getValue();
-					gs.baseParams['opening'] = businessHour.opening;
-					gs.baseParams['ending'] = businessHour.ending;
+					gs.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
+					gs.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';
 					gs.baseParams['branchId'] = branch_combo_gift.getValue();
 					gs.load({
 						params : {
@@ -329,8 +324,8 @@ Ext.onReady(function(){
 						region : Ext.getCmp('giftStatistic_comboRegion').getValue(),
 						giftStaffId : gift_combo_staffs.getValue(),
 						foodName : Ext.getCmp('gift_foodName').getValue(),
-						opening : businessHour.opening,
-						ending : businessHour.ending,
+						opening : businessHour.opening != '00:00' ? businessHour.opening : '',
+						ending : businessHour.ending != '00:00' ? businessHour.ending : '',
 						branchId : branch_combo_gift.getValue()
 					};
 					gift_chartLoadMarsk.show();
@@ -407,16 +402,16 @@ Ext.onReady(function(){
 			    }],
 			    ['赠送日期', 'orderDateFormat',100],
 			    ['菜品名称', 'name', 100], 
-			    ['数量','count', 60, 'right', Ext.ux.txtFormat.gridDou],
+			    ['数量','totalAmount', 60, 'right', Ext.ux.txtFormat.gridDou],
 			    ['单价','unitPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
-			    ['总价','totalPrice', 60, 'right', giftTotalPrice],
+			    ['总价','totalGift', 60, 'right'],
 			    ['赠送人','waiter', null,'center']
 			],
-			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter', 'rid'],
+			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'unitPrice', 'waiter', 'rid', 'totalAmount', 'totalGift'],
 		    [ ['dataSource', 'normal']],
 		    GRID_PADDING_LIMIT_20,
 		    '',
-		    [grid_giftStatisticsTbar, Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:gift_dateCombo,statistic : 'giftStatistic_',tbarType: 0, callback : function businessHourSelect(){giftStatistic_hours = null;}})]
+		    [grid_giftStatisticsTbar, Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:gift_dateCombo,statistic : 'giftStatistic_',tbarType: 0, callback : function businessHourSelect(){}})]
 		);
 		
 		grid_giftStatistics.frame = false;
@@ -458,10 +453,11 @@ Ext.onReady(function(){
 				}
 				
 				grid_giftStatistics.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-     			grid_giftStatistics.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-     			grid_giftStatistics.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-     			grid_giftStatistics.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
-     			grid_giftStatistics.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 2).innerHTML = '--';		//单据编号
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 3).innerHTML = '--';      //赠送日期
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 4).innerHTML = '--';      //菜品名称
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 6).innerHTML = '--';      //单价
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 8).innerHTML = '--';      //赠送人
      			
      		}
 			
@@ -518,12 +514,7 @@ Ext.onReady(function(){
 	//		dateCombo.fireEvent('select', dateCombo, null, 1);
 	//	});
 	}
-	
-	
-	function giftTotalPrice(s, d, data, f){
-		var totalPrice = parseFloat(data.json.unitPrice * data.json.count);
-		return totalPrice;
-	}
+
 
 	function gift_changeChartWidth(w,h){
 		if(eval($('div:visible[data-type=giftChart]').attr('data-value'))){
@@ -761,7 +752,7 @@ Ext.onReady(function(){
 	}
 
 	var grid_giftStatistics, giftViewBillWin;
-	var gift_cutAfterDrag=75, gift_cutBeforeDrag=70, giftStatistic_hours;
+	var gift_cutAfterDrag=75, gift_cutBeforeDrag=70;
 	var giftDetailsStatPanel, giftStatChartTabPanel, giftDetailChartPanel, giftStaffChartPanel, giftDeptChartPanel;
 	var gift_detailChart, gift_staffPieChart, gift_staffColumnChart, gift_deptPieChart, gift_deptColumnChart;
 	var requestParams, gift_dateCombo;
