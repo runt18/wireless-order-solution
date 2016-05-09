@@ -95,7 +95,7 @@ public class WxOperateRepresentAction extends DispatchAction{
 		
 		try{
 			//生成带推荐人ID的【我要代言】二维码
-			final String qrCodeUrl = new QRCode().setSceneId(WxHandleMessage.QrCodeParam.newRepresent(referrer.getMemberId()).sceneId())
+			final String qrCodeUrl = new QRCode().setTemp(String.valueOf(WxHandleMessage.QrCodeParam.newRepresent(referrer.getMemberId()).sceneId()))
 												 .setExpired(24 * 3600 * 30)	//30天
 												 .createUrl(Token.newInstance(AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken())));
 												 //.createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));

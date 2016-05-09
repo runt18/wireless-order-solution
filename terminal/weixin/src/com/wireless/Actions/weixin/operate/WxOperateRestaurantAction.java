@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -17,6 +18,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.listener.SessionListener;
 
 public class WxOperateRestaurantAction extends DispatchAction {
 	
@@ -70,15 +72,22 @@ public class WxOperateRestaurantAction extends DispatchAction {
 	 */
 	public ActionForward detail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		final String fid = request.getParameter("fid");
+		String fid = request.getParameter("fid");
 		final String branchId = request.getParameter("branchId");
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
 			final int restaurantId;
 			if(branchId != null && !branchId.isEmpty()){
 				restaurantId = Integer.parseInt(branchId);
 			}else{
-				restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+				if(sessionId != null && !sessionId.isEmpty()){
+					HttpSession session = SessionListener.sessions.get(sessionId);
+					fid = String.valueOf(session.getAttribute("fid"));
+					restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+				}else{
+					restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+				}
 			}
 			
 			jObject.setRoot(RestaurantDao.getById(restaurantId));

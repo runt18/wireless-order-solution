@@ -19,7 +19,7 @@ public class FinanceQRCodeAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 	    final String callbackFunName = request.getParameter("callbackparam");
 	    final String restaurantId = request.getParameter("restaurantId");
-		final String codeUrl = new QRCode().setSceneId(Integer.parseInt(restaurantId)).createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
+		final String codeUrl = new QRCode().setTemp(restaurantId).createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
 		final JObject jObj = new JObject();
 		jObj.setExtra(new Jsonable(){
 

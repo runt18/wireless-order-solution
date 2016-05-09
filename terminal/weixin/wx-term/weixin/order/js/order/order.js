@@ -52,6 +52,7 @@ $(function(){
 			dataSource : 'getByCond',
 			oid : Util.mp.oid,
 			fid : Util.mp.fid,
+			sessionId : Util.mp.params.sessionId,
 			includeBranch : true
 		},
 		success : function(data, status, xhr){
@@ -92,7 +93,8 @@ $(function(){
 		data : {
 			dataSource : 'getByCond',
 			oid : Util.mp.oid,
-			fid : Util.mp.fid
+			fid : Util.mp.fid,
+			sessionId : Util.mp.params.sessionId
 		},
 		success : function(data, status, xhr){
 			var html = [];

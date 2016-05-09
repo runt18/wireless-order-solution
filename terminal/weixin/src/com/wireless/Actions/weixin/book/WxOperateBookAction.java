@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -31,6 +32,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.listener.SessionListener;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
@@ -312,8 +314,16 @@ public class WxOperateBookAction extends DispatchAction {
 	 */
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final JObject jObject = new JObject();
-		final String fid = request.getParameter("fid");
+		final String sessionId = request.getParameter("sessionId");
 		try{
+			final String fid;
+			if(sessionId != null && !sessionId.isEmpty()){
+				HttpSession session = SessionListener.sessions.get(sessionId);
+				fid = (String)session.getAttribute("fid");
+			}else{
+				fid = request.getParameter("fid");
+			}
+			
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			final BookDao.ExtraCond extraCond = new BookDao.ExtraCond();

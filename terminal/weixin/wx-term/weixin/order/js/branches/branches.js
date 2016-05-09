@@ -10,11 +10,12 @@ $(function(){
 		type : 'post',
 		data : {
 			dataSource : 'detail',
-			fid : Util.mp.fid
+			fid : Util.mp.fid,
+			sessionId : Util.mp.params.sessionId
 		},
 		dataType : 'json',
 		success : function(data){
-			if(data.root[0].typeVal == branches.GROUP.val){
+			if((data.root[0].typeVal == branches.GROUP.val) && !Util.mp.params.branchId){
 				var branchesTemplet =  '<div class="main-box" data-value={breanchesId} data-type="braches_div_branches">'
 							+'<ul class="m-b-list">'
 								+'<li style="line-height: 40px;width:98%;">'
@@ -66,7 +67,11 @@ $(function(){
 				});
 				
 			}else{
-				Util.jump(Util.mp.params.redirect_url);
+				if(Util.mp.params.tableId){
+					window.location.href = Util.mp.params.redirect_url + '?tableId' + window.location.search.split('tableId')[1];
+				}else{
+					Util.jump(Util.mp.params.redirect_url);
+				}
 			}
 		}
 	});
