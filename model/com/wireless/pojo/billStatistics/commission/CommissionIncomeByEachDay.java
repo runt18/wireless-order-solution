@@ -3,8 +3,9 @@ package com.wireless.pojo.billStatistics.commission;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 
-public class CommissionIncomeByEachDay implements Jsonable{
+public class CommissionIncomeByEachDay implements Jsonable, Comparable<CommissionIncomeByEachDay>{
 	
 	private final DutyRange range;
 	private final float mCommissionAmount;
@@ -51,6 +52,12 @@ public class CommissionIncomeByEachDay implements Jsonable{
 	@Override
 	public String toString(){
 		return "[" + this.range.getOffDutyFormat() + ", " + mCommissionAmount + ", " + mCommissionPrice + "]"  ;
+	}
+
+	@Override
+	public int compareTo(CommissionIncomeByEachDay o) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
