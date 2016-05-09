@@ -262,6 +262,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String tableAlias = request.getParameter("tableAlias");
 		final String force = request.getParameter("force");
 		final JObject jObject= new JObject();
+		String tableId = request.getParameter("tableId");
 		
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
@@ -271,7 +272,11 @@ public class WxOperateOrderAction extends DispatchAction {
 				final String oid = (String)session.getAttribute("oid");
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				
-				final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)).getId()));
+				if(tableAlias != null && !tableAlias.isEmpty() && tableId == null){
+					tableId = Integer.toString(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)).getId());
+				}
+				
+				final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(Integer.valueOf(tableId)));
 				if(foods != null && !foods.isEmpty()){
 					for (String of : foods.split("&")) {
 						String orderFoods[] = of.split(",");
@@ -332,6 +337,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String cost = request.getParameter("cost");
 		final String foods = request.getParameter("foods");
 		final String tableAlias = request.getParameter("tableAlias");
+		final String tableId = request.getParameter("tableId");
 		final JObject jObject = new JObject();
 		try {
 			final HttpSession session = SessionListener.sessions.get(sessionId);
@@ -342,7 +348,12 @@ public class WxOperateOrderAction extends DispatchAction {
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				final Member member = MemberDao.getByWxSerial(staff, oid);
 				final Restaurant restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(fid));
-				final Table table = TableDao.getByAlias(staff, Integer.parseInt(tableAlias));
+				final Table table;
+				if(tableId != null && !tableId.isEmpty()){
+					table = TableDao.getById(staff, Integer.valueOf(tableId));
+				}else{
+					table = TableDao.getByAlias(staff, Integer.parseInt(tableAlias));
+				}
 				
 				if(table.isBusy()){
 					Order order = OrderDao.getById(staff, table.getOrderId(), DateType.TODAY);
@@ -358,8 +369,8 @@ public class WxOperateOrderAction extends DispatchAction {
 					final String billNo = System.currentTimeMillis() + "";
 					Bill.Response beeCloudResponse = app.bill().ask(new Bill.Request().setChannel(Bill.Channel.WX_JSAPI)
 																									  .setOpenId(oid)
-																									  .setTotalFee((int)((Float.valueOf(cost) * 100)))
-//																									  .setTotalFee(1)
+//																									  .setTotalFee((int)((Float.valueOf(cost) * 100)))
+																									  .setTotalFee(1)
 																									  .setBillNo(billNo)
 																									  .setTitle(restaurant.getName() + "微信支付"), 
 					new Callable<ProtocolPackage>(){
@@ -443,6 +454,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		String branchId = request.getParameter("branchId");
 		final String foods = request.getParameter("foods");
 		final String tableAlias = request.getParameter("tableAlias");
+		final String tableId = request.getParameter("tableId");
 		final String comment = request.getParameter("comment");
 		final String qrCode = request.getParameter("qrCode");
 		final String sessionId = request.getParameter("sessionId");
@@ -491,6 +503,8 @@ public class WxOperateOrderAction extends DispatchAction {
 						throw e;
 					}
 				}
+			}else{
+				builder.setTable(TableDao.getById(staff, Integer.valueOf(tableId)));
 			}
 			
 			if(comment != null && !comment.isEmpty()){

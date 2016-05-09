@@ -13,6 +13,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -31,6 +32,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.listener.SessionListener;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -108,10 +110,16 @@ public class WxOperateInterfaceAction extends DispatchAction{
 	public ActionForward jsApiSign(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		final String url = request.getParameter("url");
-		final String fromId = request.getParameter("fid");
-		
+		final String sessionId = request.getParameter("sessionId");
 		final JObject jObject = new JObject();
 		try{
+			String fromId;
+			if(sessionId != null && !sessionId.isEmpty()){
+				final HttpSession session = SessionListener.sessions.get(sessionId);
+				fromId = (String)session.getAttribute("fid");
+			}else{
+				fromId = request.getParameter("fid");
+			}
 			
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);

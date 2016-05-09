@@ -10,23 +10,20 @@ $(function(){
 	var orderFoodPopup;			//点菜container
 	initWaiterOrder();
 	function initWaiterOrder(){
-		checkMove();
+//		checkMove();
+//		
+//		function checkMove(){
+//			var lastX;
+//			var currentX;
+//			$('#foodViewList_div_waiter').on('touchstart', function(e){
+//				alert(e.targetTouches);
+//			});
+//		}
 		
-		function checkMove(){
-			var lastX;
-			var currentX;
-			$('#foodViewList_div_waiter').on('swpieleft', function(e){
-				var event = e || window.event;
-				lastX = event.screenX;
-				alert(e.offsetX);
-//				$('#foodViewList_div_waiter').on('touchend', function(ev){
-//					var eventUp = ev || window.event;
-//					currentX = eventUp.screenX;
-//					alert(lastX + '-------------' + currentX);
-//				});
-			});
-		}
-		
+//		$('#foodViewList_div_waiter').on('touchmove', function(e){
+//				alert(e.touches);
+//		});
+//		
 		//获取门店信息
 		$.ajax({
 			url : '../../WxOperateRestaurant.do',
@@ -664,7 +661,8 @@ $(function(){
 							if(data.success){
 								checkPayTypeDialog.close();
 								//提示框设置
-								var finishOrderDialog = new WeDialogPopup({
+								var finishOrderDialog;
+								finishOrderDialog = new WeDialogPopup({
 									titleText : '温馨提示',
 									content : '<span style="display:block;text-align:center;">下单成功,确认返回账单</span>',
 									leftText : '确认',

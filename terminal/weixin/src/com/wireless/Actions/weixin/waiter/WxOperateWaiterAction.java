@@ -169,7 +169,7 @@ public class WxOperateWaiterAction extends DispatchAction{
 			}
 			
 			//生成带账单ID的微信二维码
-			final String qrCodeUrl = new QRCode().setSceneId(WxHandleMessage.QrCodeParam.newWaiter(order.getId()).sceneId())
+			final String qrCodeUrl = new QRCode().setTemp(String.valueOf(WxHandleMessage.QrCodeParam.newWaiter(order.getId()).sceneId()))
 												 .setExpired(14400)	//4 hour
 												 .createUrl(Token.newInstance(AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken())));
 												 //.createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
