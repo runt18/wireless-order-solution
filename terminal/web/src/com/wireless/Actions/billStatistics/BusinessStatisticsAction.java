@@ -114,9 +114,9 @@ public class BusinessStatisticsAction extends DispatchAction {
 			final String chartDatas = chartData;
 			final ShiftDetail shiftDetail;
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
-				shiftDetail = CalcBillStatisticsDao.calcSalesIncome(staff, new DutyRange(onDuty, offDuty), extraCond);
+				shiftDetail = CalcBillStatisticsDao.calcSalesIncome(staff, extraCond.setDutyRange(new DutyRange(onDuty, offDuty)));
 			}else{
-				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), extraCond);
+				shiftDetail = ShiftDao.getByRange(staff, extraCond.setDutyRange(new DutyRange(onDuty, offDuty)));
 			}
 			
 			jObject.setExtra(new Jsonable(){
@@ -170,7 +170,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 		try{
 
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			final ShiftDetail sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
+			final ShiftDetail sdetail = ShiftDao.getByRange(staff, new CalcBillStatisticsDao.ExtraCond(DateType.TODAY).setDutyRange(new DutyRange(onDuty, offDuty)));
 			
 			if(sdetail != null){
 				jObject.setExtra(new Jsonable(){

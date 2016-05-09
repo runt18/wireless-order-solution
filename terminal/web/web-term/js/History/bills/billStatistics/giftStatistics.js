@@ -401,6 +401,7 @@ Ext.onReady(function(){
 		    '../../QueryGiftStatistic.do',
 		    [
 			    [true, false, false, false], 
+			    ['门店名称', 'restaurantName', 60],
 			    ['单据编号', 'orderId', 100, null, function(v){
 			    	return '<a class="orderLinkId">' + v + '</a>';
 			    }],
@@ -411,7 +412,7 @@ Ext.onReady(function(){
 			    ['总价','totalPrice', 60, 'right', giftTotalPrice],
 			    ['赠送人','waiter', null,'center']
 			],
-			['orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter'],
+			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'count', 'unitPrice', 'actualPrice', 'waiter', 'rid'],
 		    [ ['dataSource', 'normal']],
 		    GRID_PADDING_LIMIT_20,
 		    '',
@@ -446,6 +447,24 @@ Ext.onReady(function(){
 		});	
 		grid_giftStatistics.getStore().on('load', function(store, records, options){
 			
+			if(store.getCount() > 0){
+     			var sumRow = grid_giftStatistics.getView().getRow(store.getCount() - 1);
+     			sumRow.style.backgroundColor = '#EEEEEE';
+				for(var i = 0; i < grid_giftStatistics.getColumnModel().getColumnCount(); i++){
+					var sumCell = grid_giftStatistics.getView().getCell(store.getCount() -1, i);
+					sumCell.style.fontSize = '15px';
+    				sumCell.style.fontWeight = 'bold';
+    				sumCell.style.color= 'green';
+				}
+				
+				grid_giftStatistics.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+     			
+     		}
+			
 			function showGiftOrder(orderID){
 				giftViewBillWin = new Ext.Window({
 					layout : 'fit',
@@ -479,6 +498,7 @@ Ext.onReady(function(){
 							});
 							thiz.orderId = sd.orderId;
 							thiz.queryType = 'History';
+							thiz.branchId = sd.rid;
 							thiz.center();	
 						}
 					}

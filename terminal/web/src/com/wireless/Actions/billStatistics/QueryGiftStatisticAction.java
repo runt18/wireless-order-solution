@@ -89,10 +89,19 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			List<OrderFood> orderFoodList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
 			
-			jobject.setTotalProperty(orderFoodList.size());
+			
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				jobject.setTotalProperty(orderFoodList.size());
+				OrderFood total = new OrderFood();
+				for(OrderFood item : orderFoodList){
+					total.setCount(item.getCount() + total.getCount());
+					total.setPlanPrice(item.getPlanPrice() + total.getPlanPrice());
+					total.asFood().setPrice(item.asFood().getPrice() + total.asFood().getPrice());
+				}
+				
 				orderFoodList = DataPaging.getPagingData(orderFoodList, true, Integer.parseInt(start), Integer.parseInt(limit));
+				orderFoodList.add(total);
 			}
 			jobject.setRoot(orderFoodList);
 			
@@ -162,7 +171,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(staff, extraCond);
+			final List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -260,7 +269,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, extraCond));
+			jObject.setRoot(CalcGiftStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -328,7 +337,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, extraCond));
+			jObject.setRoot(CalcGiftStatisticsDao.calcIncomeByDept(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

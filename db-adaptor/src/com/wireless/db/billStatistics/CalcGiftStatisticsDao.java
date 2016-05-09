@@ -168,11 +168,11 @@ public class CalcGiftStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<GiftIncomeByStaff> calcGiftIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<GiftIncomeByStaff> calcIncomeByStaff(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcGiftIncomeByStaff(dbCon, staff, extraCond);
+			return calcIncomeByStaff(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -191,7 +191,7 @@ public class CalcGiftStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<GiftIncomeByStaff> calcGiftIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<GiftIncomeByStaff> calcIncomeByStaff(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		List<GiftIncomeByStaff> result = new ArrayList<GiftIncomeByStaff>();
 		
@@ -199,11 +199,11 @@ public class CalcGiftStatisticsDao {
 			
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the gift income by staff to the group.
-			result.addAll(calcGiftIncomeByStaff(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
+			result.addAll(calcIncomeByStaff(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
 			
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
 				//Append the gift income by staff to each branch.
-				result.addAll(calcGiftIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
+				result.addAll(calcIncomeByStaff(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
 			}
 			
 		}else{
@@ -240,11 +240,11 @@ public class CalcGiftStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<GiftIncomeByDept> calcGiftIncomeByDept(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<GiftIncomeByDept> calcIncomeByDept(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcGiftIncomeByDept(dbCon, staff, extraCond);
+			return calcIncomeByDept(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -263,11 +263,11 @@ public class CalcGiftStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<GiftIncomeByEachDay> calcGiftIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<GiftIncomeByEachDay> calcIncomeByEachDay(Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcGiftIncomeByEachDay(dbCon, staff, extraCond);
+			return calcIncomeByEachDay(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -288,20 +288,20 @@ public class CalcGiftStatisticsDao {
 	 * 			throws if failed to parse the duty range
 	 * @throws BusinessException 
 	 */
-	public static List<GiftIncomeByEachDay> calcGiftIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
+	public static List<GiftIncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, ParseException, BusinessException{
 		
 		if(extraCond.isChain){
 			
 			final Map<DutyRange, GiftIncomeByEachDay> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the gift income by each day to the group.
-			for(GiftIncomeByEachDay groupIncome : calcGiftIncomeByEachDay(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
+			for(GiftIncomeByEachDay groupIncome : calcIncomeByEachDay(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupIncome.getRange(), groupIncome);
 			}
 			
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
 				//Append the gift income by each to each branch.
-				for(GiftIncomeByEachDay branchIncome : calcGiftIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
+				for(GiftIncomeByEachDay branchIncome : calcIncomeByEachDay(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchIncome.getRange())){
 						GiftIncomeByEachDay giftIncome = chainResult.get(branchIncome.getRange());
 						final float giftAmount = branchIncome.getGiftAmount() + giftIncome.getGiftAmount();
@@ -365,20 +365,20 @@ public class CalcGiftStatisticsDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<GiftIncomeByDept> calcGiftIncomeByDept(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<GiftIncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
 		if(extraCond.calcByDuty){
 			
 			final Map<String, GiftIncomeByDept> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
 			//Append the gift income by department to the group.
-			for(GiftIncomeByDept groupIncome : calcGiftIncomeByDept(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
+			for(GiftIncomeByDept groupIncome : calcIncomeByDept(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false))){
 				chainResult.put(groupIncome.getDepartment().getName(), groupIncome);
 			}
 			
 			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
 				//Append the gift income by department to each branch.
-				for(GiftIncomeByDept branchIncome : calcGiftIncomeByDept(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
+				for(GiftIncomeByDept branchIncome : calcIncomeByDept(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false))){
 					if(chainResult.containsKey(branchIncome.getDepartment().getName())){
 						GiftIncomeByDept giftIncome = chainResult.get(branchIncome.getDepartment().getName());
 						final float giftAmount = branchIncome.getGiftAmount() + giftIncome.getGiftAmount();
