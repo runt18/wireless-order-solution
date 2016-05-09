@@ -523,10 +523,10 @@ public class JobContentFactory {
 					   printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
 						 //Get the details to daily settlement from history ,
 						 //since records to today has been moved to history before printing daily settlement receipt. 
-						shiftDetail = ShiftDao.getByRange(staff, range, new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+						shiftDetail = ShiftDao.getByRange(staff, new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setDutyRange(range));
 						
 					}else{
-						shiftDetail = ShiftDao.getByRange(staff, range, new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
+						shiftDetail = ShiftDao.getByRange(staff, new CalcBillStatisticsDao.ExtraCond(DateType.TODAY).setDutyRange(range));
 					}
 					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 												   new ShiftContent(shiftDetail, 
