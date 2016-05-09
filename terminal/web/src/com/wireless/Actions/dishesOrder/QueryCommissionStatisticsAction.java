@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcCommissionStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -56,14 +55,22 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
 			
-			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY)
+																			.setDutyRange(new DutyRange(beginDate, endDate))
+																			.setCalcByDuty(true);
 			
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				extraCond.setStaffId(Integer.valueOf(staffId));
+			}
+			
+			if(branchId != null && !branchId.isEmpty()){
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
 			if(deptId != null && !deptId.equals("-1")){
@@ -74,12 +81,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-			if(range == null){
-				range = new DutyRange(beginDate, endDate); 
-			}
-			
-			List<CommissionStatistics> list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, range, extraCond);
+			List<CommissionStatistics> list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, extraCond);
 			
 			if(!list.isEmpty()){
 				jObject.setTotalProperty(list.size());
@@ -129,11 +131,17 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
+			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY)
+																			.setDutyRange(new DutyRange(dateBeg, dateEnd))
+																			.setCalcByDuty(true);
 			
-			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(branchId != null && !branchId.isEmpty()){
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
+			}
 			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
@@ -145,13 +153,8 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd); 
-			}
-			
-			final List<CommissionIncomeByEachDay> result = CalcCommissionStatisticsDao.calcCommissionIncomeByEachDay(staff, range, extraCond);
+		
+			final List<CommissionIncomeByEachDay> result = CalcCommissionStatisticsDao.calcCommissionIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -165,6 +168,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 				totalMoney += c.getmCommissionPrice();
 				totalCount += c.getmCommissionAmount();
 			}
+			
 			
 			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/result.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/result.size())*100)/100 + 
 					",\"ser\":[{\"name\":\'提成金额\', \"data\" : " + data + "}, {\"name\":\'提成数量\', \"data\" : " + amountData + "}]}";
@@ -221,11 +225,19 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
+			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY)
+																		.setCalcByDuty(true)
+																		.setDutyRange(new DutyRange(dateBeg, dateEnd));
+			
+
 			if(branchId != null && !branchId.isEmpty()){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					extraCond.setChain(true);
+				}
 			}
 			
-			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
@@ -236,12 +248,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			DutyRange range = DutyRangeDao.exec(staff, dateBeg, dateEnd);
-			if(range == null){
-				range = new DutyRange(dateBeg, dateEnd); 
-			}
-			
-			jObject.setRoot(CalcCommissionStatisticsDao.calcCommissionIncomeByStaff(staff, range, extraCond));
+			jObject.setRoot(CalcCommissionStatisticsDao.calcCommissionIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

@@ -122,7 +122,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 		try{
 			final CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY)
 																						.setDutyRange(new DutyRange(dateBeg, dateEnd))
-																						;
+																						.setCalcByCond(true);
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
