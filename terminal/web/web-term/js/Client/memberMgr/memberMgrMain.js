@@ -2000,7 +2000,7 @@ Ext.onReady(function(){
 						var discount = Ext.getCmp('comboDiscount_combo_member');
 						var pricePlan = Ext.getCmp('comboDefaultPricePlan_combo_member');
 						
-						discount.setValue(jr.root[0].discounts[0] ? jr.root[0].discounts[0].id : '');
+						discount.setValue(jr.root[0].discount ? jr.root[0].discount.id : jr.root[0].discounts[0].id);
 						if(pricePlan){
 							pricePlan.setValue(jr.root[0].pricePlans[0] ? jr.root[0].pricePlans[0].id : '');
 						}
@@ -2216,6 +2216,7 @@ Ext.onReady(function(){
 											})
 											Ext.example.msg(jr.title, jr.msg);
 											Ext.getCmp('btnRefreshMemberType_btn_member').handler();
+											memberDisountWin.hide();
 //											member_loadMemberTypeChart();
 										}else{
 											Ext.ux.showMsg(jr);								
