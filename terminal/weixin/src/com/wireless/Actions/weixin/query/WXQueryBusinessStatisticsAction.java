@@ -20,7 +20,6 @@ import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
 import com.wireless.db.billStatistics.CalcGiftStatisticsDao;
 import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
-import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.shift.ShiftDao;
@@ -38,7 +37,6 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByFood;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
-import com.wireless.pojo.billStatistics.commission.CommissionIncomeByStaff;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByDept;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByStaff;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByDept;
@@ -80,8 +78,6 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			
-			String dutyRange = request.getParameter("dutyRange");
 			
 			String region = request.getParameter("region");
 			
@@ -125,22 +121,10 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			final String chartDatas = chartData;
 			final ShiftDetail shiftDetail;
 			final MemberStatistics memberStatistics;
-			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
-				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
-				
-				if(range != null){
-					shiftDetail = ShiftDao.getByRange(staff, range, extraCond);
-					
-					memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
-				}else{
-					shiftDetail = new ShiftDetail(new DutyRange(onDuty, offDuty));
-					memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(onDuty, offDuty), new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
-				}
-			}else{
-				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), extraCond);
-				
-				memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, new DutyRange(onDuty, offDuty), new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
-			}
+			final DutyRange range = new DutyRange(onDuty, offDuty);
+			
+			shiftDetail = ShiftDao.getByRange(staff, extraCond.setDutyRange(range));
+			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
 			
 			jObject.setExtra(new Jsonable(){
 				@Override
@@ -404,7 +388,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<GiftIncomeByStaff> giftList = CalcGiftStatisticsDao.calcGiftIncomeByStaff(staff, extraCond);
+			List<GiftIncomeByStaff> giftList = CalcGiftStatisticsDao.calcIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(giftList);
 			
@@ -465,7 +449,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
-			List<GiftIncomeByDept> giftList = CalcGiftStatisticsDao.calcGiftIncomeByDept(staff, extraCond);
+			List<GiftIncomeByDept> giftList = CalcGiftStatisticsDao.calcIncomeByDept(staff, extraCond);
 			
 			jobject.setRoot(giftList);
 			
@@ -687,47 +671,50 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 
 		return null;
 	}
-	public ActionForward getCommissionStaffChart(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		String dateBeg = request.getParameter("dateBeg");
-		String dateEnd = request.getParameter("dateEnd");
-		String deptID = request.getParameter("deptID");
-		String staffID = request.getParameter("staffID");
-		String opening = request.getParameter("opening");
-		String ending = request.getParameter("ending");
+	public ActionForward getCommissionStaffChart(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String dateBeg = request.getParameter("dateBeg");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String deptId = request.getParameter("deptID");
+		final String staffId = request.getParameter("staffID");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
 		
-		String openId = request.getParameter("oid");
+		final String openId = request.getParameter("oid");
 		
 		int rid = WeixinFinanceDao.getRestaurantIdByWeixin(openId);
-		Staff staff = StaffDao.getAdminByRestaurant(rid);		
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
-			CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
-			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);		
+
+			final CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
-			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffID));
+			
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
 			}
+			
 			if(opening != null && !opening.isEmpty()){
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CommissionIncomeByStaff> cancelList = CalcCommissionStatisticsDao.calcCommissionIncomeByStaff(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			extraCond.setDutyRange(new DutyRange(dateBeg, dateEnd));
 			
-			jobject.setRoot(cancelList);
+			jObject.setRoot(CalcCommissionStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
