@@ -32,6 +32,46 @@ import com.wireless.util.DataPaging;
 
 public class QueryGiftStatisticAction extends DispatchAction{
 
+	private static class GiftDetail implements Jsonable{
+
+		private final OrderFood giftDetail;
+		private float totalGift;
+		private float totalAmount;
+		
+		GiftDetail(OrderFood of){
+			this.giftDetail = of;
+			if(of != null){
+				this.totalGift = of.getCount() * of.getFoodPrice();
+				this.totalAmount = of.getCount();
+			}
+			
+		}
+		
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			JsonMap jm = new JsonMap();
+			if(giftDetail != null){
+				jm.putString("restaurantName", giftDetail.getRestaurantName());
+				jm.putInt("orderId", giftDetail.getOrderId());
+				jm.putString("orderDateFormat", DateUtil.format(giftDetail.getOrderDate()));
+				jm.putString("name", giftDetail.getName());
+				jm.putFloat("count", giftDetail.getCount());
+				jm.putFloat("unitPrice", giftDetail.getFoodPrice());
+				jm.putString("waiter", giftDetail.getWaiter());
+				jm.putInt("rid", giftDetail.getRestaurantId());
+			}
+			jm.putFloat("totalAmount", totalAmount);
+			jm.putFloat("totalGift", totalGift);
+			return jm;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jm, int flag) {
+			
+		}
+		
+	}
+	
 	/**
 	 * 获取赠送明细数据
 	 * @param mapping
@@ -87,23 +127,28 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<OrderFood> orderFoodList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
-			
+			List<GiftDetail> result = new ArrayList<>();
+
+			for(OrderFood item : OrderFoodDao.getSingleDetail(staff, extraCond, null)){
+				result.add(new GiftDetail(item));
+			}
 			
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				jobject.setTotalProperty(orderFoodList.size());
-				OrderFood total = new OrderFood();
-				for(OrderFood item : orderFoodList){
-					total.setCount(item.getCount() + total.getCount());
-					total.setPlanPrice(item.getPlanPrice() + total.getPlanPrice());
-					total.asFood().setPrice(item.asFood().getPrice() + total.asFood().getPrice());
+				jobject.setTotalProperty(result.size());
+				GiftDetail total = new GiftDetail(null);
+				
+				for(GiftDetail giftDetail : result){
+					total.totalAmount += giftDetail.giftDetail.getCount();
+					total.totalGift += giftDetail.giftDetail.getFoodPrice() * giftDetail.giftDetail.getCount();
 				}
 				
-				orderFoodList = DataPaging.getPagingData(orderFoodList, true, Integer.parseInt(start), Integer.parseInt(limit));
-				orderFoodList.add(total);
+				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
+				
+				result.add(total);
 			}
-			jobject.setRoot(orderFoodList);
+			
+			jobject.setRoot(result);
 			
 		}catch(BusinessException | SQLException e){
 			jobject.initTip(e);
