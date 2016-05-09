@@ -81,7 +81,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CommissionStatistics> list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, extraCond);
+			List<CommissionStatistics> list = CalcCommissionStatisticsDao.getDetail(staff, extraCond);
 			
 			if(!list.isEmpty()){
 				jObject.setTotalProperty(list.size());
@@ -154,7 +154,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 		
-			final List<CommissionIncomeByEachDay> result = CalcCommissionStatisticsDao.calcCommissionIncomeByEachDay(staff, extraCond);
+			final List<CommissionIncomeByEachDay> result = CalcCommissionStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -248,7 +248,7 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcCommissionStatisticsDao.calcCommissionIncomeByStaff(staff, extraCond));
+			jObject.setRoot(CalcCommissionStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

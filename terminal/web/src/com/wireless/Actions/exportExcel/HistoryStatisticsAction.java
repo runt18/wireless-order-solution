@@ -3617,7 +3617,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(deptId != null && !deptId.equals("-1")){
 			extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 		}
-		final List<CommissionStatistics> list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+		
+		extraCond.setDutyRange(new DutyRange(beginDate, endDate));
+		
+		final List<CommissionStatistics> list = CalcCommissionStatisticsDao.getDetail(staff, extraCond);
 		
 		CommissionStatistics total = new CommissionStatistics();
 		total.setCommission(0);

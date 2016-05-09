@@ -38,7 +38,7 @@ public class DailySettleStatDetailAction extends Action {
 
 			// get the query condition
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			final ShiftDetail result = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+			final ShiftDetail result = ShiftDao.getByRange(staff, new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setDutyRange(new DutyRange(onDuty, offDuty)));
 
 			final List<Jsonable> list = new ArrayList<Jsonable>();
 			list.add(new Jsonable() {
