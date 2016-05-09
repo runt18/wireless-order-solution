@@ -3,7 +3,6 @@ package com.wireless.pojo.billStatistics.commission;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 
 public class CommissionIncomeByEachDay implements Jsonable, Comparable<CommissionIncomeByEachDay>{
 	
@@ -56,8 +55,7 @@ public class CommissionIncomeByEachDay implements Jsonable, Comparable<Commissio
 
 	@Override
 	public int compareTo(CommissionIncomeByEachDay o) {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.range.compareTo(o.range);
 	}
 
 }
