@@ -1,6 +1,6 @@
 
 Ext.onReady(function(){
-	
+	var GRID_PADDING_LIMIT_20 = 20;
 	//初始化区域combo
 	function initRegionCombo(statistic){
 		var combo = {
@@ -395,7 +395,7 @@ Ext.onReady(function(){
 		    '',
 		    '../../QueryGiftStatistic.do',
 		    [
-			    [true, false, false, false], 
+			    [true, false, false, true], 
 			    ['门店名称', 'restaurantName', 60],
 			    ['单据编号', 'orderId', 100, null, function(v){
 			    	return '<a class="orderLinkId">' + v + '</a>';
@@ -409,7 +409,7 @@ Ext.onReady(function(){
 			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'waiter', 'rid', 'totalAmount', 'totalGift'],
 		    [ ['dataSource', 'normal']],
 		    GRID_PADDING_LIMIT_20,
-		    '',
+		    null,
 		    [grid_giftStatisticsTbar, Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:gift_dateCombo,statistic : 'giftStatistic_',tbarType: 0, callback : function businessHourSelect(){}})]
 		);
 		
