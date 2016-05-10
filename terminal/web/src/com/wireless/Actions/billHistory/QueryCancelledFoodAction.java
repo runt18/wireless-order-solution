@@ -79,15 +79,6 @@ public class QueryCancelledFoodAction extends DispatchAction{
 					extraCond4Total.setChain(true);
 				}
 			}
-
-//			DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-//			if(range != null){
-//				extraCond.setDutyRange(range);
-//				extraCond4Total.setRange(range);
-//			}else{
-//				extraCond.setDutyRange(new DutyRange(beginDate, endDate));
-//				extraCond4Total.setRange(range);
-//			}
 			
 			DutyRange range = new DutyRange(beginDate, endDate);
 			extraCond.setDutyRange(range);
