@@ -23,14 +23,34 @@ public class WxRestaurant implements Jsonable{
 		private String couponDrawTemplate;
 		private String couponTimeoutTemplate;
 		private String chargeTemplate;
+		private String orderNotifyTemplate;
+		private PayType defaultOrderType;
 		
 		public UpdateBuilder setChargeTemplate(String template){
 			this.chargeTemplate = template;
 			return this;
 		}
 		
+		public boolean isDefaultOrderType(){
+			return this.defaultOrderType != null;
+		}
+		
+		public UpdateBuilder setDefaultOrderType(PayType type){
+			this.defaultOrderType = type;
+			return this;
+		}
+		
 		public boolean isChargeTemplateChanged(){
 			return this.chargeTemplate != null;
+		}
+		
+		public boolean isOrderNotifyTemplateChanged(){
+			return this.orderNotifyTemplate != null;
+		}
+		
+		public UpdateBuilder setOrderNotifyTemplate(String template){
+			this.orderNotifyTemplate = template;
+			return this;
 		}
 		
 		public UpdateBuilder setPaymentTemplate(String template){
@@ -169,6 +189,7 @@ public class WxRestaurant implements Jsonable{
 		}
 	}
 	
+	
 	public static enum Status{
 		CREATED(1, "已创建"),
 		VERIFIED(2, "已验证"),
@@ -247,6 +268,37 @@ public class WxRestaurant implements Jsonable{
 		}
 	}
 	
+	
+	public static enum PayType{
+		WX_PAY(1, "微信下单"),
+		CONFIRM_BY_STAFF(2,"确认下单"),
+		DIRECT_ORDER(3,"直接下单");
+		
+		private final int val;
+		private final String desc;
+		PayType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getValue(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		public static PayType valueOf(int val){
+			for(PayType type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The PayType(val = " + val + ")is invaild.");
+		}
+	}
+	
 	private String weixinSerial;
 	private int restaurantId;
 	private long bindDate;
@@ -264,7 +316,9 @@ public class WxRestaurant implements Jsonable{
 	private String paymentTemplate;
 	private String couponDrawTemplate;
 	private String couponTimeoutTemplate;
+	private String orderNotifyTemplate;
 	private String chargeTemplate;
+	private PayType defaultOrderType;
 	
 	private WxRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
@@ -282,6 +336,8 @@ public class WxRestaurant implements Jsonable{
 		this.couponDrawTemplate = builder.couponDrawTemplate;
 		this.couponTimeoutTemplate = builder.couponTimeoutTemplate;
 		this.chargeTemplate = builder.chargeTemplate;
+		this.orderNotifyTemplate = builder.orderNotifyTemplate;
+		this.defaultOrderType = builder.defaultOrderType;
 	}
 	
 	public WxRestaurant(int restaurantId){
@@ -294,7 +350,27 @@ public class WxRestaurant implements Jsonable{
 		}
 		return weixinSerial;
 	}
+	
+	public void setDefaultOrderType(PayType type){
+		this.defaultOrderType = type;
+	}
 
+	public PayType getDefaultOrderType(){
+		return this.defaultOrderType;
+	}
+	
+	public void setOrderNotifyTemplate(String template){
+		this.orderNotifyTemplate = template;
+	}
+	
+	public String getOrderNotifyTemplate(){
+		return this.orderNotifyTemplate;
+	}
+	
+	public boolean hasOrderNotifyTemplate(){
+		return this.orderNotifyTemplate != null;
+	}
+	
 	public void setQrCodeStatus(QrCodeStatus status){
 		this.qrCodeStatus = status;
 	}
@@ -528,6 +604,7 @@ public class WxRestaurant implements Jsonable{
 		jm.putString("qrCode", getQrCode());
 		jm.putInt("qrCodeStatus", getQrCodeStatus().getVal());
 		jm.putBoolean("isAuth", hasQrCode());
+		jm.putInt("defaultOrderType", getDefaultOrderType().getValue());
 		
 		return jm;
 	}

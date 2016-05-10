@@ -596,6 +596,7 @@ $(function(){
 						}
 					});
 				}else if(payType == 'waiterCheck'){
+					//确认下单
 					$.ajax({
 						url : '../../WxOperateOrder.do',
 						type : 'post',
@@ -645,6 +646,7 @@ $(function(){
 						}
 					});
 				}else if(payType == 'fastOrder'){
+					//直接下单
 					$.ajax({
 						url : '../../WxOperateOrder.do',
 						type : 'post',

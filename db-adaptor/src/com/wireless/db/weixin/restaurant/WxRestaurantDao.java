@@ -157,6 +157,8 @@ public class WxRestaurantDao {
 			  (builder.isCouponDrawTemplateChanged() ? " ,coupon_draw_template = '" + wr.getCouponDrawTemplate() + "'" : "") +
 			  (builder.isCouponTimeoutTemplateChanged() ? " ,coupon_timeout_template = '" + wr.getCouponTimeoutTemplate() + "'" : "") +
 			  (builder.isChargeTemplateChanged() ? " ,charge_template = '" + wr.getChargeTemplate() + "'" : "") +
+			  (builder.isOrderNotifyTemplateChanged() ? " ,order_notify_template = '" + wr.getOrderNotifyTemplate() + "'" : "") +
+			  (builder.isDefaultOrderType() ? " ,default_order_type = '" + wr.getDefaultOrderType().getValue() : "") + 
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
@@ -295,6 +297,8 @@ public class WxRestaurantDao {
 			wr.setCouponDrawTemplate(dbCon.rs.getString("coupon_draw_template"));
 			wr.setCouponTimeoutTemplate(dbCon.rs.getString("coupon_timeout_template"));
 			wr.setChargeTemplate(dbCon.rs.getString("charge_template"));
+			wr.setOrderNotifyTemplate(dbCon.rs.getString("order_notify_template"));
+			wr.setDefaultOrderType(WxRestaurant.PayType.valueOf(dbCon.rs.getInt("default_order_type")));
 			result.add(wr);
 		}
 		dbCon.rs.close();

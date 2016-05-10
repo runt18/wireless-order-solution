@@ -62,7 +62,11 @@ $(function(){
 						$(element).css({
 						    'background-color': '#ddd'
 						});
-						Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'));
+						if(Util.mp.params.sessionId){
+							window.location.href = Util.mp.params.redirect_url + '?branchId=' + $(element).attr('data-value') + '&sessionId=' + Util.mp.params.sessionId;
+						}else{
+							Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'));
+						}
 					};
 				});
 				

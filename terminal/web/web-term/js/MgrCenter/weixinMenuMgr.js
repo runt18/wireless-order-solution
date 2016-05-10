@@ -11,6 +11,7 @@ Ext.onReady(function(){
 			ORDER_EVENT_KEY : {val : "order_event_key", text : "我的订单", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E6%88%91%E7%9A%84%E8%AE%A2%E5%8D%95.png'},
 			MY_QRCODE_EVENT_KEY : {val : "my_qrcode_event_key", text : "我的二维码", image : 'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxReplySample/%E6%88%91%E7%9A%84%E4%BA%8C%E7%BB%B4%E7%A0%81.png'},
 			SCAN_EVENT_KEY : {val : "scan_event_key", text : "扫一扫"}
+//			SCAN_EVENT_KEY : {val : "scancode_push", text : "扫码"}
 	};
 
 
@@ -376,7 +377,8 @@ Ext.onReady(function(){
 		
 		tn.attributes.type = "click";
 		if(key == "scan_event_key"){
-			tn.attributes.type = "scancode_waitmsg";
+//			tn.attributes.type = "scancode_waitmsg";
+			tn.attributes.type = "scancode_push";
 		}
 		tn.attributes.key = key;
 		
@@ -1831,7 +1833,13 @@ Ext.onReady(function(){
 		width : 270,
 		frame : false,
 		region : 'west',
-		items : [tree, autoReply, keywordTree]
+		items : [tree, autoReply, keywordTree
+//		,{
+//			xtype : 'panel',
+//			height : '100',
+//			frame : true
+//		}
+		]
 	});	
 	
 	

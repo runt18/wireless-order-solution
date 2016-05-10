@@ -2,6 +2,7 @@ package com.wireless.Actions.weixin.operate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +17,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.marker.weixin.api.Template;
+import org.marker.weixin.api.Template.Keyword;
+import org.marker.weixin.api.Token;
+import org.marker.weixin.auth.AuthParam;
+import org.marker.weixin.auth.AuthorizerToken;
 
 import com.wireless.beeCloud.BeeCloud;
 import com.wireless.beeCloud.Bill;
@@ -44,6 +50,7 @@ import com.wireless.pack.req.ReqOrderDiscount;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
+import com.wireless.parcel.wrapper.IntParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.PayType;
@@ -56,6 +63,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.order.WxOrder;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ws.waiter.WxWaiter;
 import com.wireless.ws.waiter.WxWaiterServerPoint;
@@ -170,10 +178,14 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String foods = request.getParameter("foods");
 		final String coupons = request.getParameter("coupons");
 		final JObject jObject= new JObject();
+		String branchId = request.getParameter("branchId");
+
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
 			if(session != null){
-				final String branchId = (String)session.getAttribute("branchId");
+				if(branchId == null ){
+					branchId = (String)session.getAttribute("branchId");
+				}
 				final String oid = (String)session.getAttribute("oid");
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				Order order = new Order(0);
@@ -191,10 +203,16 @@ public class WxOperateOrderAction extends DispatchAction {
 					}
 				}
 				
-				//设置折扣
 				Member member = MemberDao.getByWxSerial(staff, oid);
-				order.setDiscount(member.getMemberType().getDefaultDiscount());
-
+				//设置折扣
+				if(member.getMemberType().hasDefaultDiscount()){
+					order.setDiscount(member.getMemberType().getDefaultDiscount());
+				}
+				//设置会员价
+				if(member.getMemberType().hasDefaultPrice()){
+					order.setPricePlan(member.getMemberType().getDefaultPrice());
+				}
+				
 				//使用coupon
 				if(coupons != null && !coupons.isEmpty()){
 					float couponPrice = 0;
@@ -266,17 +284,31 @@ public class WxOperateOrderAction extends DispatchAction {
 		
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
-			if(session != null){
+			if(foods == null || foods.isEmpty()){
+				throw new BusinessException("提交的订单菜品不能为空");
+				
+			}else if(session != null){
 				final String branchId = (String)session.getAttribute("branchId");
-				//FIXME 
 				final String oid = (String)session.getAttribute("oid");
-				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				final String fid = (String)session.getAttribute("fid");
+				final Staff staff;
+				if(branchId != null && !branchId.isEmpty()){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}else{
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+				}
+				
+				final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 				
 				if(tableAlias != null && !tableAlias.isEmpty() && tableId == null){
 					tableId = Integer.toString(TableDao.getByAlias(staff, Integer.parseInt(tableAlias)).getId());
 				}
 				
-				final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(Integer.valueOf(tableId)));
+				//建立订单
+				final Order.InsertBuilder orderBuilder = new Order.InsertBuilder(new Table.Builder(Integer.valueOf(tableId)));
+				//建立微订
+				final WxOrder.InsertBuilder4Inside wxOrderBuilder = new WxOrder.InsertBuilder4Inside(oid);
+				
 				if(foods != null && !foods.isEmpty()){
 					for (String of : foods.split("&")) {
 						String orderFoods[] = of.split(",");
@@ -286,16 +318,34 @@ public class WxOperateOrderAction extends DispatchAction {
 						if(orderFoods.length > 2 && Integer.parseInt(orderFoods[2]) != 0){
 							orderFood.setFoodUnit(FoodUnitDao.getById(staff, Integer.parseInt(orderFoods[2])));
 						}
-						builder.add(orderFood, staff);
+						orderBuilder.add(orderFood, staff);
+						wxOrderBuilder.add(orderFood);
 					}
 				}
-
+				
+				int wxOrderId = WxOrderDao.insert(staff, wxOrderBuilder);
+				
+				orderBuilder.addWxOrder(WxOrderDao.getById(staff, wxOrderId));
+				
 				if(force != null && !force.isEmpty() && Boolean.parseBoolean(force)){
-					builder.setForce(true);
+					orderBuilder.setForce(true);
 				}
 				
-				final ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, PrintOption.DO_PRINT));
+				final ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, orderBuilder, PrintOption.DO_PRINT));
 				if(resp.header.type == Type.ACK){
+					final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+					final Token token = Token.newInstance(authorizerToken);
+					
+					Order order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
+					
+					Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
+								  							   .setToUser(oid)
+								  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
+								  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
+								  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
+								  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
+								  							   .addKeyword(new Keyword("keyword4", String.valueOf(order.calcTotalPrice() + "元")))
+								  							   .addKeyword(new Keyword("remark", "感谢你的使用，欢迎下次再来订餐")));
 					jObject.initTip(true, ("下单成功."));
 				}else{
 					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
@@ -348,6 +398,7 @@ public class WxOperateOrderAction extends DispatchAction {
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				final Member member = MemberDao.getByWxSerial(staff, oid);
 				final Restaurant restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+				final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 				final Table table;
 				if(tableId != null && !tableId.isEmpty()){
 					table = TableDao.getById(staff, Integer.valueOf(tableId));
@@ -378,6 +429,7 @@ public class WxOperateOrderAction extends DispatchAction {
 						public ProtocolPackage call() throws Exception {
 							
 							final Order.InsertBuilder builder = new Order.InsertBuilder(new Table.Builder(table.getId()));
+							final WxOrder.InsertBuilder4Inside wxOrderBuilder = new WxOrder.InsertBuilder4Inside(oid);
 							try{
 								if(foods != null && !foods.isEmpty()){
 									for (String of : foods.split("&")) {
@@ -389,24 +441,41 @@ public class WxOperateOrderAction extends DispatchAction {
 											orderFood.setFoodUnit(FoodUnitDao.getById(staff, Integer.parseInt(orderFoods[2])));
 										}
 										builder.add(orderFood, staff);
+										wxOrderBuilder.add(orderFood);
 									}
 								}
 								builder.setForce(true);
+								builder.addWxOrder(WxOrderDao.getById(staff, WxOrderDao.insert(staff, wxOrderBuilder)));
 								ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, builder, PrintOption.DO_PRINT));
 								if(resp.header.type == Type.ACK){
-									//TODO 账单注入此微信会员
-									Order.DiscountBuilder discountBuilder = Order.DiscountBuilder.build4Member(table.getOrderId(), member);
+									final int orderId = new Parcel(resp.body).readParcel(IntParcel.CREATOR).intValue();
+									//账单注入此微信会员
+									Order.DiscountBuilder discountBuilder = Order.DiscountBuilder.build4Member(orderId, member);
+									
 									resp = ServerConnector.instance().ask(new ReqOrderDiscount(staff, discountBuilder));
 									if(resp.header.type == Type.NAK){
 										throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 									}
 
-									//TODO 用微信支付的方式结账
-									Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(table.getOrderId(), PayType.WX, true);
+									//用微信支付的方式结账
+									Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(orderId, PayType.WX, true);
 									resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
 									if(resp.header.type == Type.NAK){
 										throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 									}
+									
+									final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+									final Token token = Token.newInstance(authorizerToken);
+									Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+									
+									Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
+				  							   .setToUser(oid)
+				  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
+				  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
+				  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
+				  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
+				  							   .addKeyword(new Keyword("keyword4", cost + "元"))
+				  							   .addKeyword(new Keyword("remark", "感谢你的使用，欢迎下次再来订餐")));
 								}else{
 									throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 								}
@@ -503,7 +572,7 @@ public class WxOperateOrderAction extends DispatchAction {
 						throw e;
 					}
 				}
-			}else{
+			}else if(tableId != null && !tableId.isEmpty()){
 				builder.setTable(TableDao.getById(staff, Integer.valueOf(tableId)));
 			}
 			

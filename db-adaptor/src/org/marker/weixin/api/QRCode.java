@@ -13,7 +13,8 @@ public class QRCode implements Jsonable{
 
 	static enum ActionName{
 		TEMP("QR_SCENE", "临时"),
-		LIMIT("QR_LIMIT_SCENE", "永久");
+		LIMIT("QR_LIMIT_SCENE", "永久"),
+		LIMITSTR("QR_LIMIT_STR_SCENE", "永久");
 		
 		private final String val;
 		@SuppressWarnings("unused")
@@ -34,24 +35,48 @@ public class QRCode implements Jsonable{
 	private int sceneId;
 	private String ticket;
 	private ActionName actionName = ActionName.TEMP;
+	private String sceneStr;
 	
 	public QRCode setExpired(int expired){
 		this.expired = expired;
 		return this;
 	}
 
-	public QRCode setSceneId(String sceneId){
+//	public QRCode setSceneId(String sceneId){
+//		this.sceneId = Integer.parseInt(sceneId);
+//		return this;
+//	}
+//	
+//	public QRCode setSceneId(int sceneId){
+//		this.sceneId = sceneId;
+//		return this;
+//	}
+//	
+//	public QRCode setActionName(ActionName actionName){
+//		this.actionName = actionName;
+//		return this;
+//	}
+//	
+//	public QRCode setSceneStr(String sceneStr){
+//		this.sceneStr = sceneStr;
+//		return this;
+//	}
+	
+	public QRCode setTemp(String sceneId){
+		this.actionName = ActionName.TEMP;
 		this.sceneId = Integer.parseInt(sceneId);
 		return this;
 	}
 	
-	public QRCode setSceneId(int sceneId){
-		this.sceneId = sceneId;
+	public QRCode setLimit(String sceneId){
+		this.actionName = ActionName.LIMIT;
+		this.sceneId = Integer.parseInt(sceneId);
 		return this;
 	}
 	
-	public QRCode setActionName(ActionName actionName){
-		this.actionName = actionName;
+	public QRCode setLimitStr(String sceneStr){
+		this.actionName = ActionName.LIMITSTR;
+		this.sceneStr = sceneStr;
 		return this;
 	}
 	
@@ -89,7 +114,9 @@ public class QRCode implements Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		if(flag == QR_CODE_JSONABLE_4_TICKET){
-			jm.putInt(Key4Json.EXPIRED_SECONDS.key, expired);
+			if(this.actionName == ActionName.TEMP){
+				jm.putInt(Key4Json.EXPIRED_SECONDS.key, expired);
+			}
 			jm.putString(Key4Json.ACTION_NAME.key, actionName.val);
 			jm.putJsonable(Key4Json.ACTION_INFO.key, new Jsonable(){
 				@Override
@@ -99,7 +126,11 @@ public class QRCode implements Jsonable{
 						@Override
 						public JsonMap toJsonMap(int flag) {
 							JsonMap jm = new JsonMap();
-							jm.putInt(Key4Json.SCENE_ID.key, sceneId);
+							if(actionName == ActionName.LIMITSTR){
+								jm.putString(Key4Json.SCENE_STR.key, sceneStr);
+							}else{
+								jm.putInt(Key4Json.SCENE_ID.key, sceneId);
+							}
 							return jm;
 						}
 
@@ -136,8 +167,11 @@ public class QRCode implements Jsonable{
 	};
 	
 	public static void main(String[] args) throws IOException{
-		String appId = "wx6fde9cd2c7fc791e";
-		String appSecret = "0a360a43b80e3a334e5e52da706a3134";
-		System.out.println(new QRCode().setSceneId(98).createUrl(Token.newInstance(appId, appSecret)));
+//		String appId = "wx6fde9cd2c7fc791e";
+//		String appSecret = "0a360a43b80e3a334e5e52da706a3134";
+		String appId = "wx49b3278a8728ff76";
+		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+//		System.out.println(JSONObject.toJSON(new QRCode().setActionName(ActionName.LIMIT).setSceneStr("4&7777").toJsonMap(0)));
+		System.out.println(new QRCode().setLimitStr("44778&40").createUrl(Token.newInstance(appId, appSecret)));
 	}
 }

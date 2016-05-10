@@ -75,8 +75,8 @@ function PickFoodComponent(param){
 		  	+'<div id="shoppingFoodsum_div_fastOrderFood">'
 		  		+'<span style="display"><span style="color:#000;display:inline-block;width:49%;">原价:&nbsp;<span id="sumPrice_div_fastOrderFood" style="color:#26a9d0;">--.--</span></span>'
 		  		+'<span style="color:#000;display:inline-block;width:49%;">会员价:&nbsp;<span id="actualPrice_div_fastOrderFood" style="color:#26a9d0;">--.--</span></span></span>'
-		  		+'<span style="display"><span style="color:#000;display:inline-block;width:44%;">菜品数量:&nbsp;<span id="sumCount_span_fastOrderFood" style="color:#26a9d0;">--.--</span></span>'
-		  		+'<span style="color:#000;display:inline-block;width:54%;"><span id="sumCount_span_fastOrderFood" style="color:#26a9d0;"></span></span></span>'
+		  		+'<span style="display"><span style="color:#000;display:none;width:44%;">菜品数量:&nbsp;<span id="sumCount_span_fastOrderFood" style="color:#26a9d0;">--.--</span></span>'
+		  		+'<span style="color:#000;display:none;width:54%;"><span id="sumCount_span_fastOrderFood" style="color:#26a9d0;"></span></span></span>'
 		  	+'</div>'
 		  	+'<div id="cartComment_div_fastOrderFood"> </div>'
 			+'<div id="shoppingBtn_div_fastOrderFood" class="hewarp">'
@@ -757,11 +757,12 @@ function PickFoodComponent(param){
 			data : {
 				dataSource : 'calcOrder',
 				sessionId : Util.mp.params.sessionId,
-				foods : foods
+				foods : foods,
+				branchId : Util.mp.params.branchId
 			},
 			success : function(data, status, req){
 				if(data.success){
-					$('#sumPrice_div_fastOrderFood').html(data.root[0].totalPrice.toFixed(2));
+					$('#sumPrice_div_fastOrderFood').html(data.root[0].pureTotalPrice.toFixed(2));
 					$('#actualPrice_div_fastOrderFood').html(data.root[0].actualPrice.toFixed(2));
 					_calcOrderCost = data.root[0].actualPrice;
 				}

@@ -12,9 +12,10 @@ $(function(){
 		inside: '<div class="box-order {orderBorder}">' +
 					'<div ><span style="font-weight: bold;font-size:20px;color:green;">{restaurantName}</div>' +
 					'<div class="{orderClass}"><div style="height: 20px;">' +
-							'<div style="float: left;font-size:16px;">订单号:{code}</div>' +
+							'<div style="float: left;font-size:16px;">微订编号:{code}</div>' +
 							'<div style="float: right;color:#26a9d0;">{status}</div>' +
 					'</div></div>' +
+					'<div>账单号: <span>{orderId}</span></div>' +
 					'<div>点单日期: <span style="font-weight: bold">{orderDate}</span></div>' +
 					'<div>' +
 						'<div style="float: left">金额: <span style="font-weight: bold;color: red;">{totalPrice}</span> 元</div>' +
@@ -70,6 +71,7 @@ $(function(){
 					restaurantName : temp.restaurantName,
 					code : temp.code,
 					status : temp.statusDesc,
+					orderId : temp.orderId ? temp.orderId : '----',
 					orderDate : temp.date,
 					totalPrice : temp.price,
 					count : count,

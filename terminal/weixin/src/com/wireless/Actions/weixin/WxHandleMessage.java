@@ -384,7 +384,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		try{
 			// 绑定餐厅和公众平台信息
 			//WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
-			
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
@@ -739,10 +738,10 @@ public class WxHandleMessage extends HandleMessageAdapter {
 //					  .append("开台时间：" + DateUtil.format(new Date())).append("\r\n")
 //					  .append("点击进入自助点餐界面，自助点菜");
 			
-			final String desc = ("欢迎客官：{wxMeberName}\r\n"
+			final String desc = ("欢迎客官：{wxMemberName}\r\n"
 								+ "餐台：{tableName}\r\n"
 								+ "开台时间：{severingTime}\r\n"
-								+ "点击进入自助点餐界面，自助点菜").replace("{wxMeberName}", MemberDao.getByWxSerial(staff, msg.getFromUserName()).getName())
+								+ "点击进入自助点餐界面，自助点菜").replace("{wxMemberName}", MemberDao.getByWxSerial(staff, msg.getFromUserName()).getName())
 														 .replace("{tableName}", table.getName())
 														 .replace("{severingTime}", DateUtil.format(new Date()));
 			
