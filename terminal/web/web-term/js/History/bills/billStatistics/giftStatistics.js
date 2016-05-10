@@ -403,11 +403,10 @@ Ext.onReady(function(){
 			    ['赠送日期', 'orderDateFormat',100],
 			    ['菜品名称', 'name', 100], 
 			    ['数量','totalAmount', 60, 'right', Ext.ux.txtFormat.gridDou],
-			    ['单价','unitPrice', 60, 'right', Ext.ux.txtFormat.gridDou],
 			    ['总价','totalGift', 60, 'right'],
 			    ['赠送人','waiter', null,'center']
 			],
-			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'unitPrice', 'waiter', 'rid', 'totalAmount', 'totalGift'],
+			['restaurantName', 'orderId', 'orderDateFormat', 'name', 'waiter', 'rid', 'totalAmount', 'totalGift'],
 		    [ ['dataSource', 'normal']],
 		    GRID_PADDING_LIMIT_20,
 		    '',
@@ -456,8 +455,7 @@ Ext.onReady(function(){
      			grid_giftStatistics.getView().getCell(store.getCount()-1, 2).innerHTML = '--';		//单据编号
      			grid_giftStatistics.getView().getCell(store.getCount()-1, 3).innerHTML = '--';      //赠送日期
      			grid_giftStatistics.getView().getCell(store.getCount()-1, 4).innerHTML = '--';      //菜品名称
-     			grid_giftStatistics.getView().getCell(store.getCount()-1, 6).innerHTML = '--';      //单价
-     			grid_giftStatistics.getView().getCell(store.getCount()-1, 8).innerHTML = '--';      //赠送人
+     			grid_giftStatistics.getView().getCell(store.getCount()-1, 7).innerHTML = '--';      //赠送人
      			
      		}
 			

@@ -31,6 +31,7 @@ import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.billStatistics.CalcCommissionStatisticsDao;
 import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
 import com.wireless.db.billStatistics.CalcEraseStatisticsDao;
+import com.wireless.db.billStatistics.CalcGiftStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
@@ -60,6 +61,7 @@ import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
+import com.wireless.pojo.billStatistics.gift.GiftDetail;
 import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -3949,23 +3951,29 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		final String pin = (String) request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
-		final String beginDate = request.getParameter("beginDate");
-		final String endDate = request.getParameter("endDate");
+		final String onDuty = request.getParameter("beginDate");
+		final String offDuty = request.getParameter("endDate");
 		final String region = request.getParameter("region");
 		final String foodName = request.getParameter("foodName");
 		final String giftStaffId = request.getParameter("staffId");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
 		
+		final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																.setDutyRange(new DutyRange(onDuty, offDuty))
+																.setCalcByDuty(true);
+		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		if(branchId != null && !branchId.isEmpty()){
-			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			if(Integer.parseInt(branchId) > 0){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				extraCond.setChain(true);
+			}
 		}
 		
-		final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY);
 		
-		extraCond.setGift(true);
 		
 		if(region != null && !region.equals("-1")){
 			extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
@@ -3978,23 +3986,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(giftStaffId != null && !giftStaffId.isEmpty() && !giftStaffId.equals("-1")){
 			extraCond.setStaffId(Integer.parseInt(giftStaffId));
 		}
+		
 		if(opening != null && !opening.isEmpty()){
 			extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 		}
 		
-		DutyRange range = DutyRangeDao.exec(staff, beginDate, endDate);
-		if(range != null){
-			extraCond.setDutyRange(range);
-		}else{
-			extraCond.setDutyRange(new DutyRange(beginDate, endDate));
-		}
-		
-		final List<OrderFood> list = OrderFoodDao.getSingleDetail(staff, extraCond, null);
+		List<GiftDetail> result = CalcGiftStatisticsDao.getDetail(staff, extraCond);
+
 		
 		float totalGiftPrice = 0;
-		if(!list.isEmpty()){
-			for (OrderFood item : list) {
-				totalGiftPrice += item.getFoodPrice();
+		if(!result.isEmpty()){
+			for (GiftDetail g : result) {
+				totalGiftPrice += g.getTotalGift();
 			}
 		}
 		
@@ -4034,7 +4037,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		
-		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         赠送总额: " + totalGiftPrice);
+		cell.setCellValue("日期: " + onDuty + "  至  " + offDuty +  "         赠送总额: " + totalGiftPrice);
 //		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 5));
@@ -4064,10 +4067,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("单价");
-		cell.setCellStyle(headerStyle);
-
-		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("总价");
 		cell.setCellStyle(headerStyle);
 		
@@ -4075,43 +4074,38 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("赠送人");
 		cell.setCellStyle(headerStyle);
 		
-		for (OrderFood of : list) {
+		for (GiftDetail g : result) {
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
 			//账单号
 			cell = row.createCell(0);
-			cell.setCellValue(of.getOrderId());
+			cell.setCellValue(g.getOrderId());
 			cell.setCellStyle(strStyle);
 			
 			//日期
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(DateUtil.format(of.getOrderDate()));
+			cell.setCellValue(DateUtil.format(g.getOrderDateFormat()));
 			cell.setCellStyle(strStyle);
 			
 			//菜品名称
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(of.asFood().getName());
+			cell.setCellValue(g.getName());
 			cell.setCellStyle(strStyle);
 			
 			//数量
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(of.getCount());
-			cell.setCellStyle(numStyle);
-			
-			//单价
-			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(of.getPrice());
+			cell.setCellValue(g.getTotalAmount());
 			cell.setCellStyle(numStyle);
 			
 			//总价
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(of.getPrice() * of.getCount());
+			cell.setCellValue(g.getTotalGift());
 			cell.setCellStyle(numStyle);
 			
 			//赠送人
 			cell = row.createCell((int)row.getLastCellNum());
-			cell.setCellValue(of.getWaiter());
+			cell.setCellValue(g.getWaiter());
 			cell.setCellStyle(strStyle);
 			
 		}
