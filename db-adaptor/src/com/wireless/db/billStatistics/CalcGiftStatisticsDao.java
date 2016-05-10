@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.billStatistics.gift.GiftDetail;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByDept;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByEachDay;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByStaff;
@@ -36,7 +37,7 @@ public class CalcGiftStatisticsDao {
 		//private final String orderTblAlias = "O";
 		private final String orderFoodTbl;
 		//private final String orderFoodTblAlias = "OF";
-		private final String tasteGroupTbl;
+		private final String tasteGroupTbl; 
 		
 		private Department.DeptId deptId;
 		private int staffId;
@@ -155,6 +156,65 @@ public class CalcGiftStatisticsDao {
 			}
 			return extraCond.toString();
 		}
+	}
+	
+	/**
+	 * Get gift detail list by condition.
+	 * @param staff
+	 * @param queryType
+	 * @return	the gift list
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throw if the query type is invalid
+	 */
+	public static List<GiftDetail> getDetail(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		
+		try{
+			dbCon.connect();
+			return getDetail(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<GiftDetail> getDetail(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		final List<GiftDetail> result = new ArrayList<GiftDetail>();
+		
+		if(extraCond.isChain){
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			
+			//Append the gift detail to the group
+			result.addAll(getDetail(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
+			
+			//Append the gift detail to the branch
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				result.addAll(getDetail(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
+			}
+		}else{
+			String sql = makeSql4GiftFood(staff, extraCond);
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while(dbCon.rs.next()){
+				GiftDetail g = new GiftDetail();
+				g.setOrderId(dbCon.rs.getInt("order_id"));
+				g.setCount(dbCon.rs.getFloat("gift_amount"));
+				g.setName(dbCon.rs.getString("name"));
+				g.setOrderDateFormat(dbCon.rs.getTimestamp("order_date").getTime());
+				g.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+				g.setRid(dbCon.rs.getInt("restaurant_id"));
+				g.setWaiter(dbCon.rs.getString("waiter"));
+				g.setTotalGift(dbCon.rs.getFloat("gift_price"));
+				g.setTotalAmount(dbCon.rs.getInt("gift_amount"));
+				result.add(g);
+			}
+			dbCon.rs.close();
+		}
+		
+		return result;
+		
 	}
 	
 	/**
@@ -367,7 +427,7 @@ public class CalcGiftStatisticsDao {
 	 */
 	public static List<GiftIncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		
-		if(extraCond.calcByDuty){
+		if(extraCond.isChain){
 			
 			final Map<String, GiftIncomeByDept> chainResult = new HashMap<>();
 			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
@@ -431,12 +491,14 @@ public class CalcGiftStatisticsDao {
 	private static String makeSql4GiftFood(Staff staff, ExtraCond extraCond){
 		String sql;
 		sql = (" SELECT " +
-			  " OF.dept_id, OF.staff_id, OF.waiter, " +
+			  " OF.dept_id, OF.staff_id, OF.order_date, OF.waiter, OF.restaurant_id, R.restaurant_name, OF.order_id, OF.name, " +
 			  " ABS(OF.order_count) AS gift_amount, " +
 			  " (($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count) AS gift_price " +
 			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
 			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O " +
+			  " JOIN " + Params.dbName + ".restaurant R " + 
 			  " ON 1 = 1 " +
+			  " AND R.id = OF.restaurant_id " +
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
 			  //" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +

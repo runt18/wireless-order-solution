@@ -570,9 +570,10 @@ Ext.onReady(function(){
 				cfdsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 				cfdsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 				cfdsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-				cfdsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = sumData.get('unitPrice').toFixed(2);
-				cfdsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+				cfdsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+				cfdsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = sumData.get('count').toFixed(2);
 				cfdsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				cfdsGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 				
 				$('#cancelledFoodPanel').find('.orderLinkId').each(function(index, element){
         			element.onclick = function(){

@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcGiftStatisticsDao;
-import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -21,8 +20,8 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.billStatistics.gift.GiftDetail;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByEachDay;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -31,7 +30,7 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 
 public class QueryGiftStatisticAction extends DispatchAction{
-
+	
 	/**
 	 * 获取赠送明细数据
 	 * @param mapping
@@ -57,11 +56,10 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		try{
 			
-			final OrderFoodDao.ExtraCond extraCond = new OrderFoodDao.ExtraCond(DateType.HISTORY)
-																	 .setDutyRange(new DutyRange(onDuty, offDuty))
-																	 .setCalcByDuty(true)
-																	 .setGift(true);
-			
+			final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
+																		.setDutyRange(new DutyRange(onDuty, offDuty))
+																		.setCalcByDuty(true);
+
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(branchId != null && !branchId.isEmpty()){
@@ -87,23 +85,24 @@ public class QueryGiftStatisticAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<OrderFood> orderFoodList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
-			
-			
+			List<GiftDetail> result = CalcGiftStatisticsDao.getDetail(staff, extraCond);
+
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				jobject.setTotalProperty(orderFoodList.size());
-				OrderFood total = new OrderFood();
-				for(OrderFood item : orderFoodList){
-					total.setCount(item.getCount() + total.getCount());
-					total.setPlanPrice(item.getPlanPrice() + total.getPlanPrice());
-					total.asFood().setPrice(item.asFood().getPrice() + total.asFood().getPrice());
+				jobject.setTotalProperty(result.size());
+				GiftDetail total = new GiftDetail();
+				
+				for(GiftDetail giftDetail : result){
+					total.setTotalAmount(giftDetail.getTotalAmount() + total.getTotalAmount());
+					total.setTotalGift(giftDetail.getTotalGift() + total.getTotalGift());
 				}
 				
-				orderFoodList = DataPaging.getPagingData(orderFoodList, true, Integer.parseInt(start), Integer.parseInt(limit));
-				orderFoodList.add(total);
+				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
+				
+				result.add(total);
 			}
-			jobject.setRoot(orderFoodList);
+			
+			jobject.setRoot(result);
 			
 		}catch(BusinessException | SQLException e){
 			jobject.initTip(e);
