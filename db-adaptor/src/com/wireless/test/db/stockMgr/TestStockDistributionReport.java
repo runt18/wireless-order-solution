@@ -21,7 +21,7 @@ public class TestStockDistributionReport {
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 		TestInit.init();
 		try{
-			mStaff = StaffDao.getByRestaurant(37).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 			//mTerminal.restaurantID = 37;
 		}catch(SQLException e){
 			e.printStackTrace();

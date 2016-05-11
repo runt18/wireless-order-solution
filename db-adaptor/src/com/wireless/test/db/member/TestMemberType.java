@@ -34,7 +34,7 @@ public class TestMemberType {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getByRestaurant(37).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -60,11 +60,11 @@ public class TestMemberType {
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		
-		Restaurant group = RestaurantDao.getById(41);
+		Restaurant group = RestaurantDao.getById(40);
 		Staff groupStaff = StaffDao.getAdminByRestaurant(group.getId());
 		final List<Discount> groupDiscounts = DiscountDao.getByCond(groupStaff, null, DiscountDao.ShowType.BY_KITCHEN);
 		final List<PricePlan> groupPrices = PricePlanDao.getByCond(groupStaff, null);
-		Restaurant branch = RestaurantDao.getById(40);
+		Restaurant branch = RestaurantDao.getById(41);
 		Staff branchStaff = StaffDao.getAdminByRestaurant(branch.getId());
 		final List<Discount> branchDiscounts = DiscountDao.getByCond(branchStaff, null, DiscountDao.ShowType.BY_KITCHEN);
 		final List<PricePlan> branchPrices = PricePlanDao.getByCond(branchStaff, null);

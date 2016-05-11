@@ -83,7 +83,8 @@ public class TestWeixinRestaurantDao {
 																	.setQrCodeStatus(QrCodeStatus.NORMAL)
 																	.setHeadImgUrl("http://www.headimg")
 																	.setNickName("测试昵称")
-																	.setRefreshToken("adfeiilmasd;iottt");
+																	.setRefreshToken("adfeiilmasd;iottt")
+																	.setDefaultOrderType(WxRestaurant.PayType.CONFIRM_BY_STAFF);
 		WxRestaurantDao.update(mStaff, builder);
 		
 		WxRestaurant expected = builder.build();
@@ -114,6 +115,7 @@ public class TestWeixinRestaurantDao {
 		Assert.assertEquals("weixin head image url", expected.getHeadImgUrl(), actual.getHeadImgUrl());
 		Assert.assertEquals("weixin nick name", expected.getNickName(), actual.getNickName());
 		Assert.assertEquals("weixin refresh token", expected.getRefreshToken(), actual.getRefreshToken());
+		Assert.assertEquals("weixin refresh token", expected.getDefaultOrderType(), actual.getDefaultOrderType());
 
 	}
 }

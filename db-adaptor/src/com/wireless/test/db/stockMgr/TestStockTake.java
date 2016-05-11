@@ -46,7 +46,7 @@ public class TestStockTake {
 	public static void initDBParam() throws PropertyVetoException, SQLException, BusinessException{
 		TestInit.init();
 		try{
-			mStaff = StaffDao.getByRestaurant(37).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 			//mTerminal.restaurantID = 26;
 		}catch(SQLException e){
 			e.printStackTrace();

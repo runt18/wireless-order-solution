@@ -53,8 +53,12 @@ public class WxRestaurantDao {
 	public static void insert(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".weixin_restaurant" +
-		      " (restaurant_id, status) " +
-			  " VALUES (" + staff.getRestaurantId() + "," + WxRestaurant.Status.CREATED.getVal() + ")";
+		      " (restaurant_id, status, default_order_type) " +
+			  " VALUES (" + 
+		      staff.getRestaurantId() +  
+			  "," + WxRestaurant.Status.CREATED.getVal() +
+			  "," + WxRestaurant.PayType.CONFIRM_BY_STAFF.getValue() +
+			  ")";
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -158,7 +162,7 @@ public class WxRestaurantDao {
 			  (builder.isCouponTimeoutTemplateChanged() ? " ,coupon_timeout_template = '" + wr.getCouponTimeoutTemplate() + "'" : "") +
 			  (builder.isChargeTemplateChanged() ? " ,charge_template = '" + wr.getChargeTemplate() + "'" : "") +
 			  (builder.isOrderNotifyTemplateChanged() ? " ,order_notify_template = '" + wr.getOrderNotifyTemplate() + "'" : "") +
-			  (builder.isDefaultOrderType() ? " ,default_order_type = '" + wr.getDefaultOrderType().getValue() : "") + 
+			  (builder.isDefaultOrderTypeChanged() ? " ,default_order_type = " + wr.getDefaultOrderType().getValue() : "") + 
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
@@ -298,7 +302,9 @@ public class WxRestaurantDao {
 			wr.setCouponTimeoutTemplate(dbCon.rs.getString("coupon_timeout_template"));
 			wr.setChargeTemplate(dbCon.rs.getString("charge_template"));
 			wr.setOrderNotifyTemplate(dbCon.rs.getString("order_notify_template"));
-			wr.setDefaultOrderType(WxRestaurant.PayType.valueOf(dbCon.rs.getInt("default_order_type")));
+			if(dbCon.rs.getInt("default_order_type") != 0){
+				wr.setDefaultOrderType(WxRestaurant.PayType.valueOf(dbCon.rs.getInt("default_order_type")));
+			}
 			result.add(wr);
 		}
 		dbCon.rs.close();

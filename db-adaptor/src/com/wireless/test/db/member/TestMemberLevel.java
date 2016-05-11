@@ -28,7 +28,7 @@ public class TestMemberLevel {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getByRestaurant(63).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(63);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

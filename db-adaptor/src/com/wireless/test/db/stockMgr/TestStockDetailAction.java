@@ -26,7 +26,7 @@ public class TestStockDetailAction {
 		TestInit.init();
 		
 		try{
-			mStaff = StaffDao.getByRestaurant(37).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}

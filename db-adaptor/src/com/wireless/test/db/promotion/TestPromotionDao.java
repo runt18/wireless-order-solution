@@ -73,7 +73,7 @@ public class TestPromotionDao {
 		
 		int promotionId = 0;
 		try{
-			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance("测试优惠活动", "测试优惠活动", new CouponType.InsertBuilder("测试优惠券类型", 30, "2016-2-1")
+			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance("测试优惠活动", "测试优惠活动", new CouponType.InsertBuilder("测试优惠券类型", 30, "2020-2-1")
 							   										  .setComment("测试备注"), "hello jingjing<br>")
 					  												  .addTrigger(Promotion.Trigger.WX_SUBSCRIBE)
 					  												   ;

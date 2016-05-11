@@ -25,7 +25,7 @@ public class TestMaterialDao {
 	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			staff = StaffDao.getByRestaurant(26).get(0);
+			staff = StaffDao.getAdminByRestaurant(26);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

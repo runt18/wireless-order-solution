@@ -144,7 +144,7 @@ public class TestRestaurantDao {
 			comparePrinters(staff);
 			
 			//Compare the weixin restaurant
-			compareWeixinRestaurant(staff);
+			compareWxRestaurant(staff);
 			
 			//Compare the SMS state
 			compareSMStat(staff);
@@ -260,12 +260,13 @@ public class TestRestaurantDao {
 		Assert.assertEquals("sms stat : remaining", 0, actual.getRemaining());
 	}
 	
-	private void compareWeixinRestaurant(Staff staff) throws SQLException, BusinessException{
+	private void compareWxRestaurant(Staff staff) throws SQLException, BusinessException{
 		WxRestaurant actual = WxRestaurantDao.get(staff);
 		Assert.assertEquals("weixin restaurant : restaurant id", actual.getRestaurantId(), staff.getRestaurantId());
 		Assert.assertEquals("weixin restaurant : info", actual.getWeixinInfo(), "");
 		Assert.assertEquals("weixin restaurant : logo", actual.getWeixinLogo(), null);
 		Assert.assertEquals("weixin restaurant : status", actual.getStatus(), WxRestaurant.Status.CREATED);
+		Assert.assertEquals("weixin restaurant : default order pay", actual.getDefaultOrderType(), WxRestaurant.PayType.CONFIRM_BY_STAFF);
 	}
 	
 	private void comparePrinters(Staff staff) throws SQLException{

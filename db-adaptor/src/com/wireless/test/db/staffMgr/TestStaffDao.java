@@ -26,7 +26,7 @@ public class TestStaffDao {
 	public static void initDBParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try{
-			mStaff = StaffDao.getByRestaurant(37).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(37);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -84,7 +84,7 @@ public class TestStaffDao {
 			
 		}finally{
 			if(staffId != 0){
-				StaffDao.delete(mStaff, staffId);
+				StaffDao.deleteById(mStaff, staffId);
 				try{
 					StaffDao.getById(staffId);
 				}catch(BusinessException e){

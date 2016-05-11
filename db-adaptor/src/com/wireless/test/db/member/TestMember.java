@@ -101,9 +101,9 @@ public class TestMember {
 	
 	@Test
 	public void testMemberChain() throws BusinessException, SQLException{
-		Restaurant group = RestaurantDao.getById(41);
+		Restaurant group = RestaurantDao.getById(40);
 		Staff groupStaff = StaffDao.getAdminByRestaurant(group.getId());
-		Restaurant branch = RestaurantDao.getById(40);
+		Restaurant branch = RestaurantDao.getById(41);
 		Staff branchStaff = StaffDao.getAdminByRestaurant(branch.getId());
 		
 		RestaurantDao.update(new Restaurant.UpdateBuilder(group.getId()).addBranch(branch));
@@ -116,13 +116,13 @@ public class TestMember {
 		try{
 			//Insert a new member
 			Member.InsertBuilder builder = new Member.InsertBuilder("张三", memberType.getId())
-															   .setMobile("13694260535")
+															   .setMobile("13794260531")
 													 		   .setSex(Sex.FEMALE)
 													 		   .setBirthday(DateUtil.parseDate("1981-03-15"))
 													 		   .setCompany("Digie Co.,Ltd")
 													 		   .setContactAddr("广州市东圃镇晨晖商务大厦")
 													 		   .setIdCard("440711198103154818")
-													 		   .setMemberCard("100010000")
+													 		   .setMemberCard("100010003")
 													 		   .setTele("020-87453214")
 													 		   ;
 			
@@ -172,7 +172,7 @@ public class TestMember {
 		}finally{
 			if(memberId != 0){
 				//Delete the member 		
-				MemberDao.deleteById(groupStaff, memberId);
+				MemberDao.deleteById(branchStaff, memberId);
 				//Check to see whether the member is deleted
 				try{
 					MemberDao.getById(branchStaff, memberId);
