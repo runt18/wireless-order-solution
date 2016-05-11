@@ -12,7 +12,7 @@ public class Staff implements Parcelable, Jsonable{
 	
 	public static enum Type{
 		NORMAL(1, "普通"),
-		RESERVED(2, "系统保留"),
+		ADMIN(2, "管理员"),
 		WX(3, "微信客人");
 		
 		private final int val;
@@ -104,13 +104,23 @@ public class Staff implements Parcelable, Jsonable{
 	//the restaurant type to this staff
 	private Restaurant.Type restaurantType;
 
+	public static class WxBuilder extends InsertBuilder{
+		
+		public final static String WX = "微信客人";
+		
+		public WxBuilder(String pwd, Role role){
+			super(WX, pwd, role);
+			super.type = Type.WX;
+		}
+	}
+	
 	public static class AdminBuilder extends InsertBuilder{
 		
 		public final static String ADMIN = "管理员";
 		
 		public AdminBuilder(String pwd, Role role){
 			super(ADMIN, pwd, role);
-			super.type = Type.RESERVED;
+			super.type = Type.ADMIN;
 		}
 	}
 	
