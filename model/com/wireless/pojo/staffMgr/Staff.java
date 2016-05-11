@@ -12,7 +12,8 @@ public class Staff implements Parcelable, Jsonable{
 	
 	public static enum Type{
 		NORMAL(1, "普通"),
-		RESERVED(2, "系统保留");
+		RESERVED(2, "系统保留"),
+		WX(3, "微信客人");
 		
 		private final int val;
 		private final String desc;

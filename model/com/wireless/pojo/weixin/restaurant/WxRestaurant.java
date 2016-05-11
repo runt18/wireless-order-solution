@@ -31,7 +31,7 @@ public class WxRestaurant implements Jsonable{
 			return this;
 		}
 		
-		public boolean isDefaultOrderType(){
+		public boolean isDefaultOrderTypeChanged(){
 			return this.defaultOrderType != null;
 		}
 		
@@ -318,7 +318,7 @@ public class WxRestaurant implements Jsonable{
 	private String couponTimeoutTemplate;
 	private String orderNotifyTemplate;
 	private String chargeTemplate;
-	private PayType defaultOrderType;
+	private PayType defaultOrderType = PayType.CONFIRM_BY_STAFF;
 	
 	private WxRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
@@ -604,8 +604,8 @@ public class WxRestaurant implements Jsonable{
 		jm.putString("qrCode", getQrCode());
 		jm.putInt("qrCodeStatus", getQrCodeStatus().getVal());
 		jm.putBoolean("isAuth", hasQrCode());
-		jm.putInt("defaultOrderType", getDefaultOrderType().getValue());
-		
+		jm.putInt("defaultOrderType", getDefaultOrderType().val);
+		jm.putString("defaultOrderTypeText", getDefaultOrderType().desc);
 		return jm;
 	}
 
