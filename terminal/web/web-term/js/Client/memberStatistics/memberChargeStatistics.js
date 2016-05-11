@@ -425,7 +425,7 @@ Ext.onReady(function(){
 				mcs_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 				mcs_grid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 				mcs_grid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-				mcs_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+				mcs_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 				mcs_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 				mcs_grid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 			}
