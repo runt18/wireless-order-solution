@@ -170,7 +170,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			final List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(staff, extraCond);
+			final List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
@@ -268,7 +268,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByReason(staff, extraCond));
+			jObject.setRoot(CalcCancelStatisticsDao.calcIncomeByReason(staff, extraCond));
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -331,7 +331,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, extraCond));
+			jObject.setRoot(CalcCancelStatisticsDao.calcIncomeByStaff(staff, extraCond));
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -394,7 +394,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			jObject.setRoot(CalcCancelStatisticsDao.calcCancelIncomeByDept(staff, extraCond));
+			jObject.setRoot(CalcCancelStatisticsDao.calcIncomeByDept(staff, extraCond));
 			
 		}catch(BusinessException  | SQLException e){
 			e.printStackTrace();
