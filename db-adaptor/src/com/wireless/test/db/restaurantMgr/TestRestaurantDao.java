@@ -434,25 +434,32 @@ public class TestRestaurantDao {
 	
 	private Staff compareRoleAndStaff(int restaurantId) throws SQLException, BusinessException{
 		
-		Staff expectedStaff = StaffDao.getByRestaurant(restaurantId).get(0);
-		Assert.assertEquals("admin staff restaurant id", expectedStaff.getRestaurantId(), restaurantId);
-		Assert.assertEquals("admin staff type", expectedStaff.getType().getVal(), Staff.Type.RESERVED.getVal());
-		Assert.assertEquals("admin staff role type", expectedStaff.getRole().getCategory().getVal(), Role.Category.ADMIN.getVal());
-		Assert.assertEquals("admin staff name", expectedStaff.getName(), Staff.AdminBuilder.ADMIN);
+		Staff admin = StaffDao.getAdminByRestaurant(restaurantId);
+		Assert.assertEquals("admin staff restaurant id", restaurantId, admin.getRestaurantId());
+		Assert.assertEquals("admin staff type", Staff.Type.ADMIN.getVal(), admin.getType().getVal());
+		Assert.assertEquals("admin staff role type",  Role.Category.ADMIN.getVal(), admin.getRole().getCategory().getVal());
+		Assert.assertEquals("admin staff name", Staff.AdminBuilder.ADMIN, admin.getName());
+
+		Staff weixin = StaffDao.getWxByRestaurant(restaurantId);
+		Assert.assertEquals("admin staff restaurant id", weixin.getRestaurantId(), restaurantId);
+		Assert.assertEquals("admin staff type", weixin.getType().getVal(), Staff.Type.WX.getVal());
+		Assert.assertEquals("admin staff role type", weixin.getRole().getCategory().getVal(), Role.Category.ADMIN.getVal());
+		Assert.assertEquals("admin staff name", weixin.getName(), Staff.WxBuilder.WX);
+
 		
-		compareRole(restaurantId, expectedStaff, Role.Category.ADMIN, Role.Type.RESERVED);
+		compareRole(restaurantId, admin, Role.Category.ADMIN, Role.Type.RESERVED);
 		
-		compareRole(restaurantId, expectedStaff, Role.Category.BOSS, Role.Type.RESERVED);
+		compareRole(restaurantId, admin, Role.Category.BOSS, Role.Type.RESERVED);
 
-		compareRole(restaurantId, expectedStaff, Role.Category.FINANCE, Role.Type.NORMAL);
+		compareRole(restaurantId, admin, Role.Category.FINANCE, Role.Type.NORMAL);
 
-		compareRole(restaurantId, expectedStaff, Role.Category.MANAGER, Role.Type.NORMAL);
+		compareRole(restaurantId, admin, Role.Category.MANAGER, Role.Type.NORMAL);
 
-		compareRole(restaurantId, expectedStaff, Role.Category.CASHIER, Role.Type.NORMAL);
+		compareRole(restaurantId, admin, Role.Category.CASHIER, Role.Type.NORMAL);
 
-		compareRole(restaurantId, expectedStaff, Role.Category.WAITER, Role.Type.NORMAL);
+		compareRole(restaurantId, admin, Role.Category.WAITER, Role.Type.NORMAL);
 
-		return expectedStaff;
+		return admin;
 	}
 	
 	private void compareRole(int restaurantId, Staff staff, Role.Category cate, Role.Type type) throws SQLException{

@@ -16,6 +16,7 @@ import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
+import com.wireless.pojo.staffMgr.Staff.Type;
 import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 
 public class StaffDao {
@@ -97,7 +98,7 @@ public class StaffDao {
 				typeCond.append(type.getVal());
 			}
 			if(typeCond.length() != 0){
-				extraCond.append(" AND.STAFF.type IN (" + typeCond.toString() + ")");
+				extraCond.append(" AND STAFF.type IN (" + typeCond.toString() + ")");
 			}
 			
 			if(!codes.isEmpty()){
@@ -212,27 +213,25 @@ public class StaffDao {
 	 */
 	public static Staff verify(DBCon dbCon, int staffId) throws SQLException, BusinessException{
 		String sql;
-		sql = " SELECT expire_date, REST.id AS restaurant_id " +
+		sql = " SELECT expire_date " +
 		      " FROM " + Params.dbName + ".restaurant REST " +
 			  " JOIN " + Params.dbName + ".staff STAFF ON REST.id = STAFF.restaurant_id " +
 			  " WHERE STAFF.staff_id = " + staffId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		int restaurantId = 0;
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("expire_date") != null){
 				if(dbCon.rs.getTimestamp("expire_date").getTime() < System.currentTimeMillis()){
 					throw new BusinessException(RestaurantError.RESTAURANT_EXPIRED);
 				}
 			}
-			restaurantId = dbCon.rs.getInt("restaurant_id");
 		}else{
 			throw new BusinessException(StaffError.STAFF_NOT_EXIST);
 		}
 		
 		dbCon.rs.close();
 
-		return getByCond(dbCon, restaurantId, new ExtraCond().setStaff(staffId), null).get(0);
+		return getById(dbCon, staffId);
 
 	}
 	
@@ -269,7 +268,7 @@ public class StaffDao {
 	 * 			throws if the admin to this restaurant does NOT exist
 	 */
 	public static Staff getAdminByRestaurant(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
-		List<Staff> result = getByCond(dbCon, restaurantId, new ExtraCond().setCategory(Role.Category.ADMIN) , null);
+		List<Staff> result = getByCond(dbCon, new ExtraCond().setRestaurantId(restaurantId).addType(Type.ADMIN) , null);
 		if(result.isEmpty()){
 			throw new BusinessException(StaffError.STAFF_NOT_EXIST);
 		}else{
@@ -277,6 +276,47 @@ public class StaffDao {
 		}
 	}
 
+	/**
+	 * Get the wx staff to specific restaurant
+	 * @param restaurantId
+	 * 			the restaurant id
+	 * @return the admin to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the admin to this restaurant does NOT exist
+	 */
+	public static Staff getWxByRestaurant(int restaurantId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getWxByRestaurant(dbCon, restaurantId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the wx staff to specific restaurant
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantId
+	 * 			the restaurant id
+	 * @return the admin to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the admin to this restaurant does NOT exist
+	 */
+	public static Staff getWxByRestaurant(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
+		List<Staff> result = getByCond(dbCon, new ExtraCond().setRestaurantId(restaurantId).addType(Type.WX) , null);
+		if(result.isEmpty()){
+			throw new BusinessException(StaffError.STAFF_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
 	/**
 	 * Get the staff to specific device {@link #Device}.
 	 * @param dbCon
@@ -310,7 +350,7 @@ public class StaffDao {
 	 * @throws BusinessException
 	 */
 	public static List<Staff> getByDevice(DBCon dbCon, Device device) throws SQLException, BusinessException{
-		return getByCond(dbCon, device.getRestaurantId(), new ExtraCond().addType(Staff.Type.NORMAL).addType(Staff.Type.RESERVED), null);
+		return getByCond(dbCon, new ExtraCond().setRestaurantId(device.getRestaurantId()).addType(Staff.Type.NORMAL).addType(Staff.Type.ADMIN), null);
 	}
 	
 	/**
@@ -346,7 +386,7 @@ public class StaffDao {
 	 * 			throws if the staff to find does NOT exist
 	 */
 	public static Staff getById(DBCon dbCon, int staffId) throws SQLException, BusinessException{
-		List<Staff> result = getByCond(dbCon, 0, new ExtraCond().setStaff(staffId), null);
+		List<Staff> result = getByCond(dbCon, new ExtraCond().setStaff(staffId), null);
 		if(result.isEmpty()){
 			throw new BusinessException(StaffError.STAFF_NOT_EXIST);
 		}else{
@@ -387,7 +427,7 @@ public class StaffDao {
 	 * 			throws if the role to any staff does NOT exist
 	 */
 	public static List<Staff> getByRestaurant(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
-		return getByCond(dbCon, restaurantId, null, null);
+		return getByCond(dbCon, new ExtraCond().setRestaurantId(restaurantId), null);
 	}
 	
 	/**
@@ -510,7 +550,7 @@ public class StaffDao {
 	 * 			throws if the role to any staff does NOT exist
 	 */
 	public static List<Staff> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
-		return getByCond(dbCon, staff.getRestaurantId(), extraCond, null);
+		return getByCond(dbCon, extraCond.setRestaurantId(staff.getRestaurantId()), null);
 	}
 	
 	/**
@@ -526,7 +566,7 @@ public class StaffDao {
 	 * @throws BusinessException
 	 * 			throws if the role to any staff does NOT exist
 	 */
-	private static List<Staff> getByCond(DBCon dbCon, int restaurantId, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
+	private static List<Staff> getByCond(DBCon dbCon, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		
 		String sql = " SELECT "	+
 					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.role_id, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type, " +
@@ -535,7 +575,7 @@ public class StaffDao {
 					 " JOIN " + Params.dbName + ".restaurant REST ON REST.id = STAFF.restaurant_id " +
 					 " LEFT JOIN " + Params.dbName + ".role ROLE ON STAFF.role_id = ROLE.role_id " +
 					 " WHERE 1 = 1 " +
-					 (extraCond != null ? extraCond.setRestaurantId(restaurantId) : " ") +
+					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : " ORDER BY ROLE.cate, STAFF.staff_id ");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -735,7 +775,7 @@ public class StaffDao {
 		sql = " SELECT type FROM " + Params.dbName + ".staff WHERE staff_id = " + staffId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			if(Staff.Type.valueOf(dbCon.rs.getInt("type")) == Staff.Type.RESERVED){
+			if(Staff.Type.valueOf(dbCon.rs.getInt("type")) == Staff.Type.ADMIN){
 				throw new BusinessException(StaffError.RESERVED_STAFF_NOT_ALLOW_MODIFY);
 			}
 		}
@@ -764,7 +804,7 @@ public class StaffDao {
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException {
 		int amount = 0;
 		for(Staff s : getByCond(dbCon, staff, extraCond)){
-			if(s.getType() == Staff.Type.RESERVED || s.getType() == Staff.Type.WX){
+			if(s.getType() == Staff.Type.ADMIN || s.getType() == Staff.Type.WX){
 				continue;
 			}
 			String sql = " DELETE FROM " + Params.dbName + ".staff WHERE staff_id = " + s.getId();

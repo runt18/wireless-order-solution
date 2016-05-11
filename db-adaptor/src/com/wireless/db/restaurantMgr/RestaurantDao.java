@@ -930,6 +930,8 @@ public class RestaurantDao {
 		staff.setRestaurantId(restaurantId);
 		//insert '管理员' role
 		int adminRoleId = RoleDao.insert(dbCon, staff, new Role.AdminBuilder(restaurantId));
+		//insert '微信客人' staff
+		StaffDao.insert(dbCon, staff, new Staff.WxBuilder(pwd, new Role(adminRoleId)));
 		//insert '管理员' staff
 		int staffId = StaffDao.insert(dbCon, staff, new Staff.AdminBuilder(pwd, new Role(adminRoleId)));
 		//insert '老板' role

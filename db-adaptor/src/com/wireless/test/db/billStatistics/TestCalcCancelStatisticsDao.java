@@ -40,7 +40,7 @@ public class TestCalcCancelStatisticsDao {
 	
 	@Test
 	public void testCalcCancelStatistics() throws SQLException, ParseException, BusinessException{
-		List<CancelIncomeByReason> incomesByReason = CalcCancelStatisticsDao.calcCancelIncomeByReason(mStaff, mExtraCond.setRange(mDutyRange));
+		List<CancelIncomeByReason> incomesByReason = CalcCancelStatisticsDao.calcIncomeByReason(mStaff, mExtraCond.setRange(mDutyRange));
 		float totalIncomeByReason = 0;
 		float totalAmountByReason = 0;
 		for(CancelIncomeByReason each : incomesByReason){
@@ -48,7 +48,7 @@ public class TestCalcCancelStatisticsDao {
 			totalAmountByReason += each.getCancelAmount();
 		}
 		
-		List<CancelIncomeByStaff> incomesByStaff = CalcCancelStatisticsDao.calcCancelIncomeByStaff(mStaff, mExtraCond.setRange(mDutyRange));
+		List<CancelIncomeByStaff> incomesByStaff = CalcCancelStatisticsDao.calcIncomeByStaff(mStaff, mExtraCond.setRange(mDutyRange));
 		float totalIncomeByStaff = 0;
 		float totalAmountByStaff = 0;
 		for(CancelIncomeByStaff each : incomesByStaff){
@@ -59,7 +59,7 @@ public class TestCalcCancelStatisticsDao {
 		Assert.assertEquals("cancel income by reason is different from the one by staff", totalIncomeByReason, totalIncomeByStaff, 0.01);
 		Assert.assertEquals("cancel amount by reason is different from the one by staff", totalAmountByReason, totalAmountByStaff, 0.01);
 		
-		List<CancelIncomeByDept> incomesByDept = CalcCancelStatisticsDao.calcCancelIncomeByDept(mStaff, mExtraCond.setRange(mDutyRange));
+		List<CancelIncomeByDept> incomesByDept = CalcCancelStatisticsDao.calcIncomeByDept(mStaff, mExtraCond.setRange(mDutyRange));
 		float totalIncomeByDept = 0;
 		float totalAmountByDept = 0;
 		for(CancelIncomeByDept each : incomesByDept){
@@ -70,7 +70,7 @@ public class TestCalcCancelStatisticsDao {
 		Assert.assertEquals("cancel income by department is different from the one by staff", totalIncomeByDept, totalIncomeByStaff, 0.01);
 		Assert.assertEquals("cancel amount by department is different from the one by staff", totalAmountByDept, totalAmountByStaff, 0.01);
 		
-		List<CancelIncomeByEachDay> incomesByEachDay = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(mStaff, mExtraCond);
+		List<CancelIncomeByEachDay> incomesByEachDay = CalcCancelStatisticsDao.calcIncomeByEachDay(mStaff, mExtraCond);
 		@SuppressWarnings("unused")
 		float totalIncomeByEachDay = 0;
 		@SuppressWarnings("unused")
