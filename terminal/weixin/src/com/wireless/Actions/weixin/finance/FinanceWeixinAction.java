@@ -347,8 +347,7 @@ public class FinanceWeixinAction extends Action {
 			dbCon.rs.close();
 			
 			ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getAdminByRestaurant(restaurantId), 
-				    								 new DutyRange(onDuty, offDuty), 
-				    								 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+				    								 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setDutyRange(new DutyRange(onDuty, offDuty)));
 
 			return new Msg4Text(msg, makeShiftContent("最近日结", RestaurantDao.getById(restaurantId), detail));
 			
@@ -441,8 +440,8 @@ public class FinanceWeixinAction extends Action {
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
 			
 			ShiftDetail detail = ShiftDao.getByRange(StaffDao.getAdminByRestaurant(restaurantId), 
-													 new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE), DateUtil.format(endDate, DateUtil.Pattern.DATE)), 
-													 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+													 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+													 		.setDutyRange(new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE), DateUtil.format(endDate, DateUtil.Pattern.DATE))));
 			
 			return new Msg4Text(msg, makeShiftContent("本月月报", RestaurantDao.getById(restaurantId), detail));
 			
@@ -472,8 +471,8 @@ public class FinanceWeixinAction extends Action {
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
 			
 			ShiftDetail detail = ShiftDao.getByRange(StaffDao.getAdminByRestaurant(restaurantId), 
-													 new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE), DateUtil.format(endDate, DateUtil.Pattern.DATE)), 
-													 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+													 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+													 		.setDutyRange(new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE), DateUtil.format(endDate, DateUtil.Pattern.DATE))));
 			
 			return new Msg4Text(msg, makeShiftContent("上月月报", RestaurantDao.getById(restaurantId), detail));
 			
