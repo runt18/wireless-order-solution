@@ -405,9 +405,11 @@ Ext.onReady(function(){
         				sumCell.style.color= 'green';
         			}
         			couponGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-        			couponGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
         			couponGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
         			couponGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+        			couponGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+        			couponGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+        			couponGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
         		}
         		$('#couponStatistics_div_cpStatistics').find('.couponLinkId').each(function(index, element){
         			element.onclick = function(){
