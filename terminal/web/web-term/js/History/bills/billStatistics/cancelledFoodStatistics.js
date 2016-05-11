@@ -485,17 +485,17 @@ Ext.onReady(function(){
 			 ['门店名称', 'restaurantName', 50],
 			 ['日期','orderDateFormat',150], 
 			 ['菜名','name',180],
-	         ['部门','kitchen.dept.name'], 
+	         ['部门','dept'], 
 	         ['账单号', 'orderId', null, null, function(v){
 	         	return '<a class="orderLinkId">' + v + '</a>';
 	         }],
 	         ['单价','unitPrice', null, 'right', Ext.ux.txtFormat.gridDou],
-	         ['退菜数量','count', null, 'right', Ext.ux.txtFormat.gridDou], 
-	         ['退菜金额','totalPrice', null, 'right', Ext.ux.txtFormat.gridDou],		              
+	         ['退菜数量','totalAmount', null, 'right', Ext.ux.txtFormat.gridDou], 
+	         ['退菜金额','totalCancel', null, 'right', Ext.ux.txtFormat.gridDou],		              
 	         ['操作人','waiter'], 
-	         ['退菜原因','cancelReason.reason', 200]
+	         ['退菜原因','cancelReason', 200]
 			],
-			['restaurantName', 'orderDateFormat', 'name', 'kitchen.dept.name', 'orderId', 'unitPrice', 'count', 'totalPrice', 'waiter', 'cancelReason.reason', 'rid'],
+			['restaurantName', 'orderDateFormat', 'name', 'dept', 'orderId', 'unitPrice', 'totalAmount', 'totalCancel', 'waiter', 'cancelReason', 'rid'],
 			[ ['dataSource', 'getDetail']],
 			cancel_FOOD_PAGE_LIMIT,
 			null,
@@ -571,7 +571,6 @@ Ext.onReady(function(){
 				cfdsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 				cfdsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				cfdsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-				cfdsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = sumData.get('count').toFixed(2);
 				cfdsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 				cfdsGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 				

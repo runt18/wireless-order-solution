@@ -18,6 +18,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.billStatistics.cancel.CancelDetail;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByFood;
@@ -178,6 +179,71 @@ public class CalcCancelStatisticsDao {
 			}
 			return extraCond.toString();
 		}
+	}
+	
+	
+	/**
+	 * Get cancel detail list by condition.
+	 * @param staff
+	 * @param queryType
+	 * @return	the cancel list
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throw if the query type is invalid
+	 */
+	public static List<CancelDetail> getDetail(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		
+		try{
+			dbCon.connect();
+			return getDetail(dbCon, staff, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	
+	public static List<CancelDetail> getDetail(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		final List<CancelDetail> result = new ArrayList<CancelDetail>();
+		
+		if(extraCond.isChain){
+			final Staff groupStaff = StaffDao.getAdminByRestaurant(dbCon, staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId());
+			
+			//Append the cancel detail to the group
+			result.addAll(getDetail(dbCon, groupStaff, ((ExtraCond)extraCond.clone()).setChain(false)));
+			
+			//Append the cancel detail to the branch
+			for(Restaurant branch : RestaurantDao.getById(dbCon, groupStaff.getRestaurantId()).getBranches()){
+				result.addAll(getDetail(dbCon, StaffDao.getAdminByRestaurant(dbCon, branch.getId()), ((ExtraCond)extraCond.clone()).setChain(false)));
+			}
+			
+		}else{
+			String sql = makeSql4CancelFood(staff, extraCond);
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while(dbCon.rs.next()){
+				CancelDetail c = new CancelDetail();
+				c.setCancelCount(dbCon.rs.getFloat("cancel_amount"));
+				c.setCancelReason(dbCon.rs.getString("cancel_reason"));
+				c.setDept(dbCon.rs.getString("dept_name"));
+				c.setName(dbCon.rs.getString("name"));
+				c.setOrderDateFormat(dbCon.rs.getTimestamp("order_date").getTime());
+				c.setOrderId(dbCon.rs.getInt("order_id"));
+				c.setUnitPrice(dbCon.rs.getFloat("unit_price"));
+				c.setWaiter(dbCon.rs.getString("waiter"));
+				c.setTotalAmount(dbCon.rs.getFloat("cancel_amount"));
+				c.setTotalCancel(dbCon.rs.getFloat("cancel_price"));
+				c.setRid(dbCon.rs.getInt("restaurant_id"));
+				c.setRestaurantName(dbCon.rs.getString("restaurant_name"));
+				result.add(c);
+			}
+			
+			dbCon.rs.close();
+		}
+		return result;
 	}
 	
 	/**
@@ -678,7 +744,7 @@ public class CalcCancelStatisticsDao {
 	private static String makeSql4CancelFood(Staff staff, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
-			  " OF.food_id, OF.name, OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IFNULL(OF.cancel_reason, '无原因') AS cancel_reason, " +
+			  "  R.restaurant_name, OF.restaurant_id, IFNULL(D.name, '已删除部门') AS dept_name, OF.order_date, OF.order_id, OF.unit_price, OF.food_id, OF.name, OF.dept_id, OF.staff_id, OF.waiter, OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) AS cancel_reason, " +
 			  " ABS(OF.order_count) AS cancel_amount, " +
 			  " ABS(($(unit_price) + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount) AS cancel_price " +
 			  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderFoodTbl + " OF " + 
@@ -687,6 +753,8 @@ public class CalcCancelStatisticsDao {
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
 			  " JOIN " + Params.dbName + "." + extraCond.dbTbl.tgTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			  " LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = OF.dept_id AND D.restaurant_id = OF.restaurant_id " +
+			  " LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = OF.restaurant_id " +
 			  " WHERE 1 = 1 " +
 			  " AND OF.order_count < 0 " +
 			  " AND OF.operation = " + OrderFood.Operation.CANCEL.getVal() +

@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
-import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -21,10 +20,9 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
+import com.wireless.pojo.billStatistics.cancel.CancelDetail;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department.DeptId;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -67,7 +65,6 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				return null;
 			}
 			
-			final OrderFoodDao.ExtraCond4CancelFood extraCond = (OrderFoodDao.ExtraCond4CancelFood)new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY).setCalcByDuty(true);
 			final CalcCancelStatisticsDao.ExtraCond extraCond4Total = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY).setCalcByDuty(true);
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -75,49 +72,38 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				if(Integer.parseInt(branchId) > 0){
 					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				}else{
-					extraCond.setChain(true);
 					extraCond4Total.setChain(true);
 				}
 			}
 			
 			DutyRange range = new DutyRange(beginDate, endDate);
-			extraCond.setDutyRange(range);
 			extraCond4Total.setRange(range);
 			
 			if(reasonId != null && !reasonId.isEmpty() && !reasonId.equals("-1")){
-				extraCond.setReasonId(Integer.parseInt(reasonId));
 				extraCond4Total.setReasonId(Integer.parseInt(reasonId));
 			}
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 				extraCond4Total.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
 			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
-				extraCond.setStaffId(Integer.valueOf(staffId));
 				extraCond4Total.setStaffId(Integer.parseInt(staffId));
 			}
 			if(opening != null && !opening.isEmpty()){
-				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 				extraCond4Total.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<OrderFood> cancelList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
+			List<CancelDetail> cancelList = CalcCancelStatisticsDao.getDetail(staff, extraCond4Total);
 			if(!cancelList.isEmpty()){
 				jObject.setTotalProperty(cancelList.size());
 				
-				final float[] totalResult = CalcCancelStatisticsDao.calcByCond(staff, extraCond4Total);
+				CancelDetail total = new CancelDetail();
 				
-				Food totalFood = new Food(0);
-				totalFood.setKitchen(cancelList.get(0).asFood().getKitchen());
-				totalFood.setPrice(totalResult[1]);
+				for(CancelDetail cancelDetail : cancelList){
+					total.setTotalAmount(cancelDetail.getTotalAmount() + total.getTotalAmount());
+					total.setTotalCancel(cancelDetail.getTotalCancel() + total.getTotalCancel());
+				}
 				
-				OrderFood total = new OrderFood(totalFood);
-				
-				total.setCount(totalResult[0]);
-				
-				total.setCancelReason(cancelList.get(0).getCancelReason());
-				
-				cancelList = DataPaging.getPagingData(cancelList, true, start, limit);
+				cancelList = DataPaging.getPagingData(cancelList, true, Integer.parseInt(start), Integer.parseInt(limit));
 				
 				cancelList.add(total);
 				
@@ -161,7 +147,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		try{
 			final CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY)
 																						   .setRange(new DutyRange(dateBeg, dateEnd))
-																						   ;
+																						   .setCalcByDuty(true);
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(branchId != null && !branchId.isEmpty()){
 				if(Integer.parseInt(branchId) > 0){
