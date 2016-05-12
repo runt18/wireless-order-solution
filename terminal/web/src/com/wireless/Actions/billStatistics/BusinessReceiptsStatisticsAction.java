@@ -59,17 +59,18 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final CalcBillStatisticsDao.ExtraCond extraCond;
+			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+																	.setDutyRange(new DutyRange(onDuty, offDuty))
+																	.setCalcByDuty(true);
+
 			if(branchId != null && !branchId.isEmpty()){
-				if(branchId.equals("-1")){
-					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY).setChain(true);
-				}else{
+				if(Integer.parseInt(branchId) > 0){
 					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-					extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
-				}
-			}else{
-				extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+				}else{
+					extraCond.setChain(true);
+				} 
 			}
+
 			
 			if(opening != null && !opening.isEmpty()){
 				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
@@ -79,8 +80,6 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			if(region != null && !region.isEmpty()){
 				extraCond.setRegion(Region.RegionId.valueOf(Integer.parseInt(region)));
 			}
-			
-			extraCond.setDutyRange(new DutyRange(onDuty, offDuty));
 			
 			List<IncomeByEachDay> incomesByEachDay = CalcBillStatisticsDao.calcIncomeByEachDay(staff, extraCond);
 

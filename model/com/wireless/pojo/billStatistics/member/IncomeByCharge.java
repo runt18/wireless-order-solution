@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics.member;
 
 public class IncomeByCharge {
 
-	public final static IncomeByCharge DUMMY = new IncomeByCharge();
-	
 	private int chargeAmount;				//充值次数
 	
 	private float actualCashCharge;			//现金充值实收额

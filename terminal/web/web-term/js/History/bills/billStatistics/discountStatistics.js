@@ -369,7 +369,7 @@ Ext.onReady(function(){
 			}
 		}];
 		
-		var discountStatisticsGridTbar = Ext.ux.initTimeBar({beginDate:discount_beginDate, endDate:discount_endDate,dateCombo:discount_dateCombo, tbarType : 1, statistic : 'discount_', callback : function businessHourSelect(){discount_hours = null;}}).concat(discountStatisticsGridTbarItem);
+		var discountStatisticsGridTbar = Ext.ux.initTimeBar({beginDate:discount_beginDate, endDate:discount_endDate,dateCombo:discount_dateCombo, tbarType : 1, statistic : 'discount_', callback : function businessHourSelect(){}}).concat(discountStatisticsGridTbarItem);
 		
 		discountStatisticsGrid = createGridPanel(
 			'',
@@ -710,7 +710,7 @@ Ext.onReady(function(){
 		discountDetailsStatPanel.otype = v;
 	}
 	
-	var discount_cutAfterDrag = 190, discount_cutBeforeDrag = 40, discount_hours;
+	var discount_cutAfterDrag = 190, discount_cutBeforeDrag = 40;
 	var titleDiscountDeptName, titleDiscountStaffName;
 	var discount_detailChart, discount_staffPieChart, discount_staffColumnChart, discount_deptPieChart, discount_deptColumnChart;
 	

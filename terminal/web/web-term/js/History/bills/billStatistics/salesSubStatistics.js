@@ -7,7 +7,6 @@ $(function(){
 	var SALESSUB_PAGE_LIMIT = 22;
 	var titleDeptName, titleRegionName, selectDeptId;
 	var deptStatPanelGrid = null;
-	var salesSub_hours = null;
 	var salesSubWin = null;
 	var salesSubWinTabPanel = null;
 	var orderFoodStatPanel = null;
@@ -426,15 +425,7 @@ $(function(){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
 				
-				var opening, ending;
 				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
-				if(parseInt(businessHour.businessHourType) != -1){
-					opening = businessHour.opening;
-					ending = businessHour.ending;
-				}else{
-					opening = '';
-					ending = '';
-				}
 				
 				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}&opening={7}&ending={8}&branchId={9}&kitchenId={10}';
 				url = String.format(
@@ -446,8 +437,8 @@ $(function(){
 						endDate.getValue().format('Y-m-d 23:59:59'),
 						salesSubDeptId,
 						foodName.getValue(),
-						opening,
-						ending,
+						businessHour.opening != '00:00' ? businessHour.opening : '',
+						businessHour.ending != '00:00' ? businessHour.ending : '',
 						branch_combo_foodstatistics.getValue(),
 						salesSubKitchenId
 					);
@@ -1183,12 +1174,7 @@ $(function(){
 						Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 					}
 					
-					var data;
-					if(salesSub_hours){
-						data = salesSub_hours;
-					}else{
-						data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
-					}				
+					var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
 					
 					if(typeof e != 'undefined' && typeof e == 'boolean'){
 						Ext.getCmp('southDeptChartPanel').expand();
@@ -1199,8 +1185,8 @@ $(function(){
 							dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 							dateEnd : endDate.getRawValue() + ' 23:59:59', 
 							region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
-							opening : data.opening,
-							ending : data.ending,
+							opening : data.opening != '00:00' ? data.opening : '',
+							ending : data.ending != '00:00' ? data.ending : '',
 							deptId : selectDeptId,
 							branchId :branch_combo_deptStatistics.getValue()
 						});
@@ -1282,7 +1268,7 @@ $(function(){
 		
 		deptStatPanelGridTbar = new Ext.Toolbar({
 			height : 26,
-			items : [Ext.ux.initTimeBar({dateCombo:dateCombo, beginDate: beginDate, endDate:endDate, statistic : 'deptStatistic_', callback : function businessHourSelect(){salesSub_hours = null;}}).concat(deptStatPanelGridTbarItem)]
+			items : [Ext.ux.initTimeBar({dateCombo:dateCombo, beginDate: beginDate, endDate:endDate, statistic : 'deptStatistic_', callback : function businessHourSelect(){}}).concat(deptStatPanelGridTbarItem)]
 		});
 		
 		deptStatPanelGrid = createGridPanel(

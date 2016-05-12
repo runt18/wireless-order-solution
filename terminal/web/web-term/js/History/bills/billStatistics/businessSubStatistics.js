@@ -26,6 +26,12 @@
 			sendToStatisticsPageHours.endingText = sendToStatisticsPageHours.ending;
 		}
 		
+		var data = {
+			hourId : sendToStatisticsPageHours.hourComboValue,
+			opening : sendToStatisticsPageHours.opening,
+			ending : sendToStatisticsPageHours.ending
+		}
+		
 //		sendToPageOperation = true;
 		
 		var businessSubStatisticsLoading = new Ext.LoadMask(document.body, {
@@ -51,14 +57,7 @@
 								Ext.getCmp('endDate_combo_discountStatistics').setValue(sendToStatisticsPageEndDate);	
 								Ext.getCmp('discount_deptCombo').setValue(sendToStatisticsRegion);
 								
-								var data = {
-									hourId : sendToStatisticsPageHours.hourComboValue,
-									opening : sendToStatisticsPageHours.opening,
-									ending : sendToStatisticsPageHours.ending
-								}
-								
 								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'discount_'});
-								discount_hours = sendToStatisticsPageHours;
 								
 								Ext.getCmp('discount_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
 								Ext.getCmp('discount_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.endingText+'</font>');
@@ -100,13 +99,14 @@
 								Ext.getCmp('beginDate_combo_giftStatistics').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_giftStatistics').setValue(sendToStatisticsPageEndDate);		
 								
-								giftStatistic_hours = sendToStatisticsPageHours;
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'giftStatistic_'});
+								
 								
 								Ext.getCmp('giftStatistic_comboRegion').setValue(sendToStatisticsRegion);
 								
-								Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.openingText+'</font>');
-								Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.endingText+'</font>');
-								Ext.getCmp('giftStatistic_comboBusinessHour').setValue(giftStatistic_hours.hourComboValue);
+								Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
+								Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.endingText+'</font>');
+								Ext.getCmp('giftStatistic_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
 								
 								Ext.getCmp('giftStatistic_btnSearch').handler();
 								businessSubStatisticsLoading.hide();
@@ -146,12 +146,6 @@
 								//设置开始日期和结束日期
 								Ext.getCmp('beginDate_combo_cancelledFood').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_cancelledFood').setValue(sendToStatisticsPageEndDate);
-								
-								var data = {
-									hourId : sendToStatisticsPageHours.hourComboValue,
-									opening : sendToStatisticsPageHours.opening,
-									ending : sendToStatisticsPageHours.ending
-								};
 								
 								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'cancel_'});
 								
@@ -194,11 +188,11 @@
 								Ext.getCmp('beginDate_combo_repaid').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_repaind').setValue(sendToStatisticsPageEndDate);	
 								
-								repaid_hours = sendToStatisticsPageHours;
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'repaid_'});
 								
-								Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+repaid_hours.openingText+'</font>');
-								Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+repaid_hours.endingText+'</font>');
-								Ext.getCmp('repaid_comboBusinessHour').setValue(repaid_hours.hourComboValue);	
+								Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
+								Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.endingText+'</font>');
+								Ext.getCmp('repaid_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);	
 								
 								Ext.getCmp('repaid_btnSearch').handler();
 								
@@ -239,14 +233,13 @@
 									Ext.getCmp('deptStatistic_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
 									Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);
 									
-									salesSub_hours = sendToStatisticsPageHours;
+									Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'deptStatistic_'});
 									
 									Ext.getCmp('deptStatistic_comboRegion').setValue(sendToStatisticsRegion);
 									
-									Ext.getCmp('deptStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+salesSub_hours.openingText+'</font>');
-									Ext.getCmp('deptStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+salesSub_hours.endingText+'</font>');
-									Ext.getCmp('deptStatistic_comboBusinessHour').setValue(salesSub_hours.hourComboValue);
-									console.log(salesSub_hours.hourComboValue);
+									Ext.getCmp('deptStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
+									Ext.getCmp('deptStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.endingText+'</font>');
+									Ext.getCmp('deptStatistic_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
 									
 									Ext.getCmp('salesSubDeptId_textField_salesSub').setValue(sendToStatisticsPageDeptId);
 									Ext.getCmp('salesSubDeptName_textField_salesSub').setValue(sendToStatisticsPageDeptName);
@@ -290,12 +283,12 @@
 								Ext.getCmp('beginDate_combo_receipts').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_receipts').setValue(sendToStatisticsPageEndDate);
 								
-								receipt_hours = sendToStatisticsPageHours;
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'businessReceipt_'});
 								
 								Ext.getCmp('regionSelect_combo_businessReceips').setValue(sendToStatisticsRegion);
 								
-								Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.openingText+'</font>');
-								Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.endingText+'</font>');
+								Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + sendToStatisticsPageHours.openingText+'</font>');
+								Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + sendToStatisticsPageHours.endingText+'</font>');
 								Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
 								Ext.getCmp('businessReceipt_btnSearch').handler();
 								businessSubStatisticsLoading.hide();
@@ -1137,16 +1130,15 @@ Ext.onReady(function(){
 			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data;
 			var region = Ext.getCmp('businessSub_comboRegion');
 			
-			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&dataType={4}&opening={5}&ending={6}&region={7}&branchId={8}';
+			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&opening={4}&ending={5}&region={6}&branchId={7}';
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
 					'business',
 					Ext.util.Format.date(businessSub_beginDate.getValue(), 'Y-m-d 00:00:00'),
 					Ext.util.Format.date(businessSub_endDate.getValue(), 'Y-m-d 23:59:59'),
-					'history',
-					data.opening,
-					data.ending,
+					data.opening != '00:00' ? data.opening : '',
+					data.ending != '00:00' ? data.ending : '',
 					region.getValue(),
 					branchSelect_combo_businessSubStatistics.getValue()
 				);

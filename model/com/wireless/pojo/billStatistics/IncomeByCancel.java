@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByCancel {
 
-	public final static IncomeByCancel DUMMY = new IncomeByCancel();
-	
 	private int mCancelAmount;		//退菜账单数
 	private float mTotalCancel;		//合计退菜金额
 	

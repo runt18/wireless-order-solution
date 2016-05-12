@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByGift {
 	
-	public final static IncomeByGift DUMMY = new IncomeByGift();
-	
 	private int mGiftAmount;	//赠送账单数
 	private float mTotalGift;	//合计赠送金额
 	

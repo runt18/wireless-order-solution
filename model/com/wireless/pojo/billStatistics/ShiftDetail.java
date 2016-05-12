@@ -483,7 +483,7 @@ public class ShiftDetail implements Jsonable{
 
 	public IncomeByCharge getIncomeByCharge(){
 		if(this.incomeByCharge == null){
-			return IncomeByCharge.DUMMY;
+			return new IncomeByCharge();
 		}
 		return this.incomeByCharge;
 	}

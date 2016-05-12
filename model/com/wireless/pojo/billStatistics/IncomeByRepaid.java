@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByRepaid {
 
-	public final static IncomeByRepaid DUMMY = new IncomeByRepaid();
-	
 	private int mRepaidAmount;
 	private float mTotalRepaid;
 	

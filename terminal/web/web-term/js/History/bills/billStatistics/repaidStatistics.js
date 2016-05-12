@@ -381,20 +381,15 @@ Ext.onReady(function(){
 						return;
 					}
 					
-					var businessHour;
-					if(repaid_hours){
-						businessHour = repaid_hours;
-					}else{
-						businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'repaid_'}).data;
-					}				
+					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'repaid_'}).data;
 					
 					var store = repaidStatisticsGrid.getStore();
 					store.baseParams['dataSource'] = 'normal',
 					store.baseParams['beginDate'] = Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d 00:00:00');
 					store.baseParams['endDate'] = Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59');
 					store.baseParams['staffId'] = repaid_combo_staffs.getValue();
-					store.baseParams['opening'] = businessHour.opening;
-					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
+					store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';	
 					store.baseParams['branchId'] = branch_combo_repaidStatistics.getValue();
 					store.load({
 						params : {
@@ -414,8 +409,8 @@ Ext.onReady(function(){
 						dateBeg : Ext.util.Format.date(repaid_beginDate.getValue(), 'Y-m-d 00:00:00'),
 						dateEnd : Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59'),
 						staffID : repaid_combo_staffs.getValue(),
-						opening : businessHour.opening,
-						ending : businessHour.ending,
+						opening : businessHour.opening != '00:00' ? businessHour.opening : '',
+						ending : businessHour.ending != '00:00' ? businessHour.ending : '',
 						branchId : branch_combo_repaidStatistics.getValue()
 					};
 					
@@ -464,7 +459,7 @@ Ext.onReady(function(){
 			}
 		}];
 		
-		var repaidStatisticsTbar = Ext.ux.initTimeBar({beginDate:repaid_beginDate, endDate:repaid_endDate,dateCombo:repaid_dateCombo, tbarType : 1, statistic : 'repaid_', callback : function businessHourSelect(){repaid_hours = null;}}).concat(repaidStatisticsTbarItem);
+		var repaidStatisticsTbar = Ext.ux.initTimeBar({beginDate:repaid_beginDate, endDate:repaid_endDate,dateCombo:repaid_dateCombo, tbarType : 1, statistic : 'repaid_', callback : function businessHourSelect(){}}).concat(repaidStatisticsTbarItem);
 		
 		var pagingBar = new Ext.PagingToolbar({
 		   pageSize : limitCount,	//显示记录条数
@@ -619,7 +614,7 @@ Ext.onReady(function(){
 	
 	
 	var repaid_cutAfterDrag=70, repaid_cutBeforeDrag=0;
-	var requestParams = {}, repaid_tabPanelHeight, repaidPanelHeight, repaid_hours;
+	var requestParams = {}, repaid_tabPanelHeight, repaidPanelHeight;
 	var colors = Highcharts.getOptions().colors, repaid_panelDrag = false;
 	var repaidDetailChart, repaid_staffPieChart, repaid_staffColumnChart;
 	var repaidDetailPanel, repaidDetailChartPanel, repaidStaffChartPanel, repaidStatChartTabPanel;
