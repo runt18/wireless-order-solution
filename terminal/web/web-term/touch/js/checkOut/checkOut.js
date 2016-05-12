@@ -276,11 +276,18 @@ uo.showNorthForUpdateOrder = function(){
 	html = "<div><span style = 'margin : 10px 250px 10px 10px; font-size : 24px;font-weight : bold;'>已点菜页面</span>" +
 			"<span style = 'margin: 10px;'>餐台名： " + tableName + "</span>" +
 			"<span style = 'margin: 10px;'>餐台号：" + uo.order.table.alias + " </span>" +
-			"<span style = 'margin: 10px;'>账单号：" + uo.order.id + " </span>" +
+			"<span style = 'margin: 10px;'>账单号：" + uo.order.id + (uo.order.weixinOrder.length ? '(<a id="getWeixinOrderDetail_a_tableSelect" style = "color: green; cursor: pointer; text-decoration: underline;">微信订单</a>)' : '')  + " </span>" +
 			"<span style = 'margin: 10px;' id='customNumForUO'>用餐人数：" + uo.customNum + "</span>" +			
 			(uo.order.comment ? ("<span style = 'margin: 10px;' >开台备注：" + uo.order.comment + "</span>") : "") +
 		"</div>";
 	$("#divNorthForUpdateOrder").html(html);
+	
+	//查看微信订单详情
+	$('#getWeixinOrderDetail_a_tableSelect').click(function(){
+		seajs.use('wxOrderListPopup', function(wxOrderListPopup){
+			wxOrderListPopup.newInstance(uo.order.weixinOrder).open();
+		});
+	});
 };
 
 /**
@@ -1207,7 +1214,6 @@ $(function(){
 	$('#payOrder_a_checkOut').click(function(){
 		pm.entry({table:uo.table});
 	});
-	
 	
 	//退菜原因的add
 	$('#cancelAdd_span_checkOut').click(function(){

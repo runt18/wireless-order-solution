@@ -62,6 +62,7 @@ $(function(){
 		
 		//加载混合结账付款方式
 		loadPayTypeData(); 
+		
 	});
 
 	//加载显示账单基础信息
@@ -157,7 +158,7 @@ $(function(){
 		$('#remark').val('');
 		
 		//账单基础信息
-		$('#orderIdInfo').html('结账 -- 账单号:<font color="#f7c942">' + orderMsg.id + '</font> ' + (orderMsg.isWeixinOrder?'(<span id="showWeixinOrder" style="font-size:15px;font-weight:bold;color:green;text-decoration:underline">微信账单</span>)' : ''));
+		$('#orderIdInfo').html('结账 -- 账单号:<font color="#f7c942">' + orderMsg.id + '</font> ' + (orderMsg.isWeixinOrder?'(<span id="showWeixinOrder" style="font-size:15px;font-weight:bold;color:green;text-decoration:underline;cursor:pointer;">微信账单</span>)' : ''));
 		if(orderMsg.category != 4){
 			$('#orderTableInfo').html('餐桌号:<font color="#f7c942">' + orderMsg.table.alias + '</font>&nbsp;' + (pm.table.name?'<font color="#f7c942" >(' + pm.table.name +')</font>' :''));
 		}
@@ -240,18 +241,26 @@ $(function(){
 			$('#useCoupon_a_orderFood').hide();
 		}
 		
-		//微信账单
-		$('#showWeixinOrder').hover(function(){
-			if(!weixinOrderDetailWin.loadOrder){
-				loadWeixinOrderDetail();
-				weixinOrderDetailWin.loadOrder = true;
-			}
-			weixinOrderDetailWin.setPosition($('#showWeixinOrder').position().left + 475, $('#showWeixinOrder').position().top + 60);
-			weixinOrderDetailWin.show();		
-			
-		}, function(){
-			weixinOrderDetailWin.hide();
-		});		
+		//查看微信订单详情
+		$('#showWeixinOrder').click(function(){
+			seajs.use('wxOrderListPopup', function(wxOrderListPopup){
+				wxOrderListPopup.newInstance(orderMsg.weixinOrder).open();
+			});
+		});
+		
+		
+//		//微信账单
+//		$('#showWeixinOrder').hover(function(){
+//			if(!weixinOrderDetailWin.loadOrder){
+//				loadWeixinOrderDetail();
+//				weixinOrderDetailWin.loadOrder = true;
+//			}
+//			weixinOrderDetailWin.setPosition($('#showWeixinOrder').position().left + 475, $('#showWeixinOrder').position().top + 60);
+//			weixinOrderDetailWin.show();		
+//			
+//		}, function(){
+//			weixinOrderDetailWin.hide();
+//		});		
 		
 		//菜品列表
 		var html = [];

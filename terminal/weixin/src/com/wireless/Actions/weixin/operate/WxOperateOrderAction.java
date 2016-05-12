@@ -293,9 +293,9 @@ public class WxOperateOrderAction extends DispatchAction {
 				final String fid = (String)session.getAttribute("fid");
 				final Staff staff;
 				if(branchId != null && !branchId.isEmpty()){
-					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+					staff = StaffDao.getWxByRestaurant(Integer.parseInt(branchId));
 				}else{
-					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+					staff = StaffDao.getWxByRestaurant(Integer.parseInt(fid));
 				}
 				
 				final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
@@ -333,19 +333,26 @@ public class WxOperateOrderAction extends DispatchAction {
 				
 				final ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, orderBuilder, PrintOption.DO_PRINT));
 				if(resp.header.type == Type.ACK){
-					final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-					final Token token = Token.newInstance(authorizerToken);
 					
-					Order order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
+					try{
+						final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+						final Token token = Token.newInstance(authorizerToken);
+						
+						Order order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
+						
+						Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
+	  							   .setToUser(oid)
+	  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
+	  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
+	  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
+	  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
+	  							   .addKeyword(new Keyword("keyword4", String.valueOf(order.calcTotalPrice() + "元")))
+	  							   .addKeyword(new Keyword("remark", "感谢你的使用，欢迎下次再来订餐")));
+						
+					}catch(Exception ignored){
+						ignored.printStackTrace();
+					}
 					
-					Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
-								  							   .setToUser(oid)
-								  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
-								  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
-								  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
-								  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
-								  							   .addKeyword(new Keyword("keyword4", String.valueOf(order.calcTotalPrice() + "元")))
-								  							   .addKeyword(new Keyword("remark", "感谢你的使用，欢迎下次再来订餐")));
 					jObject.initTip(true, ("下单成功."));
 				}else{
 					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
@@ -395,7 +402,7 @@ public class WxOperateOrderAction extends DispatchAction {
 				final String branchId = (String)session.getAttribute("branchId");
 				final String oid = (String)session.getAttribute("oid");
 				final String fid = (String)session.getAttribute("fid");
-				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				final Staff staff = StaffDao.getWxByRestaurant(Integer.parseInt(branchId));
 				final Member member = MemberDao.getByWxSerial(staff, oid);
 				final Restaurant restaurant = RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(fid));
 				final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);

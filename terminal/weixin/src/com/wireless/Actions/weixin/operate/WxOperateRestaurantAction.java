@@ -19,6 +19,8 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.listener.SessionListener;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WxOperateRestaurantAction extends DispatchAction {
 	
@@ -91,6 +93,47 @@ public class WxOperateRestaurantAction extends DispatchAction {
 			}
 			
 			jObject.setRoot(RestaurantDao.getById(restaurantId));
+			
+		}catch(SQLException | BusinessException e){
+			e.printStackTrace();
+			jObject.initTip4Exception(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * 用extraCond来获取微信餐厅信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String fid = request.getParameter("fid");
+		final String branchId = request.getParameter("branchId");
+		final String sessionId = request.getParameter("sessionId");
+		final JObject jObject = new JObject();
+		try{
+			final Staff staff;
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				if(sessionId != null && !sessionId.isEmpty()){
+					HttpSession session = SessionListener.sessions.get(sessionId);
+					fid = String.valueOf(session.getAttribute("fid"));
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+				}else{
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+				}
+			}
+			
+			WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			jObject.setRoot(wxRestaurant);
 			
 		}catch(SQLException | BusinessException e){
 			e.printStackTrace();

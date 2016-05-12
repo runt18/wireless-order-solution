@@ -61,7 +61,8 @@
 			'useCoupon' : './js/popup/coupon/usePopup',
 			'taste' : './js/popup/taste/taste',
 			'tempTaste' : './js/popup/tempTaste/tempTaste',
-			'moreTastes' : './js/popup/moreTaste/moreTaste'
+			'moreTastes' : './js/popup/moreTaste/moreTaste',
+			'wxOrderListPopup' : './js/popup/wxOrderList/wxOrderList'
 		}
 	});
 </script>
