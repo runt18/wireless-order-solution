@@ -513,7 +513,11 @@ public class OrderDao {
 		}
 		//Get the detail to associated wx orders.
 		for(WxOrder wxOrder : WxOrderDao.getByCond(dbCon, staff, new WxOrderDao.ExtraCond().setOrder(order), null)){
-			order.addWxOrder(wxOrder);
+			try{
+				order.addWxOrder(WxOrderDao.getById(dbCon, staff, wxOrder.getId()));
+			}catch(BusinessException | SQLException ignored){
+				ignored.printStackTrace();
+			}
 		}
 		
 	}
