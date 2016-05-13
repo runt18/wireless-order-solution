@@ -218,8 +218,6 @@ $(function(){
 					});
 				}else if(_orderType){
 					if(tableId){
-						checkPayTypeDialog.close();
-						
 						if(_orderType == orderType.WX_PAY){
 							Util.lm.show();
 							$.ajax({
