@@ -502,7 +502,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByReason(staff, extraCond);
+			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcIncomeByReason(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			
@@ -555,7 +555,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
-			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(staff, extraCond);
+			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcIncomeByStaff(staff, extraCond);
 			
 			jobject.setRoot(cancelList);
 			
@@ -602,7 +602,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 			}
 			
-			List<CancelIncomeByFood> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByFood(staff, new DutyRange(dateBeg, dateEnd), extraCond);
+			List<CancelIncomeByFood> cancelList = CalcCancelStatisticsDao.calcIncomeByFood(staff, new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			jobject.setRoot(cancelList);
 			
