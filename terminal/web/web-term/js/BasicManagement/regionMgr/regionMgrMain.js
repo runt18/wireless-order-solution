@@ -213,7 +213,7 @@
 		    data : {
 		    	dataSource : 'qrCode',
 		    	restaurantId : restaurantID,
-		    	limitStr : scanType.SCAN_ORDER + "_" + Ext.ux.getSelData(tableBasicGrid).id
+		    	limitStr : scanType.SCAN_ORDER + Ext.ux.getSelData(tableBasicGrid).id +  "_" + restaurantID
 		    },
 		    jsonp: "callback",//服务端用于接收callback调用的function名的参数
 		    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
