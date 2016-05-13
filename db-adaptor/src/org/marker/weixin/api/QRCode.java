@@ -172,6 +172,6 @@ public class QRCode implements Jsonable{
 		String appId = "wx49b3278a8728ff76";
 		String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
 //		System.out.println(JSONObject.toJSON(new QRCode().setActionName(ActionName.LIMIT).setSceneStr("4&7777").toJsonMap(0)));
-		System.out.println(new QRCode().setLimitStr("44778&40").createUrl(Token.newInstance(appId, appSecret)));
+		System.out.println(new QRCode().setLimitStr("44778_40").createUrl(Token.newInstance(appId, appSecret)));
 	}
 }

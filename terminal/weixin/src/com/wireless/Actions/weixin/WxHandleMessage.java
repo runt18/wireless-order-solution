@@ -725,7 +725,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			final Table table = TableDao.getById(staff, Integer.valueOf(qrParam.param.split("&")[0]));
-			final int restaurantId = Integer.valueOf(qrParam.param.split("&")[1]);
+			final int restaurantId = Integer.valueOf(qrParam.param.split("_")[1]);
 			
 			HttpSession httpSession = request.getSession(true);
 			httpSession.setAttribute("fid", msg.getToUserName());

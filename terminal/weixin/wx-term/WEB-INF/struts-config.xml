@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/WxOperateQrCode"
+			type="com.wireless.Actions.weixin.qrCode.WxOperateQrCodeAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/WxOperateRepresent"
 			type="com.wireless.Actions.weixin.represent.WxOperateRepresentAction" scope="request"
 			parameter="dataSource">
