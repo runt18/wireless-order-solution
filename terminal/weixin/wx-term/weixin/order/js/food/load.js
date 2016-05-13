@@ -356,7 +356,6 @@ $(function(){
 														} 
 														
 													}else{
-														checkPayTypeDialog.close();
 														payParam = null;
 														var dialog = new WeDialogPopup({
 															content : data.msg,
@@ -427,7 +426,6 @@ $(function(){
 								});
 							}
 						});
-						checkPayTypeDialog.close();
 						showQrCodeDialog.open();
 					}
 				}else{
