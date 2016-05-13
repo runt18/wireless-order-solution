@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -172,35 +173,51 @@ public class StockReportDao {
 		}
 		dbCon.rs.close();
 		
-//		//获取所有上月期初数量不为0的商品和原料
+//		//获取本月之前期末数量不为0的商品和原料
 //		List<StockActionDetail> detailWithPrime = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 //																								.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
 //																								.setOriStockDate(null, extraCond.range.getOpeningFormat()), 
 //																								" GROUP BY D.material_id HAVING(D.dept_in_remaining) > 0 ");
-//		//需要追加统计上月期初数量不为0，但是本月没有做过出入库任务的商品和原料
-//		for(StockActionDetail detail : detailWithPrime){
-//			
-//			boolean isExist = false;
-//			for(StockReport eachReport : result){
-//				if(eachReport.getMaterial().getId() == detail.getMaterialId()){
-//					isExist = true;
-//				}
-//			}
-//			
-//			if(!isExist){
-//				try{
-//					Material material = MaterialDao.getById(dbCon, staff, detail.getMaterialId());
-//					
-//					StockReport report = new StockReport();
-//					report.setMaterial(material);
-//					report.setFinalPrice(material.getPrice());
-//					
-//					result.add(report);
-//				}catch(BusinessException ignored){
-//					//ignored.printStackTrace();
-//				}
-//			}
-//		}
+		
+		//获取本月之前期末数量不为0的商品和原料
+		sql = " SELECT * FROM " + Params.dbName + ".stock_action_detail " +
+		      " WHERE 1 = 1 " +
+		      " AND id IN ( " +
+			      " SELECT MAX(D.id) AS last_id FROM wireless_order_db.stock_action_detail D " +
+			      " JOIN wireless_order_db.stock_action S ON D.stock_action_id = S.id " +
+			      " WHERE 1 = 1 " + 
+			      " AND S.`status` IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") " +
+			      " AND S.restaurant_id = " + staff.getRestaurantId() +
+			      " GROUP BY D.material_id " +
+		      ")" +
+		      " AND remaining > 0 "; 
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		
+		//需要追加统计本月之前初数量不为0，但是本月没有做过出入库任务的商品和原料
+		while(dbCon.rs.next()){
+			boolean isExist = false;
+			for(StockReport eachReport : result){
+				if(eachReport.getMaterial().getId() == dbCon.rs.getInt("id")){
+					isExist = true;
+					break;
+				}
+			}
+			
+			if(!isExist){
+				try {
+					Material material = MaterialDao.getById(staff, dbCon.rs.getInt("material_id"));
+					StockReport report = new StockReport();
+					report.setMaterial(material);
+					report.setFinalPrice(material.getPrice());
+					
+					result.add(report);
+				} catch (BusinessException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 			  
 		for(StockReport report : result){
 			List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
