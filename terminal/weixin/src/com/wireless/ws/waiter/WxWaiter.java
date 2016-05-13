@@ -72,7 +72,8 @@ public class WxWaiter {
 	
 	public static class Msg4WxOrder extends Msg{
 		public Msg4WxOrder(WxOrder wxOrder) {
-			super(MsgType.WX_ORDER, "【" + wxOrder.getTable().getName() + "】的会员【" + wxOrder.getMember().getName() + "】有微信下单，请留意处理");
+			super(MsgType.WX_ORDER, ("【$(table)】【" + wxOrder.getMember().getName() + "】有微信下单，请留意处理")
+									 .replace("$(table)",  wxOrder.hasTable() ? "【" + wxOrder.getTable().getName() + "】的" : ""));
 		}
 	}
 

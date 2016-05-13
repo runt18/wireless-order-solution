@@ -203,8 +203,9 @@
 		}
 		
 		var scanType = {
-			SCAN_ORDER : 4
+			SCAN_ORDER : '4'
 		};
+		
 		loadMask.show();
 		$.ajax({
 		    type : "post",
