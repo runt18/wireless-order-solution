@@ -289,7 +289,7 @@ $(function(){
 			$('#orderPay_li_orderFood').hide();
 			//已点菜结账按钮
 			$('#payOrder_a_checkOut').hide();
-			//快餐模式的结账按钮
+			//快餐模式的现金找零
 			$('#cashReceives_a_payment').hide();
 			//收银端餐台列表高度
 			tableListHeight = 86;
