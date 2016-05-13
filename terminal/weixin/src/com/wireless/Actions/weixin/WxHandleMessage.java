@@ -242,7 +242,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_SCANNING = root + "/weixin/order/scan.html";
 		this.WEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
 		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
-		//TODO
 		this.WEIXIN_REPRESENT = root + "/weixin/order/representCard.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
@@ -430,7 +429,11 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(EventKey.SELF_ORDER_EVENT_KEY.val)){
 					//自助点餐
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", picUrl, createUrl(msg, WEIXIN_FOOD))));
+					HttpSession httpSession = request.getSession(true);
+					httpSession.setAttribute("fid", msg.getToUserName());
+					httpSession.setAttribute("oid", msg.getFromUserName());
+					httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", picUrl, createUrl4Session(WEIXIN_FOOD, httpSession))));
 					
 				}else if(msg.getEventKey().equals(EventKey.INTRO_EVENT_KEY.val)){
 					//餐厅简介
@@ -567,7 +570,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("点击此处开始扫描", "点我扫描支付二维码", "", createUrl(msg, WEIXIN_SCANNING))));
 					
 				}else if(msg.getEventKey().equals(EventKey.I_WANT_REPRESENT.val)){
-					//TODO 我要代言
+					//我要代言
 					final Represent represent = RepresentDao.getByCond(staff, null).get(0);
 					if(represent.isProgress()){
 						final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
@@ -721,7 +724,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			}
 			
 		}else if(qrParam.type == QrCodeType.SCAN_ORDER){
-			//TODO 扫码下单  param中的param为   tableId _ restaurantId
+
+			//扫码下单  param中的param为   tableId _ restaurantId
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			final Table table = TableDao.getById(staff, Integer.valueOf(qrParam.param.split("_")[0]));
