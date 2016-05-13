@@ -121,7 +121,7 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				//handle the query staff request
 				Device device = DeviceDao.getWorkingDevices(new Parcel(request.body).readParcel(Device.CREATOR).getDeviceId());
-				response = new RespPackage(request.header).fillBody(StaffDao.getByRestaurant(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header).fillBody(StaffDao.getByDevice(device), Staff.ST_PARCELABLE_COMPLEX);
 				
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_BACKUP_SERVER){
 				//handle the query backup connectors

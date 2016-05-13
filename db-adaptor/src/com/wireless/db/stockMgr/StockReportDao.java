@@ -117,7 +117,9 @@ public class StockReportDao {
 	public static List<StockReport> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		String sql;
 		
-		sql = " SELECT D.material_id, MAX(D.name) AS material_name, MAX(M.price) AS material_price " +
+		sql = " SELECT D.material_id, MAX(D.name) AS material_name " + 
+			  //" ,MAX(M.price) AS material_price " +
+			  " ,MAX(IFNULL(COST.cost, M.price)) AS material_price " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount, 0)) AS stock_in " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_in = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_in_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_out = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_out_transfer " +
@@ -132,7 +134,10 @@ public class StockReportDao {
 			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
 			  " JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
  			  " JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
+			  " LEFT JOIN " + Params.dbName + ".monthly_cost COST ON M.material_id = COST.material_id " +
+			  " LEFT JOIN " + Params.dbName + ".monthly_balance MB ON MB.id = COST.monthly_balance_id " +
 			  " WHERE 1 = 1 " +
+			  " AND MB.month BETWEEN '" + extraCond.range.getEndingFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" +
 			  " AND S.restaurant_id = " + staff.getRestaurantId() +
 			  " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ")" +
 			  (extraCond != null ? extraCond.toString() : "") +
