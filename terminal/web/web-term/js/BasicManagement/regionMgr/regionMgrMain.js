@@ -246,7 +246,7 @@
 		    	
 		    },
 		    error:function(){
-		    	
+		    	loadMask.hide();
 		    }
 		});	
 	}
