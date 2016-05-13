@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByDiscount {
 
-	public final static IncomeByDiscount DUMMY = new IncomeByDiscount();
-	
 	private int mDiscountAmount;		//折扣账单数
 	private float mTotalDiscount;		//合计折扣金额
 	

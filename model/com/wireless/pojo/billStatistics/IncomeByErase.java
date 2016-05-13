@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByErase {
 	
-	public final static IncomeByErase DUMMY = new IncomeByErase();
-	
 	private float mErasePrice;		//抹数账单数
 	private int mEraseAmount;		//抹数账单数		
 	

@@ -57,7 +57,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByErase getIncomeByErase() {
 		if(incomeByErase == null){
-			return IncomeByErase.DUMMY;
+			return new IncomeByErase();
 		}
 		return incomeByErase;
 	}
@@ -98,80 +98,77 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	}
 	
 	private void append(IncomeByErase eraseIncome){
-		if(this.incomeByErase != null){
-			this.incomeByErase.setEraseAmount(this.incomeByErase.getEraseAmount() + eraseIncome.getEraseAmount());
-			this.incomeByErase.setErasePrice(this.incomeByErase.getTotalErase() + eraseIncome.getTotalErase());
-		}else{
-			this.incomeByErase = eraseIncome;
+		if(this.incomeByErase == null){
+			this.incomeByErase = new IncomeByErase();
 		}
+		this.incomeByErase.setEraseAmount(this.incomeByErase.getEraseAmount() + eraseIncome.getEraseAmount());
+		this.incomeByErase.setErasePrice(this.incomeByErase.getTotalErase() + eraseIncome.getTotalErase());
 	}
 	
 	private void append(IncomeByDiscount discountIncome){
-		if(this.incomeByDiscount != null){
-			this.incomeByDiscount.setDiscountAmount(this.incomeByDiscount.getDiscountAmount() + discountIncome.getDiscountAmount());
-			this.incomeByDiscount.setTotalDiscount(this.incomeByDiscount.getTotalDiscount() + discountIncome.getTotalDiscount());
-		}else{
-			this.incomeByDiscount = discountIncome;
+		if(this.incomeByDiscount == null){
+			this.incomeByDiscount = new IncomeByDiscount();
 		}
+		this.incomeByDiscount.setDiscountAmount(this.incomeByDiscount.getDiscountAmount() + discountIncome.getDiscountAmount());
+		this.incomeByDiscount.setTotalDiscount(this.incomeByDiscount.getTotalDiscount() + discountIncome.getTotalDiscount());
 	}
 	
 	private void append(IncomeByGift giftIncome){
-		if(this.incomeByGift != null){
-			this.incomeByGift.setGiftAmount(this.incomeByGift.getGiftAmount() + giftIncome.getGiftAmount());
-			this.incomeByGift.setTotalGift(this.incomeByGift.getTotalGift() + giftIncome.getTotalGift());
-		}else{
-			this.incomeByGift = giftIncome;
+		if(this.incomeByGift == null){
+			this.incomeByGift = new IncomeByGift();
 		}
+		this.incomeByGift.setGiftAmount(this.incomeByGift.getGiftAmount() + giftIncome.getGiftAmount());
+		this.incomeByGift.setTotalGift(this.incomeByGift.getTotalGift() + giftIncome.getTotalGift());
 	}
 	
 	private void append(IncomeByCancel cancelIncome){
-		if(this.incomeByCancel != null){
-			this.incomeByCancel.setCancelAmount(this.incomeByCancel.getCancelAmount() + cancelIncome.getCancelAmount());
-			this.incomeByCancel.setTotalCancel(this.incomeByCancel.getTotalCancel() + cancelIncome.getTotalCancel());
-		}else{
-			this.incomeByCancel = cancelIncome;
+		if(this.incomeByCancel == null){
+			this.incomeByCancel = new IncomeByCancel();
 		}
+		
+		this.incomeByCancel.setCancelAmount(this.incomeByCancel.getCancelAmount() + cancelIncome.getCancelAmount());
+		this.incomeByCancel.setTotalCancel(this.incomeByCancel.getTotalCancel() + cancelIncome.getTotalCancel());
 	}
 	
 	private void append(IncomeByService serviceIncome){
-		if(this.incomeByService != null){
-			this.incomeByService.setServiceAmount(this.incomeByService.getServiceAmount() + serviceIncome.getServiceAmount());
-			this.incomeByService.setTotalService(this.incomeByService.getTotalService() + serviceIncome.getTotalService());
-		}else{
-			this.incomeByService = serviceIncome;
+		if(this.incomeByService == null){
+			this.incomeByService = new IncomeByService();
 		}
+		
+		this.incomeByService.setServiceAmount(this.incomeByService.getServiceAmount() + serviceIncome.getServiceAmount());
+		this.incomeByService.setTotalService(this.incomeByService.getTotalService() + serviceIncome.getTotalService());
 	}
 	
 	private void append(IncomeByRepaid repaidIncome){
-		if(this.incomeByRepaid != null){
-			this.incomeByRepaid.setRepaidAmount(this.incomeByRepaid.getRepaidAmount() + repaidIncome.getRepaidAmount());
-			this.incomeByRepaid.setTotalRepaid(this.incomeByRepaid.getTotalRepaid() + repaidIncome.getTotalRepaid());
-		}else{
-			this.incomeByRepaid = repaidIncome;
+		if(this.incomeByRepaid == null){
+			this.incomeByRepaid = new IncomeByRepaid();
 		}
+		
+		this.incomeByRepaid.setRepaidAmount(this.incomeByRepaid.getRepaidAmount() + repaidIncome.getRepaidAmount());
+		this.incomeByRepaid.setTotalRepaid(this.incomeByRepaid.getTotalRepaid() + repaidIncome.getTotalRepaid());
 	}
 	
 	private void append(IncomeByCoupon couponIncome){
-		if(this.incomeByCoupon != null){
-			this.incomeByCoupon.setCouponAmount(this.incomeByCoupon.getCouponAmount() + couponIncome.getCouponAmount());
-			this.incomeByCoupon.setTotalCoupon(this.incomeByCoupon.getTotalCoupon() + couponIncome.getTotalCoupon());
-		}else{
-			this.incomeByCoupon = couponIncome;
+		if(this.incomeByCoupon == null){
+			this.incomeByCoupon = new IncomeByCoupon();
 		}
+		
+		this.incomeByCoupon.setCouponAmount(this.incomeByCoupon.getCouponAmount() + couponIncome.getCouponAmount());
+		this.incomeByCoupon.setTotalCoupon(this.incomeByCoupon.getTotalCoupon() + couponIncome.getTotalCoupon());
 	}
 	
 	private void append(IncomeByCharge chargeIncome){
-		if(this.incomeByCharge != null){
-			this.incomeByCharge.setActualCashCharge(this.incomeByCharge.getActualCashCharge() + chargeIncome.getActualCashCharge());
-			this.incomeByCharge.setActualCreditCardCharge(this.incomeByCharge.getActualCreditCardCharge() + chargeIncome.getActualCreditCardCharge());
-			this.incomeByCharge.setChargeAmount(this.incomeByCharge.getChargeAmount() + chargeIncome.getChargeAmount());
-			this.incomeByCharge.setRefundAmount(this.incomeByCharge.getRefundAmount() + chargeIncome.getRefundAmount());
-			this.incomeByCharge.setTotalAccountCharge(this.incomeByCharge.getTotalAccountCharge() + chargeIncome.getTotalAccountCharge());
-			this.incomeByCharge.setTotalAccountRefund(this.incomeByCharge.getTotalAccountRefund() + chargeIncome.getTotalAccountRefund());
-			this.incomeByCharge.setTotalActualRefund(this.incomeByCharge.getTotalActualRefund() + chargeIncome.getTotalActualRefund());
-		}else{
-			this.incomeByCharge = chargeIncome;
+		if(this.incomeByCharge == null){
+			this.incomeByCharge = new IncomeByCharge();
 		}
+		
+		this.incomeByCharge.setActualCashCharge(this.incomeByCharge.getActualCashCharge() + chargeIncome.getActualCashCharge());
+		this.incomeByCharge.setActualCreditCardCharge(this.incomeByCharge.getActualCreditCardCharge() + chargeIncome.getActualCreditCardCharge());
+		this.incomeByCharge.setChargeAmount(this.incomeByCharge.getChargeAmount() + chargeIncome.getChargeAmount());
+		this.incomeByCharge.setRefundAmount(this.incomeByCharge.getRefundAmount() + chargeIncome.getRefundAmount());
+		this.incomeByCharge.setTotalAccountCharge(this.incomeByCharge.getTotalAccountCharge() + chargeIncome.getTotalAccountCharge());
+		this.incomeByCharge.setTotalAccountRefund(this.incomeByCharge.getTotalAccountRefund() + chargeIncome.getTotalAccountRefund());
+		this.incomeByCharge.setTotalActualRefund(this.incomeByCharge.getTotalActualRefund() + chargeIncome.getTotalActualRefund());
 	}
 	
 	public void setIncomeByErase(IncomeByErase incomeByErase) {
@@ -180,7 +177,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByDiscount getIncomeByDiscount() {
 		if(incomeByDiscount == null){
-			return IncomeByDiscount.DUMMY;
+			return new IncomeByDiscount(0, 0);
 		}
 		return incomeByDiscount;
 	}
@@ -191,7 +188,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByGift getIncomeByGift() {
 		if(incomeByGift == null){
-			return IncomeByGift.DUMMY;
+			return new IncomeByGift();
 		}
 		return incomeByGift;
 	}
@@ -202,7 +199,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByCancel getIncomeByCancel() {
 		if(incomeByCancel == null){
-			return IncomeByCancel.DUMMY;
+			return new IncomeByCancel();
 		}
 		return incomeByCancel;
 	}
@@ -213,7 +210,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByCoupon getIncomeByCoupon(){
 		if(incomeByCoupon == null){
-			return IncomeByCoupon.DUMMY;
+			return new IncomeByCoupon(0, 0);
 		}
 		return incomeByCoupon;
 	}
@@ -224,7 +221,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByRepaid getIncomeByRepaid() {
 		if(incomeByRepaid == null){
-			return IncomeByRepaid.DUMMY;
+			return new IncomeByRepaid();
 		}
 		return incomeByRepaid;
 	}
@@ -235,7 +232,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByService getIncomeByService() {
 		if(incomeByService == null){
-			return IncomeByService.DUMMY;
+			return new IncomeByService();
 		}
 		return incomeByService;
 	}
@@ -246,7 +243,7 @@ public class IncomeByEachDay implements Jsonable, Comparable<IncomeByEachDay>{
 	
 	public IncomeByCharge getIncomeByCharge() {
 		if(incomeByCharge == null){
-			return IncomeByCharge.DUMMY;
+			return new IncomeByCharge();
 		}
 		return incomeByCharge;
 	}

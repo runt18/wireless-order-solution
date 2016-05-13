@@ -555,12 +555,7 @@ $(function(){
 				if(!dateBegin.isValid() || !dateEnd.isValid()){
 					return;
 				}
-				var data;
-				if(receipt_hours){
-					data = receipt_hours;
-				}else{
-					data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
-				}
+				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
 				
 				var regionId;
 				var branchId = branchSelect_combo_businessReceips.getValue();
@@ -574,8 +569,8 @@ $(function(){
 				initBusinessReceipsData({
 					dateBegin : Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'), 
 					dateEnd :Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),
-					opening : branchId == -1 ? '' : data.opening,
-					ending : branchId == -1 ? '' : data.ending,
+					opening : data.opening != '00:00' ? data.opening : '',
+					ending : data.ending != '00:00' ? data.ending : '',
 					regionId : regionId,
 					branchId : branchId
 				});
@@ -595,7 +590,9 @@ $(function(){
 					regionId = regionSelect_combo_businessReceips.getValue();
 				}
 				
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&region={6}&branchId={7}';
+				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
+				
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&dateBegin={4}&dateEnd={5}&region={6}&branchId={7}&opening={8}&ending={9}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -605,7 +602,9 @@ $(function(){
 						Ext.util.Format.date(onDuty.getValue(), 'Y-m-d 00:00:00'),
 						Ext.util.Format.date(offDuty.getValue(), 'Y-m-d 23:59:59'),
 						regionId,
-						branchId
+						branchId,
+						data.opening != '00:00' ? data.opening : '',
+						data.ending != '00:00' ? data.ending : ''
 					);
 				
 				window.location = url;
@@ -614,7 +613,7 @@ $(function(){
 		
 		var businessReceiptGridTbar = new Ext.Toolbar({
 			height : 26,
-			items : [Ext.ux.initTimeBar({beginDate:receipts_beginDate, endDate:receipts_endDate,dateCombo:receipts_dateCombo, tbarType : 1, statistic : 'businessReceipt_', callback : function businessHourSelect(){receipt_hours = null;}}).concat(businessReceiptGridTbarItem)]
+			items : [Ext.ux.initTimeBar({beginDate:receipts_beginDate, endDate:receipts_endDate,dateCombo:receipts_dateCombo, tbarType : 1, statistic : 'businessReceipt_', callback : function businessHourSelect(){}}).concat(businessReceiptGridTbarItem)]
 		});
 		
 		
@@ -675,7 +674,6 @@ $(function(){
 		
 	}
 	
-	var receipt_hours;
 	var business_receipts_payType;
 
 	Ext.onReady(function(){

@@ -440,7 +440,7 @@ Ext.onReady(function(){
 				mcus_grid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-				mcus_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+				mcus_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';

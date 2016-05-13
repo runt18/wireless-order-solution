@@ -190,7 +190,7 @@ Ext.onReady(function(){
 				}
 	
 				if(!isJump){
-					Ext.getCmp('businessReceipt_btnSearch').handler();	
+					Ext.getCmp('passengerFlow_btnSearch	').handler();	
 				}
 			}
 		}

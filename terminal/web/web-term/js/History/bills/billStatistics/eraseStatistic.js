@@ -1,4 +1,3 @@
-
 Ext.onReady(function(){
 	
 	function showEraseOrder(orderID){

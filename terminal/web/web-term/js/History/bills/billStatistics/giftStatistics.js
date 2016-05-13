@@ -427,7 +427,7 @@ Ext.onReady(function(){
 					if(typeof giftPanelHeight != 'undefined'){
 						var chartHeight = gift_tabPanelHeight + (giftPanelHeight - h);
 						
-						giftStatChartTabPanel.getEl().setTop((h+30)) ;
+						giftStatChartTabPanel.getEl().setTop((h+30));
 						
 						gift_changeChartWidth(w,chartHeight-70);
 						

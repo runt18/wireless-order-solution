@@ -45,7 +45,7 @@ public class StatisticsByEachDay implements Jsonable{
 	
 	public IncomeByCharge getCharge(){
 		if(this.charge == null){
-			return IncomeByCharge.DUMMY;
+			return new IncomeByCharge();
 		}
 		return this.charge;
 	}

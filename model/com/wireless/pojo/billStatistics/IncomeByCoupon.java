@@ -2,8 +2,6 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByCoupon {
 	
-	public final static IncomeByCoupon DUMMY = new IncomeByCoupon();
-	
 	private int mCouponAmount;		//优惠券使用账单数
 	private float mTotalCoupon;		//合计优惠券使用金额
 	

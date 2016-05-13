@@ -702,6 +702,11 @@ $(function(){
 			$('#cashReceive_div_payment').popup('open');
 		});
 		
+		//快餐模式的现金找零
+		$('#cashReceives_a_payment').click(function(){
+			$('#cashReceive_div_payment').popup('open');
+		});
+		
 		//现金输入框在输入数字后实时显示找零
 		$('#cashReceive_input_payment').on('keyup', function(){
 			//计算抹零
