@@ -1,5 +1,4 @@
 Ext.onReady(function(){
-	var hours;
 	var highChart;
 	var chartPanel;
 	var businessPanelHeight = 0;
@@ -80,7 +79,6 @@ Ext.onReady(function(){
 				});
 			},
 			select : function(){
-				
 				Ext.getCmp('passengerFlow_btnSearch').handler();
 			}
 		}
@@ -225,15 +223,10 @@ Ext.onReady(function(){
 			if(!dateBegin.isValid() || !dateEnd.isValid()){
 				return;
 			}
-			var data;
-			if(hours){
-				data = hours;
-			}else{
-				data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'passengerFlow_'}).data;
-			}
-			
+			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'passengerFlow_'}).data;
 			var regionId;
 			var branchId = branchSelect_combo_passengerFlow.getValue();
+			
 			if(regionSelect_combo_passengerFlow.getValue() == '-1'){
 				regionId = '';
 			}else{
@@ -243,15 +236,44 @@ Ext.onReady(function(){
 			initPassengerFlowData({
 				dateBegin : Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'),
 				dateEnd : Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),
-				opening : data.opening,
-				ending : data.ending,
+				opening : data.opening != '00:00' ? data.opening : '',
+				ending : data.ending != '00:00' ? data.ending : '', 
 				regionId : regionId,
 				branchId : branchId
 			});
 		}
 	},'-',{
 		text : '导出',
-		iconCls : 'icon_tb_exoprt_excel'
+		iconCls : 'icon_tb_exoprt_excel',
+		handler : function(){
+			if(!Ext.getCmp('beginDate_combo_passengerFlow').isValid() || !Ext.getCmp('endDate_combo_passengerFlow').isValid()){
+				return;
+			}
+			
+			var dateBegin = Ext.getCmp('beginDate_combo_passengerFlow');
+			var dateEnd = Ext.getCmp('endDate_combo_passengerFlow');
+			
+			if(regionSelect_combo_passengerFlow.getValue() == '-1'){
+				regionId = '';
+			}else{
+				regionId = regionSelect_combo_passengerFlow.getValue();
+			}
+			
+			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'passengerFlow_'}).data;
+			var url = '../../{0}?dateBegin={1}&dateEnd={2}&opening={3}&ending={4}&branchId={5}&region={6}&dataSource={7}';
+			url = String.format(
+				url,
+				'ExportHistoryStatisticsToExecl.do',
+				Ext.util.Format.date(dateBegin.getValue(), 'Y-m-d 00:00:00'),
+				Ext.util.Format.date(dateEnd.getValue(), 'Y-m-d 23:59:59'),
+				data.opening != '00:00' ? data.opening : '',
+				data.ending != '00:00' ? data.ending : '', 
+				branchSelect_combo_passengerFlow.getValue(),
+				regionId,
+				'passengerFlowStatistics'
+			);
+			window.location = url;
+		}
 	}];
 	
 	
@@ -309,7 +331,6 @@ Ext.onReady(function(){
 		tbarType : 1,
 		statistic : 'passengerFlow_',
 		callback : function businessHourSelect(){
-			hours = null;
 		}
 	}).concat(passengerFlowTbarFor2);
 	

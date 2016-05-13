@@ -798,15 +798,7 @@ $(function(){
 					}else if(bd == '' && ed != ''){
 						Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 					}
-					var opening, ending;
 					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'kitchenStatistic_'}).data;
-					if(parseInt(businessHour.businessHourType) != -1){
-						opening = businessHour.opening;
-						ending = businessHour.ending;
-					}else{
-						opening = '';
-						ending = '';
-					}
 					
 					var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}&branchId={7}';
 					url = String.format(
@@ -816,8 +808,8 @@ $(function(){
 							'salesByKitchen',
 							beginDate.getValue().format('Y-m-d 00:00:00'),
 							endDate.getValue().format('Y-m-d 23:59:59'),
-							opening,
-							ending,
+							businessHour.opening != '00:00' ? businessHour.opening : '',
+							businessHour.ending != '00:00' ? businessHour.ending : '',
 							branch_combo_kitchenStatistics.getValue()
 						);
 					window.location = url;
@@ -1239,16 +1231,7 @@ $(function(){
 						Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 					}
 					
-					var opening, ending;
 					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
-					if(parseInt(businessHour.businessHourType) != -1){
-						opening = businessHour.opening;
-						ending = businessHour.ending;
-					}else{
-						opening = '';
-						ending = '';
-					}				
-					
 					
 					var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}&branchId={7}';
 					url = String.format(
@@ -1258,8 +1241,8 @@ $(function(){
 							'salesByDept',
 							beginDate.getValue().format('Y-m-d 00:00:00'),
 							endDate.getValue().format('Y-m-d 23:59:59'),
-							opening,
-							ending,
+							businessHour.opening != '00:00' ? businessHour.opening : '',
+							businessHour.ending != '00:00' ? businessHour.ending : '',
 							branch_combo_deptStatistics.getValue()
 						);
 					window.location = url;

@@ -13,6 +13,7 @@ public class CommissionStatistics implements Jsonable{
 	private String foodName;
 	private Department dept;
 	private int orderId;
+	private String restaurantName;
 	private float unitPrice;
 	private float amount;
 	private float totalPrice;
@@ -23,6 +24,12 @@ public class CommissionStatistics implements Jsonable{
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	public String getRestaurantName() {
+		return restaurantName;
+	}
+	public void setRestaurantName(String restaurantName) {
+		this.restaurantName = restaurantName;
 	}
 	public long getOrderDate() {
 		return orderDate;
@@ -112,7 +119,7 @@ public class CommissionStatistics implements Jsonable{
 		jm.putFloat("totalPrice", this.getTotalPrice());
 		jm.putFloat("commission", this.commission);
 		jm.putString("staffName",this.waiter);
-		
+		jm.putString("restaurantName", this.restaurantName);
 		return jm;
 	}
 	

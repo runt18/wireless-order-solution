@@ -224,7 +224,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								thiz.setValue(jr.root[0].id);
 							}else{
-								thiz.setValue(null);
+								thiz.setValue(-1);
 							}
 							
 							thiz.fireEvent('select');

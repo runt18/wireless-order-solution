@@ -327,11 +327,11 @@
 								Ext.getCmp('beginDate_combo_commission').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_commission').setValue(sendToStatisticsPageEndDate);	
 								
-								commission_hours = sendToStatisticsPageHours;
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'commissin_'});
 								
-								Ext.getCmp('commission_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+commission_hours.openingText+'</font>');
-								Ext.getCmp('commission_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+commission_hours.endingText+'</font>');
-								Ext.getCmp('commission_comboBusinessHour').setValue(commission_hours.hourComboValue);	
+								Ext.getCmp('commission_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
+								Ext.getCmp('commission_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.endingText+'</font>');
+								Ext.getCmp('commission_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);	
 								
 								
 								Ext.getCmp('commission_btnSearch').handler();
@@ -426,11 +426,11 @@
 								Ext.getCmp('beginDate_combo_erase').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_erase').setValue(sendToStatisticsPageEndDate);	
 								
-								erase_hours = sendToStatisticsPageHours;
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'erase_'});
 								
-								Ext.getCmp('erase_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+erase_hours.openingText+'</font>');
-								Ext.getCmp('erase_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+erase_hours.endingText+'</font>');
-								Ext.getCmp('erase_comboBusinessHour').setValue(erase_hours.hourComboValue);	
+								Ext.getCmp('erase_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
+								Ext.getCmp('erase_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.endingText+'</font>');
+								Ext.getCmp('erase_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);	
 								
 								Ext.getCmp('erase_btnSearch').handler();
 								businessSubStatisticsLoading.hide();
@@ -563,23 +563,24 @@
 						Ext.getCmp('branchSelect_combo_passengerFlow').fireEvent('select', this, null, null, isJump);
 						
 								
-								(function(){
-									if(Ext.getCmp('passengerFlow_comboBusinessHour').getValue() ){
-										Ext.getCmp('beginDate_combo_passengerFlow').setValue(sendToStatisticsPageBeginDate);
-										Ext.getCmp('endDate_combo_passengerFlow').setValue(sendToStatisticsPageEndDate);
-										Ext.getCmp('regionSelect_combo_passengerFlow').setValue(sendToStatisticsRegion);
-										hours = sendToStatisticsPageHours;
-										
-										Ext.getCmp('passengerFlow_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
-										Ext.getCmp('passengerFlow_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
-										Ext.getCmp('passengerFlow_comboBusinessHour').setValue(hours.hourComboValue);	
-										
-										Ext.getCmp('passengerFlow_btnSearch').handler();
-										businessSubStatisticsLoading.hide();
-									}else{
-										setTimeout(arguments.callee, 500);
-									}
-								})();
+						(function(){
+							if(Ext.getCmp('passengerFlow_comboBusinessHour').getValue() ){
+								Ext.getCmp('beginDate_combo_passengerFlow').setValue(sendToStatisticsPageBeginDate);
+								Ext.getCmp('endDate_combo_passengerFlow').setValue(sendToStatisticsPageEndDate);
+								Ext.getCmp('regionSelect_combo_passengerFlow').setValue(sendToStatisticsRegion);
+								
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'passengerFlow_'});
+								
+								Ext.getCmp('passengerFlow_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + sendToStatisticsPageHours.openingText + '</font>');
+								Ext.getCmp('passengerFlow_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + sendToStatisticsPageHours.endingText + '</font>');
+								Ext.getCmp('passengerFlow_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);	
+								
+								Ext.getCmp('passengerFlow_btnSearch').handler();
+								businessSubStatisticsLoading.hide();
+							}else{
+								setTimeout(arguments.callee, 500);
+							}
+						})();
 					}else{
 						setTimeout(arguments.callee, 500);
 					}

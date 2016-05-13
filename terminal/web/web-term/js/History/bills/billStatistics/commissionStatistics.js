@@ -257,6 +257,7 @@ Ext.onReady(function(){
 			new Ext.grid.RowNumberer(),
 			{header : '日期', dataIndex : 'orderDateFormat'},
 			{header : '菜名', dataIndex : 'foodName'},
+			{header : '操作名店', dataIndex : 'restaurantName'},
 			{header : '部门', dataIndex : 'dept'},
 			{header : '账单号', dataIndex : 'orderId', renderer : function(v){
 				return '<a class="orderLinkId">' + v + '</a>';
@@ -281,7 +282,8 @@ Ext.onReady(function(){
 			{name : 'amount'},
 			{name : 'totalPrice'},
 			{name : 'commission'},
-			{name : 'staffName'}
+			{name : 'staffName'},
+			{name : 'restaurantName'}
 			])
 			
 		});
@@ -305,12 +307,7 @@ Ext.onReady(function(){
 						return;
 					}
 					
-					var businessHour;
-					if(commission_hours){
-						businessHour = commission_hours;
-					}else{
-						businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'commission_'}).data;
-					}					
+					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'commission_'}).data;
 					
 					var store = commissionStatisticsGrid.getStore();
 					store.baseParams['dataSource'] = 'normal';
@@ -318,8 +315,8 @@ Ext.onReady(function(){
 					store.baseParams['endDate'] = Ext.util.Format.date(commission_endDate.getValue(), 'Y-m-d 23:59:59');
 					store.baseParams['staffId'] = commission_combo_staffs.getValue();
 					store.baseParams['deptId'] = commission_deptCombo.getValue();
-					store.baseParams['opening'] = businessHour.opening;
-					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
+					store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';	
 					store.baseParams['branchId'] = branch_combo_commission.getValue();
 					
 					store.load({
@@ -347,8 +344,8 @@ Ext.onReady(function(){
 						dateEnd : Ext.util.Format.date(commission_endDate.getValue(), 'Y-m-d 23:59:59'),
 						deptID : commission_deptCombo.getValue(),
 						staffID : commission_combo_staffs.getValue(),
-						opening : businessHour.opening,
-						ending : businessHour.ending,
+						opening : businessHour.opening != '00:00' ? businessHour.opening : '',
+						ending : businessHour.ending != '00:00' ? businessHour.ending : '',
 						branchId : branch_combo_commission.getValue()
 					};
 					
@@ -383,7 +380,9 @@ Ext.onReady(function(){
 				if(!commission_beginDate.isValid() || !commission_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&deptId={4}&dataSource={5}&branchId={6}';
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&deptId={4}&dataSource={5}&branchId={6}&opening={7}&ending={8}';
+				
+				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'commission_'}).data;
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -392,13 +391,15 @@ Ext.onReady(function(){
 						commission_combo_staffs.getValue(),
 						commission_deptCombo.getValue(),
 						'commissionStatisticsList',
-						branch_combo_commission.getValue()
+						branch_combo_commission.getValue(),
+						businessHour.opening != '00:00' ? businessHour.opening : '',
+						businessHour.ending != '00:00' ? businessHour.ending : ''
 				);
 				window.location = url;
 			}
 		}];
 		
-		var commissionStatisticsTbar = Ext.ux.initTimeBar({beginDate:commission_beginDate, endDate:commission_endDate,dateCombo:commission_dateCombo, tbarType : 1, statistic : 'commission_', callback : function businessHourSelect(){commission_hours = null;}}).concat(commissionStatisticsTbarItem);
+		var commissionStatisticsTbar = Ext.ux.initTimeBar({beginDate:commission_beginDate, endDate:commission_endDate,dateCombo:commission_dateCombo, tbarType : 1, statistic : 'commission_', callback : function businessHourSelect(){}}).concat(commissionStatisticsTbarItem);
 		
 		var pagingBar = new Ext.PagingToolbar({
 		   pageSize : limitCount,	//显示记录条数
@@ -490,7 +491,8 @@ Ext.onReady(function(){
 				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+				commissionStatisticsGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 				
 				$('#commissionStatisticsPanel').find('.orderLinkId').each(function(index, element){
         			element.onclick = function(){
@@ -688,7 +690,7 @@ Ext.onReady(function(){
 	    });	
 	};
 
-	var commission_cutAfterDrag = 70, commission_cutBeforeDrag = 40, commission_hours;
+	var commission_cutAfterDrag = 70, commission_cutBeforeDrag = 40;
 	var requestParams, commission_panelDrag = false;
 	var commissionStatChartTabPanel;
 	var commissionDetailChart, commissionStaffChartPanel;

@@ -1,5 +1,6 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +97,11 @@ public class ShiftDetail implements Jsonable{
 	}
 	
 	private void append(List<IncomeByDept> appendDeptIncome){
-		if(this.deptIncome != null){
+		if(appendDeptIncome != null){
+			if(this.deptIncome == null){
+				this.deptIncome = new ArrayList<IncomeByDept>();
+			}
+			
 			//Group by the department name.
 			Map<String, IncomeByDept> result = new HashMap<String, IncomeByDept>();
 			for(IncomeByDept eachIncome : this.deptIncome){
@@ -114,44 +119,54 @@ public class ShiftDetail implements Jsonable{
 			}
 			this.deptIncome.clear();
 			this.deptIncome.addAll(result.values());
-		}else{
-			this.deptIncome = appendDeptIncome;
 		}
 	}
 	
 	private void append(CouponUsage couponUsage){
-		if(this.couponUsage != null){
+		if(couponUsage != null){
+			if(this.couponUsage == null){
+				this.couponUsage = new CouponUsage();
+			}
+			
 			for(CouponUsage.Usage used : couponUsage.getUsed()){
 				this.couponUsage.addUse(used.getName(), used.getAmount(), used.getPrice());
 			}
 			for(CouponUsage.Usage issued : couponUsage.getIssued()){
 				this.couponUsage.addIssue(issued.getName(), issued.getAmount(), issued.getPrice());
 			}
-		}else{
-			this.couponUsage = couponUsage;
 		}
+		
 	}
 	
 	private void append(IncomeByBook bookIncome){
-		if(this.incomeByBook != null){
+		if(bookIncome != null){
+			if(this.incomeByBook == null){
+				this.incomeByBook = new IncomeByBook(0, 0);
+			}
+			
 			this.incomeByBook.setAmount(this.incomeByBook.getAmount() + bookIncome.getAmount());
 			this.incomeByBook.setIncome(this.incomeByBook.getIncome() + bookIncome.getIncome());
-		}else{
-			this.incomeByBook = bookIncome;
 		}
 	}
 	
 	private void append(IncomeByCoupon couponIncome){
-		if(this.incomeByCoupon != null){
+		if(couponIncome != null){
+			if(this.incomeByCoupon == null){
+				this.incomeByCoupon = new IncomeByCoupon();
+			}
+			
 			this.incomeByCoupon.setCouponAmount(this.incomeByCoupon.getCouponAmount() + couponIncome.getCouponAmount());
 			this.incomeByCoupon.setTotalCoupon(this.incomeByCoupon.getTotalCoupon() + couponIncome.getTotalCoupon());
-		}else{
-			this.incomeByCoupon = couponIncome;
 		}
 	}
 	
 	private void append(IncomeByCharge chargeIncome){
-		if(this.incomeByCharge != null){
+		if(chargeIncome != null){
+			if(this.incomeByCharge == null){
+				this.incomeByCharge = new IncomeByCharge();
+			}
+			
+			
 			this.incomeByCharge.setActualCashCharge(this.incomeByCharge.getActualCashCharge() + chargeIncome.getActualCashCharge());
 			this.incomeByCharge.setActualCreditCardCharge(this.incomeByCharge.getActualCreditCardCharge() + chargeIncome.getActualCreditCardCharge());
 			this.incomeByCharge.setChargeAmount(this.incomeByCharge.getChargeAmount() + chargeIncome.getChargeAmount());
@@ -159,71 +174,84 @@ public class ShiftDetail implements Jsonable{
 			this.incomeByCharge.setTotalAccountCharge(this.incomeByCharge.getTotalAccountCharge() + chargeIncome.getTotalAccountCharge());
 			this.incomeByCharge.setTotalAccountRefund(this.incomeByCharge.getTotalAccountRefund() + chargeIncome.getTotalAccountRefund());
 			this.incomeByCharge.setTotalActualRefund(this.incomeByCharge.getTotalActualRefund() + chargeIncome.getTotalActualRefund());
-		}else{
-			this.incomeByCharge = chargeIncome;
 		}
+		
 	}
 	
 	private void append(IncomeByRound roundIncome){
-		if(this.incomeByRound != null){
+		if(roundIncome != null){
+			if(this.incomeByRound == null){
+				this.incomeByRound = new IncomeByRound();
+			}
+			
 			this.incomeByRound.setAmount(this.incomeByRound.getAmount() + roundIncome.getAmount());
 			this.incomeByRound.setTotal(this.incomeByRound.getTotal() + roundIncome.getTotal());
-		}else{
-			this.incomeByRound = roundIncome;
 		}
 	}
 	
 	private void append(IncomeByErase eraseIncome){
-		if(this.incomeByErase != null){
+		if(eraseIncome != null){
+			if(this.incomeByErase == null){
+				this.incomeByErase = new IncomeByErase();
+			}
+			
 			this.incomeByErase.setEraseAmount(this.incomeByErase.getEraseAmount() + eraseIncome.getEraseAmount());
 			this.incomeByErase.setErasePrice(this.incomeByErase.getTotalErase() + eraseIncome.getTotalErase());
-		}else{
-			this.incomeByErase = eraseIncome;
 		}
 	}
 	
 	private void append(IncomeByDiscount discountIncome){
-		if(this.incomeByDiscount != null){
+		if(discountIncome != null){
+			if(this.incomeByDiscount == null){
+				this.incomeByDiscount = new IncomeByDiscount();
+			}
+			
 			this.incomeByDiscount.setDiscountAmount(this.incomeByDiscount.getDiscountAmount() + discountIncome.getDiscountAmount());
 			this.incomeByDiscount.setTotalDiscount(this.incomeByDiscount.getTotalDiscount() + discountIncome.getTotalDiscount());
-		}else{
-			this.incomeByDiscount = discountIncome;
 		}
 	}
 	
 	private void append(IncomeByGift giftIncome){
-		if(this.incomeByGift != null){
+		if(giftIncome != null){
+			if(this.incomeByGift == null){
+				this.incomeByGift = new IncomeByGift();
+			}
+			
 			this.incomeByGift.setGiftAmount(this.incomeByGift.getGiftAmount() + giftIncome.getGiftAmount());
 			this.incomeByGift.setTotalGift(this.incomeByGift.getTotalGift() + giftIncome.getTotalGift());
-		}else{
-			this.incomeByGift = giftIncome;
 		}
 	}
 	
 	private void append(IncomeByCancel cancelIncome){
-		if(this.incomeByCancel != null){
+		if(cancelIncome != null){
+			if(this.incomeByCancel == null){
+				this.incomeByCancel = new IncomeByCancel();
+			}
+
 			this.incomeByCancel.setCancelAmount(this.incomeByCancel.getCancelAmount() + cancelIncome.getCancelAmount());
 			this.incomeByCancel.setTotalCancel(this.incomeByCancel.getTotalCancel() + cancelIncome.getTotalCancel());
-		}else{
-			this.incomeByCancel = cancelIncome;
 		}
 	}
 	
 	private void append(IncomeByService serviceIncome){
-		if(this.incomeByService != null){
+		if(serviceIncome != null){
+			if(this.incomeByService == null){
+				this.incomeByService = new IncomeByService();
+			}
+			
 			this.incomeByService.setServiceAmount(this.incomeByService.getServiceAmount() + serviceIncome.getServiceAmount());
 			this.incomeByService.setTotalService(this.incomeByService.getTotalService() + serviceIncome.getTotalService());
-		}else{
-			this.incomeByService = serviceIncome;
 		}
 	}
 	
 	private void append(IncomeByRepaid repaidIncome){
-		if(this.incomeByRepaid != null){
+		if(repaidIncome != null){
+			if(this.incomeByRepaid == null){
+				this.incomeByRepaid = new IncomeByRepaid();
+			}
+			
 			this.incomeByRepaid.setRepaidAmount(this.incomeByRepaid.getRepaidAmount() + repaidIncome.getRepaidAmount());
 			this.incomeByRepaid.setTotalRepaid(this.incomeByRepaid.getTotalRepaid() + repaidIncome.getTotalRepaid());
-		}else{
-			this.incomeByRepaid = repaidIncome;
 		}
 	}
 	
