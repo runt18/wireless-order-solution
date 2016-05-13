@@ -721,10 +721,10 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			}
 			
 		}else if(qrParam.type == QrCodeType.SCAN_ORDER){
-			//TODO 扫码下单  param中的param为   tableId & restaurantId
+			//TODO 扫码下单  param中的param为   tableId _ restaurantId
 			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
-			final Table table = TableDao.getById(staff, Integer.valueOf(qrParam.param.split("&")[0]));
+			final Table table = TableDao.getById(staff, Integer.valueOf(qrParam.param.split("_")[0]));
 			final int restaurantId = Integer.valueOf(qrParam.param.split("_")[1]);
 			
 			HttpSession httpSession = request.getSession(true);
