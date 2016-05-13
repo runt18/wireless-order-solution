@@ -23,6 +23,19 @@ $(function(){
 			},
 			success : function(data, status, xhr){
 				document.title = data.root[0].name; 
+			}
+		});
+		
+		//获取门店信息
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'getByCond',
+				branchId : Util.mp.params.branchId
+			},
+			success : function(data, status, xhr){
 				_orderType = data.root[0].defaultOrderType;
 			}
 		});
@@ -38,6 +51,19 @@ $(function(){
 			},
 			success : function(data, status, xhr){
 				document.title = data.root[0].name; 
+			}
+		});
+		
+		//获取门店信息
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'getByCond',
+				branchId : Util.mp.params.branchId
+			},
+			success : function(data, status, xhr){
 				_orderType = data.root[0].defaultOrderType;
 			}
 		});
