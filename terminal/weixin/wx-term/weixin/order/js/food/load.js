@@ -189,7 +189,6 @@ $(function(){
 							tableId : tableId
 						},
 						success : function(response, status, xhr){
-							checkPayTypeDialog.close();
 							if(response.success){
 								//提示框设置
 								var finishOrderDialog = new WeDialogPopup({
@@ -252,7 +251,6 @@ $(function(){
 										} 
 										
 									}else{
-										checkPayTypeDialog.close();
 										payParam = null;
 										var dialog = new WeDialogPopup({
 											content : data.msg,
@@ -283,7 +281,6 @@ $(function(){
 								},
 								success : function(data, status, req){
 									if(data.success){
-										checkPayTypeDialog.close();
 										//提示框设置
 										var finishOrderDialog = new WeDialogPopup({
 											titleText : '温馨提示',
@@ -395,7 +392,6 @@ $(function(){
 												},
 												success : function(data, status, req){
 													if(data.success){
-														checkPayTypeDialog.close();
 														//提示框设置
 														var finishOrderDialog = new WeDialogPopup({
 															titleText : '温馨提示',
