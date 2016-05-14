@@ -1,5 +1,4 @@
 Ext.onReady(function(){
-	var hours;
 	var isDuty = false;
 	var beginDate = new Ext.form.DateField({
 		id: 'beginDate_combo_coupon',
@@ -281,11 +280,7 @@ Ext.onReady(function(){
 				return;
 			}
 			
-			if(hours){
-				businessHour = hours;
-			}else{
-				businessHour =  Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'coupon_'}).data;
-			}
+			businessHour =  Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'coupon_'}).data;
 			
 			var memeberName = Ext.getCmp('memeberName_textfield');
 			
@@ -294,9 +289,9 @@ Ext.onReady(function(){
 			store.baseParams['beginDate'] = Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00');
 			store.baseParams['endDate'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 			store.baseParams['staffId'] = couponStaff.getValue() < 0 ? '' : couponStaff.getValue();
-			store.baseParams['opening'] = businessHour.opening;
+			store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
 			store.baseParams['isDuty'] = isDuty;
-			store.baseParams['ending'] = businessHour.ending;
+			store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';
 			store.baseParams['couponTypeId'] = coupon.getValue();
 			store.baseParams['branchId'] = branch_combo_coupon.getValue();
 			
@@ -335,9 +330,9 @@ Ext.onReady(function(){
 				Ext.util.Format.date(beginDate.getValue(), 'Y-m-d 00:00:00'),
 				Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 				couponStaff.getValue() < 0 ? '' : couponStaff.getValue(),
-				businessHour.opening,
+				businessHour.opening != '00:00' ? businessHour.opening : '',
 				isDuty,
-				businessHour.ending,
+				businessHour.ending != '00:00' ? businessHour.ending : '', 
 				coupon.getValue(),
 				branch_combo_coupon.getValue(),
 				couponType.getValue() == 'issue' || couponType.getValue() == 'use' ? null : couponType.getValue(),
@@ -357,7 +352,7 @@ Ext.onReady(function(){
 		tbarType : 1, 
 		statistic : 'coupon_', 
 		callback : function businessHourSelect(){
-			hours = null;}
+			}
 	}).concat(couponStatisticsTbarItem);
 	
 	

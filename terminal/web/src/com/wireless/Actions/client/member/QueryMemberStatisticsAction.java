@@ -318,11 +318,15 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 			final MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 			
 			if(branchId != null && !branchId.isEmpty()){
-				extraCond.setBranch(Integer.parseInt(branchId));
+				if(Integer.parseInt(branchId) > 0){
+					extraCond.setBranch(Integer.parseInt(branchId));
+				}
 			}
 			
-			if(memberType != null && !memberType.trim().isEmpty() && !memberType.equals("-1"))
+			if(memberType != null && !memberType.trim().isEmpty() && !memberType.equals("-1")){
 				extraCond.setMemberType(Integer.parseInt(memberType));
+			}
+				
 			if(dateBegin != null && !dateBegin.isEmpty()){
 				extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
 			}

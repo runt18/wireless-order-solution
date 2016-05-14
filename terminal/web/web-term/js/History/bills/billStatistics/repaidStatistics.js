@@ -446,6 +446,9 @@ Ext.onReady(function(){
 					return;
 				}
 				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&dataSource={4}&branchId={5}';
+				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'repaid_'}).data;
+					
+				
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -453,7 +456,9 @@ Ext.onReady(function(){
 						Ext.util.Format.date(repaid_endDate.getValue(), 'Y-m-d 23:59:59'),
 						repaid_combo_staffs.getValue(),
 						'repaidStatisticsList',
-						branch_combo_repaidStatistics.getValue()
+						branch_combo_repaidStatistics.getValue(),
+						businessHour.opening != '00:00' ? businessHour.opening : '',
+						businessHour.ending != '00:00' ? businessHour.ending : ''
 					);
 				window.location = url;
 			}

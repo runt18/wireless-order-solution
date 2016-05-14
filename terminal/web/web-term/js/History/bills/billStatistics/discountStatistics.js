@@ -354,7 +354,9 @@ Ext.onReady(function(){
 				if(!discount_beginDate.isValid() || !discount_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}';
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}&opening={7}&ending={8}';
+				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'discount_'}).data;
+				
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -363,7 +365,9 @@ Ext.onReady(function(){
 						discount_combo_staffs.getValue(),
 						discount_deptCombo.getValue(),
 						'discountStatisticsList',
-						branch_combo_discount.getValue()
+						branch_combo_discount.getValue(),
+						businessHour.opening != '00:00' ? businessHour.opening : null,
+						businessHour.ending != '00:00' ? businessHour.ending : null
 				);
 				window.location = url;
 			}
@@ -388,7 +392,7 @@ Ext.onReady(function(){
 	         ['操作人', 'discounter'], 
 	         ['备注', 'comment', 200]
 			],
-			['restaurantName', 'orderDateFormat', 'id', 'discountPrice', 'actualPrice', 'waiter', 'comment', 'rid'],
+			['restaurantName', 'orderDateFormat', 'id', 'discountPrice', 'actualPrice', 'discounter', 'comment', 'rid'],
 			[ ['dataSource', 'getDetail']],
 			GRID_PADDING_LIMIT_20,
 			null,

@@ -289,7 +289,7 @@ public class ShiftDao {
 		//Get the coupon usage
 		result.setCouponUsage(CalcCouponStatisticsDao.calcUsage(dbCon, staff, new CalcCouponStatisticsDao.ExtraCond().setRange(extraCond.getDutyRange())));
 		
-		//FIXME Get the gift, discount & total to each department during this period.
+		//Get the gift, discount & total to each department during this period.
 		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, extraCond));
 		
 		return result;

@@ -212,7 +212,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								data.push([jr.root[0]['id'], jr.root[0]['name']]);
 							}else{
-								data.push([null, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
+								data.push([-1, '全部'], [jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
 									data.push([jr.root[0].branches[i]['id'], jr.root[0].branches[i]['name']]);
@@ -225,7 +225,7 @@ Ext.onReady(function(){
 							if(jr.root[0].typeVal != '2'){
 								thiz.setValue(jr.root[0].id);
 							}else{
-								thiz.setValue(null);
+								thiz.setValue(-1);
 							}
 							
 							thiz.fireEvent('select');
@@ -285,16 +285,16 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mcrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 						
 						var memberType = mcrs_search_memberType.getRawValue() != '' ? mcrs_search_memberType.getValue() : '';
-						var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&create=true&branchId={6}';
+						var url = '../../{0}?memberType={1}&dataSource={2}&dateBegin={3}&dateEnd={4}&memberCardOrMobileOrName={5}&branchId={6}';
 						url = String.format(
 								url, 
 								'ExportHistoryStatisticsToExecl.do', 
 								memberType > 0 ? memberType : '', 
-								'memberList',
+								'createCard',
 								onDuty,
 								offDuty,
 								mcrs_search_memberName.getValue(),
-								branch_combo_memberCreate.getValue()
+								Ext.getCmp('branch_combo_memberCreate').getValue()
 							);
 						window.location = url;
 					}
@@ -335,7 +335,7 @@ Ext.onReady(function(){
 					['名称', 'name'],
 					['类型', 'memberType.name'],
 					['创建时间','createDateFormat'],
-					['操作门店', 'branchName', 60],
+					['操作门店', 'restaurantName', 60],
 					['消费次数', 'consumptionAmount', null,'right', Ext.ux.txtFormat.gridDou],
 					['消费总额', 'totalConsumption', null,'right', Ext.ux.txtFormat.gridDou],
 					['累计积分', 'totalPoint', null, 'right', Ext.ux.txtFormat.gridDou],

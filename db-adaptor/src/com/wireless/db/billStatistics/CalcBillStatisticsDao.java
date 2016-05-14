@@ -936,6 +936,7 @@ public class CalcBillStatisticsDao {
 				    						 dbCon.rs.getInt("restaurant_id"),
 				    						 Department.Type.valueOf(dbCon.rs.getShort("type")),
 				    						 dbCon.rs.getInt("display_id"));
+			
 			if(dept.isIdle()){
 				dept.setName(dept.getName().isEmpty() ? "已删除部门" : dept.getName() + "(已删除)");
 			}
@@ -1384,7 +1385,7 @@ public class CalcBillStatisticsDao {
 				IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
 				if(range != null){
 					
-					extraCond.setDutyRange(range);
+					extraCond = ((ExtraCond)extraCond.clone()).setDutyRange(range).setCalcByDuty(false);
 					
 					//Calculate the customer amount
 					income.setCustomerAmount(calcCustomerAmount(dbCon, staff, extraCond));
@@ -1503,9 +1504,10 @@ public class CalcBillStatisticsDao {
 		}else{
 			final DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, extraCond.dutyRange);
 			if(dutyRange == null){
-				result = ShiftDao.getByRange(dbCon, staff, extraCond);
+				//result = ShiftDao.getByRange(dbCon, staff, extraCond);
+				return new ShiftDetail(extraCond.dutyRange);
 			}else{
-				result = ShiftDao.getByRange(dbCon, staff, extraCond);
+				result = ShiftDao.getByRange(dbCon, staff, ((ExtraCond)extraCond.clone()).setDutyRange(dutyRange).setCalcByDuty(false));
 			}
 		}
 		

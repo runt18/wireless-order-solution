@@ -433,6 +433,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	private int id;
 	private int restaurantId;
+	private String restaurantName;      //操作门店
 	private int branchId;
 	private float totalCommission;		// 佣金总额
 	private float totalConsumption;		// 消费总额
@@ -1030,6 +1031,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.id);
 		jm.putInt("rid", this.restaurantId);
+		jm.putString("restaurantName", this.restaurantName);
 		jm.putInt("branchId", this.branchId);
 		jm.putFloat("totalCharge", this.totalCharge);
 		jm.putInt("totalPoint", this.totalPoint);
@@ -1095,6 +1097,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		this.id = id;
 	}
 	
+	public String getRestaurantName() {
+		return restaurantName;
+	}
+
+	public void setRestaurantName(String restaurantName) {
+		this.restaurantName = restaurantName;
+	}
+
 	public int getRestaurantId() {
 		return restaurantId;
 	}

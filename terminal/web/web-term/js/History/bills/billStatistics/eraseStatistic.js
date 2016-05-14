@@ -313,12 +313,7 @@ Ext.onReady(function(){
 						return;
 					}
 					
-					var businessHour;
-					if(erase_hours){
-						businessHour = erase_hours;
-					}else{
-						businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'erase_'}).data;
-					}	
+					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'erase_'}).data;;
 					
 					var store = eraseStatisticsGrid.getStore();
 					store.baseParams['dataSource'] = 'normal',
@@ -326,8 +321,8 @@ Ext.onReady(function(){
 					store.baseParams['endDate'] = Ext.util.Format.date(erase_endDate.getValue(), 'Y-m-d 23:59:59');
 					store.baseParams['staffID'] = erase_combo_staffs.getValue();
 					store.baseParams['deptID'] = erase_deptCombo.getValue();
-					store.baseParams['opening'] = businessHour.opening;
-					store.baseParams['ending'] = businessHour.ending;	
+					store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
+					store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';	
 					store.baseParams['branchId'] = branch_combo_eraseStatistics.getValue();
 					
 					store.load({
@@ -355,8 +350,8 @@ Ext.onReady(function(){
 						dateEnd : Ext.util.Format.date(erase_endDate.getValue(), 'Y-m-d 23:59:59'),
 						deptID : erase_deptCombo.getValue(),
 						staffId : erase_combo_staffs.getValue(),
-						opening : businessHour.opening,
-						ending : businessHour.ending,
+						opening : businessHour.opening != '00:00' ? businessHour.opening : '',
+						ending : businessHour.ending != '00:00' ? businessHour.ending : '',
 						branchId : branch_combo_eraseStatistics.getValue()
 					};
 					erase_chartLoadMarsk.show();
@@ -398,7 +393,8 @@ Ext.onReady(function(){
 				if(!erase_beginDate.isValid() || !erase_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}';
+				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'erase_'}).data;;
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}&opening={7}&ending={8}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
@@ -407,13 +403,15 @@ Ext.onReady(function(){
 						erase_combo_staffs.getValue(),
 						erase_deptCombo.getValue(),
 						'eraseStatisticsList',
-						branch_combo_eraseStatistics.getValue()
+						branch_combo_eraseStatistics.getValue(),
+						businessHour.opening != '00:00' ? businessHour.opening : '',
+						businessHour.ending != '00:00' ? businessHour.ending : ''
 				);
 				window.location = url;
 			}
 		}];
 		
-		var eraseStatisticsGridTbar = Ext.ux.initTimeBar({beginDate:erase_beginDate, endDate:erase_endDate,dateCombo:erase_dateCombo, tbarType : 1, statistic : 'erase_', callback : function businessHourSelect(){erase_hours = null;}}).concat(eraseStatisticsGridTbarItem);
+		var eraseStatisticsGridTbar = Ext.ux.initTimeBar({beginDate:erase_beginDate, endDate:erase_endDate,dateCombo:erase_dateCombo, tbarType : 1, statistic : 'erase_', callback : function businessHourSelect(){}}).concat(eraseStatisticsGridTbarItem);
 		
 		eraseStatisticsGrid = createGridPanel(
 			'',
@@ -643,7 +641,7 @@ Ext.onReady(function(){
 	}
 
 	var eraseViewBillWin;
-	var erase_cutAfterDrag = 190, erase_cutBeforeDrag = 40, erase_hours;
+	var erase_cutAfterDrag = 190, erase_cutBeforeDrag = 40;
 	var titleEraseDeptName, titleEraseStaffName;
 	var erase_detailChart, erase_staffPieChart, erase_staffColumnChart, erase_deptPieChart, erase_deptColumnChart;
 	

@@ -188,6 +188,7 @@ public class CalcCommissionStatisticsDao {
 				c.setAmount(dbCon.rs.getFloat("order_count"));
 				c.setTotalPrice(dbCon.rs.getFloat("total_price"));
 				c.setCommission(dbCon.rs.getFloat("commission"));
+				c.setRestaurantName(dbCon.rs.getString("restaurant_name"));
 				c.setWaiter(dbCon.rs.getString("waiter"));
 				result.add(c);
 			}
@@ -375,18 +376,19 @@ public class CalcCommissionStatisticsDao {
 		
 		
 		return result;
-	}
+	} 
 	
 	private static String makeSql4Commission(Staff staff, ExtraCond extraCond){
 		String sql;
 		sql = " SELECT " +
-			  " OF.order_id, OF.order_date, OF.name, OF.unit_price, OF.order_count, OF.waiter, OF.staff_id, " +
+			  " R.restaurant_name, OF.order_id, OF.order_date, OF.name, OF.unit_price, OF.order_count, OF.waiter, OF.staff_id, " +
 			  " ROUND((OF.unit_price * OF.order_count), 2) AS total_price, " +
 			  " ROUND((OF.commission * OF.order_count), 2) AS commission, " +
 			  " D.dept_id, D.restaurant_id, D.name AS dept_name " +
-			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " +
 			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " ON OF.order_id = O.id " +
+			  " LEFT JOIN " + Params.dbName + " .restaurant R ON R.id = OF.restaurant_id " +
 			  " JOIN " + Params.dbName + ".department D ON D.dept_id = OF.dept_id AND D.restaurant_id = OF.restaurant_id " +
 			  " WHERE 1 = 1 " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +

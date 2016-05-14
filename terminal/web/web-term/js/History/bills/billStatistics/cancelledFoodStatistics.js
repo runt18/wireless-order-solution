@@ -457,7 +457,9 @@ Ext.onReady(function(){
 						Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 					}
 					
-					var url = '../../{0}?deptID={1}&dateBeg={2}&dateEnd={3}&reasonID={4}&dataSource={5}&staffID={6}&branchId={7}';
+					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'cancel_'}).data;
+					
+					var url = '../../{0}?deptID={1}&dateBeg={2}&dateEnd={3}&reasonID={4}&dataSource={5}&staffID={6}&branchId={7}&opening={8}&ending={9}';
 					
 					url = String.format(
 						url,
@@ -468,7 +470,9 @@ Ext.onReady(function(){
 						reasonCombo.getValue(),
 						'cancelledFood',
 						cancel_combo_staffs.getValue(),
-						branch_combo_cancelledFood.getValue()
+						branch_combo_cancelledFood.getValue(),
+						businessHour.opening != '00:00' ? businessHour.opening : null,
+						businessHour.ending != '00:00' ? businessHour.ending : null
 					);
 					window.location = url;
 	

@@ -94,10 +94,6 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				 incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, true, start, limit);
 			 }
 			 
-			 incomesByEachDay.add(total);
-			
-			 jObject.setRoot(incomesByEachDay);
-			
 			if(includingChart != null && !includingChart.isEmpty()){
 				final List<String> xAxis = new ArrayList<String>();
 				final List<Float> incomes = new ArrayList<Float>();
@@ -106,6 +102,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				float totalMoney = 0, totalCount = 0; 
 				int totalCustomerAmount = 0;
 				int count = 0;
+				
 				for (IncomeByEachDay e : incomesByEachDay) {
 					xAxis.add("\'" + e.getDate() + "\'");
 					incomes.add(e.getIncomeByPay().getTotalActual());
@@ -143,6 +140,10 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				
 				});
 			}
+			
+		 incomesByEachDay.add(total);
+			
+		 jObject.setRoot(incomesByEachDay);
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

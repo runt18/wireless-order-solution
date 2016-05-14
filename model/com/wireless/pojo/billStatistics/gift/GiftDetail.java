@@ -37,6 +37,10 @@ public class GiftDetail implements Jsonable{
 		return orderDateFormat;
 	}
 	
+	public String getRestaurantName(){
+		return restaurantName;
+	}
+	
 	public String getName(){
 		return name;
 	}
