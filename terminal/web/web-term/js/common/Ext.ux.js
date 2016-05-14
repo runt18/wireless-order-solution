@@ -918,7 +918,7 @@ var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimum
     'categoryValue', 'categoryText', 'statusValue', 'statusText', 'region', 'region.name']);
 var SalesSubStatRecord = Ext.ux.cr(['salesAmount', 'income', 'tasteIncome', 'discount', 'gifted', 'giftedAmount','avgPrice','avgCost']);
 var MemberBasicRecord = Ext.ux.cr(['id', 'rid', 'totalConsumption','ageVal', 'fansAmount', 'ageText', 'totalCharge', 'totalPoint', 'lastConsumption', 'baseBalance', 'extraBalance', 'totalBalance', 'usedBalance', 'point', 'usedPoint', 'sexText', 'sexValue', 'memberType', 'memberType.name',
-    'consumptionAmount', 'name', 'branchName', 'tele', 'mobile', 'birthday', 'referrer', 'birthdayFormat', 'idCard', 'branchId', 'company', 'tastePref', 'taboo', 'contactAddress', 'comment', 'createDate', 'createDateFormat', 'memberCard', 'publicComment', 'privateComment', 'acctendtioned', 'weixinCard']);
+    'consumptionAmount', 'name', 'restaurantName', 'tele', 'mobile', 'birthday', 'referrer', 'birthdayFormat', 'idCard', 'branchId', 'company', 'tastePref', 'taboo', 'contactAddress', 'comment', 'createDate', 'createDateFormat', 'memberCard', 'publicComment', 'privateComment', 'acctendtioned', 'weixinCard']);
 var MemberOperationRecord = Ext.ux.cr(['id', 'seq', 'rid', 'staffId', 'staffName', 'orderId', 'deltaBaseMoney', 'deltaExtraMoney', 'deltaPoint', 'remainingBaseMoney', 'remainingExtraMoney', 'remainingPoint', 'comment', 'deltaTotalMoney', 'remainingTotalMoney', 'operateDateFormat',
     'member', 'branchName', 'member.name','member.mobile', 'member.memberType.name', 'member.memberCard', 'operateTypeText', 'operateTypeValue', 'payTypeText', 'payTypeValue', 'payMoney', 'chargeTypeText', 'chargeTypeValue', 'chargeMoney']);
 

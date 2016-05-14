@@ -860,7 +860,7 @@ public class MemberDao {
 		final List<Member> result = new ArrayList<Member>();
 		String sql;
 		sql = " SELECT "	+
-			  " M.member_id, M.restaurant_id, M.branch_id, M.point, M.used_point, " +
+			  " R.restaurant_name, M.member_id, M.restaurant_id, M.branch_id, M.point, M.used_point, " +
 			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
@@ -873,6 +873,7 @@ public class MemberDao {
 			  " FROM " + Params.dbName + ".member M " +
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " LEFT JOIN " + Params.dbName + ".weixin_member WM ON WM.member_id = M.member_id " +
+			  " LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = M.restaurant_id " +
 			  " WHERE 1 = 1 " +
 			  " AND M.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond : " ") +
@@ -881,6 +882,7 @@ public class MemberDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Member member = new Member(dbCon.rs.getInt("member_id"));
+			member.setRestaurantName(dbCon.rs.getString("restaurant_name"));
 			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			member.setBranchId(dbCon.rs.getInt("branch_id"));
 			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));

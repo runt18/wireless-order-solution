@@ -530,11 +530,11 @@
 								Ext.getCmp('beginDate_combo_coupon').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_coupon').setValue(sendToStatisticsPageEndDate);
 								
-								hours = sendToStatisticsPageHours;
+								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'coupon_'});
 								
-								Ext.getCmp('coupon_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + hours.openingText + '</font>');
-								Ext.getCmp('coupon_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + hours.endingText + '</font>');
-								Ext.getCmp('coupon_comboBusinessHour').setValue(hours.hourComboValue);	
+								Ext.getCmp('coupon_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">' + sendToStatisticsPageHours.openingText + '</font>');
+								Ext.getCmp('coupon_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">' + sendToStatisticsPageHours.endingText + '</font>');
+								Ext.getCmp('coupon_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);	
 								
 								Ext.getCmp('coupon_btnSearch').handler();
 								businessSubStatisticsLoading.hide();

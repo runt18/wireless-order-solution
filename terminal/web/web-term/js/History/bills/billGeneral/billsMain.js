@@ -43,12 +43,8 @@ Ext.onReady(function() {
 			businessHour = history_oBusinessHourData({type : 'get'}).data;
 		}
 		
-		if(parseInt(businessHour.businessHourType) != -1){
-			gs.baseParams['opening'] = businessHour.opening;
-			gs.baseParams['ending'] = businessHour.ending;
-		}else{
-			gs.baseParams['opening'] = '';
-		}
+		gs.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
+		gs.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';
 		gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
 		
 		gs.baseParams['seqId'] = Ext.getCmp('numberSearchSeqIdValue').getValue();
@@ -67,14 +63,8 @@ Ext.onReady(function() {
 		var url;
 		sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;
 		var businessHour = history_oBusinessHourData({type : 'get'}).data;
-		var opening, ending;
-		if(parseInt(businessHour.businessHourType) != -1){
-			opening = businessHour.opening;
-			ending = businessHour.ending;
-		}else{
-			opening = '';
-			ending = '';
-		}
+		var opening = businessHour.opening;
+		var	ending = businessHour.ending;
 		url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}&seqId={12}&opening={13}&ending={14}&branchId={15}';
 		url = String.format(
 			url, 
@@ -91,8 +81,8 @@ Ext.onReady(function() {
 			'historyOrder',
 			1,
 			Ext.getCmp('numberSearchSeqIdValue').getValue(),
-			opening,
-			ending,
+			opening != '00:00' ? opening : '',
+			ending != '00:00' ? ending : '',
 			branch_combo_history.getValue()
 		);
 		window.location = url;

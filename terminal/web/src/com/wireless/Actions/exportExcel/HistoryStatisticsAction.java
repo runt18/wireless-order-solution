@@ -2924,7 +2924,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond = new MemberOperationDao.ExtraCond(dy);
 		}
 		
-		if(branchId != null && branchId.isEmpty()){
+		if(branchId != null && !branchId.isEmpty()){
 			if(Integer.parseInt(branchId) > 0){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				extraCond.setBranch(Integer.parseInt(branchId));
@@ -3387,6 +3387,232 @@ public class HistoryStatisticsAction extends DispatchAction{
 	
 	/**
 	 * 会员开卡统计导出excel
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward createCard(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		response.setContentType("application/vnd.ms-excel;");
+		
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dateBegin = request.getParameter("dateBegin");
+		final String dateEnd = request.getParameter("dateEnd");
+		final String memberType = request.getParameter("memberType");
+		final String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		final MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
+		
+		if(branchId != null && !branchId.isEmpty()){
+			if(Integer.parseInt(branchId) > 0){
+				extraCond.setBranch(Integer.parseInt(branchId));
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+		}
+		
+		if(memberType != null && !memberType.trim().isEmpty() && !memberType.equals("-1")){
+			extraCond.setMemberType(Integer.parseInt(memberType));
+		}
+		
+		if(dateBegin != null && !dateBegin.isEmpty()){
+			extraCond.setCreateRange(new DutyRange(dateBegin, dateEnd));
+		}
+		
+		if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty()){
+			extraCond.setFuzzyName(memberCardOrMobileOrName);
+		}
+		
+		List<Member> list = MemberDao.getByCond(staff, extraCond, null);
+		
+		String title;
+		if(Integer.parseInt(branchId) > 0){
+			title = "会员列表(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
+		}else{
+			title = "会员列表(全部门店)";
+		}
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员列表.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3000);
+		sheet.setColumnWidth(1, 3300);
+		sheet.setColumnWidth(2, 3000);
+		sheet.setColumnWidth(3, 3500);
+		sheet.setColumnWidth(4, 3500);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 4000);
+		sheet.setColumnWidth(7, 3200);
+		sheet.setColumnWidth(8, 4000);
+		sheet.setColumnWidth(9, 4000);
+		sheet.setColumnWidth(10, 3000);
+		sheet.setColumnWidth(11, 3200);
+		sheet.setColumnWidth(12, 4000);
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+				
+		//------------------报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
+		//---------------摘要------------------		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("会员数量: " + list.size());
+//				cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+		//----------------		
+		//----------------空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("创建时间");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作门店");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("消费次数");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("消费总额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("累计积分");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("当前积分");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("总充值额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("账户余额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("手机号码");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员卡号");
+		cell.setCellStyle(headerStyle);
+		
+		for (Member member : list){
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			//名称
+			cell = row.createCell(0);
+			cell.setCellValue(member.getName());
+			cell.setCellStyle(strStyle);
+		
+			//类型
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getMemberType().getName());
+			cell.setCellStyle(strStyle);
+			
+			//创建时间
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(DateUtil.format(member.getCreateDate()));
+			cell.setCellStyle(normalNumStyle);
+			
+			//操作门店
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getRestaurantName());
+			cell.setCellStyle(strStyle);
+			
+			//消费次数
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getConsumptionAmount());
+			cell.setCellStyle(normalNumStyle);
+			
+			//消费总额
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getTotalConsumption());
+			cell.setCellStyle(normalNumStyle);
+			
+			//累计积分
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getTotalPoint());
+			cell.setCellStyle(normalNumStyle);
+			
+			//当前积分
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getPoint());
+			cell.setCellStyle(normalNumStyle);
+			
+			//总充值额
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getTotalCharge());
+			cell.setCellStyle(numStyle);
+			
+			//账户余额
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getTotalBalance());
+			cell.setCellStyle(numStyle);
+			
+			//手机号码
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getMobile());
+			cell.setCellStyle(strStyle);
+			
+			//会员卡号
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getMemberCard());
+			cell.setCellStyle(strStyle);
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+	}
+	
+	
+	/**
+	 * 会员会员分析导出excel
 	 * @param mapping
 	 * @param form
 	 * @param request
