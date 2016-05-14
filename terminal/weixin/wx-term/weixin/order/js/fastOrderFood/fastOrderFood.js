@@ -5,8 +5,15 @@ function PickFoodComponent(param){
 		orderDataCount : null,
 		confirm : function(selectedFoods, comment, container, _calcOrderCost){},
 		onCartChange : function(selectedFoods){},
-		bottomId : null              //尾部栏
+		bottomId : null,              //尾部栏
+		payType : null
 	};
+	
+	var _orderType = {
+		WX_PAY : 1,				//微信支付下单
+		CONFIRM_BY_STAFF : 2,	//确认下单
+		DIRECT_ORDER : 3		//直接下单
+	}
 	
 	//总的div
 	var _container = null;
@@ -53,7 +60,19 @@ function PickFoodComponent(param){
 	};
 	
 	this.openShopping = function(){
+		var html = '下单';
+		if(_orderType.WX_PAY == param.payType){
+			html = '微信支付';
+			
+		}else if(_orderType.CONFIRM_BY_STAFF == param.payType){
+			html = '确认下单';
+			
+		}else if(_orderType.DIRECT_ORDER == param.payType){
+			html = '直接下单';
+		}
+		
 		openShoppingCar({otype:'show'});
+		$('#shoppingCarCommit_span_fastOrderFood').html(html);
 	};
 	
 	this.refresh = function(){
@@ -88,7 +107,7 @@ function PickFoodComponent(param){
 					+'</li>'
 					+'<li style="width: 33%" id="shoppingCarSelect_li_fastOrderFood">'
 						+'<a href="#">'
-							+'<i class="foundicon-checkmark fcolor2"></i>下单'
+							+'<i class="foundicon-checkmark fcolor2"></i><span id="shoppingCarCommit_span_fastOrderFood">下单</span>'
 						+'</a>'
 					+'</li>'
 					+'<li style="width: 33%">'

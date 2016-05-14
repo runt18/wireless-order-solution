@@ -649,7 +649,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 														  .append("服务员 ：" + order.getWaiter()).append("\r\n")
 														  .append("点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单");
 			session.callback(new Msg4ImageText(msg).addItem(
-					new Data4Item("微信店小二(" + RestaurantDao.getById(branchId).getName() + ")", desc.toString(), picUrl,
+					new Data4Item("微信店小二(餐台：" + order.getDestTbl().getName() + ")", desc.toString(), picUrl,
 								  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
 			
 		}else if(qrParam.type == QrCodeType.REPRESENT){
@@ -758,7 +758,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			}
 			
 			session.callback(new Msg4ImageText(msg).addItem(
-					new Data4Item("自助点餐(" + RestaurantDao.getById(restaurantId).getName() + ")", desc, picUrl,
+					new Data4Item("欢迎使用扫码下单(餐台：" + table.getName() + ")", desc, picUrl,
 								  createUrl4Session(WEIXIN_FOOD + "&tableId=" + table.getId() + "&branchId=" + restaurantId, httpSession))));
 		}
 	}

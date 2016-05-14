@@ -16,6 +16,7 @@ $(function(){
 							'<div style="float: right;color:#26a9d0;">{status}</div>' +
 					'</div></div>' +
 					'<div>账单号: <span>{orderId}</span></div>' +
+					'<div>就餐餐桌: <span>{tableAlias}</span></div>' +
 					'<div>点单日期: <span style="font-weight: bold">{orderDate}</span></div>' +
 					'<div>' +
 						'<div style="float: left">金额: <span style="font-weight: bold;color: red;">{totalPrice}</span> 元</div>' +
@@ -72,6 +73,7 @@ $(function(){
 					code : temp.code,
 					status : temp.statusDesc,
 					orderId : temp.orderId ? temp.orderId : '----',
+					tableAlias : temp.table.name,
 					orderDate : temp.date,
 					totalPrice : temp.price,
 					count : count,

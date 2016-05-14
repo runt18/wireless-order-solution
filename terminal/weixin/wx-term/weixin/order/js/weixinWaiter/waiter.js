@@ -160,18 +160,6 @@ $(function(){
 			}
 		});
 		
-//		$('#containerList_div_waiter').on('swipeleft',function(e){
-// 			$('#containerList_div_waiter').css('margin-left', '-100%');
-// 			$('[data-name=orderListTab_waiter]').addClass('checkTab');
-//			$('[data-name=foodListTab_waiter]').removeClass('checkTab');
-//		});
-//		
-//		$('#containerList_div_waiter').on('swiperight',function(e){
-// 			$('#containerList_div_waiter').css('margin-left', '0');
-// 			$('[data-name=foodListTab_waiter]').addClass('checkTab');
-//			$('[data-name=orderListTab_waiter]').removeClass('checkTab');
-//		});
-//		$().css();
 	}
 	
 	
@@ -297,6 +285,7 @@ $(function(){
 		var isProcessing = false;
 		//建立popup
 		orderFoodPopup = new PickFoodComponent({
+			payType : fastFoodWaiterData._orderType,
 			bottomId : 'fastFoodBottom_div_waiter',
 			//下单键回调  能调用的三个参数_orderData, _commentData, _container
 			confirm : function(_orderData, _commentData, _container, _calcOrderCost){
@@ -589,7 +578,7 @@ $(function(){
 						//提示框设置
 						var finishOrderDialog = new WeDialogPopup({
 							titleText : '温馨提示',
-							content : '<span style="display:block;text-align:center;">下单成功,确认返回账单</span>',
+							content : '<span style="display:block;text-align:center;">下单成功,等待服务员确认订单</span>',
 							leftText : '确认',
 							left : function(){
 								finishOrderDialog.close();								
@@ -635,7 +624,7 @@ $(function(){
 						var finishOrderDialog;
 						finishOrderDialog = new WeDialogPopup({
 							titleText : '温馨提示',
-							content : '<span style="display:block;text-align:center;">下单成功,确认返回账单</span>',
+							content : '<span style="display:block;text-align:center;">下单成功,厨房正在安排,请稍等</span>',
 							leftText : '确认',
 							left : function(){
 								finishOrderDialog.close();								
@@ -741,13 +730,27 @@ $(function(){
 			}, function(res) {
 				if (res.err_msg == "get_brand_wcpay_request:ok") {
 					// 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-					orderFoodPopup.closeShopping();
-					$('#closeFastFood_a_waiter').click();
-					$('#foodList_div_waiter').html('');
-					initWaiterOrder();
-					setTimeout(function(){
-						window.location.reload();
-					}, 2500);
+					
+					var orderSuccessDialog;
+					orderSuccessDialog = new WeDialogPopup({
+						titleText : '温磬提示',
+						content : ('<span style="display:block;text-align:center;">微信支付下单成功,厨房正在准备,请稍等</span>'),
+						leftText : '确认',
+						left : function(){
+							errDialog.close();
+						},
+						afterClose : function(){
+							orderFoodPopup.closeShopping();
+							$('#closeFastFood_a_waiter').click();
+							$('#foodList_div_waiter').html('');
+							initWaiterOrder();
+							setTimeout(function(){
+								window.location.reload();
+							}, 2000);
+						}
+					});
+					
+					errDialog.open();
 				} 
 			});
 		}

@@ -96,6 +96,7 @@ $(function(){
 	
 	 //自助点餐
 	 var pickFoodComponent = new PickFoodComponent({
+	 	 payType : _orderType,
 		 confirm : function(orderFoodData, comment, container, calcOrderCost){
 			if(orderFoodData.length == 0){
 				var dialog = new WeDialogPopup({
@@ -193,7 +194,7 @@ $(function(){
 								//提示框设置
 								var finishOrderDialog = new WeDialogPopup({
 									titleText : '温馨提示',
-									content : '<span style="display:block;text-align:center;">下单成功</span>',
+									content : '<span style="display:block;text-align:center;">下单成功,等待服务员确认订单</span>',
 									leftText : '确认',
 									left : function(){
 										finishOrderDialog.close();								
@@ -282,7 +283,7 @@ $(function(){
 										//提示框设置
 										var finishOrderDialog = new WeDialogPopup({
 											titleText : '温馨提示',
-											content : '<span style="display:block;text-align:center;">下单成功</span>',
+											content : '<span style="display:block;text-align:center;">下单成功,厨房正在安排,请稍等</span>',
 											leftText : '确认',
 											left : function(){
 												finishOrderDialog.close();								
@@ -723,7 +724,7 @@ $(function(){
 					// 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
 					var finishOrderDialog = new WeDialogPopup({
 						titleText : '温馨提示',
-						content : '<span style="display:block;text-align:center;">下单成功</span>',
+						content : '<span style="display:block;text-align:center;">微信支付下单成功,厨房正在准备,请稍等</span>',
 						leftText : '确认',
 						left : function(){
 							finishOrderDialog.close();								
