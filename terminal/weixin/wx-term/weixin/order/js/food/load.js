@@ -312,121 +312,135 @@ $(function(){
 						
 					
 					}else{
-						var showQrCodeDialog
-						showQrCodeDialog = new WeDialogPopup({
+//						var showQrCodeDialog
+//						showQrCodeDialog = new WeDialogPopup({
+//							titleText : '温磬提示',
+//							content : '<span style="display:block;text-align:center;">请先扫描桌上二维码</span>',
+//							leftText : '确认',
+//							left : function(){
+//								showQrCodeDialog.close();
+//								wx.scanQRCode({
+//								    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+//								    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+//								    success: function (res) {
+//										
+//										if(payType == 'payByWeiXin'){
+//											Util.lm.show();
+//											$.ajax({
+//												url : '../../WxOperateOrder.do',
+//												type : 'post',
+//												dataType : 'json',
+//												data : {
+//													dataSource : 'wxPayOrder',
+//													sessionId : Util.mp.params.sessionId,
+//						//							fid : Util.mp.fid,
+//						//							oid : Util.mp.oid,
+//													foods : foods,
+//													cost : calcOrderCost,
+//													tableId : tableId ? tableId : '',
+//													tableAlias : tableId ? '' : res.resultStr.split('?')[1]
+//												},
+//												success : function(data, status, req){
+//													Util.lm.hide();
+//													if(data.success){
+//														payParam = data.other;
+//														if(typeof WeixinJSBridge == 'undefined'){
+//															if (document.addEventListener) {
+//																document.addEventListener('WeixinJSBridgeReady', onBridgeReady,	false);
+//															} else if (document.attachEvent) {
+//																document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+//																document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+//															}
+//														}else{
+//															onBridgeReady();
+//														} 
+//														
+//													}else{
+//														payParam = null;
+//														var dialog = new WeDialogPopup({
+//															content : data.msg,
+//															titleText : '微信支付失败',
+//															leftText : '确认',
+//															left : function(){
+//																dialog.close();
+//															}
+//														})
+//														dialog.open();
+//													}
+//												},
+//												error : function(req, status, error){
+//													alert(error);
+//												}
+//											});
+//										}else if(payType == 'fastOrder'){
+//											$.ajax({
+//												url : '../../WxOperateOrder.do',
+//												type : 'post',
+//												dataType : 'json',
+//												data : {
+//													dataSource : 'insert',
+//													foods : foods,
+//													sessionId : Util.mp.params.sessionId,
+//							//						fid : Util.mp.fid,
+//							//						oid : Util.mp.oid,
+//													tableAlias : res.resultStr.split('?')[1],
+//													tableId : tableId,
+//													force : true
+//												},
+//												success : function(data, status, req){
+//													if(data.success){
+//														//提示框设置
+//														var finishOrderDialog = new WeDialogPopup({
+//															titleText : '温馨提示',
+//															content : '<span style="display:block;text-align:center;">下单成功</span>',
+//															leftText : '确认',
+//															left : function(){
+//																finishOrderDialog.close();								
+//															},
+//															afterClose : function(){
+//																//关闭后回调
+//																window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
+//															}
+//														});
+//														
+//														finishOrderDialog.open();
+//													}
+//												},
+//												error : function(req, status, err){
+//													var errDialog;
+//													errDialog = new WeDialogPopup({
+//														titleText : '温磬提示',
+//														content : ('<span style="display:block;text-align:center;">' + err.msg + '</span>'),
+//														leftText : '确认',
+//														left : function(){
+//															errDialog.close();
+//														}
+//													});
+//													errDialog.open();
+//												}
+//											});
+//										}
+//										
+//									
+//								    }
+//								});
+//							}
+//						});
+//						showQrCodeDialog.open();
+						
+						var errDialog;
+						errDialog = new WeDialogPopup({
 							titleText : '温磬提示',
-							content : '<span style="display:block;text-align:center;">请先扫描桌上二维码</span>',
+							content : ('<span style="display:block;text-align:center;">餐厅不支持该下单方式</span>'),
 							leftText : '确认',
 							left : function(){
-								showQrCodeDialog.close();
-								wx.scanQRCode({
-								    needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-								    scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
-								    success: function (res) {
-										
-										if(payType == 'payByWeiXin'){
-											Util.lm.show();
-											$.ajax({
-												url : '../../WxOperateOrder.do',
-												type : 'post',
-												dataType : 'json',
-												data : {
-													dataSource : 'wxPayOrder',
-													sessionId : Util.mp.params.sessionId,
-						//							fid : Util.mp.fid,
-						//							oid : Util.mp.oid,
-													foods : foods,
-													cost : calcOrderCost,
-													tableId : tableId ? tableId : '',
-													tableAlias : tableId ? '' : res.resultStr.split('?')[1]
-												},
-												success : function(data, status, req){
-													Util.lm.hide();
-													if(data.success){
-														payParam = data.other;
-														if(typeof WeixinJSBridge == 'undefined'){
-															if (document.addEventListener) {
-																document.addEventListener('WeixinJSBridgeReady', onBridgeReady,	false);
-															} else if (document.attachEvent) {
-																document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
-																document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
-															}
-														}else{
-															onBridgeReady();
-														} 
-														
-													}else{
-														payParam = null;
-														var dialog = new WeDialogPopup({
-															content : data.msg,
-															titleText : '微信支付失败',
-															leftText : '确认',
-															left : function(){
-																dialog.close();
-															}
-														})
-														dialog.open();
-													}
-												},
-												error : function(req, status, error){
-													alert(error);
-												}
-											});
-										}else if(payType == 'fastOrder'){
-											$.ajax({
-												url : '../../WxOperateOrder.do',
-												type : 'post',
-												dataType : 'json',
-												data : {
-													dataSource : 'insert',
-													foods : foods,
-													sessionId : Util.mp.params.sessionId,
-							//						fid : Util.mp.fid,
-							//						oid : Util.mp.oid,
-													tableAlias : res.resultStr.split('?')[1],
-													tableId : tableId,
-													force : true
-												},
-												success : function(data, status, req){
-													if(data.success){
-														//提示框设置
-														var finishOrderDialog = new WeDialogPopup({
-															titleText : '温馨提示',
-															content : '<span style="display:block;text-align:center;">下单成功</span>',
-															leftText : '确认',
-															left : function(){
-																finishOrderDialog.close();								
-															},
-															afterClose : function(){
-																//关闭后回调
-																window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
-															}
-														});
-														
-														finishOrderDialog.open();
-													}
-												},
-												error : function(req, status, err){
-													var errDialog;
-													errDialog = new WeDialogPopup({
-														titleText : '温磬提示',
-														content : ('<span style="display:block;text-align:center;">' + err.msg + '</span>'),
-														leftText : '确认',
-														left : function(){
-															errDialog.close();
-														}
-													});
-													errDialog.open();
-												}
-											});
-										}
-										
-									
-								    }
-								});
+								errDialog.close();
+							},
+							afterClose : function(){
+								window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
 							}
 						});
-						showQrCodeDialog.open();
+						errDialog.open();
 					}
 				}else{
 					var errDialog;
@@ -436,6 +450,9 @@ $(function(){
 						leftText : '确认',
 						left : function(){
 							errDialog.close();
+						},
+						afterClose : function(){
+							window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
 						}
 					});
 					errDialog.open();
