@@ -1507,7 +1507,7 @@ public class CalcBillStatisticsDao {
 				//result = ShiftDao.getByRange(dbCon, staff, extraCond);
 				return new ShiftDetail(extraCond.dutyRange);
 			}else{
-				result = ShiftDao.getByRange(dbCon, staff, extraCond);
+				result = ShiftDao.getByRange(dbCon, staff, ((ExtraCond)extraCond.clone()).setDutyRange(dutyRange).setCalcByDuty(false));
 			}
 		}
 		
