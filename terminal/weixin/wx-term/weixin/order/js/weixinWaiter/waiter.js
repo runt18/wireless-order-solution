@@ -47,6 +47,12 @@ $(function(){
 		});
 		
 		
+		var tableStatus = {
+				IDLE : { val : 0, desc : '空闲'},
+				BUSY : { val : 1, desc : '就餐'}
+			};
+
+		
 		$.ajax({
 			url : '../../WxOperateWaiter.do',
 			data : {
@@ -58,7 +64,7 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					if(data.root[0].statusValue == WirelessOrder.TableList.Status.BUSY.val){ //就餐
+					if(data.root[0].statusValue == tableStatus.BUSY.val){ //就餐
 						initTableMsg();
 					}else{
 						//自助点餐点击
