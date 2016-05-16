@@ -134,7 +134,7 @@ public class WxOperateWaiterAction extends DispatchAction{
 					fid = (String)session.getAttribute("fid");
 				}
 			}
-			final Staff staff = StaffDao.getWxByRestaurant(Integer.valueOf(fid));
+			final Staff staff = StaffDao.getWxByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
 			
 			if(tableId != null && !tableId.isEmpty()){
 				table = TableDao.getById(staff, Integer.valueOf(tableId));
