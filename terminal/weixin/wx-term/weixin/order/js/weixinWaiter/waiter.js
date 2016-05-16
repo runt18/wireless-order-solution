@@ -72,7 +72,6 @@ $(function(){
 					}	
 				}
 			}
-			
 		});
 		
 		
@@ -781,7 +780,12 @@ $(function(){
 							orderFoodPopup.closeShopping();
 							$('#closeFastFood_a_waiter').click();
 							$('#foodList_div_waiter').html('');
-							initWaiterOrder();
+							if(Util.mp.params.tableId){
+								window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
+							}else{
+								initWaiterOrder();
+							}
+							
 							setTimeout(function(){
 								window.location.reload();
 							}, 2000);
