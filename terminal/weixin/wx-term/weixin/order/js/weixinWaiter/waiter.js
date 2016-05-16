@@ -526,7 +526,8 @@ $(function(){
 					sessionId : Util.mp.params.sessionId,
 					foods : foods,
 					cost : calcOrderCost,
-					tableAlias : fastFoodWaiterData._tableAlias
+					tableAlias : fastFoodWaiterData._tableAlias,
+					tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
 				},
 				success : function(data, status, req){
 					Util.lm.hide();
