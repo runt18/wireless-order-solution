@@ -34,6 +34,7 @@ import com.wireless.Actions.weixin.WxHandleMessage;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.PayOrder;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -47,6 +48,7 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
@@ -109,6 +111,49 @@ public class WxOperateWaiterAction extends DispatchAction{
 		return null;
 	}
 	
+	
+	/**
+	 * 获取餐桌信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getTableStatus(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String tableId = request.getParameter("tableId");
+		final String sessionId = request.getParameter("sessionId");
+		final JObject jObject = new JObject();
+		String fid = request.getParameter("fid");
+		try {
+			Table table;
+			if(sessionId != null && !sessionId.isEmpty()){
+				final HttpSession session = SessionListener.sessions.get(sessionId);
+				if(session != null){
+					fid = (String)session.getAttribute("fid");
+				}
+			}
+			final Staff staff = StaffDao.getWxByRestaurant(Integer.valueOf(fid));
+			
+			if(tableId != null && !tableId.isEmpty()){
+				table = TableDao.getById(staff, Integer.valueOf(tableId));
+				jObject.setRoot(table);
+			}else{
+				throw new BusinessException("餐桌号不能为空");
+			}
+		}catch(SQLException | BusinessException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		} finally {
+			response.getWriter().print(jObject.toString());
+		}
+		
+		
+		return null;
+	}
+	
+	
 	/**
 	 * 获取账单信息
 	 * @param mapping
@@ -121,7 +166,8 @@ public class WxOperateWaiterAction extends DispatchAction{
 	public ActionForward getOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String orderId = request.getParameter("orderId");
 		final String sessionId = request.getParameter("sessionId");
-
+		final String tableId = request.getParameter("tableId");
+		
 		final JObject jObject= new JObject();
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
@@ -129,7 +175,16 @@ public class WxOperateWaiterAction extends DispatchAction{
 				final String branchId = (String)session.getAttribute("branchId");
 				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 				//jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
-				jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
+				
+				if(orderId != null && !orderId.isEmpty()){
+					jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
+				}else{
+					if(tableId != null && !tableId.isEmpty() && TableDao.getById(staff, Integer.parseInt(tableId)).isBusy()){
+						jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(OrderDao.getByTableId(staff, Integer.parseInt(tableId)).getId())));
+					}else{
+						throw new BusinessException("餐桌为空闲状态");
+					}
+				}
 				
 			}else{
 				throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
