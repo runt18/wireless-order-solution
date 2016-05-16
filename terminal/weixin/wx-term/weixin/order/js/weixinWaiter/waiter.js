@@ -58,12 +58,14 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					if(data.statusValue == WirelessOrder.TableList.Status.BUSY.val){ //就餐
+					if(data.root[0].statusValue == WirelessOrder.TableList.Status.BUSY.val){ //就餐
 						initTableMsg();
 					}else{
 						//自助点餐点击
 						$('#orderBySelf_a_waiter').click();
 					}	
+				}else{
+					
 				}
 			}
 			
