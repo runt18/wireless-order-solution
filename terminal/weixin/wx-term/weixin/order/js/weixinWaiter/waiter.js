@@ -228,6 +228,11 @@ $(function(){
 		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
 			hasFoods = true;
+			if(index > 0){
+				//自助点餐点击
+				$('#orderBySelf_a_waiter').click();
+			}
+			
 		});
 		
 		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){

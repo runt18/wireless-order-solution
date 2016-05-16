@@ -759,7 +759,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			
 			session.callback(new Msg4ImageText(msg).addItem(
 					new Data4Item("欢迎使用扫码下单(餐台：" + table.getName() + ")", desc, picUrl,
-								  createUrl4Session(WEIXIN_FOOD + "&tableId=" + table.getId() + "&branchId=" + restaurantId, httpSession))));
+								  createUrl4Session(WEIXIN_WAITER + "&tableId=" + table.getId() + "&branchId=" + restaurantId, httpSession))));
 		}
 	}
 	
