@@ -70,8 +70,6 @@ $(function(){
 						//自助点餐点击
 						$('#orderBySelf_a_waiter').click();
 					}	
-				}else{
-					
 				}
 			}
 			
