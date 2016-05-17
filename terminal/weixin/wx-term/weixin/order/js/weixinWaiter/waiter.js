@@ -673,6 +673,7 @@ $(function(){
 				}
 			});
 		}else if(fastFoodWaiterData._orderType == orderType.DIRECT_ORDER){
+			Util.lm.show();
 			//直接下单
 			$.ajax({
 				url : '../../WxOperateOrder.do',
@@ -688,6 +689,7 @@ $(function(){
 				},
 				success : function(data, status, req){
 					if(data.success){
+						Util.lm.hide();
 						//提示框设置
 						var finishOrderDialog;
 						finishOrderDialog = new WeDialogPopup({
