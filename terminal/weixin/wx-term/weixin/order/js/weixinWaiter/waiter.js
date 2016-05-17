@@ -701,11 +701,9 @@ $(function(){
 							},
 							afterClose : function(){
 								//关闭后回调
-								orderFoodPopup.closeShopping();
-								$('#closeFastFood_a_waiter').click();
-								$('#foodList_div_waiter').html('');
-								initWaiterOrder();
-							}
+								window.location.reload();
+							},
+							dismissable : true
 						});
 						
 						finishOrderDialog.open();
