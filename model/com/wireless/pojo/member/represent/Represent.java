@@ -88,9 +88,15 @@ public class Represent implements Jsonable {
 		private Float subscribeMoney;
 		private Float commissionRate;
 		private int imageId;
+		private String giftDesc;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setGiftDesc(String giftDesc){
+			this.giftDesc = giftDesc;
+			return this;
 		}
 		
 		public UpdateBuilder setImage(int imageId){
@@ -207,6 +213,7 @@ public class Represent implements Jsonable {
 	private int subscribePoint;
 	private float subscribeMoney;
 	private float commissionRate;
+	private String giftDesc;
 	
 	private Represent(UpdateBuilder builder){
 		this.id = builder.id;
@@ -221,6 +228,7 @@ public class Represent implements Jsonable {
 		if(builder.isImageChanged()){
 			this.ossImage = new OssImage(builder.imageId);
 		}
+		this.giftDesc = builder.giftDesc;
 	}
 	
 	private Represent(InsertBuilder builder){
@@ -239,6 +247,14 @@ public class Represent implements Jsonable {
 	
 	public Represent(int id){
 		this.id = id;
+	}
+	
+	public void setGiftDesc(String giftDesc){
+		this.giftDesc = giftDesc;
+	}
+	
+	public String getGiftDesc(){
+		return this.giftDesc;
 	}
 	
 	public int getId() {
@@ -371,6 +387,7 @@ public class Represent implements Jsonable {
 		jm.putFloat("subscribeMoney", this.subscribeMoney);
 		jm.putFloat("commissionRate", this.commissionRate);
 		jm.putJsonable("image", this.ossImage, 0);
+		jm.putString("giftDesc", this.giftDesc);
 		return jm;
 	}
 

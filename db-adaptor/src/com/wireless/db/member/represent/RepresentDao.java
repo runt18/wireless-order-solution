@@ -69,6 +69,7 @@ public class RepresentDao {
 	public static int insert(DBCon dbCon, Staff staff, Represent.InsertBuilder builder) throws SQLException{
 		Represent represent = builder.build();
 		String sql;
+		//TODO
 		sql = " INSERT INTO " + Params.dbName + ".represent" +
 			  " (`restaurant_id`, `finish_date`, `title`, `slogon`, `oss_image_id`, `recommend_point`, `recommend_money`, `subscribe_point`, `subscribe_money`, `commission_rate`) VALUES ( " +
 			  staff.getRestaurantId() + "," +
@@ -161,6 +162,7 @@ public class RepresentDao {
 			  (builder.isSubscribeMoneyChanged() ? " ,subscribe_money = " + represent.getSubscribeMoney() : "") +
 			  (builder.isTitleChanged() ? " ,title = '" + represent.getTitle() + "'" : "") +
 			  (builder.isCommissionRateChanged() ? " ,commission_rate = " + represent.getComissionRate() : "") +
+			  " ,gift_desc = '" + represent.getGiftDesc() + "'" + 
 			  " WHERE id = " + represent.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("找到相应的【我要代言】");
@@ -222,6 +224,7 @@ public class RepresentDao {
 			represent.setSubscribePoint(dbCon.rs.getInt("subscribe_point"));
 			represent.setSubscribeMoney(dbCon.rs.getFloat("subscribe_money"));
 			represent.setCommissionRate(dbCon.rs.getFloat("commission_rate"));
+			represent.setGiftDesc(dbCon.rs.getString("gift_desc"));
 			if(dbCon.rs.getInt("oss_image_id") != 0){
 				represent.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
 			}
