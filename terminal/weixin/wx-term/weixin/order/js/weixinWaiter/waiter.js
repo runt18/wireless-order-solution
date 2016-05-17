@@ -64,37 +64,6 @@ $(function(){
 		});
 	}
 	
-	function initWaiterOrder(){
-		
-		//获取门店信息
-		$.ajax({
-			url : '../../WxOperateRestaurant.do',
-			dataType : 'json',
-			type : 'post',
-			data : {
-				dataSource : 'detail',
-				branchId : Util.mp.params.branchId
-			},
-			success : function(data, status, xhr){
-				document.title = data.root[0].name;
-			}
-		});
-		
-		//获取门店信息
-		$.ajax({
-			url : '../../WxOperateRestaurant.do',
-			dataType : 'json',
-			type : 'post',
-			data : {
-				dataSource : 'getByCond',
-				branchId : Util.mp.params.branchId
-			},
-			success : function(data, status, xhr){
-				fastFoodWaiterData._orderType = data.root[0].defaultOrderType;
-			}
-		});
-		
-		
 		//加载店小二账单信息
 		function initTableMsg(){
 			//获取餐桌信息
@@ -198,7 +167,36 @@ $(function(){
 				}
 			});	 
 		}
+	
+	function initWaiterOrder(){
 		
+		//获取门店信息
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'detail',
+				branchId : Util.mp.params.branchId
+			},
+			success : function(data, status, xhr){
+				document.title = data.root[0].name;
+			}
+		});
+		
+		//获取门店信息
+		$.ajax({
+			url : '../../WxOperateRestaurant.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'getByCond',
+				branchId : Util.mp.params.branchId
+			},
+			success : function(data, status, xhr){
+				fastFoodWaiterData._orderType = data.root[0].defaultOrderType;
+			}
+		});
 		
 		var waiterTabArr = [].slice.call($('#waiterTab_div_waiter').find('[data-type=waiterTab]'));
 		waiterTabArr.forEach(function(el, index){
