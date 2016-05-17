@@ -71,10 +71,12 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					initTableMsg();
+					
 					if(data.root[0].statusValue == tableStatus.BUSY.val){						
+						initTableMsg();
 						hasFood();
 					}else{
+						fastFoodWaiterData._tableId = Util.mp.params.tableId;
 						//自助点餐点击
 						$('#orderBySelf_a_waiter').click();
 					}	
@@ -119,7 +121,6 @@ $(function(){
 					});
 					
 					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
-					fastFoodWaiterData._tableId = data.root[0].table.id;
 					///赋值账单号
 					$('#orderId_font_waiter').text(data.root[0].id);
 					
