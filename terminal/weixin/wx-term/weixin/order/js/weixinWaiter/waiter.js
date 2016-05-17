@@ -71,8 +71,8 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
+					initTableMsg();
 					if(data.root[0].statusValue == tableStatus.BUSY.val){						
-						initTableMsg();
 						hasFood();
 					}else{
 						//自助点餐点击
