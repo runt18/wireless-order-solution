@@ -275,15 +275,15 @@ $(function(){
 		//标前缀
 		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-			hasFoods = true;
+			_hasFoods = true;
 		});
 		
 		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-			hasFoods = true;
+			_hasFoods = true;
 		});
 		
-		if(!hasFoods){
+		if(!_hasFoods){
 			$('#tipsFoods_span_waiter').css({
 				'margin' : '40% 0px',
 				'display' : 'block'
