@@ -14,10 +14,53 @@ $(function(){
 		DIRECT_ORDER : 3		//直接下单
 	}
 	
+	
+	var payParam = null;		//微信支付的参数
 	var checkPayTypeDialog;		//下单方式选择框
 	var orderFoodPopup;			//点菜container
+	var _hasFoods = false;      // 账单是否有菜品
+	
+	//加载店小二账单信息
 	initWaiterOrder();
+	
+	if(Util.mp.params.orderId){
+		//店小二
+		initTableMsg();
+		if(!_hasFoods){
+			//自助点餐点击
+			$('#orderBySelf_a_waiter').click();
+		}
+	}else{
+		//扫码
+		//查看餐桌信息
+		$.ajax({
+			url : '../../WxOperateWaiter.do',
+			data : {
+				dataSource : 'getTableStatus',
+				sessionId : Util.mp.params.sessionId ? Util.mp.params.sessionId : '',
+				tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(data, status, xhr){
+				if(data.success){
+					if(data.root[0].statusValue == tableStatus.BUSY.val){						
+						initTableMsg();
+						if(!_hasFoods){
+							//自助点餐点击
+							$('#orderBySelf_a_waiter').click();
+						}
+					}else{
+						//自助点餐点击
+						$('#orderBySelf_a_waiter').click();
+					}	
+				}
+			}
+		});
+	}
+	
 	function initWaiterOrder(){
+		
 		//获取门店信息
 		$.ajax({
 			url : '../../WxOperateRestaurant.do',
@@ -53,29 +96,7 @@ $(function(){
 			};
 
 		
-		$.ajax({
-			url : '../../WxOperateWaiter.do',
-			data : {
-				dataSource : 'getTableStatus',
-				sessionId : Util.mp.params.sessionId ? Util.mp.params.sessionId : '',
-				tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
-			},
-			type : 'post',
-			dataType : 'json',
-			success : function(data, status, xhr){
-				if(data.success){
-					if(data.root[0].statusValue == tableStatus.BUSY.val){ //就餐
-						initTableMsg();
-					}else{
-						//自助点餐点击
-						$('#orderBySelf_a_waiter').click();
-					}	
-				}
-			}
-		});
-		
-		
-		
+		//加载店小二账单信息
 		function initTableMsg(){
 			//获取餐桌信息
 			$.ajax({
@@ -176,7 +197,7 @@ $(function(){
 						location.href = 'waiterTimeout.html';
 					}
 				}
-			});	
+			});	 
 		}
 		
 		
@@ -199,8 +220,6 @@ $(function(){
 			
 			
 	function initFoodList(data, isWxOrder){
-		
-		
 		
 		var orderListTemplete = '<div class="main-box" style="background-color: cornsilk;">'+
 									'<ul class="m-b-list">'+
@@ -256,7 +275,6 @@ $(function(){
 			$('#orderAmountTips_span_waiter').css('background', (data.foods.length ? 'red' : ''));
 		}
 		
-		var hasFoods = false;
 		//标前缀
 		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
@@ -751,8 +769,6 @@ $(function(){
 	}
 	
 	
-	//微信支付的参数
-	var payParam = null;
 	//微信支付回调函数
 	function onBridgeReady(){
 		if(payParam){
