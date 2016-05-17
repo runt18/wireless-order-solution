@@ -6,6 +6,7 @@ $(function(){
 		_commentData : null,	//备注资料
 		_orderId : null,		//账单Id
 		_orderType : null		//下单方式
+		_tableId : null         //餐桌id
 	};
 	
 	var orderType = {
@@ -118,6 +119,7 @@ $(function(){
 					});
 					
 					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
+					fastFoodWaiterData._tableId = data.root[0].table.id;
 					///赋值账单号
 					$('#orderId_font_waiter').text(data.root[0].id);
 					
@@ -684,6 +686,7 @@ $(function(){
 					foods : foods,
 					sessionId : Util.mp.params.sessionId,
 					tableAlias : fastFoodWaiterData._tableAlias,
+					tableId : fastFoodWaiterData._tableId,
 					orderId : fastFoodWaiterData._orderId,
 					force : true
 				},
