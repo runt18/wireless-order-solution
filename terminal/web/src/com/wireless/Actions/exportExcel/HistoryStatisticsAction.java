@@ -5199,7 +5199,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(7, 3000);
 		sheet.setColumnWidth(8, 3000);
 		sheet.setColumnWidth(9, 3000);
-		sheet.setColumnWidth(10, 6000);
+		sheet.setColumnWidth(10, 3000);
+		sheet.setColumnWidth(11, 6000);
 		
 		//冻结行
 		sheet.createFreezePane(0, 4, 0, 4);
@@ -5233,6 +5234,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		cell.setCellValue("账单号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("门店名称");
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
@@ -5281,6 +5286,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			cell = row.createCell(0);
 			cell.setCellValue(o.getId());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(o.getRestaurantName());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell((int)row.getLastCellNum());
