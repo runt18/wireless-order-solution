@@ -1746,8 +1746,8 @@ public class MemberDao {
 		dbCon.stmt.executeUpdate(sql);
 
 		//获取门店的佣金比例
-		float commissionRate = RepresentDao.getByCond(dbCon, staff, null).get(0).getComissionRate();
-		if(commissionRate > 0){
+		Represent represent = RepresentDao.getByCond(dbCon, staff, null).get(0);
+		if(represent.isProgress() && represent.getComissionRate() > 0){
 			//获取关系链
 			final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
 			if(!recommends.isEmpty()){
@@ -1756,7 +1756,7 @@ public class MemberDao {
 				Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
 				
 				//计算出佣金充额(四舍五入)
-				int commission = Math.round(consumePrice * commissionRate);
+				int commission = Math.round(consumePrice * represent.getComissionRate());
 				
 				//为推荐人充值佣金 
 				if(commission > 0){
