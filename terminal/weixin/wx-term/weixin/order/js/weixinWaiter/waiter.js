@@ -46,106 +46,139 @@ $(function(){
 			}
 		});
 		
-		//获取餐桌信息
+		
+		var tableStatus = {
+				IDLE : { val : 0, desc : '空闲'},
+				BUSY : { val : 1, desc : '就餐'}
+			};
+
+		
 		$.ajax({
 			url : '../../WxOperateWaiter.do',
 			data : {
-				dataSource : 'getOrder',
-				sessionId : Util.mp.params.sessionId,
-				orderId : Util.mp.params.orderId
+				dataSource : 'getTableStatus',
+				sessionId : Util.mp.params.sessionId ? Util.mp.params.sessionId : '',
+				tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
 			},
 			type : 'post',
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					
-					fastFoodWaiterData._orderId = data.root[0].id;
-					
-					//获取【待确认】的菜品信息
-					$.ajax({
-						url : '../../WxOperateOrder.do',
-						type : 'post',
-						datatype : 'json',
-						data : {
-							dataSource : 'getByCond',
-							sessionId : Util.mp.params.sessionId, 
-							status : '2',
-							orderId : data.root[0].id
-						},
-						success : function(res, status, xhr){
-							if(res.success && res.root.length > 0){
-								initFoodList(res.root[0], true);
-							}
-						}
-					});
-					
-					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
-					///赋值账单号
-					$('#orderId_font_waiter').text(data.root[0].id);
-					
-					//赋值给餐台号
-					$('#tableNum_font_waiter').text(data.root[0].table.name);
-					
-					//赋值给开台时间
-					$('#openTableTime_font_waiter').text(data.root[0].birthDate);
-					
-					//赋值给开台人
-					$('#openTablePeople_font_waiter').text(data.root[0].waiter);
-					
-					//赋值原价
-					$('#actualPriceBeforeDiscount_span_waiter').text(data.root[0].actualPriceBeforeDiscount);
-					
-					
-					//读取账单会员数据
-					if(data.root[0].memberId != 0){
-						$.ajax({
-							url : '../../WXOperateMember.do',
-							type : 'post',
-							dataType : 'json',
-							data : {
-								dataSource : 'getByCond',
-								sessionId : Util.mp.params.sessionId,
-								memberId : data.root[0].memberId
-							},
-							success : function(data, status, xhr){
-								
-								$('#memberName_span_waiter').text(data.root[0].name);
-							}
-						});
-						
-						//赋值会员价金额
-						$('#actualPrice_span_waiter').text(data.root[0].actualPrice + '元');
-						
-						//赋值折扣金额
-						$('#discountPrice_span_waiter').text(data.root[0].discountPrice + '元');
-					
+					if(data.root[0].statusValue == tableStatus.BUSY.val){ //就餐
+						initTableMsg();
 					}else{
-						
-						$('#memberName_span_waiter').text('——');
-						
-						//赋值会员价金额
-						$('#actualPrice_span_waiter').text(data.root[0].actualPrice + '元');
-						
-						//赋值折扣金额
-						$('#discountPrice_span_waiter').text(data.root[0].discountPrice + '元');
-					}
-					
-					//加载菜品数据
-					initFoodList(data.root[0], false);
-					
-					//已经结账的账单处理
-					if(data.root[0].statusValue !== 0){
-						$('#bottom_div_waiter').css({
-							'background' : 'rgb(228, 240, 245)',
-							'padding' : '4px 0'
-						});
-						$('#bottom_div_waiter').html('<span style="display:block;color:#156785;font-size:34px;text-align:center;">账单已结账</span>');
-					}
-				}else{
-					location.href = 'waiterTimeout.html';
+						//自助点餐点击
+						$('#orderBySelf_a_waiter').click();
+					}	
 				}
 			}
-		});	
+		});
+		
+		
+		
+		function initTableMsg(){
+			//获取餐桌信息
+			$.ajax({
+				url : '../../WxOperateWaiter.do',
+				data : {
+					dataSource : 'getOrder',
+					sessionId : Util.mp.params.sessionId,
+					orderId : Util.mp.params.orderId
+				},
+				type : 'post',
+				dataType : 'json',
+				success : function(data, status, xhr){
+					if(data.success){
+						
+						fastFoodWaiterData._orderId = data.root[0].id;
+						
+						//获取【待确认】的菜品信息
+						$.ajax({
+							url : '../../WxOperateOrder.do',
+							type : 'post',
+							datatype : 'json',
+							data : {
+								dataSource : 'getByCond',
+								sessionId : Util.mp.params.sessionId, 
+								status : '2',
+								orderId : data.root[0].id
+							},
+							success : function(res, status, xhr){
+								if(res.success && res.root.length > 0){
+									initFoodList(res.root[0], true);
+								}
+							}
+						});
+						
+						fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
+						///赋值账单号
+						$('#orderId_font_waiter').text(data.root[0].id);
+						
+						//赋值给餐台号
+						$('#tableNum_font_waiter').text(data.root[0].table.name);
+						
+						//赋值给开台时间
+						$('#openTableTime_font_waiter').text(data.root[0].birthDate);
+						
+						//赋值给开台人
+						$('#openTablePeople_font_waiter').text(data.root[0].waiter);
+						
+						//赋值原价
+						$('#actualPriceBeforeDiscount_span_waiter').text(data.root[0].actualPriceBeforeDiscount);
+						
+						
+						//读取账单会员数据
+						if(data.root[0].memberId != 0){
+							$.ajax({
+								url : '../../WXOperateMember.do',
+								type : 'post',
+								dataType : 'json',
+								data : {
+									dataSource : 'getByCond',
+									sessionId : Util.mp.params.sessionId,
+									memberId : data.root[0].memberId
+								},
+								success : function(data, status, xhr){
+									
+									$('#memberName_span_waiter').text(data.root[0].name);
+								}
+							});
+							
+							//赋值会员价金额
+							$('#actualPrice_span_waiter').text(data.root[0].actualPrice + '元');
+							
+							//赋值折扣金额
+							$('#discountPrice_span_waiter').text(data.root[0].discountPrice + '元');
+						
+						}else{
+							
+							$('#memberName_span_waiter').text('——');
+							
+							//赋值会员价金额
+							$('#actualPrice_span_waiter').text(data.root[0].actualPrice + '元');
+							
+							//赋值折扣金额
+							$('#discountPrice_span_waiter').text(data.root[0].discountPrice + '元');
+						}
+						
+						//加载菜品数据
+						initFoodList(data.root[0], false);
+						
+						//已经结账的账单处理
+						if(data.root[0].statusValue !== 0){
+							$('#bottom_div_waiter').css({
+								'background' : 'rgb(228, 240, 245)',
+								'padding' : '4px 0'
+							});
+							$('#bottom_div_waiter').html('<span style="display:block;color:#156785;font-size:34px;text-align:center;">账单已结账</span>');
+						}
+					}else{
+						location.href = 'waiterTimeout.html';
+					}
+				}
+			});	
+		}
+		
 		
 		var waiterTabArr = [].slice.call($('#waiterTab_div_waiter').find('[data-type=waiterTab]'));
 		waiterTabArr.forEach(function(el, index){
@@ -747,7 +780,12 @@ $(function(){
 							orderFoodPopup.closeShopping();
 							$('#closeFastFood_a_waiter').click();
 							$('#foodList_div_waiter').html('');
-							initWaiterOrder();
+							if(Util.mp.params.tableId){
+								window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
+							}else{
+								initWaiterOrder();
+							}
+							
 							setTimeout(function(){
 								window.location.reload();
 							}, 2000);
