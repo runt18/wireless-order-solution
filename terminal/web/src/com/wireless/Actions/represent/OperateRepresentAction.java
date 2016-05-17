@@ -40,6 +40,7 @@ public class OperateRepresentAction extends DispatchAction{
 		final String subscribePoint = request.getParameter("subscribePoint");
 		final String subscribeMoney = request.getParameter("subscribeMoney");
 		final String commissionRate = request.getParameter("commissionRate");
+		final String giftDesc = request.getParameter("giftDesc");
 		final JObject jObject = new JObject();
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -63,6 +64,11 @@ public class OperateRepresentAction extends DispatchAction{
 			//结束时间
 			if(finishDate != null && !finishDate.isEmpty()){
 				builder.setFinishDate(finishDate);
+			}
+			
+			//赠送余额说明
+			if(giftDesc != null){
+				builder.setGiftDesc(giftDesc);
 			}
 			
 			//推荐积分

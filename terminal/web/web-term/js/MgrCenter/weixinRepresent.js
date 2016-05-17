@@ -21,6 +21,7 @@ Ext.onReady(function(){
 	    			Ext.getCmp('representerExtraBalance_textfield_weixinRepresent').setValue(jr.root[0].recommendMoney);
 	    			Ext.getCmp('appenderPoint_textfield_weixinRepresent').setValue(jr.root[0].subscribePoint);
 	    			Ext.getCmp('appenderExtraBalance_textfield_weixinRepresent').setValue(jr.root[0].subscribeMoney);
+	    			Ext.getCmp('commissionGiftDesc_numfield_weixinRepresent').setValue(jr.root[0].giftDesc);
 	    			
 	    			if(jr.root[0].commissionRate){
 	    				Ext.getDom('checkCommission_checkbox_weixinRepresent').checked = true;
@@ -230,7 +231,7 @@ Ext.onReady(function(){
 			fieldLabel : '<span style="line-height:30px;margin-right:10px;">活动详情</span>',
 			style : {
 				'margin-top' : '8px',
-				'height' : '120px',
+				'height' : '80px',
 				'width' : '380px'
 			}
 		},{
@@ -281,6 +282,20 @@ Ext.onReady(function(){
 			},{
 				xtype : 'label',
 				hidden : true
+			}]
+		},{
+			xtype : 'panel',
+			layout : 'form',
+			labelWidth : 94,
+			items : [{
+				id : 'commissionGiftDesc_numfield_weixinRepresent',
+				xtype : 'textarea',
+				fieldLabel : '<span style="line-height:30px;margin-right:10px;">赠送余额说明</span>',
+				style : {
+					'margin-top' : '8px',
+					'height' : '80px',
+					'width' : '380px'
+				}
 			}]
 		},{
 			id : 'memberPoint_fieldset_weixinRepresent',
@@ -394,10 +409,13 @@ Ext.onReady(function(){
         			var recommendMoney = Ext.getCmp('representerExtraBalance_textfield_weixinRepresent').getValue() ? Ext.getCmp('representerExtraBalance_textfield_weixinRepresent').getValue() : 0;
         			var subscribePoint = Ext.getCmp('appenderPoint_textfield_weixinRepresent').getValue() ? Ext.getCmp('appenderPoint_textfield_weixinRepresent').getValue() : 0;
         			var subscribeMoney = Ext.getCmp('appenderExtraBalance_textfield_weixinRepresent').getValue() ? Ext.getCmp('appenderExtraBalance_textfield_weixinRepresent').getValue() : 0;
+        			var	representGiftDesc = Ext.getCmp('commissionGiftDesc_numfield_weixinRepresent').getValue(); 
         			
         			var isChooseGivePoint = !Ext.getCmp('memberPoint_fieldset_weixinRepresent').collapsed;
         			var isChooseGiveMoney = !Ext.getCmp('extraBalance_fieldset_weixinRepresent').collapsed;
         			
+        			
+        			params.giftDesc = representGiftDesc;
         			params.recommendPoint = Number(isChooseGivePoint ? reconmendPoint : 0);
         			params.subscribePoint = Number(isChooseGivePoint ? subscribePoint : 0);
         			

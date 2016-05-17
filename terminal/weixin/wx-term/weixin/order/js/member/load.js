@@ -148,6 +148,26 @@ $(function(){
 		}
 	});
 	
+	$.ajax({
+		url : '../../WxOperateRepresent.do',
+		data : {
+			dataSource : 'getByCond',
+			fid : Util.mp.fid
+		},
+		type : 'post',
+		dataType : 'json',
+		success : function(res, status, req){
+			if(res.success){
+				$('#spanMemberExtraBalanceDesc').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
+			}else{
+				Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+			}
+		},
+		error : function(req, status, err){
+			Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+		}
+	});
+	
 	function initMemberMsg(c){
 		c = c == null ? {} : c;
 		var data = typeof c.data == 'undefined' ? {} : c.data;
