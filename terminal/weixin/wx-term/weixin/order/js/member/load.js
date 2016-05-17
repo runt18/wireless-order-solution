@@ -159,6 +159,9 @@ $(function(){
 		success : function(res, status, req){
 			if(res.success){
 				$('#spanMemberExtraBalanceDesc').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
+				if(!res.root[0].giftDesc){
+					$('#spanMemberExtraBalanceDesc_li_member').css('line-height', '0px');
+				}
 			}else{
 				Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
 			}
