@@ -309,7 +309,11 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		
 		Data4Item item4Order = new Data4Item();
 		item4Order.setTitle("自助点餐");
-		item4Order.setUrl(createUrl(msg, WEIXIN_FOOD)+ "&e=" + WxOrder.Type.INSIDE.getVal());
+		HttpSession httpSession = request.getSession(true);
+		httpSession.setAttribute("fid", msg.getToUserName());
+		httpSession.setAttribute("oid", msg.getFromUserName());
+		httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
+		item4Order.setUrl(createUrl4Session(WEIXIN_FOOD, httpSession));
 		item4Order.setPicUrl(WEIXIN_FOOD_ICON);
 		naviItem.addItem(item4Order);
 		
