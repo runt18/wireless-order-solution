@@ -5,7 +5,7 @@ $(function(){
 		_orderData : null,		//点菜资料
 		_commentData : null,	//备注资料
 		_orderId : null,		//账单Id
-		_orderType : null		//下单方式
+		_orderType : null,		//下单方式
 		_tableId : null         //餐桌id
 	};
 	
