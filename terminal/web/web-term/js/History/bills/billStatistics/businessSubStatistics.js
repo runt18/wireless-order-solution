@@ -101,7 +101,7 @@
 								
 								Ext.ux.statistic_oBusinessHourData({data : data, type : 'setValue', statistic : 'giftStatistic_'});
 								
-								
+								console.log(sendToStatisticsRegion);
 								Ext.getCmp('giftStatistic_comboRegion').setValue(sendToStatisticsRegion);
 								
 								Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+sendToStatisticsPageHours.openingText+'</font>');
@@ -278,7 +278,7 @@
 						Ext.getCmp('branchSelect_combo_businessReceips').fireEvent('select', isJump);
 						
 						(function(){
-							if(Ext.getCmp('businessReceipt_comboBusinessHour').getValue()){
+							if(Ext.getCmp('beginDate_combo_receipts').getValue()){
 								
 								Ext.getCmp('beginDate_combo_receipts').setValue(sendToStatisticsPageBeginDate);
 								Ext.getCmp('endDate_combo_receipts').setValue(sendToStatisticsPageEndDate);
@@ -899,14 +899,11 @@ Ext.onReady(function(){
 				
 				if(branchSelect_combo_businessSubStatistics.getValue() == -1){
 					
-					var data = [];
 					//区域
-					Ext.getCmp('businessSub_comboRegion').store.loadData(data);
-					Ext.getCmp('businessSub_comboRegion').setValue('');
+					Ext.getCmp('businessSub_comboRegion').setValue(-1);
 					Ext.getCmp('businessSub_comboRegion').setDisabled(true);
 					//市别
-					Ext.getCmp('businessSub_comboBusinessHour').store.loadData(data);
-					Ext.getCmp('businessSub_comboBusinessHour').setValue('');
+					Ext.getCmp('businessSub_comboBusinessHour').setValue(-1);
 					Ext.getCmp('businessSub_comboBusinessHour').setDisabled(true);
 					
 				}else{

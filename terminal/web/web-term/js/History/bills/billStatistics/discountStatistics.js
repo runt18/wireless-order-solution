@@ -351,23 +351,20 @@ Ext.onReady(function(){
 			text : '导出',
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
-				if(!discount_beginDate.isValid() || !discount_endDate.isValid()){
-					return;
-				}
 				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}&branchId={6}&opening={7}&ending={8}';
 				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'discount_'}).data;
 				
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						Ext.util.Format.date(discount_beginDate.getValue(), 'Y-m-d 00:00:00'),
-						Ext.util.Format.date(discount_endDate.getValue(), 'Y-m-d 23:59:59'),
+						Ext.util.Format.date(Ext.getCmp('beginDate_combo_discountStatistics').getValue(), 'Y-m-d 00:00:00'),
+						Ext.util.Format.date(Ext.getCmp('endDate_combo_discountStatistics').getValue(), 'Y-m-d 23:59:59'),
 						discount_combo_staffs.getValue(),
 						discount_deptCombo.getValue(),
 						'discountStatisticsList',
 						branch_combo_discount.getValue(),
-						businessHour.opening != '00:00' ? businessHour.opening : null,
-						businessHour.ending != '00:00' ? businessHour.ending : null
+						businessHour.opening != '00:00' ? businessHour.opening : '',
+						businessHour.ending != '00:00' ? businessHour.ending : ''
 				);
 				window.location = url;
 			}

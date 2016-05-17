@@ -62,9 +62,12 @@
 			'taste' : './js/popup/taste/taste',
 			'tempTaste' : './js/popup/tempTaste/tempTaste',
 			'moreTastes' : './js/popup/moreTaste/moreTaste',
-			'wxOrderListPopup' : './js/popup/wxOrderList/wxOrderList'
+			'wxOrderListPopup' : './js/popup/wxOrderList/wxOrderList',
+			'printBind' : './js/popup/print/print',
+			'feastPay' : './js/popup/feastPay/feastPay'
 		}
 	});
+	
 </script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <!-- 日期插件.js -->
@@ -101,8 +104,6 @@
 <script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
 <!-- JqmPopupDiv弹出控件 -->
 <script type="text/javascript" src="./js/popup/jqmPopupDiv.js?v=<%=v %>"></script>
-<!-- 打印机绑定 -->
-<script type="text/javascript" src="./js/popup/print/print.js?v=<%=v %>"></script>
 <!-- 查台等控件绑定 -->
 <script type="text/javascript" src="./js/popup/table/ask.js?v=<%=v %>"></script>
 <!-- 明细控件绑定 -->
@@ -119,8 +120,6 @@
 <script type="text/javascript" src="./js/popup/wxPayment/wxPayment.js?v=<%=v %>"></script>
 <!-- 开席&拼台 -->
 <script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js?v=<%=v %>"></script>
-<!-- 酒席入账 -->
-<script type="text/javascript" src="./js/popup/feastPay/feastPay.js?v=<%=v %>"></script>
 <!-- 跑马灯 -->
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
 <!-- 重连socket -->

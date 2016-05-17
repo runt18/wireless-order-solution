@@ -616,7 +616,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("菜品销售统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		if(Integer.parseInt(branchId) > 0){
+			cell.setCellValue("菜品销售统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		}else{
+			cell.setCellValue("菜品销售统计(全部)");
+		}
+		
 		cell.setCellStyle(titleStyle);
 		
 		// 摘要
@@ -1689,7 +1694,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("收款统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		if(Integer.parseInt(branchId) > 0){
+			cell.setCellValue("收款统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		}else{
+			cell.setCellValue("收款统计(全部门店)");
+		}
+		
 		cell.setCellStyle(titleStyle);
 		
 		// 摘要
@@ -1938,7 +1948,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("营业汇总(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		if(Integer.parseInt(branchId) > 0){
+			cell.setCellValue("营业汇总(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		}else{
+			cell.setCellValue("营业汇总(全部门店)");
+		}
+		
 		cell.setCellStyle(titleStyle);
 		// *****
 		// 摘要
@@ -4720,6 +4735,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			title = "折扣统计(全部门店)"; 
 		}
 		
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("折扣统计.xls").getBytes("GBK"),  "ISO8859_1"));
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet(title);
 		HSSFRow row = null;
@@ -5079,11 +5095,17 @@ public class HistoryStatisticsAction extends DispatchAction{
 
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
+		final OrderDao.ExtraCond extraCond = new OrderDao.ExtraCond(DateType.valueOf(Integer.parseInt(dateType)));
+		
 		if(branchId != null && !branchId.isEmpty()){
-			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			if(Integer.parseInt(branchId) > 0){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				extraCond.setChain(true);
+			}
 		}
 		
-		final OrderDao.ExtraCond extraCond = new OrderDao.ExtraCond(DateType.valueOf(Integer.parseInt(dateType)));
+		
 		
 		if(comboType != null && !comboType.trim().isEmpty()){
 			int comboVal = Integer.valueOf(comboType);
@@ -5152,7 +5174,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		final List<Order> list = OrderDao.getByCond(staff, extraCond, orderClause);
 		
-		final String title = "历史账单(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
+		String title;
+		if(Integer.parseInt(branchId) > 0){
+			title = "历史账单(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
+		}else{
+			title = "历史账单(全部门店)";
+		}
 		
 		//标题
 		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("历史账单.xls").getBytes("GBK"),  "ISO8859_1"));

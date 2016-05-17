@@ -471,8 +471,8 @@ Ext.onReady(function(){
 						'cancelledFood',
 						cancel_combo_staffs.getValue(),
 						branch_combo_cancelledFood.getValue(),
-						businessHour.opening != '00:00' ? businessHour.opening : null,
-						businessHour.ending != '00:00' ? businessHour.ending : null
+						businessHour.opening != '00:00' ? businessHour.opening : '',
+						businessHour.ending != '00:00' ? businessHour.ending : ''
 					);
 					window.location = url;
 	

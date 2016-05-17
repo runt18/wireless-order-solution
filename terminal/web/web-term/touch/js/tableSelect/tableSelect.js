@@ -790,8 +790,9 @@ $(function(){
 		$('#printBind_a_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
 			setTimeout(function(){
-				var printBindPopup = new PrintBindPopup();
-				printBindPopup.open();
+				seajs.use('printBind', function(print){
+					print.newInstance().open();
+				});
 			}, 300);
 			
 		});
@@ -1077,7 +1078,7 @@ $(function(){
 								commit : function(selectedFoods){
 									if(selectedFoods.length == 0){
 										Util.msg.tip("请选择菜品");		
-										return ;
+										return ;1
 									}
 									
 									var orderFoods = [];
@@ -1155,23 +1156,26 @@ $(function(){
 		$('#feastPay_li_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
 			setTimeout(function(){
-				var feastPay = new FeastPaidPopup({
-					confirm : function(result){
-						if(result.success){
-							feastPay.close();
-							//先跳转到结账界面再操作
-							updateTable({
-								toPay : true,
-								id : result.other.tableId
-							});	
-							//刷新餐台数据
-							initTableData();
-						}else{
-							Util.msg.tip(result.msg);
+				seajs.use('feastPay', function(feast){
+					var feastPay = null;
+					feastPay = feast.newInstance({
+						confirm : function(result){
+							if(result.success){
+								feastPay.close();
+								//先跳转到结账界面再操作
+								updateTable({
+									toPay : true,
+									id : result.other.tableId
+								});	
+								//刷新餐台数据
+								initTableData();
+							}else{
+								Util.msg.tip(result.msg);
+							}
 						}
-					}
+					});
+					feastPay.open();
 				});
-				feastPay.open();
 			}, 300);
 		});
 		
