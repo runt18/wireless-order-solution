@@ -28,13 +28,34 @@ $(function(){
 		BUSY : { val : 1, desc : '就餐'}
 	};
 	
+	function hasFood(){
+		//获取餐桌信息
+		$.ajax({
+			url : '../../WxOperateWaiter.do',
+			data : {
+				dataSource : 'getOrder',
+				sessionId : Util.mp.params.sessionId,
+				orderId : Util.mp.params.orderId
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(data, status, xhr){
+				if(data.success){
+					if(data.root.length == 0){
+						//自助点餐点击
+						$('#orderBySelf_a_waiter').click();
+					}
+				}
+			}
+		})
+	}
+	
+	
 	if(Util.mp.params.orderId){
 		//店小二
 		initTableMsg();
-		if(!_hasFoods){
-			//自助点餐点击
-			$('#orderBySelf_a_waiter').click();
-		}
+		
+		hasFood();
 	}else{
 		//扫码
 		//查看餐桌信息
@@ -51,10 +72,7 @@ $(function(){
 				if(data.success){
 					if(data.root[0].statusValue == tableStatus.BUSY.val){						
 						initTableMsg();
-						if(!_hasFoods){
-							//自助点餐点击
-							$('#orderBySelf_a_waiter').click();
-						}
+						hasFood();
 					}else{
 						//自助点餐点击
 						$('#orderBySelf_a_waiter').click();
@@ -275,15 +293,13 @@ $(function(){
 		//标前缀
 		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-			_hasFoods = true;
 		});
 		
 		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
-			_hasFoods = true;
 		});
 		
-		if(!_hasFoods){
+		if(data.length > 0){
 			$('#tipsFoods_span_waiter').css({
 				'margin' : '40% 0px',
 				'display' : 'block'
