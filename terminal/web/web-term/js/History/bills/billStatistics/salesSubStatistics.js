@@ -225,7 +225,7 @@ $(function(){
 								thiz.store.loadData(data);
 								thiz.setValue(jr.root[0].id);
 							}else{
-								var data = [[-1, '全部']];
+								var data = [[-1, '全部门店']];
 								data.push([jr.root[0]['id'], jr.root[0]['name'] + '(集团)']);
 								
 								for(var i = 0; i < jr.root[0].branches.length; i++){
