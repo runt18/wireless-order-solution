@@ -23,6 +23,11 @@ $(function(){
 	//加载店小二账单信息
 	initWaiterOrder();
 	
+	var tableStatus = {
+		IDLE : { val : 0, desc : '空闲'},
+		BUSY : { val : 1, desc : '就餐'}
+	};
+	
 	if(Util.mp.params.orderId){
 		//店小二
 		initTableMsg();
@@ -89,12 +94,6 @@ $(function(){
 			}
 		});
 		
-		
-		var tableStatus = {
-				IDLE : { val : 0, desc : '空闲'},
-				BUSY : { val : 1, desc : '就餐'}
-			};
-
 		
 		//加载店小二账单信息
 		function initTableMsg(){
