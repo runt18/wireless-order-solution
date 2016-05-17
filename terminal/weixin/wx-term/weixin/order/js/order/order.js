@@ -73,7 +73,7 @@ $(function(){
 					code : temp.code,
 					status : temp.statusDesc,
 					orderId : temp.orderId ? temp.orderId : '----',
-					tableAlias : temp.table.name,
+					tableAlias : temp.table ? temp.table.name : '----',
 					orderDate : temp.date,
 					totalPrice : temp.price,
 					count : count,
