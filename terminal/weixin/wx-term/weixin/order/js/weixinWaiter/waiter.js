@@ -93,7 +93,8 @@ $(function(){
 			data : {
 				dataSource : 'getOrder',
 				sessionId : Util.mp.params.sessionId,
-				orderId : Util.mp.params.orderId
+				orderId : Util.mp.params.orderId,
+				tableId : Util.mp.params.tableId
 			},
 			type : 'post',
 			dataType : 'json',
