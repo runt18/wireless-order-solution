@@ -71,7 +71,7 @@ public class WxOperateWaiterAction extends DispatchAction{
 		final String orderId = request.getParameter("orderId");
 		final String payType = request.getParameter("payType");
 		final String sessionId = request.getParameter("sessionId");
-
+		final String tableId = request.getParameter("tableId");
 		final JObject jObject= new JObject();
 		try{
 			final HttpSession session = SessionListener.sessions.get(sessionId);
@@ -82,7 +82,16 @@ public class WxOperateWaiterAction extends DispatchAction{
 				
 				final WxMember wxMember = WxMemberDao.getBySerial(staff, oid);
 				final Member member = MemberDao.getById(staff, wxMember.getMemberId());
-				final Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
+				
+				Order order;
+				if(orderId != null && !orderId.isEmpty()){
+					order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
+				}else if(tableId != null && !tableId.isEmpty()){
+					order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
+				}else{
+					throw new BusinessException("没有账单Id或者餐桌Id");
+				}
+				
 				
 				//web socket通知Touch呼叫结账
 		        WxWaiter waiter = WxWaiterServerPoint.getWxWaiter(staff.getRestaurantId());

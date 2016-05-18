@@ -513,6 +513,7 @@ $(function(){
 							dataSource : 'callPay',
 							sessionId : Util.mp.params.sessionId,
 							orderId : Util.mp.params.orderId,
+							tableId : Util.mp.params.orderId,
 							payType : payType
 						},
 						type : 'post',
