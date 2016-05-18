@@ -513,7 +513,7 @@ $(function(){
 							dataSource : 'callPay',
 							sessionId : Util.mp.params.sessionId,
 							orderId : Util.mp.params.orderId,
-							tableId : Util.mp.params.orderId,
+							tableId : Util.mp.params.tableId,
 							payType : payType
 						},
 						type : 'post',
@@ -658,10 +658,11 @@ $(function(){
 							},
 							afterClose : function(){
 								//关闭后回调
-								orderFoodPopup.closeShopping();
-								$('#closeFastFood_a_waiter').click();
-								$('#foodList_div_waiter').html('');
-								initWaiterOrder();
+//								orderFoodPopup.closeShopping();
+//								$('#closeFastFood_a_waiter').click();
+//								$('#foodList_div_waiter').html('');
+//								initWaiterOrder();
+								window.location.reload();
 							}
 						});
 						
@@ -689,7 +690,7 @@ $(function(){
 					foods : foods,
 					sessionId : Util.mp.params.sessionId,
 					tableAlias : fastFoodWaiterData._tableAlias,
-					tableId : fastFoodWaiterData._tableId,
+					tableId : Util.mp.params.tableId,
 					orderId : fastFoodWaiterData._orderId,
 					force : true
 				},
