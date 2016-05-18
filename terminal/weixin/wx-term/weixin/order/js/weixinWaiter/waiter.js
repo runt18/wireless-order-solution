@@ -643,6 +643,7 @@ $(function(){
 					comment : fastFoodWaiterData._commentData ? fastFoodWaiterData._commentData : '',
 					branchId : Util.mp.params.branchId,
 					tableAlias : fastFoodWaiterData._tableAlias,
+					tableId : Util.mp.params.tableId,
 					orderId : fastFoodWaiterData._orderId,
 					print : true
 				},
@@ -662,7 +663,13 @@ $(function(){
 //								$('#closeFastFood_a_waiter').click();
 //								$('#foodList_div_waiter').html('');
 //								initWaiterOrder();
-								window.location.reload();
+								if(Util.mp.params.tableId){
+									window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
+								}else{
+									window.location.reload();
+									$('#waiterTab_div_waiter').find('[data-type=waiterTab]').click();
+								}
+								
 							}
 						});
 						
