@@ -31,6 +31,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private boolean enabled = true;
 	
+	private int extra;
+	
 	public static class SummaryUpdateBuilder{
 		private final UpdateBuilder builder;
 		  
@@ -40,6 +42,17 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}else{
 				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
 			}
+		}
+		
+		public SummaryUpdateBuilder setDisplayTotal(boolean onOff){
+			int extra = builder.extra.intValue(); 
+			if(onOff){
+				extra |= DISPLAY_SUMMARY_TOTAL;
+			}else{
+				extra &= ~DISPLAY_SUMMARY_TOTAL;
+			}
+			builder.extra = extra;
+			return this;
 		}
 		
 		public SummaryUpdateBuilder setRepeat(int repeat){
@@ -140,6 +153,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private List<Department> mDept;
 		private List<Kitchen> mKitchens;
 		private int enabled = -1;
+		private Integer extra;
 		
 		private UpdateBuilder(int printerId, PType type, UpdateBuilder src){
 			this(printerId, type);
@@ -188,6 +202,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		public UpdateBuilder(int printerId, PType type){
 			this.mPrinterId = printerId;
 			this.mPType = type;
+		}
+		
+		public UpdateBuilder setExtra(int extra){
+			this.extra = extra;
+			return this;
+		}
+		
+		public boolean isExtraChanged(){
+			return this.extra != null;
 		}
 		
 		public boolean isCommentChanged(){
@@ -283,6 +306,25 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	public static class SummaryOptions{
+		
+		private final int extra;
+		
+		public SummaryOptions(PrintFunc func){
+			this.extra = func.extra;
+		}
+
+		public SummaryOptions(int extra){
+			this.extra = extra;
+		}
+
+		public boolean containsTotal(){
+			return (this.extra & DISPLAY_SUMMARY_TOTAL) != 0;
+		}
+	}
+	
+	private final static int DISPLAY_SUMMARY_TOTAL = 1 << 1;		//点菜总单显示小计
+	
 	/**
 	 * The helper class to create the print function of summary.
 	 */
@@ -293,6 +335,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final List<Region> mRegions = SortedList.newInstance();
 		private final List<Department> mDepts = SortedList.newInstance();
 		private String comment;
+		private int extra;
 		
 		public SummaryBuilder(int printerId, PType type){
 			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
@@ -301,6 +344,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}else{
 				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
 			}
+		}
+		
+		public SummaryBuilder setDisplayTotal(boolean onOff){
+			if(onOff){
+				this.extra |= DISPLAY_SUMMARY_TOTAL;
+			}else{
+				this.extra &= ~DISPLAY_SUMMARY_TOTAL;
+			}
+			return this;
 		}
 		
 		public SummaryBuilder setComment(String comment){
@@ -523,6 +575,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		if(builder.isEnabledChanged()){
 			enabled = builder.enabled == 1;
 		}
+		if(builder.isExtraChanged()){
+			extra = builder.extra.intValue();
+		}
 	}
 	
 	private PrintFunc(SummaryBuilder builder){
@@ -531,6 +586,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this.mRegions.addAll(builder.mRegions);
 		this.mDepts.addAll(builder.mDepts);
 		this.mComment = builder.comment;
+		this.extra = builder.extra;
 	}
 	
 	private PrintFunc(DetailBuilder builder, PType type, boolean enabled){
@@ -582,6 +638,14 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public int getRepeat(){
 		return mRepeat;
+	}
+	
+	public int getExtra(){
+		return this.extra;
+	}
+	
+	public void setExtra(int extra){
+		this.extra = extra;
 	}
 	
 	public List<Department> getDepartment(){
@@ -773,7 +837,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.putString("pTypeText", this.mType.getDesc());
 		jm.putInt("repeat", this.mRepeat);
 		jm.putString("comment", this.mComment);
-		
+		jm.putInt("extra", this.extra);
 		jm.putBoolean("enabled", this.enabled);
 		
 		if(this.mRegions.size() > 0){
