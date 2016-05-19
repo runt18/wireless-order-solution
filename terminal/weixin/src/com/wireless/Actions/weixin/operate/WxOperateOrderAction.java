@@ -476,13 +476,13 @@ public class WxOperateOrderAction extends DispatchAction {
 									Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
 									
 									Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
-				  							   .setToUser(oid)
-				  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
-				  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
-				  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
-				  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
-				  							   .addKeyword(new Keyword("keyword4", cost + "元"))
-				  							   .addKeyword(new Keyword("remark", "感谢你的使用，欢迎下次再来订餐")));
+												  							   .setToUser(oid)
+												  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
+												  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
+												  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
+												  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
+												  							   .addKeyword(new Keyword("keyword4", cost + "元"))
+												  							   .addKeyword(new Keyword("remark", "感谢你的使用，欢迎下次再来订餐")));
 								}else{
 									throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 								}

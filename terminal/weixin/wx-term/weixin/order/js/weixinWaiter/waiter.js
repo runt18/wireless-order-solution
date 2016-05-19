@@ -808,7 +808,6 @@ $(function(){
 				"signType" : payParam.signType,
 				"paySign" : payParam.paySign
 			}, function(res) {
-				alert(res.err_msg);
 				if (res.err_msg == "get_brand_wcpay_request:ok") {
 					// 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
 					
@@ -818,7 +817,7 @@ $(function(){
 						content : ('<span style="display:block;text-align:center;">微信支付下单成功,厨房正在准备,请稍等</span>'),
 						leftText : '确认',
 						left : function(){
-							errDialog.close();
+							orderSuccessDialog.close();
 						},
 						afterClose : function(){
 							orderFoodPopup.closeShopping();

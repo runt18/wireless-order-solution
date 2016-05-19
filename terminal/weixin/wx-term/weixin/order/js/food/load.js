@@ -128,7 +128,8 @@ $(function(){
 							var completeMemberMsgDialog = new CompleteMemberMsg({
 								completeFinish : function(){
 									commit(calcOrderCost);
-								}
+								},
+								sessionId : Util.mp.params.sessionId
 							});
 							completeMemberMsgDialog.open();
 						}else{
