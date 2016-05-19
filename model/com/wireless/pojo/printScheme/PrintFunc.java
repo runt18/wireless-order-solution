@@ -90,6 +90,16 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			this.cancelEnabled = cancelEnabled;
 		}
 		
+		public DetailUpdateBuilder setRegionAll(){
+			builder.setRegionAll();
+			return this;
+		}
+		
+		public DetailUpdateBuilder addRegion(Region region){
+			builder.addRegion(region);
+			return this;
+		}
+		
 		public DetailUpdateBuilder setRepeat(int repeat){
 			builder.setRepeat(repeat);
 			return this;
@@ -113,6 +123,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			final UpdateBuilder[] result = new UpdateBuilder[2];
 			result[0] = new UpdateBuilder(builder.mPrinterId, PType.PRINT_ORDER_DETAIL, builder).setEnabled(extraEnabled);
 			result[1] = new UpdateBuilder(builder.mPrinterId, PType.PRINT_CANCELLED_FOOD_DETAIL, builder).setEnabled(cancelEnabled);
+			if(builder.isRegionChanged()){
+				result[0].mRegions = new ArrayList<Region>(builder.mRegions);
+				result[1].mRegions = new ArrayList<Region>(builder.mRegions);
+			}
 			return result;
 		}
 	}

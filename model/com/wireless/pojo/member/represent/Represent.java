@@ -189,6 +189,10 @@ public class Represent implements Jsonable {
 			return this.commissionRate != null;
 		}
 		
+		public boolean isGiftDescChanged(){
+			return this.giftDesc != null;
+		}
+		
 		public UpdateBuilder setCommissionRate(float commissionRate){
 			if(commissionRate >= 0 && commissionRate <= 1){
 				this.commissionRate = commissionRate;
