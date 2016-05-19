@@ -201,7 +201,7 @@ public class Page{
 		}
 		
 
-		public String getUrl() {
+		public String getUrl(){
 			return url;
 		}
 
