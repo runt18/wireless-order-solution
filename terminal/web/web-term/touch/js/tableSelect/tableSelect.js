@@ -1848,7 +1848,7 @@ ts.member.memberPointConsumeAction = function(){
 	$.post('../OperateMember.do', {
 		dataSource : 'consumePoint',
 		memberId : ts.member.pointConsumeMember.id,
-		orientedPrinter : getcookie(document.domain + '_printers')
+		orientedPrinter : getcookie(document.domain + '_printers'),
 		point : point.val()		
 	}, function(jr){
 		if(jr.success){
