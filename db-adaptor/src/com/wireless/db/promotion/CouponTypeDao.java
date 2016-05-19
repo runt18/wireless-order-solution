@@ -163,7 +163,9 @@ public class CouponTypeDao {
 				//Married the oss image with this coupon type.
 				try{
 					OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setSingleAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
-				}catch(IOException ignored){}
+				}catch(IOException ignored){
+					ignored.printStackTrace();
+				}
 				
 				//Update the oss image id.
 				sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
