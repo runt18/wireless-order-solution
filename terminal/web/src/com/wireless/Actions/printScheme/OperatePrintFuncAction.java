@@ -75,6 +75,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			final String comment = request.getParameter("comment");
 			final String isNeedToAdd = request.getParameter("isNeedToAdd");
 			final String isNeedToCancel = request.getParameter("isNeedToCancel");
+			final String displayTotalPrice = request.getParameter("displayTotalPrice");
 			
 //			final int printerId;
 //			if(request.getParameter("printerId") == null){
@@ -118,7 +119,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.setComment(comment);
 				}
 				
-				summaryBuilder.setRepeat(Integer.parseInt(repeat));
+				summaryBuilder.setRepeat(Integer.parseInt(repeat)).setDisplayTotal(Boolean.parseBoolean(displayTotalPrice));
+				
 				
 				PrintFuncDao.addFunc(dbCon, staff, summaryBuilder);
 				
@@ -254,6 +256,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			
 			String isNeedToAdd = request.getParameter("isNeedToAdd");
 			String isNeedToCancel = request.getParameter("isNeedToCancel");
+			final String displayTotalPrice = request.getParameter("displayTotalPrice");
 			
 			String[] kitchen = null, region = null, dept = null;
 			if(!kitchens.trim().isEmpty()){
@@ -298,7 +301,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					builder.setComment(comment);
 				}
 				
-				builder.setRepeat(Integer.parseInt(repeat));
+				builder.setRepeat(Integer.parseInt(repeat)).setDisplayTotal(Boolean.parseBoolean(displayTotalPrice));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
