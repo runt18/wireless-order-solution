@@ -102,7 +102,7 @@ public class PrintFuncDao {
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
 		      "( `printer_id`, `repeat`, `type`, `comment`, `enabled`, `extra` )" +
 			  " VALUES( " +
-			  func.getPrinterId() + "," +
+			  func.getPrinterId() + 
 			  "," + func.getRepeat() + 
 			  "," + func.getType().getVal() +  
 			  "," + (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + 
