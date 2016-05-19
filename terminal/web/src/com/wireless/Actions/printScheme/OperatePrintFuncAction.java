@@ -129,6 +129,9 @@ public class OperatePrintFuncAction extends DispatchAction{
 					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
 					detailBuilder.addKitchen(ki);
 				}
+				for (String regionId : regions) {
+					detailBuilder.addRegion(new Region(Short.parseShort(regionId)));
+				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, detailBuilder);
 				
