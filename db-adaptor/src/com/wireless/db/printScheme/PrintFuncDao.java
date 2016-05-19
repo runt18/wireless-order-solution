@@ -100,13 +100,14 @@ public class PrintFuncDao {
 		deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(func.getType()));
 		
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
-		      "( `printer_id`, `repeat`, `type`, `comment`, `enabled` )" +
+		      "( `printer_id`, `repeat`, `type`, `comment`, `enabled`, `extra` )" +
 			  " VALUES( " +
 			  func.getPrinterId() + "," +
-			  func.getRepeat() + "," +
-		      func.getType().getVal() + "," +
-		      (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + "," +
-		      (func.isEnabled() ? "1" : "0") +
+			  "," + func.getRepeat() + 
+			  "," + func.getType().getVal() +  
+			  "," + (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + 
+			  "," + (func.isEnabled() ? "1" : "0") +
+			  "," + func.getExtra() +
 		      ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -356,6 +357,7 @@ public class PrintFuncDao {
 			  (builder.isRepeatChanged() ? " ,`repeat` = " + func.getRepeat() : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + func.getComment() + "'" : "") +
 			  (builder.isEnabledChanged() ? " ,enabled = " + (func.isEnabled() ? "1" : "0") : "") +
+			  (builder.isExtraChanged() ? " ,extra = " + func.getExtra() : "") +
 			  " WHERE func_id = " +  func.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -482,6 +484,7 @@ public class PrintFuncDao {
 			func.setPrinterId(dbCon.rs.getInt("printer_id"));
 			func.setComment(dbCon.rs.getString("comment"));
 			func.setEnabled(dbCon.rs.getBoolean("enabled"));
+			func.setExtra(dbCon.rs.getInt("extra"));
 			result.add(func);
 		}
 		dbCon.rs.close();
