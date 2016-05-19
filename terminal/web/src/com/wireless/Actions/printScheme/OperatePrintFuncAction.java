@@ -227,19 +227,28 @@ public class OperatePrintFuncAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 修改打印功能
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String repeat = request.getParameter("repeat");
+		final String kitchens = request.getParameter("kitchens");
+		final String depts = request.getParameter("dept");
+		final String regions = request.getParameter("regions");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String repeat = request.getParameter("repeat");
-			String kitchens = request.getParameter("kitchens");
-			String depts = request.getParameter("dept");
-			String regions = request.getParameter("regions");
+			dbCon.connect();
 			int printerId = Integer.parseInt(request.getParameter("printerId"));
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
@@ -300,6 +309,13 @@ public class OperatePrintFuncAction extends DispatchAction{
 					for (String k : kitchen) {
 						Kitchen ki = new Kitchen(Integer.parseInt(k));
 						builder.addKitchen(ki);
+					}
+				}
+				if(region.length == 0){
+					builder.setRegionAll();
+				}else{
+					for (String r : region) {
+						builder.addRegion(new Region(Short.parseShort(r)));
 					}
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
@@ -371,16 +387,16 @@ public class OperatePrintFuncAction extends DispatchAction{
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}
 		
-			jobject.initTip(true, "操作成功, 已修改方案");
+			jObject.initTip(true, "操作成功, 已修改方案");
 		}catch(BusinessException | SQLException e){
-			jobject.initTip(e);
+			jObject.initTip(e);
 			e.printStackTrace();
 		}catch(Exception e){
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		
 		return null;

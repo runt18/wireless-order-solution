@@ -37,8 +37,8 @@ public class QueryStaffAction extends Action {
 		final String cate = request.getParameter("cate");
 		final String privileges = request.getParameter("privileges");
 		final String checkPrivilege = request.getParameter("checkPrivilege");
+		final String types = request.getParameter("types");
 		final String hasDetail = request.getParameter("hasDetail");
-		
 		final JObject jObject = new JObject();
 
 		final JsonMap extra = new JsonMap();
@@ -62,6 +62,13 @@ public class QueryStaffAction extends Action {
 			}else {
 				
 				final StaffDao.ExtraCond extraCond = new StaffDao.ExtraCond();
+				
+				if(types != null && !types.isEmpty()){
+					for(String type : types.split(",")){
+						extraCond.addType(Staff.Type.valueOf(Integer.parseInt(type)));
+					}
+				}
+				
 				if(name != null && !name.trim().isEmpty()){
 					extraCond.setName(name);
 					
