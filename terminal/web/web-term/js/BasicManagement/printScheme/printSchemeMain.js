@@ -200,7 +200,12 @@ function init(){
 				thiz.doLayout();
 			}		
 		},
-		bbar : ['->',{
+		bbar : ['->', {
+			xtype : 'checkbox',
+			id : 'chkIsNeedToTotalPrice',
+			checked : false,
+			boxLabel : '是否显示总价'
+		}, {
 			xtype : 'checkbox',
 			id : 'chkIsNeedToAdd',
 			checked : true,
@@ -285,6 +290,7 @@ function init(){
 						printerId : sn.attributes.printerId,
 						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
+						displayTotalPrice : Ext.getDom('chkIsNeedToTotalPrice').checked,
 						dataSource : 'insert'
 					},
 					success : function(res, opt){
@@ -395,6 +401,7 @@ function init(){
 						funcId : funcId,
 						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
+						displayTotalPrice : Ext.getDom('chkIsNeedToTotalPrice').checked,
 						comment : printComment,
 						dataSource : dataSource
 					},
@@ -1166,6 +1173,7 @@ function showPanel(v){
 	//获取退菜btn
 	var cancelFoodBtn = Ext.getCmp('chkIsNeedToCancel');
 	var addFoodBtn = Ext.getCmp('chkIsNeedToAdd');
+	var totalPriceBtn = Ext.getCmp('chkIsNeedToTotalPrice');
 	
 	var paperDemoCmp = Ext.query("#showPrintPaper .x-panel-body")[0];
 	if(v == 1 || v ==8){//总单
@@ -1183,6 +1191,8 @@ function showPanel(v){
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
 		}
 		
+		totalPriceBtn.show();
+		totalPriceBtn.setBoxLabel('是否显示总价');
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
 //		cancelFoodBtn.show();
@@ -1200,6 +1210,7 @@ function showPanel(v){
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
 		addFoodBtn.show();
 		addFoodBtn.setBoxLabel('打印加菜分单');
+		totalPriceBtn.hide();
 	}else if(v == 18){//客显
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('kitchensTree').hide();
@@ -1222,6 +1233,7 @@ function showPanel(v){
 		Ext.getCmp('regions').show();
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
+		totalPriceBtn.hide();
 		
 		if(v == 127){//暂结
 			Ext.getCmp('printCommentPanel').show();
@@ -1322,7 +1334,7 @@ function printFuncOperactionHandler(c){
 		kitchenTree.loader.baseParams = {dataSource : 'printKitchenTree4Update', schemeId : ss.data.printFuncId, printerId:sn.id};
 	}
 	
-	addPrintFunc.show();
+	Ext.getCmp('addPrintFuncWin').show();
 	
 	Ext.getDom('lblPrinterName').innerHTML = sn.attributes.name + " " + sn.attributes.alias;
 	if(c.type == 'insert'){
@@ -1465,9 +1477,11 @@ function printFuncOperactionHandler(c){
 		repeat.setValue(ss.data.repeat);
 		
 		comment.setValue(ss.data.comment);
-	
+		
+		//TODO 是否显示总价
+		
 	}
-	addPrintFunc.center();
+	Ext.getCmp('addPrintFuncWin').center();
 }
 
 //打印机初始化

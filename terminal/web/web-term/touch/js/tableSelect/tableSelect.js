@@ -1045,7 +1045,6 @@ $(function(){
 			}
 		});
 		
-		
 		//微信预定
 		$('#WxOrder_a_tableSelect').click(function(){
 			wxOrder.entry();
@@ -1849,6 +1848,7 @@ ts.member.memberPointConsumeAction = function(){
 	$.post('../OperateMember.do', {
 		dataSource : 'consumePoint',
 		memberId : ts.member.pointConsumeMember.id,
+		orientedPrinter : getcookie(document.domain + '_printers')
 		point : point.val()		
 	}, function(jr){
 		if(jr.success){
