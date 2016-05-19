@@ -45,6 +45,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 		
 		public SummaryUpdateBuilder setDisplayTotal(boolean onOff){
+			if(builder.extra == null){
+				builder.extra = 0;
+			}
 			int extra = builder.extra.intValue(); 
 			if(onOff){
 				extra |= DISPLAY_SUMMARY_TOTAL;
