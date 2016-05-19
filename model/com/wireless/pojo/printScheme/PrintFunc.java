@@ -826,14 +826,20 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				depts = "所有部门";
 				deptValues = "";
 			}
-		}else if(this.mType == PType.PRINT_ORDER_DETAIL || this.mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
-			regions = "----";
+		}else if(this.mType == PType.PRINT_ORDER_DETAIL){
 			depts = "----";
 			if(isKitchenAll()){
 				kitchens = "所有厨房";
 				kitchenValues = "";
 			}
 		
+		}else if(this.mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
+			regions = "----";
+			depts = "----";
+			if(isKitchenAll()){
+				kitchens = "所有厨房";
+				kitchenValues = "";
+			}
 		}else{
 			depts = "----";
 			kitchens = "----";
