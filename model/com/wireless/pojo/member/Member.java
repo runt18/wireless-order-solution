@@ -439,6 +439,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private float totalConsumption;		// 消费总额
 	private int totalPoint;				// 累计积分
 	private float totalCharge;			// 累计充值额
+	private float totalRefund;          // 累计取款
 	private float usedBalance;			// 累计会员余额消费
 	private int consumptionAmount;		// 累计消费次数
 	private long lastConsumption;		// 最近一次消费时间
@@ -824,9 +825,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		
 		//float deltaBase = takeMoney;
 		//float deltaExtra = takeMoney * Math.abs(getMemberType().getChargeRate() - 1);
-
+		this.totalRefund += refundMoney;
 		this.baseBalance -= refundMoney;
 		this.extraBalance -= (accountMoney - refundMoney);
+		
 		
 		mo.setDeltaBaseMoney(-refundMoney);
 		mo.setDeltaExtraMoney(-(accountMoney-refundMoney));
@@ -1034,6 +1036,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.putString("restaurantName", this.restaurantName);
 		jm.putInt("branchId", this.branchId);
 		jm.putFloat("totalCharge", this.totalCharge);
+		jm.putFloat("totalRefund", this.totalRefund);
 		jm.putInt("totalPoint", this.totalPoint);
 		jm.putFloat("totalConsumption", this.totalConsumption);
 		jm.putFloat("totalCommission", this.totalCommission);
@@ -1357,6 +1360,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 
 	public void setTotalCharge(float totalCharge) {
 		this.totalCharge = totalCharge;
+	}
+	
+	public float getTotalRefund(){
+		return totalRefund;
+	}
+	
+	public void setTotalRefund(float totalRefund){
+		this.totalRefund = totalRefund;
 	}
 	
 	public void setReferrerId(int staffId){

@@ -1199,6 +1199,7 @@
 				['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
 				['总充值额', 'totalCharge',,'right'],
+				['总取款额', 'totalRefund',,'right'],
 				['账户余额', 'totalBalance',,'right'],
 				['手机号码', 'mobile', 125],
 				['会员卡号', 'memberCard', 125]

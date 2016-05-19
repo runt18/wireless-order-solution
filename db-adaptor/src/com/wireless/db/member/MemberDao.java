@@ -862,7 +862,7 @@ public class MemberDao {
 		sql = " SELECT "	+
 			  " R.restaurant_name, M.member_id, M.restaurant_id, M.branch_id, M.point, M.used_point, " +
 			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
-			  " M.total_consumption, M.total_point, M.total_charge, " +
+			  " M.total_consumption, M.total_point, M.total_charge, M.total_refund, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.age, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
 			  " M.referrer, M.referrer_id, " +
@@ -898,6 +898,7 @@ public class MemberDao {
 			member.setTotalConsumption(dbCon.rs.getFloat("total_consumption"));
 			member.setTotalPoint(dbCon.rs.getInt("total_point"));
 			member.setTotalCharge(dbCon.rs.getFloat("total_charge"));
+			member.setTotalRefund(dbCon.rs.getFloat("total_refund"));
 			member.setMemberCard(dbCon.rs.getString("member_card"));
 			member.setName(dbCon.rs.getString("member_name"));
 			member.setSex(dbCon.rs.getInt("sex"));
@@ -2106,7 +2107,7 @@ public class MemberDao {
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
 				 " base_balance = " + member.getBaseBalance() + ", " +
 				 " extra_balance = " + member.getExtraBalance() + "," + 
-				 " total_charge = " + member.getTotalCharge() + 
+				 " total_refund = " + member.getTotalRefund() +  
 				 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		

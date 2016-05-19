@@ -1193,7 +1193,7 @@ function showPanel(v){
 		Ext.getCmp('kitchens').show();
 		Ext.getCmp('kitchensTree').show();
 		Ext.getCmp('depts').hide();
-		Ext.getCmp('regions').hide();
+		Ext.getCmp('regions').show();
 		Ext.getCmp('printCommentPanel').hide();
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/fendan.jpg)';
 		cancelFoodBtn.show();
