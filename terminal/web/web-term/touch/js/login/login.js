@@ -255,7 +255,8 @@ function initStaffContent(c){
 	$.ajax({
 		url : '../QueryStaff.do',
 		data : {
-			restaurantID : lg.restaurant.id
+			restaurantID : lg.restaurant.id,
+			types : '1,2'		//只获取“普通”和“管理员”员工
 		},
 		dataType : 'json',
 		success : function(data, status, xhr){
