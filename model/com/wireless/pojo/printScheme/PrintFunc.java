@@ -906,7 +906,11 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				kitchens = "所有厨房";
 				kitchenValues = "";
 			}
-		
+			
+			if(isRegionAll()){
+				regions = "所有区域";
+				regionValues = "";
+			}
 		}else if(this.mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 			regions = "----";
 			depts = "----";
