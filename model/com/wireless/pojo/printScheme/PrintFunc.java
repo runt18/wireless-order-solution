@@ -405,6 +405,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final List<Kitchen> mKitchens = SortedList.newInstance();
 		private final boolean extraEnabled;
 		private final boolean cancelEnabled;
+		private List<Region> regions = SortedList.newInstance();
 		
 		public DetailBuilder(Printer printer, boolean extraEnabled, boolean cancelEnabled){
 			this(printer.getId(), extraEnabled, cancelEnabled);
@@ -436,10 +437,19 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
+		public DetailBuilder addRegion(Region region){
+			if(!regions.contains(region)){
+				regions.add(region);
+			}
+			return this;
+		}
+		
 		public PrintFunc[] build(){
 			final PrintFunc[] result = new PrintFunc[2];
 			result[0] = new PrintFunc(this, PType.PRINT_ORDER_DETAIL, extraEnabled);
+			result[0].setRegions(this.regions);
 			result[1] = new PrintFunc(this, PType.PRINT_CANCELLED_FOOD_DETAIL, cancelEnabled);
+			result[1].setRegions(this.regions);
 			return result;
 		}
 	}
