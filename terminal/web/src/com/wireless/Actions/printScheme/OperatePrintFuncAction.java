@@ -256,7 +256,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		final String kitchens = request.getParameter("kitchens");
 		final String depts = request.getParameter("dept");
 		final String regions = request.getParameter("regions");
-		
+		final String ending = request.getParameter("comment");
 		final JObject jObject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
@@ -288,8 +288,11 @@ public class OperatePrintFuncAction extends DispatchAction{
 				dept = new String[0];
 			}
 			
-			if(PType.valueOf(pType) == PType.PRINT_ORDER || PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
-				PrintFunc.SummaryUpdateBuilder builder = new PrintFunc.SummaryUpdateBuilder(printerId, PType.valueOf(pType));
+			final PType printType = PType.valueOf(pType);
+			
+			if(printType == PType.PRINT_ORDER || printType == PType.PRINT_ALL_CANCELLED_FOOD){
+				//点菜总单
+				PrintFunc.SummaryUpdateBuilder builder = new PrintFunc.SummaryUpdateBuilder(printerId, printType);
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -307,22 +310,21 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				
 				//单尾结束语
-				String comment = request.getParameter("comment");
-				if(comment != null){
-					builder.setComment(comment);
+				if(ending != null && !ending.isEmpty()){
+					builder.setComment(ending);
 				}
 				
 				builder.setRepeat(Integer.parseInt(repeat)).setDisplayTotal(Boolean.parseBoolean(displayTotalPrice));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 				
-			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
+			}else if(printType == PType.PRINT_ORDER_DETAIL){
+				//点菜分单
 				PrintFunc.DetailUpdateBuilder builder = new PrintFunc.DetailUpdateBuilder(printerId, Boolean.parseBoolean(isNeedToAdd), Boolean.parseBoolean(isNeedToCancel));
 				if(kitchen.length == 0){
 					builder.setKitchenAll();
 				}else{
-					for (String k : kitchen) {
-						Kitchen ki = new Kitchen(Integer.parseInt(k));
-						builder.addKitchen(ki);
+					for(String kitchenId : kitchen) {
+						builder.addKitchen(new Kitchen(Integer.parseInt(kitchenId)));
 					}
 				}
 				if(region.length == 0){
@@ -334,8 +336,10 @@ public class OperatePrintFuncAction extends DispatchAction{
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
-			}else if(PType.valueOf(pType) == PType.PRINT_RECEIPT){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
+				
+			}else if(printType == PType.PRINT_RECEIPT){
+				//结账单
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -344,14 +348,15 @@ public class OperatePrintFuncAction extends DispatchAction{
 					}
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
+				
 				//单尾结束语
-				String comment = request.getParameter("comment");
-				if(comment != null){
-					builder.setComment(comment);
+				if(ending != null && !ending.isEmpty()){
+					builder.setComment(ending);
 				}
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
-			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
+				
+			}else{
+				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -360,46 +365,66 @@ public class OperatePrintFuncAction extends DispatchAction{
 					}
 				}
 				//单尾结束语
-				String comment = request.getParameter("comment");
-				if(comment != null){
-					builder.setComment(comment);
-				}
-				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder);
-			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
-				if(region.length == 0){
-					builder.setRegionAll();
-				}else{
-					for (String r : region) {
-						builder.addRegion(new Region(Short.parseShort(r)));
-					}
-				}
-				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder);
-			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
-				if(region.length == 0){
-					builder.setRegionAll();
-				}else{
-					for (String r : region) {
-						builder.addRegion(new Region(Short.parseShort(r)));
-					}
-				}
-				builder.setRepeat(Integer.parseInt(repeat));
-				PrintFuncDao.updateFunc(dbCon, staff, builder);
-			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_FOOD){
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, PType.valueOf(pType));
-				if(region.length == 0){
-					builder.setRegionAll();
-				}else{
-					for (String r : region) {
-						builder.addRegion(new Region(Short.parseShort(r)));
-					}
+				if(ending != null && !ending.isEmpty()){
+					builder.setComment(ending);
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}
+//			else if(PType.valueOf(pType) == PType.PRINT_TEMP_RECEIPT){
+//				//暂结单
+//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
+//				if(region.length == 0){
+//					builder.setRegionAll();
+//				}else{
+//					for (String r : region) {
+//						builder.addRegion(new Region(Short.parseShort(r)));
+//					}
+//				}
+//				//单尾结束语
+//				if(ending != null && !ending.isEmpty()){
+//					builder.setComment(ending);
+//				}
+//				builder.setRepeat(Integer.parseInt(repeat));
+//				PrintFuncDao.updateFunc(dbCon, staff, builder);
+//				
+//			}else if(printType == PType.PRINT_TRANSFER_TABLE){
+//				//转台单
+//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
+//				if(region.length == 0){
+//					builder.setRegionAll();
+//				}else{
+//					for (String r : region) {
+//						builder.addRegion(new Region(Short.parseShort(r)));
+//					}
+//				}
+//				builder.setRepeat(Integer.parseInt(repeat));
+//				PrintFuncDao.updateFunc(dbCon, staff, builder);
+//				
+//			}else if(printType == PType.PRINT_ALL_HURRIED_FOOD){
+//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
+//				if(region.length == 0){
+//					builder.setRegionAll();
+//				}else{
+//					for (String r : region) {
+//						builder.addRegion(new Region(Short.parseShort(r)));
+//					}
+//				}
+//				builder.setRepeat(Integer.parseInt(repeat));
+//				PrintFuncDao.updateFunc(dbCon, staff, builder);
+//				
+//			}else if(printType == PType.PRINT_TRANSFER_FOOD){
+//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
+//				if(region.length == 0){
+//					builder.setRegionAll();
+//				}else{
+//					for (String r : region) {
+//						builder.addRegion(new Region(Short.parseShort(r)));
+//					}
+//				}
+//				builder.setRepeat(Integer.parseInt(repeat));
+//				PrintFuncDao.updateFunc(dbCon, staff, builder);
+//			}
 		
 			jObject.initTip(true, "操作成功, 已修改方案");
 		}catch(BusinessException | SQLException e){
