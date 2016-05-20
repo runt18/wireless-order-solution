@@ -277,14 +277,16 @@ public class CalcBillStatisticsDao {
 			
 			//Calculate the single payment to each pay type.
 			sql = " SELECT " +
-				  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, " +
-				  " COUNT(*) AS amount, ROUND(SUM(O.total_price), 2) AS total_income, ROUND(SUM(O.actual_price), 2) AS actual_income " +
+				  " O.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name " +
+				  " ,COUNT(*) AS amount " +
+				  " ,ROUND(SUM(O.total_price), 2) AS total_income" + 
+				  " ,ROUND(SUM(IF(O.pay_type_id <> " + PayType.MIXED.getId() + ",O.actual_price, 0)), 2) AS actual_income " +
 				  " FROM " + Params.dbName + "." + extraCond.dbTbl.orderTbl + " O " +
 				  " LEFT JOIN " + Params.dbName + ".pay_type PT ON O.pay_type_id = PT.pay_type_id " +
 				  " WHERE 1 = 1 " +
 				  (extraCond != null ? extraCond.toString() : "") +
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-				  " AND O.pay_type_id <> " + PayType.MIXED.getId() +
+				  //" AND O.pay_type_id <> " + PayType.MIXED.getId() +
 				  //" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 				  " AND (O.status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
 				  " GROUP BY O.pay_type_id ";
@@ -318,10 +320,9 @@ public class CalcBillStatisticsDao {
 			while(dbCon.rs.next()){
 				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
 				payType.setName(dbCon.rs.getString("pay_type_name"));
-				int amount = dbCon.rs.getInt("amount");
-				float total = dbCon.rs.getFloat("total_income");
+				//int amount = dbCon.rs.getInt("amount");
 				float actual = dbCon.rs.getFloat("actual_income");
-				incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, amount, total, actual));
+				incomeByPay.addPaymentIncome(new IncomeByPay.PaymentIncome(payType, 0, 0, actual));
 			}
 			dbCon.rs.close();
 			
