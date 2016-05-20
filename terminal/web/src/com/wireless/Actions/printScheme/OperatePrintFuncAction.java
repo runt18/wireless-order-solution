@@ -199,7 +199,11 @@ public class OperatePrintFuncAction extends DispatchAction{
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_WX_ORDER){
 				//微信订单
-				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxOrder(printerId));
+				PrintFunc.Builder builder = Builder.newWxOrder(printerId);
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				PrintFuncDao.addFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_BOOK){
 				//微信预订
@@ -207,7 +211,11 @@ public class OperatePrintFuncAction extends DispatchAction{
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_WX_WAITER){
 				//微信店小二
-				PrintFuncDao.addFunc(dbCon, staff, Builder.newWxWaiter(printerId));
+				PrintFunc.Builder builder = Builder.newWxWaiter(printerId);
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				PrintFuncDao.addFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_WX_CALL_PAY){
 				//微信呼叫结账
