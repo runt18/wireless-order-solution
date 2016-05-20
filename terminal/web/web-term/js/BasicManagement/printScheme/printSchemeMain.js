@@ -1307,6 +1307,8 @@ function deletePrintFuncOperationHandler(){
 	
 }
 
+var DISPLAY_SUMMARY_TOTAL = 1 << 1;    //是否显示总价
+
 //打印方案初始化
 function printFuncOperactionHandler(c){
 	if(c.type == 'undefined'){
@@ -1379,7 +1381,14 @@ function printFuncOperactionHandler(c){
 				},
 				success : function(res, opt){
 					var jr = Ext.decode(res.responseText);
-					if(jr.success){
+					if(jr.success){	
+						
+						if((ss.json.extra & DISPLAY_SUMMARY_TOTAL) != 0){
+							Ext.getDom('chkIsNeedToTotalPrice').checked = true;
+						}else{
+							Ext.getDom('chkIsNeedToTotalPrice').checked = false;
+						}
+						
 						//是否有加菜
 						if(jr.other.add){
 							Ext.getDom('chkIsNeedToAdd').checked = true;

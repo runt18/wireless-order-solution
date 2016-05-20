@@ -3744,6 +3744,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(11, 3200);
 		sheet.setColumnWidth(12, 4000);
 		sheet.setColumnWidth(13, 4000);
+		sheet.setColumnWidth(14, 4000);
 		
 		//冻结行
 		sheet.createFreezePane(0, 4, 0, 4);
@@ -3822,6 +3823,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("总取款额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("账户余额");
 		cell.setCellStyle(headerStyle);
 		
@@ -3890,6 +3895,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 			//总充值额
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(member.getTotalCharge());
+			cell.setCellStyle(numStyle);
+			
+			//总取款额
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(member.getTotalRefund());
 			cell.setCellStyle(numStyle);
 			
 			//账户余额
