@@ -322,7 +322,7 @@ function PickFoodComponent(param){
 				+ '<div data-r="r" food-id={foodId} {selected} data-type="checkbox" href="#"></div>'
 			+ '</div>'
 			+'</div>'
-			+ '<div data-type="standard_div_fastOrderFood" style="width:100%" class="box-horizontal">{unitPriceHtml}</div>'
+			+ '<div data-type="standard_div_fastOrderFood" style="width:100%;" class="box-horizontal">{unitPriceHtml}</div>'
 			+ '</div>';
 			
 		var unitPrice = '<div multiUnit-Id={multiId} class="unit_css_fastOrderFood" data-type="unitPrice" href="#">'
@@ -330,7 +330,6 @@ function PickFoodComponent(param){
 						+ '</div>';
 			
 				
-			
 		var requestParams = {
 			fid : Util.mp.fid,
 			oid : Util.mp.oid,

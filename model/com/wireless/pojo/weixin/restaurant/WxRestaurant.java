@@ -25,6 +25,7 @@ public class WxRestaurant implements Jsonable{
 		private String chargeTemplate;
 		private String orderNotifyTemplate;
 		private PayType defaultOrderType;
+		private PrefectMember prefectMemberStatus;
 		
 		public UpdateBuilder setChargeTemplate(String template){
 			this.chargeTemplate = template;
@@ -37,6 +38,15 @@ public class WxRestaurant implements Jsonable{
 		
 		public UpdateBuilder setDefaultOrderType(PayType type){
 			this.defaultOrderType = type;
+			return this;
+		}
+		
+		public boolean isPrefectMemberStatusChanged(){
+			return this.prefectMemberStatus != null;
+		}
+		
+		public UpdateBuilder setPrefectMemberStatus(PrefectMember type){
+			this.prefectMemberStatus = type;
 			return this;
 		}
 		
@@ -299,6 +309,36 @@ public class WxRestaurant implements Jsonable{
 		}
 	}
 	
+	public static enum PrefectMember{
+		SHOW_PREFECMEMBER(0, "显示"),
+		HIDE_PREFECTMEMBER(1, "不显示");
+		
+		private final int val;
+		private final String desc;
+		
+		PrefectMember(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getValue(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		public static PrefectMember valueOf(int val){
+			for(PrefectMember type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The PrefectMember(val = " + val + ")is invaild.");
+		}
+	}
+	
 	private String weixinSerial;
 	private int restaurantId;
 	private long bindDate;
@@ -319,6 +359,7 @@ public class WxRestaurant implements Jsonable{
 	private String orderNotifyTemplate;
 	private String chargeTemplate;
 	private PayType defaultOrderType = PayType.CONFIRM_BY_STAFF;
+	private PrefectMember prefectMemberStatus = PrefectMember.SHOW_PREFECMEMBER;
 	
 	private WxRestaurant(UpdateBuilder builder){
 		this.weixinLogo = builder.weixinLogo;
@@ -338,6 +379,7 @@ public class WxRestaurant implements Jsonable{
 		this.chargeTemplate = builder.chargeTemplate;
 		this.orderNotifyTemplate = builder.orderNotifyTemplate;
 		this.defaultOrderType = builder.defaultOrderType;
+		this.prefectMemberStatus = builder.prefectMemberStatus;
 	}
 	
 	public WxRestaurant(int restaurantId){
@@ -357,6 +399,14 @@ public class WxRestaurant implements Jsonable{
 
 	public PayType getDefaultOrderType(){
 		return this.defaultOrderType;
+	}
+	
+	public void setPrefectMemberStatus(PrefectMember type){
+		this.prefectMemberStatus = type;
+	}
+
+	public PrefectMember getPrefectMemberStatus(){
+		return this.prefectMemberStatus;
 	}
 	
 	public void setOrderNotifyTemplate(String template){
@@ -606,6 +656,8 @@ public class WxRestaurant implements Jsonable{
 		jm.putBoolean("isAuth", hasQrCode());
 		jm.putInt("defaultOrderType", getDefaultOrderType().val);
 		jm.putString("defaultOrderTypeText", getDefaultOrderType().desc);
+		jm.putInt("prefectMemberStatus", getPrefectMemberStatus().val);
+		jm.putString("prefectMemberStatusText", getPrefectMemberStatus().desc);
 		return jm;
 	}
 
