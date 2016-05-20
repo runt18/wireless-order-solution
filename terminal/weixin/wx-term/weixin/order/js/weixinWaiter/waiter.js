@@ -1,18 +1,24 @@
 $(function(){
 	
 	var fastFoodWaiterData = {
-		_tableAlias : null,		//餐桌号
-		_orderData : null,		//点菜资料
-		_commentData : null,	//备注资料
-		_orderId : null,		//账单Id
-		_orderType : null,		//下单方式
-		_tableId : null         //餐桌id
+		_tableAlias : null,					//餐桌号
+		_orderData : null,					//点菜资料
+		_commentData : null,				//备注资料
+		_orderId : null,					//账单Id
+		_orderType : null,					//下单方式
+		_prefectMemberStauts : null,    	//是否显示完善会员资料
+		_tableId : null        				//餐桌id
 	};
 	
 	var orderType = {
 		WX_PAY : 1,				//微信支付下单
 		CONFIRM_BY_STAFF : 2,	//确认下单
 		DIRECT_ORDER : 3		//直接下单
+	}
+	
+	var prefectMemberStauts = {
+		SHOW_PREFECMEMBER : 0,         //显示完善会员资料
+		HIDE_PREFECTMEMBER : 1         //不显示完善会员资料
 	}
 	
 	
@@ -217,6 +223,7 @@ $(function(){
 			},
 			success : function(data, status, xhr){
 				fastFoodWaiterData._orderType = data.root[0].defaultOrderType;
+				fastFoodWaiterData._prefectMemberStauts = data.root[0].prefectMemberStatus;
 			}
 		});
 		
@@ -368,38 +375,42 @@ $(function(){
 					fastFoodWaiterData._orderData = _orderData;
 					fastFoodWaiterData._commentData = _commentData;
 					//读取公众号会员数据
-					$.ajax({
-						url : '../../WXOperateMember.do',
-						type : 'post',
-						dataType : 'json',
-						data : {
-							dataSource : 'getByCond',
-							sessionId : Util.mp.params.sessionId
-						},
-
-						success : function(data, status, xhr){
-							if(data.success){
-								//判断会员的信息是否补全
-								if(data.root[0].isRaw){
-									var completeMemberMsgDialog = new CompleteMemberMsg({
-										sessionId : Util.mp.params.sessionId,
-										completeFinish : function(){ commit(_calcOrderCost); }
-									});
-									completeMemberMsgDialog.open();
-									
-								}else{
-									commit(_calcOrderCost);
-								}
-							}else{
-								Util.dialog.show({msg : data.msg});	
-							}
-						},
-						
-						error : function(xhr, status, err){
-							Util.dialog.show({msg : err.msg});
-						}
-					});
 					
+					if(fastFoodWaiterData._prefectMemberStauts == prefectMemberStauts.SHOW_PREFECMEMBER){//显示完善会员资料
+						$.ajax({
+							url : '../../WXOperateMember.do',
+							type : 'post',
+							dataType : 'json',
+							data : {
+								dataSource : 'getByCond',
+								sessionId : Util.mp.params.sessionId
+							},
+	
+							success : function(data, status, xhr){
+								if(data.success){
+									//判断会员的信息是否补全
+									if(data.root[0].isRaw){
+										var completeMemberMsgDialog = new CompleteMemberMsg({
+											sessionId : Util.mp.params.sessionId,
+											completeFinish : function(){ commit(_calcOrderCost); }
+										});
+										completeMemberMsgDialog.open();
+										
+									}else{
+										commit(_calcOrderCost);
+									}
+								}else{
+									Util.dialog.show({msg : data.msg});	
+								}
+							},
+							
+							error : function(xhr, status, err){
+								Util.dialog.show({msg : err.msg});
+							}
+						});
+					}else{
+						commit(_calcOrderCost);
+					}
 				}
 			},
 			onCartChange : function(_orderData){

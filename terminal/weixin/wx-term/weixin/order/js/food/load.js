@@ -2,12 +2,18 @@ $(function(){
 	//调试模式
 	var load_debug = false;
 	
-	var _orderType = null;
+	var _orderType = null;      //下单方式
+	var _prefectMemberStauts = null   //是否显示完善会员资料
 	
 	var orderType = {
 		WX_PAY : 1,				//微信支付下单
 		CONFIRM_BY_STAFF : 2,	//确认下单
 		DIRECT_ORDER : 3		//直接下单
+	}
+	
+	var prefectMemberStauts = {
+		SHOW_PREFECMEMBER : 0,   //显示完善会员资料
+		HIDE_PREFECTMEMBER : 1  //不显示完善会员资料
 	}
 	
 	
@@ -38,6 +44,7 @@ $(function(){
 			},
 			success : function(data, status, xhr){
 				_orderType = data.root[0].defaultOrderType;
+				_prefectMemberStauts = data.root[0].prefectMemberStatus;
 			}
 		});
 	}else{
@@ -66,6 +73,7 @@ $(function(){
 			},
 			success : function(data, status, xhr){
 				_orderType = data.root[0].defaultOrderType;
+				_prefectMemberStauts = data.root[0].prefectMemberStatus;
 			}
 		});
 	}
@@ -111,39 +119,45 @@ $(function(){
 				return;
 			}
 			Util.lm.show();
-			$.ajax({
-				url : '../../WXOperateMember.do',
-				type : 'post',
-				data : {
-					dataSource : 'getByCond',
-					oid : Util.mp.oid,
-					fid : Util.mp.fid,
-					sessionId : Util.mp.params.sessionId
-				},
-				dataType : 'json',
-				success : function(data){
-					Util.lm.hide();
-					if(data.success){
-						if(data.root[0].isRaw){
-							var completeMemberMsgDialog = new CompleteMemberMsg({
-								completeFinish : function(){
-									commit(calcOrderCost);
-								},
-								sessionId : Util.mp.params.sessionId
-							});
-							completeMemberMsgDialog.open();
+			
+			
+			if(__prefectMemberStauts = prefectMemberStauts.SHOW_PREFECMEMBER){//显示
+				$.ajax({
+					url : '../../WXOperateMember.do',
+					type : 'post',
+					data : {
+						dataSource : 'getByCond',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid,
+						sessionId : Util.mp.params.sessionId
+					},
+					dataType : 'json',
+					success : function(data){
+						Util.lm.hide();
+						if(data.success){
+							if(data.root[0].isRaw){
+								var completeMemberMsgDialog = new CompleteMemberMsg({
+									completeFinish : function(){
+										commit(calcOrderCost);
+									},
+									sessionId : Util.mp.params.sessionId
+								});
+								completeMemberMsgDialog.open();
+							}else{
+								commit(calcOrderCost);
+							}
 						}else{
-							commit(calcOrderCost);
+							alert(data.msg);
 						}
-					}else{
-						alert(data.msg);
+					},
+					error : function(req, status, err){
+						Util.lm.hide();
 					}
-				},
-				error : function(req, status, err){
-					Util.lm.hide();
-					console.log(err);
-				}
-			});
+				});
+			}else{
+				commit(calcOrderCost);
+			}
+			
 			
 			//下单功能数据传递
 			function commit(calcOrderCost){
