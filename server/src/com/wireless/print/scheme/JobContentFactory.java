@@ -115,7 +115,8 @@ public class JobContentFactory {
 										   				   new SummaryContent(order,
 										   						   			  staff.getName(),
 										   						   			  printType, 
-										   						   			  printer.getStyle(), detailType).setEnding(func.getComment())));
+										   						   			  printer.getStyle(), detailType).setEnding(func.getComment())
+										   				   												     .setExtra(func.getExtra())));
 						}else{
 							//Generate the summary to specific departments.
 							final List<OrderFood> ofToDept = new ArrayList<OrderFood>();
@@ -134,7 +135,8 @@ public class JobContentFactory {
 							   						   			  orderToDept,
 							   						   			  staff.getName(),
 							   						   			  printType, 
-							   						   			  printer.getStyle(), detailType).setEnding(func.getComment())));
+							   						   			  printer.getStyle(), detailType).setEnding(func.getComment())
+							   				   													 .setExtra(func.getExtra())));
 							}
 						}
 						
@@ -167,7 +169,7 @@ public class JobContentFactory {
 			
 			for(Printer printer : printers){
 				for(PrintFunc func : printer.getPrintFuncs()){
-					if(func.isTypeMatched(printType)){
+					if(func.isTypeMatched(printType) && func.isRegionMatched(order.getRegion())){
 						for(OrderFood of : order.getOrderFoods()){
 							if(of.asFood().isCombo()){
 								for(ComboFood childFood : of.asFood().getChildFoods()){
@@ -292,24 +294,20 @@ public class JobContentFactory {
 	}
 	
 	public Content createWxOrderContent(Staff staff, List<Printer> printers, int wxOrderId) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			final List<JobContent> jobContents = new ArrayList<JobContent>();
-			
-			for(Printer printer : printers){
-				for(PrintFunc func : printer.getPrintFuncs()){
-					if(func.isTypeMatched(PType.PRINT_WX_ORDER)){
-						WxOrder wxOrder = WxOrderDao.getById(dbCon, staff, wxOrderId);
-						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_ORDER, new WxOrderContent(wxOrder, printer.getStyle())));
+		final List<JobContent> jobContents = new ArrayList<JobContent>();
+		final WxOrder wxOrder = WxOrderDao.getById(staff, wxOrderId);
+		for(Printer printer : printers){
+			for(PrintFunc func : printer.getPrintFuncs()){
+				if(func.isTypeMatched(PType.PRINT_WX_ORDER)){
+					if(wxOrder.hasTable() && !func.isRegionMatched(wxOrder.getTable().getRegion())){
+						continue;
 					}
+					jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_ORDER, new WxOrderContent(wxOrder, printer.getStyle())));
 				}
 			}
-			
-			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
-		}finally{
-			dbCon.disconnect();
 		}
+		
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 
 	/**
@@ -322,25 +320,19 @@ public class JobContentFactory {
 	 * @throws BusinessException
 	 */
 	public Content createWxWaiterContent(Staff staff, List<Printer> printers, int orderId, String qrCodeContent) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			final List<JobContent> jobContents = new ArrayList<JobContent>();
-			
-			for(Printer printer : printers){
-				for(PrintFunc func : printer.getPrintFuncs()){
-					if(func.isTypeMatched(PType.PRINT_WX_WAITER)){
-						final Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
-						final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-						jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_WAITER, new WxWaiterContent(printer.getStyle(), order, restaurant, qrCodeContent)));
-					}
+		final List<JobContent> jobContents = new ArrayList<JobContent>();
+		final Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
+		
+		for(Printer printer : printers){
+			for(PrintFunc func : printer.getPrintFuncs()){
+				if(func.isTypeMatched(PType.PRINT_WX_WAITER) && func.isRegionMatched(order.getRegion())){
+					final Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+					jobContents.add(new JobContent(printer, func.getRepeat(), PType.PRINT_WX_WAITER, new WxWaiterContent(printer.getStyle(), order, restaurant, qrCodeContent)));
 				}
 			}
-			
-			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
-		}finally{
-			dbCon.disconnect();
 		}
+		
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
 	/**
