@@ -7,6 +7,12 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/OperateKeyword" type="com.wireless.Actions.weixin.OperateKeywordAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateReply" type="com.wireless.Actions.weixin.OperateReplyAction"
+			scope="request" parameter="dataSource">
+		</action>
 		<action path="/QueryWxCommisison" type="com.wireless.Actions.represent.QueryWxCommisisonAction"
 			scope="request" parameter="dataSource">
 		</action>

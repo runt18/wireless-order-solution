@@ -1,5 +1,6 @@
 package com.wireless.db.member.represent;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,13 +163,19 @@ public class RepresentDao {
 			  (builder.isSubscribeMoneyChanged() ? " ,subscribe_money = " + represent.getSubscribeMoney() : "") +
 			  (builder.isTitleChanged() ? " ,title = '" + represent.getTitle() + "'" : "") +
 			  (builder.isCommissionRateChanged() ? " ,commission_rate = " + represent.getComissionRate() : "") +
-			  " ,gift_desc = '" + represent.getGiftDesc() + "'" + 
+			  (builder.isGiftDescChanged() ? " ,gift_desc = '" + represent.getGiftDesc() + "'" : "") + 
 			  " WHERE id = " + represent.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("找到相应的【我要代言】");
 		}
 		
-
+		if(builder.isImageChanged()){
+			try {
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(represent.getImage().getId()).setAssociated(OssImage.Type.WX_REPRESENT, represent.getId()));
+			} catch (IOException ignored) {
+				ignored.printStackTrace();
+			}
+		}
 	}
 	
 	/**

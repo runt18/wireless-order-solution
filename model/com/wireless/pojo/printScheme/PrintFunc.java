@@ -31,6 +31,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private boolean enabled = true;
 	
+	private int extra;
+	
 	public static class SummaryUpdateBuilder{
 		private final UpdateBuilder builder;
 		  
@@ -40,6 +42,20 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}else{
 				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
 			}
+		}
+		
+		public SummaryUpdateBuilder setDisplayTotal(boolean onOff){
+			if(builder.extra == null){
+				builder.extra = 0;
+			}
+			int extra = builder.extra.intValue(); 
+			if(onOff){
+				extra |= DISPLAY_SUMMARY_TOTAL;
+			}else{
+				extra &= ~DISPLAY_SUMMARY_TOTAL;
+			}
+			builder.extra = extra;
+			return this;
 		}
 		
 		public SummaryUpdateBuilder setRepeat(int repeat){
@@ -90,6 +106,16 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			this.cancelEnabled = cancelEnabled;
 		}
 		
+		public DetailUpdateBuilder setRegionAll(){
+			builder.setRegionAll();
+			return this;
+		}
+		
+		public DetailUpdateBuilder addRegion(Region region){
+			builder.addRegion(region);
+			return this;
+		}
+		
 		public DetailUpdateBuilder setRepeat(int repeat){
 			builder.setRepeat(repeat);
 			return this;
@@ -113,6 +139,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			final UpdateBuilder[] result = new UpdateBuilder[2];
 			result[0] = new UpdateBuilder(builder.mPrinterId, PType.PRINT_ORDER_DETAIL, builder).setEnabled(extraEnabled);
 			result[1] = new UpdateBuilder(builder.mPrinterId, PType.PRINT_CANCELLED_FOOD_DETAIL, builder).setEnabled(cancelEnabled);
+			if(builder.isRegionChanged()){
+				result[0].mRegions = new ArrayList<Region>(builder.mRegions);
+				result[1].mRegions = new ArrayList<Region>(builder.mRegions);
+			}
 			return result;
 		}
 	}
@@ -126,6 +156,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private List<Department> mDept;
 		private List<Kitchen> mKitchens;
 		private int enabled = -1;
+		private Integer extra;
 		
 		private UpdateBuilder(int printerId, PType type, UpdateBuilder src){
 			this(printerId, type);
@@ -174,6 +205,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		public UpdateBuilder(int printerId, PType type){
 			this.mPrinterId = printerId;
 			this.mPType = type;
+		}
+		
+		public UpdateBuilder setExtra(int extra){
+			this.extra = extra;
+			return this;
+		}
+		
+		public boolean isExtraChanged(){
+			return this.extra != null;
 		}
 		
 		public boolean isCommentChanged(){
@@ -269,6 +309,25 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	public static class SummaryOptions{
+		
+		private final int extra;
+		
+		public SummaryOptions(PrintFunc func){
+			this.extra = func.extra;
+		}
+
+		public SummaryOptions(int extra){
+			this.extra = extra;
+		}
+
+		public boolean containsTotal(){
+			return (this.extra & DISPLAY_SUMMARY_TOTAL) != 0;
+		}
+	}
+	
+	private final static int DISPLAY_SUMMARY_TOTAL = 1 << 1;		//点菜总单显示小计
+	
 	/**
 	 * The helper class to create the print function of summary.
 	 */
@@ -279,6 +338,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final List<Region> mRegions = SortedList.newInstance();
 		private final List<Department> mDepts = SortedList.newInstance();
 		private String comment;
+		private int extra;
 		
 		public SummaryBuilder(int printerId, PType type){
 			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
@@ -287,6 +347,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}else{
 				throw new IllegalArgumentException("打印类型只能是【" + PType.PRINT_ORDER.getDesc() + "】或者【" + PType.PRINT_ALL_CANCELLED_FOOD.getDesc() + "】");
 			}
+		}
+		
+		public SummaryBuilder setDisplayTotal(boolean onOff){
+			if(onOff){
+				this.extra |= DISPLAY_SUMMARY_TOTAL;
+			}else{
+				this.extra &= ~DISPLAY_SUMMARY_TOTAL;
+			}
+			return this;
 		}
 		
 		public SummaryBuilder setComment(String comment){
@@ -339,6 +408,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final List<Kitchen> mKitchens = SortedList.newInstance();
 		private final boolean extraEnabled;
 		private final boolean cancelEnabled;
+		private List<Region> regions = SortedList.newInstance();
 		
 		public DetailBuilder(Printer printer, boolean extraEnabled, boolean cancelEnabled){
 			this(printer.getId(), extraEnabled, cancelEnabled);
@@ -370,10 +440,19 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
+		public DetailBuilder addRegion(Region region){
+			if(!regions.contains(region)){
+				regions.add(region);
+			}
+			return this;
+		}
+		
 		public PrintFunc[] build(){
 			final PrintFunc[] result = new PrintFunc[2];
 			result[0] = new PrintFunc(this, PType.PRINT_ORDER_DETAIL, extraEnabled);
+			result[0].setRegions(this.regions);
 			result[1] = new PrintFunc(this, PType.PRINT_CANCELLED_FOOD_DETAIL, cancelEnabled);
+			result[1].setRegions(this.regions);
 			return result;
 		}
 	}
@@ -509,6 +588,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		if(builder.isEnabledChanged()){
 			enabled = builder.enabled == 1;
 		}
+		if(builder.isExtraChanged()){
+			extra = builder.extra.intValue();
+		}
 	}
 	
 	private PrintFunc(SummaryBuilder builder){
@@ -517,6 +599,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this.mRegions.addAll(builder.mRegions);
 		this.mDepts.addAll(builder.mDepts);
 		this.mComment = builder.comment;
+		this.extra = builder.extra;
 	}
 	
 	private PrintFunc(DetailBuilder builder, PType type, boolean enabled){
@@ -568,6 +651,14 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public int getRepeat(){
 		return mRepeat;
+	}
+	
+	public int getExtra(){
+		return this.extra;
+	}
+	
+	public void setExtra(int extra){
+		this.extra = extra;
 	}
 	
 	public List<Department> getDepartment(){
@@ -759,7 +850,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.putString("pTypeText", this.mType.getDesc());
 		jm.putInt("repeat", this.mRepeat);
 		jm.putString("comment", this.mComment);
-		
+		jm.putInt("extra", this.extra);
 		jm.putBoolean("enabled", this.enabled);
 		
 		if(this.mRegions.size() > 0){
@@ -812,14 +903,24 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				depts = "所有部门";
 				deptValues = "";
 			}
-		}else if(this.mType == PType.PRINT_ORDER_DETAIL || this.mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
+		}else if(this.mType == PType.PRINT_ORDER_DETAIL){
+			depts = "----";
+			if(isKitchenAll()){
+				kitchens = "所有厨房";
+				kitchenValues = "";
+			}
+			
+			if(isRegionAll()){
+				regions = "所有区域";
+				regionValues = "";
+			}
+		}else if(this.mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 			regions = "----";
 			depts = "----";
 			if(isKitchenAll()){
 				kitchens = "所有厨房";
 				kitchenValues = "";
 			}
-		
 		}else{
 			depts = "----";
 			kitchens = "----";

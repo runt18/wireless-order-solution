@@ -8,7 +8,7 @@ function createMixPayPopup(param){
 	}
 	
 	var _payTypeData = null;   //支付类型数据
-	
+	var _checkBoxes = [];      //支付类型按钮
 	var _mixPayPopup = null;
 	_mixPayPopup = new JqmPopup({
 		loadUrl : './popup/mixedPay/mixedPay.html',
@@ -53,6 +53,13 @@ function createMixPayPopup(param){
 				if(param.right && typeof param.right == 'function'){
 					param.right();
 				}else{
+					for(var i = 0; i < _checkBoxes.length; i++){
+						if($('#' + _checkBoxes[i]).attr('checked')){
+							var numForAlias = $("#" + $('#' + _checkBoxes[i]).attr('data-for'));
+							
+							NumKeyBoardAttacher.instance().detach(numForAlias[0]);
+						}
+					}
 					_mixPayPopup.close();
 				}
 			});
@@ -78,12 +85,11 @@ function createMixPayPopup(param){
 							'</tr>';
 						
 						var html = [];
-						var checkBoxes = [];
 						_payTypeData = jr.root;
 						for(var i = 0; i < _payTypeData.length; i++){
 							var checkBoxId = "chbForPayType" + _payTypeData[i].id;
 							var numberfieldId = "numForPayType" + _payTypeData[i].id;
-							checkBoxes.push(checkBoxId);
+							_checkBoxes.push(checkBoxId);
 							html.push(eachMaxType.format({
 								name : _payTypeData[i].name,
 								checkboxId : checkBoxId,
@@ -94,8 +100,8 @@ function createMixPayPopup(param){
 						self.find('[id="mixedPay_tbl_mixPay"]').html(html.join('')).trigger('create');
 						
 						//混合结账中每个CheckBox按钮的事件
-						for(var i = 0; i < checkBoxes.length; i++){
-							$('#' + checkBoxes[i]).click(function(){
+						for(var i = 0; i < _checkBoxes.length; i++){
+							$('#' + _checkBoxes[i]).click(function(){
 								
 								var curCheckbox = $(this);
 								var numForAlias = $("#" + curCheckbox.attr('data-for'));
@@ -116,10 +122,14 @@ function createMixPayPopup(param){
 									numForAlias.removeAttr("disabled"); 
 									numForAlias.parent().removeClass('ui-disabled');
 							
+									NumKeyBoardAttacher.instance().attach(numForAlias[0]);
+									
 									numForAlias.focus();
+									
 									numForAlias.select();
 									
 								}else{
+									NumKeyBoardAttacher.instance().detach(numForAlias[0]);
 									
 									numForAlias.attr("disabled", true); 
 									numForAlias.parent().addClass('ui-disabled');

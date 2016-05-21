@@ -66,7 +66,7 @@ $(function(){
 									'<td>' +
 										'<div data-role="controlgroup" data-type="horizontal">' +
 											'<a href="#" data-table={tableId} data-role="button" data-value={wxOrderNumber} data-status={orderStatus} data-type="wxOrderConfirm_a_wxOrder" data-theme="b">{confirm}</a>' +
-											'<a href="#"  data-role="button" data-number={wxOrderNumber} data-value={wxOrderId} data-status={orderStatus} data-type="wxOrderDelete_a_wxOrder" data-theme="b">{del}</a>' +
+											'{isNeedDel}' +
 										'</div>' +
 									'</td>' +
 								'</tr>';
@@ -80,7 +80,7 @@ $(function(){
 				wxOrderTime : data[i].date,
 				orderStatus : data[i].statusVal,
 				confirm : data[i].statusVal == WxStatus.COMMITTED.val ? '下单' : '账单已处理(' + data[i].orderId + ')',
-				del : '删除', 
+				isNeedDel : data[i].statusVal == WxStatus.COMMITTED.val ? '<a href="#"  data-role="button" data-number='+ data[i].code +' data-value='+ data[i].id +' data-status='+ data[i].statusVal +' data-type="wxOrderDelete_a_wxOrder" data-theme="b">删除</a>' : '', 
 				memberName : data[i].member.name,
 				tel : data[i].member.mobile,
 				tableName : data[i].table ? data[i].table.name : '---',

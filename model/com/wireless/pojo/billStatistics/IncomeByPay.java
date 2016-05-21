@@ -82,6 +82,16 @@ public class IncomeByPay implements Jsonable{
 	}
 	
 	public List<PaymentIncome> getPaymentIncomes(){
+//		Collections.sort(paymentIncomes, new Comparator<PaymentIncome>() {
+//			@Override
+//			public int compare(PaymentIncome o1, PaymentIncome o2) {
+//				if(o1.payType == PayType.MIXED){
+//					return 1;
+//				}else{
+//					return 0;
+//				}
+//			}
+//		});
 		return Collections.unmodifiableList(paymentIncomes);
 	}
 	

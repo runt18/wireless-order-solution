@@ -49,7 +49,7 @@
 <script type="text/javascript">
 	seajs.config({
 		alias : {
-			'diagPrinter' : './js/popup/diagPrinter/diagPrinter',
+			'diagPrinter' : './js/popup/diagPrinter/diagPrinter',   
 			'readMember' : './js/popup/member/read',
 			'addMember' : './js/popup/member/add',
 			'recharge' : './js/popup/member/recharge',
@@ -64,10 +64,10 @@
 			'moreTastes' : './js/popup/moreTaste/moreTaste',
 			'wxOrderListPopup' : './js/popup/wxOrderList/wxOrderList',
 			'printBind' : './js/popup/print/print',
-			'feastPay' : './js/popup/feastPay/feastPay'
+			'feastPay' : './js/popup/feastPay/feastPay',
+			'handlerTable' : './js/popup/handlerTable/handlerTable'
 		}
 	});
-	
 </script>
 <script type="text/javascript" src="js/common/jquery.mobile-1.3.2.min.js"></script>
 <!-- 日期插件.js -->
@@ -118,8 +118,6 @@
 <script type="text/javascript" src="./js/popup/seat/seat.js?v=<%=v %>"></script>
 <!-- 微信扫描 -->
 <script type="text/javascript" src="./js/popup/wxPayment/wxPayment.js?v=<%=v %>"></script>
-<!-- 开席&拼台 -->
-<script type="text/javascript" src="./js/popup/handlerTable/handlerTable.js?v=<%=v %>"></script>
 <!-- 跑马灯 -->
 <script type="text/javascript" src="./js/runHorse/runHorse.js"></script>
 <!-- 重连socket -->

@@ -1045,7 +1045,6 @@ $(function(){
 			}
 		});
 		
-		
 		//微信预定
 		$('#WxOrder_a_tableSelect').click(function(){
 			wxOrder.entry();
@@ -1060,56 +1059,59 @@ $(function(){
 		$('#multiOpen_li_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
 			setTimeout(function(){
-				var handlerTable = new CreateHandlerTable({
-					type : 'multiOpenTable',
-					title : '多台开席选台',
-					right : function(selectedTable){
-						if(selectedTable.length == 0){
-							Util.msg.tip("请选择餐台");
-							return;
-						}
-
-						handlerTable.close(function(){
-							//进入点菜界面
-							of.entry({
-								table : selectedTable[0],
-								comment : '',
-								orderFoodOperateType : 'multiOpenTable',
-								commit : function(selectedFoods){
-									if(selectedFoods.length == 0){
-										Util.msg.tip("请选择菜品");		
-										return ;1
-									}
-									
-									var orderFoods = [];
-									for (var i = 0; i < selectedTable.length; i++) {
-										var orderDataModel = {};
-										orderDataModel.tableID = selectedTable[i].id;
-										orderDataModel.orderFoods = selectedFoods.slice(0);
-										orderDataModel.categoryValue =  selectedTable[i].categoryValue;	
-										orderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
-									}
-									
-									Util.LM.show();
-									$.post('../OperateOrderFood.do', {
-										dataSource : 'multiOpenTable',
-										multiTableOrderFoods : orderFoods.join("<li>")
-									}, function(data){
-										Util.LM.hide();
-										if(data.success){
-											Util.msg.tip(data.msg);
-											//清空已选餐台
-											ts.loadData();
-										}else{
-											Util.msg.tip(data.msg);
+				seajs.use('handlerTable', function(handler){
+					var handlerTable = null;
+					handlerTable = handler.newInstance({
+						type : 'multiOpenTable',
+						title : '多台开席选台',
+						right : function(selectedTable){
+							if(selectedTable.length == 0){
+								Util.msg.tip("请选择餐台");
+								return;
+							}
+	
+							handlerTable.close(function(){
+								//进入点菜界面
+								of.entry({
+									table : selectedTable[0],
+									comment : '',
+									orderFoodOperateType : 'multiOpenTable',
+									commit : function(selectedFoods){
+										if(selectedFoods.length == 0){
+											Util.msg.tip("请选择菜品");		
+											return ;1
 										}
-									}, 'json');
-								}
-							});	
-						}, 300);
-					}
+										
+										var orderFoods = [];
+										for (var i = 0; i < selectedTable.length; i++) {
+											var orderDataModel = {};
+											orderDataModel.tableID = selectedTable[i].id;
+											orderDataModel.orderFoods = selectedFoods.slice(0);
+											orderDataModel.categoryValue =  selectedTable[i].categoryValue;	
+											orderFoods.push(JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)));
+										}
+										
+										Util.LM.show();
+										$.post('../OperateOrderFood.do', {
+											dataSource : 'multiOpenTable',
+											multiTableOrderFoods : orderFoods.join("<li>")
+										}, function(data){
+											Util.LM.hide();
+											if(data.success){
+												Util.msg.tip(data.msg);
+												//清空已选餐台
+												ts.loadData();
+											}else{
+												Util.msg.tip(data.msg);
+											}
+										}, 'json');
+									}
+								});	
+							}, 300);
+						}
+					});
+					handlerTable.open();
 				});
-				handlerTable.open();
 			}, 200);
 		});
 		
@@ -1117,38 +1119,41 @@ $(function(){
 		$('#MultiPayTable_li_tableSelect').click(function(){
 			$('#tableSelectOtherOperateCmp').popup('close');
 			setTimeout(function(){
-				var handlerTable = new CreateHandlerTable({
-					title : '拼台(菜品将合并到第一张餐台)',
-					type : 'spellingTable',
-					right : function(selectedTable){
-						if(selectedTable.length == 0){
-							Util.msg.tip("请选择餐台");
-							return;
-						}
-						var multiTables = [];
-						for (var i = 0; i < selectedTable.length; i++) {
-							multiTables.push(selectedTable[i].id);
-						}
-
-						$.post('../OperateTable.do', {
-							dataSource : 'mergeTable',
-							tables : multiTables.join(",")
-						}, function(rt){
-							if(rt.success){
-								Util.msg.tip("并台成功, 已合并到 "+ selectedTable[0].name);
-								//关闭选台
-								handlerTable.close();
-								//进入已点菜界面
-								uo.entry({
-									table : selectedTable[0]
-								});
-							}else{
-								Util.msg.tip('tableSelectMgr');
+				seajs.use('handlerTable', function(handler){
+					var handlerTable = null;
+					handlerTable = handler.newInstance({
+						title : '拼台(菜品将合并到第一张餐台)',
+						type : 'spellingTable',
+						right : function(selectedTable){
+							if(selectedTable.length == 0){
+								Util.msg.tip("请选择餐台");
+								return;
 							}
-						}, 'json');
-					}
-				});
-				handlerTable.open();
+							var multiTables = [];
+							for (var i = 0; i < selectedTable.length; i++) {
+								multiTables.push(selectedTable[i].id);
+							}
+	
+							$.post('../OperateTable.do', {
+								dataSource : 'mergeTable',
+								tables : multiTables.join(",")
+							}, function(rt){
+								if(rt.success){
+									Util.msg.tip("并台成功, 已合并到 "+ selectedTable[0].name);
+									//关闭选台
+									handlerTable.close();
+									//进入已点菜界面
+									uo.entry({
+										table : selectedTable[0]
+									});
+								}else{
+									Util.msg.tip('tableSelectMgr');
+								}
+							}, 'json');
+						}
+					});
+					handlerTable.open();
+				});	
 			}, 300);
 		});
 		
@@ -1849,6 +1854,7 @@ ts.member.memberPointConsumeAction = function(){
 	$.post('../OperateMember.do', {
 		dataSource : 'consumePoint',
 		memberId : ts.member.pointConsumeMember.id,
+		orientedPrinter : getcookie(document.domain + '_printers'),
 		point : point.val()		
 	}, function(jr){
 		if(jr.success){

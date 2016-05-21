@@ -9,8 +9,11 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.printScheme.PrintFunc;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
 import com.wireless.print.content.decorator.ExtraFormatDecorator;
+import com.wireless.print.content.decorator.RightAlignedDecorator;
 import com.wireless.server.WirelessSocketServer;
 
 public class SummaryContent extends ConcreteContent {
@@ -21,6 +24,7 @@ public class SummaryContent extends ConcreteContent {
 	private final Order mOrder;
 	private final FoodDetailContent.DetailType mDetailType;
 	private String ending;
+	private int extra;
 	
 	public SummaryContent(Order order, String waiter, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
@@ -39,6 +43,11 @@ public class SummaryContent extends ConcreteContent {
 		mDetailType = detailType;
 	}
 
+	public SummaryContent setExtra(int extra){
+		this.extra = extra;
+		return this;
+	}
+	
 	public SummaryContent setEnding(String ending){
 		this.ending = ending;
 		return this;
@@ -107,11 +116,18 @@ public class SummaryContent extends ConcreteContent {
 						new ExtraFormatDecorator(
 							new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle, mDetailType), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
-		if(hasEnding() && mPrintType == PType.PRINT_ORDER){
-			mTemplate = mTemplate.replace(PVar.VAR_4, "*" + ending + "*");
-		}else{
-			mTemplate = mTemplate.replace(PVar.VAR_4, "");
+		final StringBuilder var4 = new StringBuilder();
+		if(mPrintType == PType.PRINT_ORDER || mPrintType == PType.PRINT_ALL_EXTRA_FOOD || mPrintType == PType.PRINT_ORDER_PATCH){
+			PrintFunc.SummaryOptions options = new PrintFunc.SummaryOptions(extra);
+			if(options.containsTotal()){
+				var4.append(new ExtraFormatDecorator(
+								new RightAlignedDecorator("Ð¡¼Æ£º" + NumericUtil.CURRENCY_SIGN + mOrder.calcTotalPrice(), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X));
+			}
+			if(hasEnding()){
+				var4.append(SEP).append("*" + ending + "*");
+			}
 		}
+		mTemplate = mTemplate.replace(PVar.VAR_4, var4.toString());
 		
 		return mTemplate;
 	}

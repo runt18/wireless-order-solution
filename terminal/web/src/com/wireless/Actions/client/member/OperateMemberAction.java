@@ -340,9 +340,9 @@ public class OperateMemberAction extends DispatchAction{
 			}
 
 			
-		}catch(BusinessException e){	
+		}catch(BusinessException | SQLException e){	
 			e.printStackTrace();
-			jObject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
 			jObject.initTip4Exception(e);
@@ -458,28 +458,26 @@ public class OperateMemberAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward consumePoint(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward consumePoint(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final String pin = (String)request.getAttribute("pin");
+		final String memberId = request.getParameter("memberId");
+		final String point = request.getParameter("point");
 		
-		JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String memberId = request.getParameter("memberId");
-			String point = request.getParameter("point");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			MemberDao.pointConsume(staff, Integer.valueOf(memberId), Integer.valueOf(point));
-			jobject.initTip(true, "操作成功, 会员积分消费成功.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 会员积分消费成功.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

@@ -163,6 +163,7 @@ public class WxRestaurantDao {
 			  (builder.isChargeTemplateChanged() ? " ,charge_template = '" + wr.getChargeTemplate() + "'" : "") +
 			  (builder.isOrderNotifyTemplateChanged() ? " ,order_notify_template = '" + wr.getOrderNotifyTemplate() + "'" : "") +
 			  (builder.isDefaultOrderTypeChanged() ? " ,default_order_type = " + wr.getDefaultOrderType().getValue() : "") + 
+			  (builder.isPrefectMemberStatusChanged() ? " , prefect_member_status = " + wr.getPrefectMemberStatus().getValue() : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
@@ -304,6 +305,10 @@ public class WxRestaurantDao {
 			wr.setOrderNotifyTemplate(dbCon.rs.getString("order_notify_template"));
 			if(dbCon.rs.getInt("default_order_type") != 0){
 				wr.setDefaultOrderType(WxRestaurant.PayType.valueOf(dbCon.rs.getInt("default_order_type")));
+			}
+			if(dbCon.rs.getInt("prefect_member_status") != 0){
+
+				wr.setPrefectMemberStatus(WxRestaurant.PrefectMember.valueOf(dbCon.rs.getInt("prefect_member_status")));
 			}
 			result.add(wr);
 		}
