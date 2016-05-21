@@ -386,7 +386,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	public void onEventMsg(Msg4Event msg) {
 		try{
 			// 绑定餐厅和公众平台信息
-			//WxRestaurantDao.bind(msg.getToUserName(), RestaurantDao.getById(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName())).getAccount());
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
@@ -394,7 +393,16 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				if(msg.getTicket().isEmpty()){
 					final List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
 					if(reply.isEmpty()){
-						session.callback(createNavi(msg));
+						WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+						String picUrl;
+						if(wxRestaurant.hasWeixinLogo()){
+							picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
+						}else{
+							picUrl = "";
+						}
+						//餐厅简介
+						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("欢迎关注【" + RestaurantDao.getById(staff.getRestaurantId()).getName() + "】", "点击去餐厅简介", picUrl, createUrl(msg, WEIXIN_ABOUT))));
+
 					}else{
 						session.callback(appendUrlParam(msg, new WxMenuAction.MsgProxy(msg.getHead(), reply.get(0)).toMsg()));
 					}

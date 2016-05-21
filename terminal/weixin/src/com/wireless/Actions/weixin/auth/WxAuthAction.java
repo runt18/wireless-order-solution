@@ -77,7 +77,7 @@ public class WxAuthAction extends Action {
 			//Make the menu.
 			Menu menu = new Menu();
 			Menu.delete(Token.newInstance(authorizerToken));
-			menu.set1stButton(new Button.ClickBuilder("餐厅导航", WxHandleMessage.EventKey.NAVI_EVENT_KEY.getKey()).build());
+			menu.set1stButton(new Button.ClickBuilder("餐厅简介", WxHandleMessage.EventKey.INTRO_EVENT_KEY.getKey()).build());
 			menu.set2ndButton(new Button.ScanMsgBuilder("扫一扫", WxHandleMessage.EventKey.SCAN_EVENT_KEY.getKey()).build());
 			
 			menu.set3rdButton(new Button.ClickBuilder("我的", "AAA")
