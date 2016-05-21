@@ -110,8 +110,8 @@ var Util = {
 			line.addClass(sc);
 		}
 	},
-	jump : function(page, extra){
-		var paramFormat = 'm={0}&r={1}&time={2}' + (extra ? '&e=' + extra : '');
+	jump : function(page, extra, sessionId, str){
+		var paramFormat = 'm={0}&r={1}&time={2}' + (extra ? '&e=' + extra : '') + (sessionId ? '&sessionId=' + sessionId : '') + (str ? str : '');
 		if(page.indexOf('?') > 0){
 			window.location.href = page + '&' + paramFormat.format(this.mp.oid, this.mp.fid, new Date().getTime());
 		}else{
@@ -347,4 +347,19 @@ function Util_urlParaQuery() {
 	}
 }
 
-
+Util.showErrorMsg = function(msg, afterClose){
+	if(typeof afterClose != 'function'){
+		afterClose = null;
+	}
+	var errDialog;
+	errDialog = new WeDialogPopup({
+		titleText : '错误提示',
+		content : ('<span style="display:block;text-align:center;">' + msg + '</span>'),
+		leftText : '确认',
+		left : function(){
+			errDialog.close();
+		},
+		afterClose : afterClose
+	});
+	errDialog.open();
+}

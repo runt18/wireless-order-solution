@@ -37,6 +37,7 @@ public class WxOrderDao {
 		private WxOrder.Type type;
 		private String weixinSerial;
 		private int memberId;
+		private int tableId;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -78,6 +79,11 @@ public class WxOrderDao {
 			return this;
 		}
 		
+		public ExtraCond setTableId(int tableId){
+			this.tableId = tableId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -110,6 +116,10 @@ public class WxOrderDao {
 			}
 			if(statusCond.length() != 0){
 				extraCond.append(" AND WO.status IN ( " + statusCond.toString() + ")");
+			}
+			
+			if(tableId != 0){
+				extraCond.append(" AND WO.table_id = " + tableId);
 			}
 			return extraCond.toString();
 		}
@@ -487,11 +497,6 @@ public class WxOrderDao {
 		}
 		dbCon.rs.close();
 		wxOrder.setMember(MemberDao.getById(dbCon, staff, wxOrder.getMember().getId()));
-		if(wxOrder.hasTable()){
-			try{
-				wxOrder.setTable(TableDao.getById(dbCon, staff, wxOrder.getTable().getId()));
-			}catch(BusinessException ignored){}
-		}
 	}
 	/**
 	 * Get the weixin order according to specific extra condition{@link ExtraCond}.
@@ -561,6 +566,15 @@ public class WxOrderDao {
 		}
 		dbCon.rs.close();
 		
+		for(WxOrder wxOrder : result){
+			if(wxOrder.hasTable()){
+				try{
+					wxOrder.setTable(TableDao.getById(dbCon, staff, wxOrder.getTable().getId()));
+				}catch(BusinessException ignored){
+					ignored.printStackTrace();
+				}
+			}
+		}
 		return result;
 	}
 

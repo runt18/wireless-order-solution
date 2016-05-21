@@ -15,6 +15,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.WxRestaurantError;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -85,8 +86,12 @@ public class WxOperateRestaurantAction extends DispatchAction {
 			}else{
 				if(sessionId != null && !sessionId.isEmpty()){
 					HttpSession session = SessionListener.sessions.get(sessionId);
-					fid = String.valueOf(session.getAttribute("fid"));
-					restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+					if(session != null){
+						fid = String.valueOf(session.getAttribute("fid"));
+						restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+					}else{
+						throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+					}
 				}else{
 					restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(fid);
 				}
@@ -125,8 +130,12 @@ public class WxOperateRestaurantAction extends DispatchAction {
 			}else{
 				if(sessionId != null && !sessionId.isEmpty()){
 					HttpSession session = SessionListener.sessions.get(sessionId);
-					fid = String.valueOf(session.getAttribute("fid"));
-					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+					if(session != null){
+						fid = String.valueOf(session.getAttribute("fid"));
+						staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+					}else{
+						throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
+					}
 				}else{
 					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
 				}

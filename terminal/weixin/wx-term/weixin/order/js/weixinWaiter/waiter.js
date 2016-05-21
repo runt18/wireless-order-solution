@@ -1,13 +1,14 @@
 $(function(){
 	
 	var fastFoodWaiterData = {
-		_tableAlias : null,					//餐桌号
-		_orderData : null,					//点菜资料
-		_commentData : null,				//备注资料
-		_orderId : null,					//账单Id
-		_orderType : null,					//下单方式
-		_prefectMemberStauts : null,    	//是否显示完善会员资料
-		_tableId : null        				//餐桌id
+		_tableAlias : null,				//餐桌号
+		_orderData : null,				//点菜资料
+		_commentData : null,			//备注资料
+		_orderId : null,				//账单Id
+		_orderType : null,				//下单方式
+		_tableId : null,        		//餐桌id
+		_orderFoods : null,				//点菜信息
+		_prefectMemberStauts : null 	//是否显示完善会员资料
 	};
 	
 	var orderType = {
@@ -42,7 +43,8 @@ $(function(){
 			data : {
 				dataSource : 'getOrder',
 				sessionId : Util.mp.params.sessionId,
-				orderId : Util.mp.params.orderId
+				orderId : Util.mp.params.orderId,
+				tableId : Util.mp.params.tableId
 			},
 			type : 'post',
 			dataType : 'json',
@@ -52,6 +54,15 @@ $(function(){
 						//自助点餐点击
 						$('#orderBySelf_a_waiter').click();
 					}
+				}else if(data.code == '7546'){
+					sessionTimeout();
+				}
+			},
+			error : function(req, status,err){
+				if(err.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(err.msg);					
 				}
 			}
 		})
@@ -83,9 +94,53 @@ $(function(){
 						hasFood();
 					}else{
 						fastFoodWaiterData._tableId = Util.mp.params.tableId;
-						//自助点餐点击
-						$('#orderBySelf_a_waiter').click();
+
+						//客人存在这张餐桌的待确认
+						$.ajax({
+							url : '../../WxOperateOrder.do',
+							type : 'post',
+							datatype : 'json',
+							data : {
+								dataSource : 'getByCond',
+								sessionId : Util.mp.params.sessionId, 
+								status : '2',
+								tableId : Util.mp.params.tableId
+							},
+							success : function(res, status, xhr){
+								if(res.success){
+									if(res.root.length > 0){
+										initTableMsg();
+										initFoodList(res.root[0], true);
+//										$('[data-name=orderListTab_waiter]').click();
+									}else{
+										$('#orderBySelf_a_waiter').click();
+									}
+								}else if(res.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(res.msg);
+								}
+							},
+							error : function(req, status, err){
+								if(err.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(err.msg);					
+								}
+							}
+						});
 					}	
+				}else if(data.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(data.msg);
+				}
+			},
+			error : function(req, status, err){
+				if(err.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(err.msg);					
 				}
 			}
 		});
@@ -118,11 +173,25 @@ $(function(){
 							dataSource : 'getByCond',
 							sessionId : Util.mp.params.sessionId, 
 							status : '2',
-							orderId : data.root[0].id
+							orderId : data.root[0].id,
+							tableId : Util.mp.params.tableId
 						},
 						success : function(res, status, xhr){
-							if(res.success && res.root.length > 0){
-								initFoodList(res.root[0], true);
+							if(res.success){
+								if(res.root.length > 0){
+									initFoodList(res.root[0], true);						
+								}
+							}else if(data.code == '7546'){
+								sessionTimeout();
+							}else{
+								Util.showErrorMsg(data.msg);
+							}
+						},
+						error : function(req, status, err){
+							if(err.code == '7546'){
+								sessionTimeout();
+							}else{
+								Util.showErrorMsg(err.msg);					
 							}
 						}
 					});
@@ -156,8 +225,20 @@ $(function(){
 								memberId : data.root[0].memberId
 							},
 							success : function(data, status, xhr){
-								
-								$('#memberName_span_waiter').text(data.root[0].name);
+								if(data.success){
+									$('#memberName_span_waiter').text(data.root[0].name);
+								}else if(data.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(data.msg);
+								}
+							},
+							error : function(req, status, err){
+								if(err.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(err.msg);					
+								}
 							}
 						});
 						
@@ -189,9 +270,12 @@ $(function(){
 						});
 						$('#bottom_div_waiter').html('<span style="display:block;color:#156785;font-size:34px;text-align:center;">账单已结账</span>');
 					}
-				}else{
-					location.href = 'waiterTimeout.html';
+				}else if(data.code == '7546'){
+					sessionTimeout();	
 				}
+			},
+			error : function(req, status, err){
+				Util.showErrorMsg(err.msg);
 			}
 		});	 
 	}
@@ -227,6 +311,7 @@ $(function(){
 			}
 		});
 		
+		//tab点击事件
 		var waiterTabArr = [].slice.call($('#waiterTab_div_waiter').find('[data-type=waiterTab]'));
 		waiterTabArr.forEach(function(el, index){
 			el.onclick = function(){
@@ -251,7 +336,7 @@ $(function(){
 									'<ul class="m-b-list">'+
 										'<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>'+
 										'<li  class="box-horizontal" style="border-bottom:0px;line-height:15px;">'+
-											'<div style="width:85%;"><span data-type="foodIndex">{index}</span>、{foodName}<span style="font-size:20px;letter-spacing:4px;color:red;">x{count}</span><span style="color:red;">{discount}</span></div>'+
+											'<div style="width:85%;"><span data-type="foodIndex">{index}</span>、{foodName}<span style="font-size:20px;letter-spacing:4px;color:green;">x{count}</span><span style="color:green;">{discount}</span></div>'+
 											'<div style="width:15%;"><font style="font-weight:bold;color:green">{foodPrice}元</font></div>'+
 										'</li>'+
 										'<li style="border-bottom:0px;line-height:10px;">&nbsp;</li>'+	
@@ -293,7 +378,7 @@ $(function(){
 					count : temp.count,
 					discount : temp.discount != 1 ? '(' + (temp.discount * 10) + '折)': '',
 					foodPrice : temp.totalPrice,
-					foodUnit : temp.tasteGroup.tastePref + '<span style="color:red;float:right;">&nbsp;&nbsp;<strong>(待确认)</strong></span>'
+					foodUnit : temp.tasteGroup.tastePref + '<span style="color:#283892;float:right;">&nbsp;&nbsp;<strong>(待确认)</strong></span>'
 				}));
 			});
 			$('#orderList_div_waiter').html(html.join(''));
@@ -310,26 +395,34 @@ $(function(){
 			element.innerHTML = index + 1;
 		});
 		
-		if(data.orderFoods.length > 0){
+		if(data.foods && data.foods.length > 0 || data.orderFoods && data.orderFoods.length > 0){
+			if(data.orderFoods){
+				fastFoodWaiterData._orderFoods = data.orderFoods;
+			}
 			$('#tipsFoods_span_waiter').css({
-				'margin' : '40% 0px',
-				'display' : 'block'
+				'margin' : '0px 0px',
+				'display' : 'none'
 			});
 			$('#tipsOrder_span_waiter').css({
-				'margin' : '40% 0px',
-				'display' : 'block'
+				'margin' : '0px 0px',
+				'display' : 'none'
 			});
+			
+			if(data.foods && !data.orderFoods && !fastFoodWaiterData._orderFoods){
+				$('[data-name=orderListTab_waiter]').click();
+			}
+			
 		}else{
 			//自助点餐点击
 			$('#orderBySelf_a_waiter').click();
 			
 			$('#tipsFoods_span_waiter').css({
-				'margin' : '0px 0px',
-				'display' : 'none'
+				'margin' : '40% 0px',
+				'display' : 'block'
 			});
 			$('#tipsOrder_span_waiter').css({
-				'margin' : '0px 0px',
-				'display' : 'none'
+				'margin' : '40% 0px',
+				'display' : 'block'
 			});
 		}
 	}
@@ -399,15 +492,22 @@ $(function(){
 									}else{
 										commit(_calcOrderCost);
 									}
+								}else if(data.code == '7546'){
+									sessionTimeout();	
 								}else{
-									Util.dialog.show({msg : data.msg});	
+									Util.showErrorMsg(data.msg);
 								}
 							},
-							
+						
 							error : function(xhr, status, err){
-								Util.dialog.show({msg : err.msg});
+								if(err.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(err.msg);					
+								}
 							}
 						});
+					
 					}else{
 						commit(_calcOrderCost);
 					}
@@ -630,13 +730,27 @@ $(function(){
 							leftText : '确认',
 							left : function(){
 								dialog.close();
+							},
+							afterClose : function(){
+								window.location.reload();
 							}
 						})
 						dialog.open();
 					}
 				},
 				error : function(req, status, error){
-					alert(error);
+					var dialog = new WeDialogPopup({
+						content : data.msg,
+						titleText : '微信支付失败',
+						leftText : '确认',
+						left : function(){
+							dialog.close();
+						},
+						afterClose : function(){
+							window.location.reload();
+						}
+					})
+					dialog.open();
 				}
 			});
 		}else if(fastFoodWaiterData._orderType == orderType.CONFIRM_BY_STAFF){
@@ -658,8 +772,8 @@ $(function(){
 					orderId : fastFoodWaiterData._orderId,
 					print : true
 				},
-				success : function(response, status, xhr){
-					if(response.success){
+				success : function(data, status, xhr){
+					if(data.success){
 						//提示框设置
 						var finishOrderDialog = new WeDialogPopup({
 							titleText : '温馨提示',
@@ -674,26 +788,32 @@ $(function(){
 //								$('#closeFastFood_a_waiter').click();
 //								$('#foodList_div_waiter').html('');
 //								initWaiterOrder();
-								if(Util.mp.params.tableId){
-									window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
-								}else{
+//								if(Util.mp.params.tableId){
+//									window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+//								}else{
 									window.location.reload();
-									$('#waiterTab_div_waiter').find('[data-type=waiterTab]').click();
-								}
+//									$('#waiterTab_div_waiter').find('[data-type=waiterTab]').click();
+//								}
 								
 							}
 						});
 						
 						finishOrderDialog.open();
 						
+					}else if(data.code == '7546'){
+						sessionTimeout();
 					}else{
-						Util.dialog.show({msg : response.msg});	
+						Util.showErrorMsg(data.msg);
 					}
 					
 				},
 				
 				error : function(xhr, status, err){
-					Util.dialog.show({msg : err.msg});
+					if(err.code == '7546'){
+						sessionTimeout();
+					}else{
+						Util.showErrorMsg(err.msg);					
+					}
 				}
 			});
 		}else if(fastFoodWaiterData._orderType == orderType.DIRECT_ORDER){
@@ -732,19 +852,18 @@ $(function(){
 						});
 						
 						finishOrderDialog.open();
+					}else if(data.code == '7546'){
+						sessionTimeout();
+					}else{
+						Util.showErrorMsg(data.msg);
 					}
 				},
 				error : function(req, status, err){
-					var errDialog;
-					errDialog = new WeDialogPopup({
-						titleText : '温磬提示',
-						content : ('<span style="display:block;text-align:center;">' + err.msg + '</span>'),
-						leftText : '确认',
-						left : function(){
-							errDialog.close();
-						}
-					});
-					errDialog.open();
+					if(err.code == '7546'){
+						sessionTimeout();
+					}else{
+						Util.showErrorMsg(err.msg);					
+					}
 				}
 			});
 		}else{
@@ -835,7 +954,7 @@ $(function(){
 							$('#closeFastFood_a_waiter').click();
 							$('#foodList_div_waiter').html('');
 							if(Util.mp.params.tableId){
-								window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId;
+								window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
 							}else{
 								initWaiterOrder();
 							}
@@ -852,4 +971,20 @@ $(function(){
 		}
 	}
 	
+	
+	function sessionTimeout(){
+		var sessionTimeoutPopup;
+		sessionTimeoutPopup = new WeDialogPopup({
+			titleText : '温磬提示',
+			content : ('<span style="display:block;text-align:center;">链接已过期,请重新扫二维码</span>'),
+			leftText : '确认',
+			left : function(){
+				sessionTimeoutPopup.close();
+			},
+			afterClose : function(){
+				wx.closeWindow();
+			}
+		});
+		sessionTimeoutPopup.open();
+	}
 })
