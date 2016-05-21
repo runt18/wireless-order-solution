@@ -437,7 +437,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					httpSession.setAttribute("fid", msg.getToUserName());
 					httpSession.setAttribute("oid", msg.getFromUserName());
 					httpSession.setMaxInactiveInterval(3600 * 2);	//2 hour
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", picUrl, createUrl4Session(WEIXIN_FOOD, httpSession))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("自助点餐", "点击去自助点餐", picUrl, createUrl4Session(WEIXIN_FOOD + "&m=" + msg.getFromUserName() + "&r=" + msg.getToUserName(), httpSession))));
 					
 				}else if(msg.getEventKey().equals(EventKey.INTRO_EVENT_KEY.val)){
 					//餐厅简介
@@ -763,7 +763,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			
 			session.callback(new Msg4ImageText(msg).addItem(
 					new Data4Item("欢迎使用扫码下单(餐台：" + table.getName() + ")", desc, picUrl,
-								  createUrl4Session(WEIXIN_WAITER + "?tableId=" + table.getId() + "&branchId=" + restaurantId, httpSession))));
+								  createUrl4Session(WEIXIN_WAITER + "?tableId=" + table.getId() + "&branchId=" + restaurantId + 
+										  			"&m=" + msg.getFromUserName() + "&r=" + msg.getToUserName(), httpSession))));
 		}
 	}
 	

@@ -708,6 +708,7 @@ public class WxOperateOrderAction extends DispatchAction {
 		final String includeBranch = request.getParameter("includeBranch");
 		final String sessionId = request.getParameter("sessionId");
 		final String orderId = request.getParameter("orderId");
+		final String tableId = request.getParameter("tableId");
 		final JObject jObject = new JObject();
 		
 		try {
@@ -749,6 +750,10 @@ public class WxOperateOrderAction extends DispatchAction {
 			
 			if(id != null && !id.isEmpty()){
 				extraCond.setId(Integer.parseInt(id));
+			}
+			
+			if(tableId != null && !tableId.isEmpty() && Integer.parseInt(tableId) > 0){
+				extraCond.setTableId(Integer.parseInt(tableId));
 			}
 			
 			final List<WxOrder> result = new ArrayList<WxOrder>();

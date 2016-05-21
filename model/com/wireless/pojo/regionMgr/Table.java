@@ -395,7 +395,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	/**
 	 * 餐台状态
-	 * 1 - 空闲, 2 - 就餐
+	 * 0 - 空闲, 1 - 就餐
 	 */
 	public static enum Status{
 		IDLE(0, "空闲"),

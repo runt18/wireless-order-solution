@@ -629,7 +629,14 @@ $(function(){
 	
 	//自助点餐
 	$('#pickOrderFood_a_member').click(function(){
-		Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
+//		Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
+		window.location.href = 'food.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
+	$('#mbarMemberCenter').click(function(){
+		window.location.href = 'member.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
+	$('#jumpIndex_a_member').click(function(){
+		window.location.href = 'index.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
 	});
 	
 });

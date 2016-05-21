@@ -70,7 +70,8 @@ $(function(){
 							    'background-color': '#ddd'
 							});
 							if(Util.mp.params.sessionId){
-								window.location.href = redirectUrl + '&branchId=' + $(element).attr('data-value');
+//								window.location.href = redirectUrl + '&branchId=' + $(element).attr('data-value');
+								Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'), Util.mp.params.sessionId, '&branchId=' + $(element).attr('data-value'));
 							}else{
 								Util.jump(Util.mp.params.redirect_url, $(element).attr('data-value'));
 							}

@@ -141,6 +141,8 @@ public class WxOperateWaiterAction extends DispatchAction{
 				final HttpSession session = SessionListener.sessions.get(sessionId);
 				if(session != null){
 					fid = (String)session.getAttribute("fid");
+				}else{
+					throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 				}
 			}
 			final Staff staff = StaffDao.getWxByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
