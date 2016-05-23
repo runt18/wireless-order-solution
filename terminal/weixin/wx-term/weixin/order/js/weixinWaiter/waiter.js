@@ -50,9 +50,37 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					if(data.root.length == 0){
-						//自助点餐点击
-						$('#orderBySelf_a_waiter').click();
+					if(!(data.root[0] && data.root[0].orderFoods) || data.root[0].orderFoods && data.root[0].orderFoods.length == 0){
+						$.ajax({
+							url : '../../WxOperateOrder.do',
+							type : 'post',
+							datatype : 'json',
+							data : {
+								dataSource : 'getByCond',
+								sessionId : Util.mp.params.sessionId, 
+								status : '2',
+								tableId : Util.mp.params.tableId
+							},
+							success : function(res, status, xhr){
+								if(res.success){
+									if(!(res.root[0] && res.root[0].foods) || res.root[0].foods && res.root[0].foods.length == 0){
+										//自助点餐点击
+										$('#orderBySelf_a_waiter').click();
+									}
+								}else if(res.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(res.msg);
+								}
+							},
+							error : function(req, status, err){
+								if(err.code == '7546'){
+									sessionTimeout();
+								}else{
+									Util.showErrorMsg(err.msg);					
+								}
+							}
+						});
 					}
 				}else if(data.code == '7546'){
 					sessionTimeout();
@@ -94,43 +122,8 @@ $(function(){
 						hasFood();
 					}else{
 						fastFoodWaiterData._tableId = Util.mp.params.tableId;
-
 						//客人存在这张餐桌的待确认
-						$.ajax({
-							url : '../../WxOperateOrder.do',
-							type : 'post',
-							datatype : 'json',
-							data : {
-								dataSource : 'getByCond',
-								sessionId : Util.mp.params.sessionId, 
-								status : '2',
-								tableId : Util.mp.params.tableId
-							},
-							success : function(res, status, xhr){
-								if(res.success){
-									if(res.root.length > 0){
-										initTableMsg();
-										for(var i = (res.root.length - 1); i >= 0; i--){
-											initFoodList(res.root[i], true);
-										}
-//										$('[data-name=orderListTab_waiter]').click();
-									}else{
-										$('#orderBySelf_a_waiter').click();
-									}
-								}else if(res.code == '7546'){
-									sessionTimeout();
-								}else{
-									Util.showErrorMsg(res.msg);
-								}
-							},
-							error : function(req, status, err){
-								if(err.code == '7546'){
-									sessionTimeout();
-								}else{
-									Util.showErrorMsg(err.msg);					
-								}
-							}
-						});
+						hasFood();
 					}	
 				}else if(data.code == '7546'){
 					sessionTimeout();
@@ -428,7 +421,7 @@ $(function(){
 			
 		}else{
 			//自助点餐点击
-			$('#orderBySelf_a_waiter').click();
+//			$('#orderBySelf_a_waiter').click();
 			
 			$('#tipsFoods_span_waiter').css({
 				'margin' : '40% 0px',
@@ -769,6 +762,7 @@ $(function(){
 			});
 		}else if(fastFoodWaiterData._orderType == orderType.CONFIRM_BY_STAFF){
 			//确认下单
+			Util.lm.show();
 			$.ajax({
 				url : '../../WxOperateOrder.do',
 				type : 'post',
@@ -787,6 +781,7 @@ $(function(){
 					print : true
 				},
 				success : function(data, status, xhr){
+					Util.lm.hide();
 					if(data.success){
 						//提示框设置
 						var finishOrderDialog = new WeDialogPopup({
@@ -823,6 +818,7 @@ $(function(){
 				},
 				
 				error : function(xhr, status, err){
+					Util.lm.hide();
 					if(err.code == '7546'){
 						sessionTimeout();
 					}else{

@@ -261,6 +261,7 @@ $(function(){
 				});
 				
 				if(_orderType == orderType.CONFIRM_BY_STAFF){
+					Util.lm.show();
 					$.ajax({
 						url : '../../WxOperateOrder.do',
 						type : 'post',
@@ -277,6 +278,7 @@ $(function(){
 							tableId : tableId
 						},
 						success : function(data, status, xhr){
+							Util.lm.hide();
 							if(data.success){
 								//提示框设置
 								var finishOrderDialog = new WeDialogPopup({
@@ -303,6 +305,7 @@ $(function(){
 						},
 						
 						error : function(xhr, status, err){
+							Util.lm.hide();
 							if(err.code == '7546'){
 								sessionTimeout();
 							}else{
