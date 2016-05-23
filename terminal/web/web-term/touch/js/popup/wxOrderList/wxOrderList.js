@@ -82,7 +82,7 @@ define(function(require, exports, module){
 					html.push(memberBtnTemplate.format({
 						id : 'wxOrderMember_' + member,
 						theme : 'b',
-						name : wxOrderMemberObj.member.name
+						name : wxOrderMemberObj.member.name + '(' + wxOrderMemberObj.code + ')'
 					}));
 				}
 				
