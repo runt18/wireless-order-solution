@@ -340,9 +340,19 @@ public class WxOperateOrderAction extends DispatchAction {
 						
 						Order order = OrderDao.getByTableId(staff, Integer.parseInt(tableId));
 						
+						List<OrderFood> orderFoods = order.getOrderFoods();
+						StringBuilder foodBuilder = new StringBuilder();
+						for(OrderFood food : orderFoods){
+							if(foodBuilder.length() == 0){
+								foodBuilder.append(food.getName());
+							}else{
+								foodBuilder.append(", " + food.getName());
+							}
+						}
+						
 						Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
 	  							   .setToUser(oid)
-	  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
+	  							   .addKeyword(new Keyword("first", "你点的（" + foodBuilder.toString() + "）已经下单"))
 	  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
 	  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
 	  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))
@@ -475,9 +485,19 @@ public class WxOperateOrderAction extends DispatchAction {
 									final Token token = Token.newInstance(authorizerToken);
 									Order order = OrderDao.getById(staff, orderId, DateType.TODAY);
 									
+									List<OrderFood> orderFoods = order.getOrderFoods();
+									StringBuilder foodBuilder = new StringBuilder();
+									for(OrderFood food : orderFoods){
+										if(foodBuilder.length() == 0){
+											foodBuilder.append(food.getName());
+										}else{
+											foodBuilder.append(", " + food.getName());
+										}
+									}
+									
 									Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getOrderNotifyTemplate())
 												  							   .setToUser(oid)
-												  							   .addKeyword(new Keyword("first", "你好,你已成功下单"))
+												  							   .addKeyword(new Keyword("first", "你点的菜（" + foodBuilder.toString() + "）已经下单"))
 												  							   .addKeyword(new Keyword("keyword1", String.valueOf(order.getId())))
 												  							   .addKeyword(new Keyword("keyword2", TableDao.getById(staff, Integer.parseInt(tableId)).getName()))
 												  							   .addKeyword(new Keyword("keyword3", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(order.getBirthDate())))

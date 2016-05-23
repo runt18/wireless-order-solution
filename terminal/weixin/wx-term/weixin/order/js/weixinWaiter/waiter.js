@@ -59,6 +59,7 @@ $(function(){
 								dataSource : 'getByCond',
 								sessionId : Util.mp.params.sessionId, 
 								status : '2',
+								orderId : Util.mp.params.tableId ? '' : Util.mp.params.orderId,
 								tableId : Util.mp.params.tableId
 							},
 							success : function(res, status, xhr){
