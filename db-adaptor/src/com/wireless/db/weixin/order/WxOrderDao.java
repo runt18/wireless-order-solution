@@ -11,7 +11,6 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.TakeoutAddressDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodUnitDao;
-import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -24,7 +23,6 @@ import com.wireless.pojo.member.TakeoutAddress;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.weixin.order.WxOrder;
 
 public class WxOrderDao {
@@ -181,13 +179,13 @@ public class WxOrderDao {
 		}
 		
 		//Make the previous inside committed orders invalid.
-		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setMember(wxOrder.getMember()).setType(WxOrder.Type.INSIDE).addStatus(WxOrder.Status.COMMITTED), null)){
-			try{
-				update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
-			}catch(BusinessException ignored){
-				ignored.printStackTrace();
-			}
-		}
+//		for(WxOrder order : getByCond(dbCon, staff, new ExtraCond().setMember(wxOrder.getMember()).setType(WxOrder.Type.INSIDE).addStatus(WxOrder.Status.COMMITTED), null)){
+//			try{
+//				update(dbCon, staff, new WxOrder.UpdateBuilder(order.getId()).setStatus(WxOrder.Status.INVALID));
+//			}catch(BusinessException ignored){
+//				ignored.printStackTrace();
+//			}
+//		}
 
 		//Insert the new inside order.
 		return insert(dbCon, staff, wxOrder);
@@ -632,7 +630,7 @@ public class WxOrderDao {
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		int amount = 0;
 		for(WxOrder wxOrder : getByCond(dbCon, staff, extraCond, null)){
-			if(OrderDao.getByCond(dbCon, staff, new OrderDao.ExtraCond(DateType.TODAY).setOrderId(wxOrder.getOrderId()), null).isEmpty()){
+			if(wxOrder.getStatus() != WxOrder.Status.ORDER_ATTACHED){
 				String sql;
 				//Delete the wx order.
 				sql = " DELETE FROM " + Params.dbName + ".weixin_order WHERE wx_order_id = " + wxOrder.getId();

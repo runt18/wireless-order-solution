@@ -216,7 +216,7 @@
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="WxOrder_a_tableSelect">
 		 	<div>
 		 		<div id="wxbookAmount_div_tableSelect" style="display:none;width:28px;height: 28px;border-radius: 14px;background-color: red;float: right;margin-top: -11px;line-height:28px;">0</div>
-		 		微定
+		 		微订
 		 	</div>
 		 	</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="book_a_tableSelect">
@@ -330,9 +330,10 @@
 	         <thead>
 	           <tr class="ui-bar-d">
 	             <th style="width: 5px;"></th>
-	             <th style="width: 200px;">订单编号</th>
+	             <th style="width: 120px;">订单编号</th>
+	             <th style="width: 130px;">关联账单号</th>
 	             <th style="width: 200px;">下单时间</th>
-	             <th style="width: 200px;">会员名称</th>
+	             <th style="width: 150px;">会员名称</th>
 				 <th style="width: 100px;">联系电话</th>
 				 <th style="width: 140px;">台号</th>
 				 <th style="width: 90px;">状态</th>
