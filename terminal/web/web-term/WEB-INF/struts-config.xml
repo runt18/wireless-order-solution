@@ -7,6 +7,9 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/DownLoadQrcode" type="com.wireless.Actions.downloadQrcode.DownLoadQrcodeAction"
+			scope="request" parameter="dataSource">
+		</action>
 		<action path="/OperateKeyword" type="com.wireless.Actions.weixin.OperateKeywordAction"
 			scope="request" parameter="dataSource">
 		</action>

@@ -198,6 +198,8 @@
 		var hostName = window.location.hostname;
 		if(hostName == 'e-tones.net'){
 			hostName = 'wx.e-tones.net';
+		}else if(hostName == 'localhost'){
+			hostName = 'ts.e-tones.net';
 		}else{
 			hostName = window.location.host;
 		}
@@ -219,6 +221,7 @@
 		    jsonp: "callback",//服务端用于接收callback调用的function名的参数
 		    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
 		    success : function(json){
+	    	
 		    	loadMask.hide();
 		    	var qrCodeWindow = new Ext.Window({
 					id : 'regionQrCode_window_regionMagrMain',
@@ -231,12 +234,49 @@
 					items : [{
 						id : 'qrCodeView_window_regionMagrMain',
 						xtype : 'panel',
-						height : 480,
+						height : 500,
 						width : 480,
 						style : {
 							'margin' : '2% auto'
 						},
 						html : '<img alt="" src="'+ json.root[0].qrCode +'" width="480px" height="480px">'
+					}],
+					bbar : ['->',{
+						text : '下载二维码',
+						iconCls : 'btn_save',
+						handler : function(){
+							
+		    				var data = Ext.ux.getSelData(tableBasicGrid);
+		    				
+		    				var url = '../../{0}?dataSource={1}&qrcode={2}&tableName={3}';
+								url = String.format(
+									url,
+									'DownLoadQrcode.do',
+									'downLoad',
+									json.root[0].qrCode,
+									data.name
+								)
+								window.location = url;
+		    				
+		    				
+//							$.ajax({
+//								type : "post",
+//							    url : "../../DownLoadQrcode.do",
+//							    data : {
+//							    	dataSource : 'downLoad',
+//							    	qrcode : json.root[0].qrCode,
+//							    	tableName : data.name
+//							    },
+//							    success : function(data){
+////							    	if(data.success){
+////							    		Ext.example.msg('提示', '下载成功, 路径在C://');
+////							    	}else{
+////							    		Ext.example.msg('提示', '下载失败');
+////							    	}
+//							    }
+//							})
+							
+						}
 					}]
 				});
 				
