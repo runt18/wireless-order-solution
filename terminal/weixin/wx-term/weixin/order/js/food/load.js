@@ -109,7 +109,8 @@ $(function(){
 			type : 'post',
 			data : {
 				dataSource : 'getByCond',
-				branchId : Util.mp.params.branchId
+				branchId : Util.mp.params.branchId,
+				sessionId : Util.mp.params.sessionId
 			},
 			success : function(data, status, xhr){
 				if(data.success){
