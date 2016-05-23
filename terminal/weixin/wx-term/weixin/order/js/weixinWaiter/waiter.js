@@ -51,40 +51,13 @@ $(function(){
 			success : function(data, status, xhr){
 				if(data.success){
 					if(!(data.root[0] && data.root[0].orderFoods) || data.root[0].orderFoods && data.root[0].orderFoods.length == 0){
-						$.ajax({
-							url : '../../WxOperateOrder.do',
-							type : 'post',
-							datatype : 'json',
-							data : {
-								dataSource : 'getByCond',
-								sessionId : Util.mp.params.sessionId, 
-								status : '2',
-								orderId : Util.mp.params.tableId ? '' : Util.mp.params.orderId,
-								tableId : Util.mp.params.tableId
-							},
-							success : function(res, status, xhr){
-								if(res.success){
-									if(!(res.root[0] && res.root[0].foods) || res.root[0].foods && res.root[0].foods.length == 0){
-										//自助点餐点击
-										$('#orderBySelf_a_waiter').click();
-									}
-								}else if(res.code == '7546'){
-									sessionTimeout();
-								}else{
-									Util.showErrorMsg(res.msg);
-								}
-							},
-							error : function(req, status, err){
-								if(err.code == '7546'){
-									sessionTimeout();
-								}else{
-									Util.showErrorMsg(err.msg);					
-								}
-							}
-						});
+						checkWxOrderAmount();
 					}
 				}else if(data.code == '7546'){
 					sessionTimeout();
+				
+				}else if(data.code == '9998'){//餐桌空闲
+					checkWxOrderAmount();
 				}
 			},
 			error : function(req, status,err){
@@ -423,11 +396,13 @@ $(function(){
 		}else{
 			//自助点餐点击
 //			$('#orderBySelf_a_waiter').click();
-			
+			$('#tipsFoods_span_waiter').html('客官，你还没点菜..');
 			$('#tipsFoods_span_waiter').css({
 				'margin' : '40% 0px',
 				'display' : 'block'
 			});
+			
+			$('#tipsOrder_span_waiter').html('客官，你还没点菜..');
 			$('#tipsOrder_span_waiter').css({
 				'margin' : '40% 0px',
 				'display' : 'block'
@@ -982,6 +957,40 @@ $(function(){
 		}
 	}
 	
+	
+	function checkWxOrderAmount(){
+		$.ajax({
+			url : '../../WxOperateOrder.do',
+			type : 'post',
+			datatype : 'json',
+			data : {
+				dataSource : 'getByCond',
+				sessionId : Util.mp.params.sessionId, 
+				status : '2',
+				orderId : Util.mp.params.tableId ? '' : Util.mp.params.orderId,
+				tableId : Util.mp.params.tableId
+			},
+			success : function(res, status, xhr){
+				if(res.success){
+					if(!(res.root[0] && res.root[0].foods) || res.root[0].foods && res.root[0].foods.length == 0){
+						//自助点餐点击
+						$('#orderBySelf_a_waiter').click();
+					}
+				}else if(res.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(res.msg);
+				}
+			},
+			error : function(req, status, err){
+				if(err.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(err.msg);					
+				}
+			}
+		});
+	}
 	
 	function sessionTimeout(){
 		var sessionTimeoutPopup;
