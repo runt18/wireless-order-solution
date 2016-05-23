@@ -699,6 +699,9 @@ public class WxOperateOrderAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward getByCond(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//设置返回类型为json
+		response.setContentType("application/json; charset=utf-8"); 
+		
 		String oid = request.getParameter("oid");
 		String fid = request.getParameter("fid");
 		String branchId = request.getParameter("branchId");

@@ -110,7 +110,9 @@ $(function(){
 								if(res.success){
 									if(res.root.length > 0){
 										initTableMsg();
-										initFoodList(res.root[0], true);
+										for(var i = (res.root.length - 1); i >= 0; i--){
+											initFoodList(res.root[i], true);
+										}
 //										$('[data-name=orderListTab_waiter]').click();
 									}else{
 										$('#orderBySelf_a_waiter').click();
@@ -173,13 +175,13 @@ $(function(){
 							dataSource : 'getByCond',
 							sessionId : Util.mp.params.sessionId, 
 							status : '2',
-							orderId : data.root[0].id,
+							orderId : Util.mp.params.tableId ? '' : data.root[0].id,
 							tableId : Util.mp.params.tableId
 						},
 						success : function(res, status, xhr){
 							if(res.success){
-								if(res.root.length > 0){
-									initFoodList(res.root[0], true);						
+								for(var i = (res.root.length - 1); i >= 0; i--){
+									initFoodList(res.root[i], true);
 								}
 							}else if(data.code == '7546'){
 								sessionTimeout();
@@ -361,8 +363,6 @@ $(function(){
 				}));
 			});
 			$('#foodList_div_waiter').html(html.join(''));
-			$('#foodAmountTips_span_waiter').html((data.orderFoods.length ? data.orderFoods.length : ''));
-			$('#foodAmountTips_span_waiter').css('background', (data.orderFoods.length ? 'red' : ''));
 		}else{
 			var html = [];
 			if(data.code){
@@ -381,19 +381,33 @@ $(function(){
 					foodUnit : temp.tasteGroup.tastePref + '<span style="color:#283892;float:right;">&nbsp;&nbsp;<strong>(待确认)</strong></span>'
 				}));
 			});
-			$('#orderList_div_waiter').html(html.join(''));
-			$('#orderAmountTips_span_waiter').html((data.foods.length ? data.foods.length : ''));
-			$('#orderAmountTips_span_waiter').css('background', (data.foods.length ? 'red' : ''));
+			$('#orderList_div_waiter').prepend(html.join(''));
 		}
 		
 		//标前缀
+		var foodListCount;
 		$('#foodList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
+			foodListCount = index + 1;
 		});
 		
+		//已确认小图标
+		if(foodListCount){
+			$('#foodAmountTips_span_waiter').html((foodListCount ? foodListCount : ''));
+			$('#foodAmountTips_span_waiter').css('background', (foodListCount ? 'red' : ''));
+		}
+		
+		var orderListCount;
 		$('#orderList_div_waiter').find('[data-type=foodIndex]').each(function(index, element){
 			element.innerHTML = index + 1;
+			orderListCount = index + 1;
 		});
+		
+		//待确认小图标
+		if(orderListCount){
+			$('#orderAmountTips_span_waiter').html((orderListCount ? orderListCount : ''));
+			$('#orderAmountTips_span_waiter').css('background', (orderListCount ? 'red' : ''));
+		}
 		
 		if(data.foods && data.foods.length > 0 || data.orderFoods && data.orderFoods.length > 0){
 			if(data.orderFoods){

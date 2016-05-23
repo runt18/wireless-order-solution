@@ -58,6 +58,7 @@ $(function(){
 		var bookListTemplate = '<tr>' +
 									'<td>{list}</td>' +
 									'<td>{wxOrderNumber}</td>' +
+									'<td>{attachOrder}</td>' + 
 									'<td>{wxOrderTime}</td>' +	
 									'<td>{memberName}</td>' +
 									'<td>{tel}</td>' +
@@ -76,6 +77,7 @@ $(function(){
 			html.push(bookListTemplate.format({
 				list : i+1,
 				wxOrderId : data[i].id,
+				attachOrder : data[i].orderId ? data[i].orderId : '----',
 				wxOrderNumber : data[i].code,
 				wxOrderTime : data[i].date,
 				orderStatus : data[i].statusVal,
@@ -132,7 +134,8 @@ $(function(){
 		$('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderConfirm_a_wxOrder"]').each(function(index, element){
 			element.onclick = function(){
 				if($(element).attr('data-status') == WxStatus.COMMITTED.val){
-					var code = $('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderConfirm_a_wxOrder"]').attr('data-value');
+//					var code = $('#wxOrderList_tbody_wxOrder').find('[data-type="wxOrderConfirm_a_wxOrder"]').attr('data-value');
+					var code = $(element).attr('data-value');
 					$.ajax({
 						url : '../QueryWxOrder.do',
 						type : 'post',
@@ -229,6 +232,11 @@ $(function(){
 												}, 200);
 											}
 										});
+										
+										
+										if(result.root[0].table && result.root[0].orderId){
+											$('#tables_div_askTable').find('[data-value=' + result.root[0].table.id + ']').click();
+										}
 									}
 								});
 							}else{
