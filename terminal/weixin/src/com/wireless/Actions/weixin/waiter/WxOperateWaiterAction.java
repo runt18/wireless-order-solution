@@ -189,12 +189,16 @@ public class WxOperateWaiterAction extends DispatchAction{
 				
 				if(orderId != null && !orderId.isEmpty()){
 					jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
-				}else{
-					if(tableId != null && !tableId.isEmpty() && TableDao.getById(staff, Integer.parseInt(tableId)).isBusy()){
-						jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(OrderDao.getByTableId(staff, Integer.parseInt(tableId)).getId())));
+					
+				}else if(tableId != null && !tableId.isEmpty()){
+					Table table = TableDao.getById(staff, Integer.parseInt(tableId));
+					if(table.isBusy()){
+						jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(table.getOrderId())));
 					}else{
 						throw new BusinessException("餐桌为空闲状态");
 					}
+				}else{
+					throw new BusinessException("入口不对,不存在账单号或餐桌号");
 				}
 				
 			}else{
