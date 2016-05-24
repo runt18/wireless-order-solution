@@ -172,9 +172,9 @@ public class WxOrderDao {
 		if(members.isEmpty()){
 			throw new BusinessException("没找到相应的会员信息", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
 		}else{
-			if(members.get(0).isRaw()){
-				throw new BusinessException("会员必须绑定手机或实体卡才能下单", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
-			}
+//			if(members.get(0).isRaw()){
+//				throw new BusinessException("会员必须绑定手机或实体卡才能下单", WxOrderError.WX_INSERT_ORDER_NOT_ALLOW);
+//			}
 			wxOrder.setMember(members.get(0));
 		}
 		
