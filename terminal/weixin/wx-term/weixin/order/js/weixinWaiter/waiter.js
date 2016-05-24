@@ -8,6 +8,7 @@ $(function(){
 		_orderType : null,				//下单方式
 		_tableId : null,        		//餐桌id
 		_orderFoods : null,				//点菜信息
+		_wxOrderFoods : null,
 		_prefectMemberStauts : null 	//是否显示完善会员资料
 	};
 	
@@ -36,82 +37,82 @@ $(function(){
 		BUSY : { val : 1, desc : '就餐'}
 	};
 	
-	function hasFood(){
-		//获取餐桌信息
-		$.ajax({
-			url : '../../WxOperateWaiter.do',
-			data : {
-				dataSource : 'getOrder',
-				sessionId : Util.mp.params.sessionId,
-				orderId : Util.mp.params.orderId,
-				tableId : Util.mp.params.tableId
-			},
-			type : 'post',
-			dataType : 'json',
-			success : function(data, status, xhr){
-				if(data.success){
-					//当没有已经点菜  且 菜品数量不超过0
-					if(!(data.root[0] && data.root[0].orderFoods) || data.root[0].orderFoods && data.root[0].orderFoods.length == 0){
-						checkWxOrderAmount();
-					}
-				}else if(data.code == '7546'){
-					sessionTimeout();
-				
-				}else if(data.code == '9998'){//餐桌空闲
-					checkWxOrderAmount();
-				}
-			},
-			error : function(req, status,err){
-				if(err.code == '7546'){
-					sessionTimeout();
-				}else{
-					Util.showErrorMsg(err.msg);					
-				}
-			}
-		})
-	}
+//	function hasFood(){
+//		//获取餐桌信息
+//		$.ajax({
+//			url : '../../WxOperateWaiter.do',
+//			data : {
+//				dataSource : 'getOrder',
+//				sessionId : Util.mp.params.sessionId,
+//				orderId : Util.mp.params.orderId,
+//				tableId : Util.mp.params.tableId
+//			},
+//			type : 'post',
+//			dataType : 'json',
+//			success : function(data, status, xhr){
+//				if(data.success){
+//					//当没有已经点菜  且 菜品数量不超过0
+//					if(!(data.root[0] && data.root[0].orderFoods) || data.root[0].orderFoods && data.root[0].orderFoods.length == 0){
+//						checkWxOrderAmount();
+//					}
+//				}else if(data.code == '7546'){
+//					sessionTimeout();
+//				
+//				}else if(data.code == '9998'){//餐桌空闲
+//					checkWxOrderAmount();
+//				}
+//			},
+//			error : function(req, status,err){
+//				if(err.code == '7546'){
+//					sessionTimeout();
+//				}else{
+//					Util.showErrorMsg(err.msg);					
+//				}
+//			}
+//		})
+//	}
 	
 	initTableMsg();
 	
 	if(Util.mp.params.orderId){
 		//店小二
-		hasFood();
+//		hasFood();
 	}else{
 		//扫码
 		//查看餐桌信息
-		$.ajax({
-			url : '../../WxOperateWaiter.do',
-			data : {
-				dataSource : 'getTableStatus',
-				sessionId : Util.mp.params.sessionId ? Util.mp.params.sessionId : '',
-				tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
-			},
-			type : 'post',
-			dataType : 'json',
-			success : function(data, status, xhr){
-				if(data.success){
-					
-					if(data.root[0].statusValue == tableStatus.BUSY.val){						
-						hasFood();
-					}else{
-						fastFoodWaiterData._tableId = Util.mp.params.tableId;
-						//客人存在这张餐桌的待确认
-						hasFood();
-					}	
-				}else if(data.code == '7546'){
-					sessionTimeout();
-				}else{
-					Util.showErrorMsg(data.msg);
-				}
-			},
-			error : function(req, status, err){
-				if(err.code == '7546'){
-					sessionTimeout();
-				}else{
-					Util.showErrorMsg(err.msg);					
-				}
-			}
-		});
+//		$.ajax({
+//			url : '../../WxOperateWaiter.do',
+//			data : {
+//				dataSource : 'getTableStatus',
+//				sessionId : Util.mp.params.sessionId ? Util.mp.params.sessionId : '',
+//				tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
+//			},
+//			type : 'post',
+//			dataType : 'json',
+//			success : function(data, status, xhr){
+//				if(data.success){
+//					
+//					if(data.root[0].statusValue == tableStatus.BUSY.val){						
+//						hasFood();
+//					}else{
+//						fastFoodWaiterData._tableId = Util.mp.params.tableId;
+//						//客人存在这张餐桌的待确认
+//						hasFood();
+//					}	
+//				}else if(data.code == '7546'){
+//					sessionTimeout();
+//				}else{
+//					Util.showErrorMsg(data.msg);
+//				}
+//			},
+//			error : function(req, status, err){
+//				if(err.code == '7546'){
+//					sessionTimeout();
+//				}else{
+//					Util.showErrorMsg(err.msg);					
+//				}
+//			}
+//		});
 	}
 	
 	//加载店小二账单信息
@@ -250,6 +251,10 @@ $(function(){
 				}
 			}
 		});
+		
+		if(!fastFoodWaiterData._orderFoods && !fastFoodWaiterData._wxOrderFoods){
+			$('#orderBySelf_a_waiter').click();
+		}
 	}
 	
 	function initWaiterOrder(){
@@ -383,6 +388,11 @@ $(function(){
 			if(data.orderFoods){
 				fastFoodWaiterData._orderFoods = data.orderFoods;
 			}
+			
+			if(data.foods){
+				fastFoodWaiterData._wxOrderFoods = data.foods;
+			}
+			
 			$('#tipsFoods_span_waiter').css({
 				'margin' : '0px 0px',
 				'display' : 'none'
@@ -961,39 +971,39 @@ $(function(){
 	}
 	
 	
-	function checkWxOrderAmount(){
-		$.ajax({
-			url : '../../WxOperateOrder.do',
-			type : 'post',
-			datatype : 'json',
-			data : {
-				dataSource : 'getByCond',
-				sessionId : Util.mp.params.sessionId, 
-				status : '2',
-				orderId : Util.mp.params.orderId,
-				tableId : Util.mp.params.tableId
-			},
-			success : function(res, status, xhr){
-				if(res.success){
-					if(!(res.root[0] && res.root[0].foods) || res.root[0].foods && res.root[0].foods.length == 0){
-						//自助点餐点击
-						$('#orderBySelf_a_waiter').click();
-					}
-				}else if(res.code == '7546'){
-					sessionTimeout();
-				}else{
-					Util.showErrorMsg(res.msg);
-				}
-			},
-			error : function(req, status, err){
-				if(err.code == '7546'){
-					sessionTimeout();
-				}else{
-					Util.showErrorMsg(err.msg);					
-				}
-			}
-		});
-	}
+//	function checkWxOrderAmount(){
+//		$.ajax({
+//			url : '../../WxOperateOrder.do',
+//			type : 'post',
+//			datatype : 'json',
+//			data : {
+//				dataSource : 'getByCond',
+//				sessionId : Util.mp.params.sessionId, 
+//				status : '2',
+//				orderId : Util.mp.params.orderId,
+//				tableId : Util.mp.params.tableId
+//			},
+//			success : function(res, status, xhr){
+//				if(res.success){
+//					if(!(res.root[0] && res.root[0].foods) || res.root[0].foods && res.root[0].foods.length == 0){
+//						//自助点餐点击
+//						$('#orderBySelf_a_waiter').click();
+//					}
+//				}else if(res.code == '7546'){
+//					sessionTimeout();
+//				}else{
+//					Util.showErrorMsg(res.msg);
+//				}
+//			},
+//			error : function(req, status, err){
+//				if(err.code == '7546'){
+//					sessionTimeout();
+//				}else{
+//					Util.showErrorMsg(err.msg);					
+//				}
+//			}
+//		});
+//	}
 	
 	function sessionTimeout(){
 		var sessionTimeoutPopup;
