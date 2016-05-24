@@ -123,7 +123,7 @@ public class WxQueryDeptAction extends DispatchAction{
 		String fid = request.getParameter("fid");
 		String oid = request.getParameter("oid");
 		final String sessionId = request.getParameter("sessionId");
-		final JObject jobject = new JObject();
+		final JObject jObject = new JObject();
 		
 		try{
 
@@ -169,16 +169,16 @@ public class WxQueryDeptAction extends DispatchAction{
 			
 			list.addAll(KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setContainsImage(true), null));
 			
-			jobject.setRoot(list);
+			jObject.setRoot(list);
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
