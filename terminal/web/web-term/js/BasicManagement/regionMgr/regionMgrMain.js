@@ -230,7 +230,7 @@
 					resizeble : false,
 					modal : true,
 					width : 500,
-					height : 500,
+					height : 550,
 					items : [{
 						id : 'qrCodeView_window_regionMagrMain',
 						xtype : 'panel',
