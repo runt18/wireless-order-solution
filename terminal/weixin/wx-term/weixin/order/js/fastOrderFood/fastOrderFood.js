@@ -403,7 +403,7 @@ function PickFoodComponent(param){
 								foodId : _foodData[i].id,
 								img : _foodData[i].img ? _foodData[i].img.thumbnail : noImage,
 								hasImage : _foodData[i].img ? 'no' : 'yes',
-								name : (_foodData[i].name.length > 7 ? _foodData[i].name.substring(0, 6) + "…" : _foodData[i].name),
+								name : (_foodData[i].name.length > 9 ? _foodData[i].name.substring(0, 8) + "…" : _foodData[i].name),
 								unitPrice :  (_foodData[i].status & (1 << 4)) != 0 ? '时价' : '￥' + _foodData[i].unitPrice,
 								foodCnt : parseInt(_foodData[i].foodCnt),
 								count : count,
