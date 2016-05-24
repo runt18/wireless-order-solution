@@ -50,6 +50,7 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
+					//当没有已经点菜  且 菜品数量不超过0
 					if(!(data.root[0] && data.root[0].orderFoods) || data.root[0].orderFoods && data.root[0].orderFoods.length == 0){
 						checkWxOrderAmount();
 					}
@@ -70,11 +71,10 @@ $(function(){
 		})
 	}
 	
+	initTableMsg();
 	
 	if(Util.mp.params.orderId){
 		//店小二
-		initTableMsg();
-		
 		hasFood();
 	}else{
 		//扫码
@@ -92,7 +92,6 @@ $(function(){
 				if(data.success){
 					
 					if(data.root[0].statusValue == tableStatus.BUSY.val){						
-						initTableMsg();
 						hasFood();
 					}else{
 						fastFoodWaiterData._tableId = Util.mp.params.tableId;
@@ -126,44 +125,13 @@ $(function(){
 				orderId : Util.mp.params.orderId,
 				tableId : Util.mp.params.tableId
 			},
+			async : false,
 			type : 'post',
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
 					
 					fastFoodWaiterData._orderId = data.root[0].id;
-					
-					//获取【待确认】的菜品信息
-					$.ajax({
-						url : '../../WxOperateOrder.do',
-						type : 'post',
-						datatype : 'json',
-						data : {
-							dataSource : 'getByCond',
-							sessionId : Util.mp.params.sessionId, 
-							status : '2',
-							orderId : Util.mp.params.tableId ? '' : data.root[0].id,
-							tableId : Util.mp.params.tableId
-						},
-						success : function(res, status, xhr){
-							if(res.success){
-								for(var i = (res.root.length - 1); i >= 0; i--){
-									initFoodList(res.root[i], true);
-								}
-							}else if(data.code == '7546'){
-								sessionTimeout();
-							}else{
-								Util.showErrorMsg(data.msg);
-							}
-						},
-						error : function(req, status, err){
-							if(err.code == '7546'){
-								sessionTimeout();
-							}else{
-								Util.showErrorMsg(err.msg);					
-							}
-						}
-					});
 					
 					fastFoodWaiterData._tableAlias = data.root[0].tableAlias;
 					///赋值账单号
@@ -247,6 +215,41 @@ $(function(){
 				Util.showErrorMsg(err.msg);
 			}
 		});	 
+		
+		
+		
+		//获取【待确认】的菜品信息
+		$.ajax({
+			url : '../../WxOperateOrder.do',
+			type : 'post',
+			datatype : 'json',
+			async : false,
+			data : {
+				dataSource : 'getByCond',
+				sessionId : Util.mp.params.sessionId, 
+				status : '2',
+				orderId : Util.mp.params.orderId,
+				tableId : Util.mp.params.tableId
+			},
+			success : function(res, status, xhr){
+				if(res.success){
+					for(var i = (res.root.length - 1); i >= 0; i--){
+						initFoodList(res.root[i], true);
+					}
+				}else if(data.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(data.msg);
+				}
+			},
+			error : function(req, status, err){
+				if(err.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(err.msg);					
+				}
+			}
+		});
 	}
 	
 	function initWaiterOrder(){
@@ -967,7 +970,7 @@ $(function(){
 				dataSource : 'getByCond',
 				sessionId : Util.mp.params.sessionId, 
 				status : '2',
-				orderId : Util.mp.params.tableId ? '' : Util.mp.params.orderId,
+				orderId : Util.mp.params.orderId,
 				tableId : Util.mp.params.tableId
 			},
 			success : function(res, status, xhr){
