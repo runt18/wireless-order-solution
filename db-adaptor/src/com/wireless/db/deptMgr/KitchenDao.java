@@ -10,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeptError;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
@@ -22,7 +23,7 @@ public class KitchenDao {
 		private Kitchen.Type type;
 		private boolean isAllowTemp;
 		private boolean isContainsImage;
-
+		
 		public ExtraCond setId(int id){
 			this.id = id;
 			return this;
@@ -48,8 +49,8 @@ public class KitchenDao {
 			return this;
 		}
 		
-		public ExtraCond setContainsImage(boolean containsImage){
-			this.isContainsImage = containsImage;
+		public ExtraCond setContainsImage(boolean onOff){
+			this.isContainsImage = onOff;
 			return this;
 		}
 		
@@ -70,7 +71,7 @@ public class KitchenDao {
 			}
 			if(isContainsImage){
 				String sql;
-				sql = " SELECT kitchen_id FROM " + Params.dbName + ".food WHERE oss_image_id IS NOT NULL AND restaurant_id = K.restaurant_id GROUP BY kitchen_id ";
+				sql = " SELECT kitchen_id FROM " + Params.dbName + ".food WHERE IFNULL(oss_image_id, 0) <> 0 AND (status & " + Food.SELL_OUT + " = 0) AND restaurant_id = K.restaurant_id GROUP BY kitchen_id ";
 				extraCond.append(" AND K.kitchen_id IN (" + sql + ")");
 			}
 			return extraCond.toString();

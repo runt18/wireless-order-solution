@@ -378,9 +378,9 @@ public class FoodDao {
 			}
 			if(containsImage != -1){
 				if(containsImage == 0){
-					extraCond.append(" AND FOOD.oss_image_id = 0 ");
+					extraCond.append(" AND IFNULL(FOOD.oss_image_id, 0) = 0 ");
 				}else{
-					extraCond.append(" AND FOOD.oss_image_id <> 0 ");
+					extraCond.append(" AND IFNULL(FOOD.oss_image_id, 0) <> 0 ");
 				}
 			}
 			return extraCond.toString();
