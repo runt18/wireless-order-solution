@@ -15,24 +15,28 @@ import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
+import com.wireless.pojo.promotion.PromotionTrigger;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
 
 public class PromotionDao {
 
+	private static class IssueCond{
+		final PromotionTrigger.IssueRule rule;
+		final int extra;
+		IssueCond(PromotionTrigger.IssueRule rule, int extra){
+			this.rule = rule;
+			this.extra = extra;
+		}
+	}
+	
 	public static class ExtraCond{
 		private int promotionId;
 		private List<Promotion.Status> statusList = new ArrayList<Promotion.Status>();
 		private Promotion.Rule rule;
 		private Promotion.Type type;
-		private final List<Promotion.Trigger> triggers = new ArrayList<Promotion.Trigger>();
-		private int restaurantId;
-		
-		ExtraCond setRestaurant(int restaurantId){
-			this.restaurantId = restaurantId;
-			return this;
-		}
+		private final List<IssueCond> issueConds = new ArrayList<>();
 		
 		public ExtraCond setPromotionId(int id){
 			this.promotionId = id;
@@ -47,13 +51,6 @@ public class PromotionDao {
 		
 		public ExtraCond addStatus(Promotion.Status status){
 			this.statusList.add(status);
-			return this;
-		}
-		
-		public ExtraCond addTrigger(Promotion.Trigger trigger){
-			if(!this.triggers.contains(trigger)){
-				this.triggers.add(trigger);
-			}
 			return this;
 		}
 		
@@ -95,21 +92,6 @@ public class PromotionDao {
 			}
 			if(psCond.length() != 0){
 				extraCond.append(" AND (" + psCond.toString() + ")");
-			}
-			
-			StringBuilder triggerCond = new StringBuilder();
-			for(Promotion.Trigger trigger : triggers){
-				if(triggerCond.length() != 0){
-					triggerCond.append(",");
-				}
-				triggerCond.append(trigger.getVal());
-			}
-			if(triggerCond.length() != 0){
-				String sql = " SELECT P.promotion_id " + 
-							 " FROM " + Params.dbName + ".promotion P " +
-							 " JOIN " + Params.dbName + ".promotion_trigger PT ON PT.promotion_id = P.promotion_id AND P.restaurant_id = " + restaurantId +
-							 " WHERE PT.trigger_type IN ( " + triggerCond.toString() + ")";
-				extraCond.append(" AND P.promotion_id IN (" + sql + ")");
 			}
 			
 			if(rule != null){
@@ -202,16 +184,16 @@ public class PromotionDao {
 			throw new SQLException("Failed to generated the promotion id.");
 		}
 		
-		//Insert the promotion triggers.
-		for(Promotion.Trigger trigger : promotion.getTriggers()){
-			sql = " INSERT INTO " + Params.dbName + ".promotion_trigger " +
-				  " (promotion_id, trigger_type) VALUES ( " +
-				  promotionId + "," +
-				  trigger.getVal() +
-				  ")";
-			dbCon.stmt.executeUpdate(sql);
+		//Insert the issue promotion trigger.
+		if(builder.hasIssueTrigger()){
+			PromotionTriggerDao.insert(dbCon, staff, builder.getIssueTriggerBuilder().setPromotion(promotionId));
 		}
-		
+
+		//Insert the use promotion trigger.
+		if(builder.hasUseTrigger()){
+			PromotionTriggerDao.insert(dbCon, staff, builder.getUseTriggerBuilder().setPromotion(promotionId));
+		}
+
 		if(!promotion.getBody().isEmpty()){
 			
 			//Update the associated oss image to this promotion's body.
@@ -304,17 +286,19 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}
 		
-		//Update the associated promotion triggers.
-		if(builder.isTriggersChanged()){
-			sql = " DELETE FROM " + Params.dbName + ".promotion_trigger WHERE promotion_id = " + promotion.getId();
-			dbCon.stmt.executeUpdate(sql);
-			for(Promotion.Trigger trigger : promotion.getTriggers()){
-				sql = " INSERT INTO " + Params.dbName + ".promotion_trigger " +
-					  " (promotion_id, trigger_type) VALUES ( " +
-					  promotion.getId() + "," +
-					  trigger.getVal() +
-					  ")";
-				dbCon.stmt.executeUpdate(sql);
+		//Update the associated promotion issue trigger.
+		if(builder.isIssueTriggerChanged()){
+			PromotionTriggerDao.deleteByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setPromotion(promotion).setType(PromotionTrigger.Type.ISSUE));
+			if(builder.getIssueTriggerBuilder() != null){
+				PromotionTriggerDao.insert(dbCon, staff, builder.getIssueTriggerBuilder().setPromotion(promotion));
+			}
+		}
+
+		//Update the associated promotion use trigger.
+		if(builder.isUseTriggerChanged()){
+			PromotionTriggerDao.deleteByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setPromotion(promotion).setType(PromotionTrigger.Type.USE));
+			if(builder.getUseTriggerBuilder() != null){
+				PromotionTriggerDao.insert(dbCon, staff, builder.getUseTriggerBuilder().setPromotion(promotion));
 			}
 		}
 		
@@ -444,7 +428,7 @@ public class PromotionDao {
 			  " LEFT JOIN " + Params.dbName + ".oss_image OI ON P.oss_image_id = OI.oss_image_id " +
 			  " WHERE 1 = 1 " +
 			  " AND P.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
-			  (extraCond != null ? extraCond.setRestaurant(staff.getRestaurantId()) : "") +
+			  (extraCond != null ? extraCond : "") +
 			  " ORDER BY P.create_date ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -490,14 +474,36 @@ public class PromotionDao {
 		}
 		dbCon.rs.close();
 		
-		//Get the associated triggers
+		//Get the associated issue & use trigger
 		for(Promotion promotion : result){
-			sql = " SELECT trigger_type FROM " + Params.dbName + ".promotion_trigger WHERE promotion_id = " + promotion.getId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				promotion.addTrigger(Promotion.Trigger.valueOf(dbCon.rs.getInt("trigger_type")));
+			List<PromotionTrigger> triggers = PromotionTriggerDao.getByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setType(PromotionTrigger.Type.ISSUE).setPromotion(promotion));
+			if(!triggers.isEmpty()){
+				promotion.setIssueTrigger(triggers.get(0));
 			}
-			dbCon.rs.close();
+			triggers = PromotionTriggerDao.getByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setType(PromotionTrigger.Type.USE).setPromotion(promotion));
+			if(!triggers.isEmpty()){
+				promotion.setUseTrigger(triggers.get(0));
+			}
+		}
+		
+		final List<Promotion> promotions = new ArrayList<>(result);
+		result.clear();
+		for(IssueCond issueCond : extraCond.issueConds){
+			for(Promotion promotion : promotions){
+				if(promotion.hasIssueTrigger()){
+					if(issueCond.rule == promotion.getIssueTrigger().getIssueRule()){
+						if(issueCond.rule.isSingleExceed()){
+							if(issueCond.extra > promotion.getIssueTrigger().getExtra()){
+								result.add(promotion);
+							}
+						}else{
+							result.add(promotion);
+						}
+					}
+				}else{
+					result.add(promotion);
+				}
+			}
 		}
 		
 		return result;
@@ -521,7 +527,7 @@ public class PromotionDao {
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			delete(dbCon, staff, promotionId);
+			deleteById(dbCon, staff, promotionId);
 			dbCon.conn.commit();
 		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
@@ -545,7 +551,7 @@ public class PromotionDao {
 	 * 			<li>throws if the promotion to delete does NOT exist
 	 * 			<li>throws if the promotion to delete NOT belong to 'CREATED' status
 	 */
-	public static void delete(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
+	public static void deleteById(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
 		Promotion promotion = getById(dbCon, staff, promotionId);
 		
 		//Delete the associated oss image to this promotion
@@ -565,8 +571,7 @@ public class PromotionDao {
 		dbCon.stmt.executeUpdate(sql);
 
 		//Delete the associated triggers.
-		sql = " DELETE FROM " + Params.dbName + ".promotion_trigger WHERE promotion_id = " + promotionId;
-		dbCon.stmt.executeUpdate(sql);
+		PromotionTriggerDao.deleteByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setPromotion(promotionId));
 
 		//Delete the promotion.
 		sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;

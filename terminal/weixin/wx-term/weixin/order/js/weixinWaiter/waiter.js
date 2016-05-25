@@ -72,12 +72,11 @@ $(function(){
 //		})
 //	}
 	
-	initTableMsg();
 	
-	if(Util.mp.params.orderId){
+//	if(Util.mp.params.orderId){
 		//店小二
 //		hasFood();
-	}else{
+//	}else{
 		//扫码
 		//查看餐桌信息
 //		$.ajax({
@@ -113,7 +112,9 @@ $(function(){
 //				}
 //			}
 //		});
-	}
+//	}
+	
+	
 	
 	//加载店小二账单信息
 	function initTableMsg(){
@@ -1004,6 +1005,8 @@ $(function(){
 //			}
 //		});
 //	}
+	
+	initTableMsg();
 	
 	function sessionTimeout(){
 		var sessionTimeoutPopup;
