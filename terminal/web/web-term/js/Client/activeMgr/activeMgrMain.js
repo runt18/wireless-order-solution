@@ -948,6 +948,7 @@ Ext.onReady(function(){
 									},						
 									check : function(e){
 										if(e.getValue()){
+											changeCouponModel(3);
 										}
 									}
 								}
