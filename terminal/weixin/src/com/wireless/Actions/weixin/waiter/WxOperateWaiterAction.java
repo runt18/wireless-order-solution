@@ -31,6 +31,7 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.wireless.Actions.weixin.WxHandleMessage;
+import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.PayOrder;
@@ -180,21 +181,27 @@ public class WxOperateWaiterAction extends DispatchAction{
 		final String tableId = request.getParameter("tableId");
 		
 		final JObject jObject= new JObject();
+		DBCon dbCon = new DBCon();
 		try{
+			dbCon.connect();
 			final HttpSession session = SessionListener.sessions.get(sessionId);
 			if(session != null){
 				final String branchId = (String)session.getAttribute("branchId");
-				final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				final Staff staff = StaffDao.getAdminByRestaurant(dbCon, Integer.parseInt(branchId));
 				//jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
 				
 				if(orderId != null && !orderId.isEmpty()){
-					jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
-				}else{
-					if(tableId != null && !tableId.isEmpty() && TableDao.getById(staff, Integer.parseInt(tableId)).isBusy()){
-						jObject.setRoot(PayOrder.calc(staff, Order.PayBuilder.build4Normal(OrderDao.getByTableId(staff, Integer.parseInt(tableId)).getId())));
+					jObject.setRoot(PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
+					
+				}else if(tableId != null && !tableId.isEmpty()){
+					Table table = TableDao.getById(dbCon, staff, Integer.parseInt(tableId));
+					if(table.isBusy()){
+						jObject.setRoot(PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(table.getOrderId())));
 					}else{
 						throw new BusinessException("餐桌为空闲状态");
 					}
+				}else{
+					throw new BusinessException("入口不对,不存在账单号或餐桌号");
 				}
 				
 			}else{
@@ -206,6 +213,7 @@ public class WxOperateWaiterAction extends DispatchAction{
 			jObject.initTip(e);
 		}finally{
 			response.getWriter().print(jObject.toString());
+			dbCon.disconnect();
 		}
 		return null;
 	}
