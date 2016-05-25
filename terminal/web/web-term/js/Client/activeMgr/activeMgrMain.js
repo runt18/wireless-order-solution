@@ -458,18 +458,161 @@ Ext.onReady(function(){
 					height : 200,
 					html : '<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png" /></div>'
 				}),new Ext.Panel({
-					title : '优惠券条件设置',
 					id : 'promotionGeneral',
 					region : 'center',
 					height : 350,
 					layout : 'border',
 					items : [new Ext.Panel({
 						title : '参与会员信息',
+						frame : true,
 						id : '',
 						region : 'center',
-						layout : 'fit',
 						height : 150,
-						items : []
+						items : [{
+							xtype : 'panel',
+							layout : 'form',
+							id : 'couponConfigRules_panel_activeMgrMain',
+							autoScroll : true,
+							height : (parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,''))) - 250,
+							frame : true,
+								items : [{
+								xtype : 'radiogroup',
+								fieldLabel : '发券规则',
+								items : [{
+									boxLabel : '无规则',
+									inputValue : 1,
+									name : 'sendCouponRule',
+									checked : true
+								},{
+									boxLabel : '账单发券',
+									name : 'sendCouponRule',
+									inputValue : 2,
+									listeners : {
+										check : function(checkbox, check){
+											if(check){
+												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
+											}else{
+												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											}
+										}
+									}
+								},{
+									boxLabel : '关注发券',
+									name : 'sendCouponRule',
+									inputValue : 3
+								}]
+								}, {
+									title : '账单发券配置',
+									id : 'sendCouponByOrder_fieldset_activeMgr',
+									xtype : 'fieldset',
+									layout : 'form',
+									hidden : true,
+									items : [{
+										xtype : 'numberfield',
+										fieldLabel : '发券满足金额'
+									}]
+								}, {
+								xtype : 'radiogroup',
+								fieldLabel : '用券规则',
+								columns : 3,
+								items : [{
+									boxLabel : '无规则',
+									inputValue : 1,
+									name : 'useCouponRule',
+									checked : true
+								},{
+									boxLabel : '账单用券',
+									name : 'useCouponRule',
+									inputValue : 2,
+									listeners : {
+										check : function(checkbox, check){
+											if(check){
+												Ext.getCmp('useCouponByOrder_fieldset_activeMgr').show();
+											}else{
+												Ext.getCmp('useCouponByOrder_fieldset_activeMgr').hide();
+											}
+										}
+									}
+								}]
+								}, {
+									title : '账单用券配置',
+									id : 'useCouponByOrder_fieldset_activeMgr',
+									xtype : 'fieldset',
+									layout : 'form',
+									hidden : true,
+									items : [{
+										xtype : 'numberfield',
+										fieldLabel : '用券满足金额'
+									}]
+								}, {
+								xtype : 'container',
+								items : [{
+									xtype : 'checkbox',
+									boxLabel : '全选'
+								}]
+								}, {
+								xtype : 'container',
+								layout : 'column',
+								id : 'weeklyConfig_container_activeMgrMain',
+								items : [{
+									xtype : 'checkbox',
+									boxLabel : '星期一',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainMon',
+									isStopSearch : true
+								}), {
+									xtype : 'checkbox',
+									boxLabel : '星期二',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainTues',
+									isStopSearch : true
+								}),{
+									xtype : 'checkbox',
+									boxLabel : '星期三',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainWed',
+									isStopSearch : true
+								}),{
+									xtype : 'checkbox',
+									boxLabel : '星期四',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainThur',
+									isStopSearch : true
+								}), {
+									xtype : 'checkbox',
+									boxLabel : '星期五',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainFri',
+									isStopSearch : true
+								}), {
+									xtype : 'checkbox',
+									boxLabel : '星期六',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainSat',
+									isStopSearch : true
+								}),{
+									xtype : 'checkbox',
+									boxLabel : '星期日',
+									columnWidth : 0.6
+								}, new Ext.ux.initTimeBar({
+									tbarType : 3,
+									statistic : 'activeMgrMainSun',
+									isStopSearch : true
+								})]
+							}]
+						}]
 					})]
 				})]		
 			})]
@@ -1069,4 +1212,5 @@ Ext.onReady(function(){
  	$('#secondStepEastBody').children().first().children().first().css('overflow-y', 'visible');
  	$('#threeStepEastBody').children().first().children().first().css('overflow-y', 'visible');
  	$('#promotionPreviewBody').children().first().children().first().css('overflow-y', 'visible');
+// 	Ext.getCmp('couponConfigRules_panel_activeMgrMain').setHeight((parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,'')) - Ext.getCmp('promotionCouponPreview').getHeight()) - 50);
 });

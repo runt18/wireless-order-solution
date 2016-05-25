@@ -64,7 +64,7 @@ Ext.ux.initTimeBar = function(c){
 							if(c.callback && typeof c.callback == 'function'){
 								c.callback();
 							}
-							if(record.data.id != -2){
+							if(record.data.id != -2 && !c.isStopSearch){
 								Ext.getCmp(c.statistic+'btnSearch').handler();
 							}
 							
@@ -100,6 +100,66 @@ Ext.ux.initTimeBar = function(c){
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'}
 				];
 	
+	}else if(c.tbarType == 3){
+		
+		timeBar = new Ext.Toolbar({
+			id : c.statistic+'TimeBar',
+			hidden : false,
+			height : 28,
+			items : [
+				{xtype : 'tbtext', text : '市别:'},
+				{
+					xtype : 'combo',
+					forceSelection : true,
+					width : 90,
+					value : -1,
+					id : c.statistic+'comboBusinessHour',
+					store : new Ext.data.SimpleStore({
+						fields : ['id', 'name']
+					}),
+					valueField : 'id',
+					displayField : 'name',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					readOnly : false,
+					listeners : {
+						render : function(thiz){
+							thiz.store.loadData(businessHourData);
+							thiz.setValue(-1);
+						},
+						select : function(thiz, record, index){
+							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic, tbarType : 3});
+							if(c.callback && typeof c.callback == 'function'){
+								c.callback();
+							}
+							if(record.data.id != -2 && !c.isStopSearch){
+								Ext.getCmp(c.statistic+'btnSearch').handler();
+							}
+							
+						}
+					}
+				},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
+			    buildBusinessHourCombo(c.statistic+'comboBegionHour'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
+				{
+					xtype : 'tbtext',
+					hidden : false,
+					text : '&nbsp;至&nbsp;'
+				}, 
+				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
+				buildBusinessHourCombo(c.statistic+'comboEndHour'),
+				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+			]
+		});
+	
+	
 	}else{ //返回包含时间工具栏的数组用于拼接
 		timeBar = [
 				{xtype:'tbtext',text:'日期:'}, c.dateCombo, 
@@ -133,7 +193,7 @@ Ext.ux.initTimeBar = function(c){
 							if(c.callback && typeof c.callback == 'function'){
 								c.callback();
 							}
-							if(record.data.id != -2){
+							if(record.data.id != -2 && !c.isStopSearch){
 								Ext.getCmp(c.statistic+'btnSearch').handler();
 							}
 							
@@ -238,17 +298,22 @@ function buildBusinessMinCombo(id){
 
 //市别操作
 Ext.ux.statistic_oBusinessHourData = function(c){
-	if(c == null || c.type == null || typeof c.type == 'undefined')
+	if(c == null || c.type == null || typeof c.type == 'undefined'){
 		return;
+	}
 	var data = {};
 	var apmBegin = Ext.getCmp(c.statistic+'comboBusinessBeginApm');
 	var openingHour = Ext.getCmp((c.statistic+'comboBegionHour'));
-	var openingMin = Ext.getCmp((c.statistic+'comboBegionMin'));
+	if(c.tbarType != 3){
+		var openingMin = Ext.getCmp((c.statistic+'comboBegionMin'));	
+	}
 	var txtBusinessHourBegin = Ext.getCmp(c.statistic+'txtBusinessHourBegin');
 	
 	var apmEnd = Ext.getCmp(c.statistic+'comboBusinessEndApm');
 	var endingHour = Ext.getCmp(c.statistic+'comboEndHour');
-	var endingMin = Ext.getCmp(c.statistic+'comboEndMin');
+	if(c.tbarType != 3){
+		var endingMin = Ext.getCmp(c.statistic+'comboEndMin');	
+	}
 	var txtBusinessHourEnd = Ext.getCmp(c.statistic+'txtBusinessHourEnd');
 	
 	
@@ -260,14 +325,16 @@ Ext.ux.statistic_oBusinessHourData = function(c){
 		
 		openingHour.hide();
 		endingHour.hide();
-		openingMin.hide();
-		endingMin.hide();
+		if(c.tbarType != 3){
+			openingMin.hide();
+			endingMin.hide();	
+			Ext.getCmp(c.statistic+'txtBusinessMinBeginText').hide();
+			Ext.getCmp(c.statistic+'txtBusinessMinEndText').hide();	
+		}
 		apmBegin.hide();
 		apmEnd.hide();
 		Ext.getCmp(c.statistic+'txtBusinessHourBeginText').hide();
 		Ext.getCmp(c.statistic+'txtBusinessHourEndText').hide();
-		Ext.getCmp(c.statistic+'txtBusinessMinBeginText').hide();
-		Ext.getCmp(c.statistic+'txtBusinessMinEndText').hide();	
 		
 		if(typeof data[2] != 'undefined'){
 			
@@ -297,9 +364,10 @@ Ext.ux.statistic_oBusinessHourData = function(c){
 				endingHour.setValue(endTimes[0]);
 			}
 			
-			openingMin.setValue(beginTimes[1]);
-			
-			endingMin.setValue(endTimes[1]);
+			if(c.tbarType != 3){
+				openingMin.setValue(beginTimes[1]);
+				endingMin.setValue(endTimes[1]);
+			}
 		}else{
 			txtBusinessHourBegin.setText('<font style="color:green; font-size:20px">00:00</font>');
 			txtBusinessHourEnd.setText('<font style="color:green; font-size:20px">00:00</font>');	
@@ -310,21 +378,23 @@ Ext.ux.statistic_oBusinessHourData = function(c){
 				
 				openingHour.setValue('00');
 				endingHour.setValue('00');
-				openingMin.setValue('00');
-				endingMin.setValue('00');
+				if(c.tbarType != 3){
+					openingMin.setValue('00');
+					endingMin.setValue('00');
+					openingMin.show();
+					endingMin.show();
+					Ext.getCmp(c.statistic+'txtBusinessMinBeginText').show();
+					Ext.getCmp(c.statistic+'txtBusinessMinEndText').show();
+				}
 				apmBegin.setValue(0);
 				apmEnd.setValue(0);				
 				
 				openingHour.show();
 				endingHour.show();
-				openingMin.show();
-				endingMin.show();
 				apmBegin.show();
 				apmEnd.show();
 				Ext.getCmp(c.statistic+'txtBusinessHourBeginText').show();
 				Ext.getCmp(c.statistic+'txtBusinessHourEndText').show();
-				Ext.getCmp(c.statistic+'txtBusinessMinBeginText').show();
-				Ext.getCmp(c.statistic+'txtBusinessMinEndText').show();
 			}
 			
 		}
@@ -343,7 +413,7 @@ Ext.ux.statistic_oBusinessHourData = function(c){
 				endingHour = parseInt(endingHour) + 12;
 			}
 			
-			data.opening = openingHour + ':' + openingMin.getValue();
+			data.opening = openingHour + ':' +  openingMin.getValue();
 			
 			data.ending = endingHour + ':' + endingMin.getValue();			
 		}else{
