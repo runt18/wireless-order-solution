@@ -336,26 +336,20 @@ public class TestPromotionDao {
 		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getCouponType().getImage().getObjectKey()) != null);
 		
 		//The issue triggers
-		Assert.assertEquals("issue trigger", expected.hasIssueTrigger(), actual.hasIssueTrigger());
-		if(expected.hasIssueTrigger() && actual.hasIssueTrigger()){
-			//Assert.assertEquals("promotion trigger id", expected.getTrigger().getId(), actual.getTrigger().getId());
-			Assert.assertEquals("issue trigger type", expected.getIssueTrigger().getType(), actual.getIssueTrigger().getType());
-			Assert.assertEquals("issue id to trigger", expected.getId(), actual.getIssueTrigger().getPromotionId());
-			Assert.assertEquals("issue trigger issue rule", expected.getIssueTrigger().getIssueRule(), actual.getIssueTrigger().getIssueRule());
-			Assert.assertEquals("issue trigger use rule", expected.getIssueTrigger().getUseRule(), actual.getIssueTrigger().getUseRule());
-			Assert.assertEquals("issue trigger extra", expected.getIssueTrigger().getExtra(), actual.getIssueTrigger().getExtra());
-		}
+		//Assert.assertEquals("promotion trigger id", expected.getTrigger().getId(), actual.getTrigger().getId());
+		Assert.assertEquals("issue trigger type", expected.getIssueTrigger().getType(), actual.getIssueTrigger().getType());
+		Assert.assertEquals("issue promotion id to trigger", expected.getId(), actual.getIssueTrigger().getPromotionId());
+		Assert.assertEquals("issue trigger issue rule", expected.getIssueTrigger().getIssueRule(), actual.getIssueTrigger().getIssueRule());
+		Assert.assertEquals("issue trigger use rule", expected.getIssueTrigger().getUseRule(), actual.getIssueTrigger().getUseRule());
+		Assert.assertEquals("issue trigger extra", expected.getIssueTrigger().getExtra(), actual.getIssueTrigger().getExtra());
 		
 		//The use triggers
-		Assert.assertEquals("use trigger", expected.hasUseTrigger(), actual.hasUseTrigger());
-		if(expected.hasUseTrigger() && actual.hasUseTrigger()){
-			//Assert.assertEquals("promotion trigger id", expected.getTrigger().getId(), actual.getTrigger().getId());
-			Assert.assertEquals("use trigger type", expected.getUseTrigger().getType(), actual.getUseTrigger().getType());
-			Assert.assertEquals("use id to trigger", expected.getId(), actual.getUseTrigger().getPromotionId());
-			Assert.assertEquals("use trigger issue rule", expected.getUseTrigger().getIssueRule(), actual.getUseTrigger().getIssueRule());
-			Assert.assertEquals("use trigger use rule", expected.getUseTrigger().getUseRule(), actual.getUseTrigger().getUseRule());
-			Assert.assertEquals("use trigger extra", expected.getUseTrigger().getExtra(), actual.getUseTrigger().getExtra());
-		}
+		//Assert.assertEquals("promotion trigger id", expected.getTrigger().getId(), actual.getTrigger().getId());
+		Assert.assertEquals("use trigger type", expected.getUseTrigger().getType(), actual.getUseTrigger().getType());
+		Assert.assertEquals("promotion id to use trigger", expected.getId(), actual.getUseTrigger().getPromotionId());
+		Assert.assertEquals("use trigger issue rule", expected.getUseTrigger().getIssueRule(), actual.getUseTrigger().getIssueRule());
+		Assert.assertEquals("use trigger use rule", expected.getUseTrigger().getUseRule(), actual.getUseTrigger().getUseRule());
+		Assert.assertEquals("use trigger extra", expected.getUseTrigger().getExtra(), actual.getUseTrigger().getExtra());
 	}
 	
 	private void compare(Staff staff, Coupon.IssueBuilder issueBuilder, Promotion expectedPromotion, Member expectedMember, Coupon actual) throws SQLException{
