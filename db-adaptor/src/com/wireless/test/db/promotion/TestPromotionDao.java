@@ -31,6 +31,7 @@ import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
+import com.wireless.pojo.promotion.PromotionTrigger;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
@@ -75,7 +76,6 @@ public class TestPromotionDao {
 		try{
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance("测试优惠活动", "测试优惠活动", new CouponType.InsertBuilder("测试优惠券类型", 30, "2020-2-1")
 							   										  .setComment("测试备注"), "hello jingjing<br>")
-					  												  .addTrigger(Promotion.Trigger.WX_SUBSCRIBE)
 					  												   ;
 			promotionId = PromotionDao.create(groupStaff, promotionCreateBuilder);
 			
@@ -126,16 +126,19 @@ public class TestPromotionDao {
 			promotionImg1 = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 			promotionImg2 = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
-			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30, "2016-2-1")
+			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30, "2020-2-1")
 																	   .setComment("测试备注")
 																	   .setImage(ossImageId);
 			
 			String htmlTxt = "<br>数量份金沙路<div align=\"center\" style=\"width:100%;\"><img src='$(pic_1)' style=\"max-width:95%;\"></div>谁加路费金沙路费<br><br><div align=\"center\" style=\"width:100%;\"></div><br>";
 			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
 
+			PromotionTrigger.InsertBuilder issueTriggerBuilder = PromotionTrigger.InsertBuilder.newIssue4Free();
+			PromotionTrigger.InsertBuilder useTriggerBuilder = PromotionTrigger.InsertBuilder.newUse4SingleExceed(100);
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
 																	  .newInstance("测试优惠活动", body, typeInsertBuilder, "hello jingjing<br>")
-																	  .addTrigger(Promotion.Trigger.WX_SUBSCRIBE)
+																	  .setIssueTrigger(issueTriggerBuilder)
+																	  .setUseTrigger(useTriggerBuilder);
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -167,11 +170,14 @@ public class TestPromotionDao {
 																	   .setImage(ossImageId)
 																	   .setPrice(50);
 			body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg2).getObjectUrl());
-			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange("2016-2-1", "2016-3-1")
+			
+			issueTriggerBuilder = PromotionTrigger.InsertBuilder.newIssue4SingleExceed(100);
+			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange("2016-2-1", "2020-3-1")
 																									 .setTitle("修改优惠活动")
 																									 .setBody(body, "hello jingjing<br>")
 																									 .setCouponTypeBuilder(typeUpdateBuilder)
-																									 .emptyTriggers()
+																									 .setIssueTrigger(issueTriggerBuilder)
+																									 .setUseTrigger(null)
 																									 ;
 			expectedPromotion = promotionUpdateBuilder.build();
 			expectedPromotion.setCouponType(typeUpdateBuilder.build());
@@ -329,10 +335,26 @@ public class TestPromotionDao {
 		Assert.assertEquals("oss image id to coupon type", expected.getCouponType().getImage().getId(), actual.getCouponType().getImage().getId());
 		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getCouponType().getImage().getObjectKey()) != null);
 		
-		//The associated triggers
-		Assert.assertEquals("size to promotion triggers", expected.getTriggers().size(), actual.getTriggers().size());
-		for(int i = 0; i < expected.getTriggers().size(); i++){
-			Assert.assertEquals("promotion trigger", expected.getTriggers().get(i), actual.getTriggers().get(i));
+		//The issue triggers
+		Assert.assertEquals("issue trigger", expected.hasIssueTrigger(), actual.hasIssueTrigger());
+		if(expected.hasIssueTrigger() && actual.hasIssueTrigger()){
+			//Assert.assertEquals("promotion trigger id", expected.getTrigger().getId(), actual.getTrigger().getId());
+			Assert.assertEquals("issue trigger type", expected.getIssueTrigger().getType(), actual.getIssueTrigger().getType());
+			Assert.assertEquals("issue id to trigger", expected.getId(), actual.getIssueTrigger().getPromotionId());
+			Assert.assertEquals("issue trigger issue rule", expected.getIssueTrigger().getIssueRule(), actual.getIssueTrigger().getIssueRule());
+			Assert.assertEquals("issue trigger use rule", expected.getIssueTrigger().getUseRule(), actual.getIssueTrigger().getUseRule());
+			Assert.assertEquals("issue trigger extra", expected.getIssueTrigger().getExtra(), actual.getIssueTrigger().getExtra());
+		}
+		
+		//The use triggers
+		Assert.assertEquals("use trigger", expected.hasUseTrigger(), actual.hasUseTrigger());
+		if(expected.hasUseTrigger() && actual.hasUseTrigger()){
+			//Assert.assertEquals("promotion trigger id", expected.getTrigger().getId(), actual.getTrigger().getId());
+			Assert.assertEquals("use trigger type", expected.getUseTrigger().getType(), actual.getUseTrigger().getType());
+			Assert.assertEquals("use id to trigger", expected.getId(), actual.getUseTrigger().getPromotionId());
+			Assert.assertEquals("use trigger issue rule", expected.getUseTrigger().getIssueRule(), actual.getUseTrigger().getIssueRule());
+			Assert.assertEquals("use trigger use rule", expected.getUseTrigger().getUseRule(), actual.getUseTrigger().getUseRule());
+			Assert.assertEquals("use trigger extra", expected.getUseTrigger().getExtra(), actual.getUseTrigger().getExtra());
 		}
 	}
 	
