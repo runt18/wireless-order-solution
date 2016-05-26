@@ -176,6 +176,7 @@ public class CouponDao {
 	 * @throws BusinessException
 	 * 			throws if any cases below
 	 * 			<li>the promotion does NOT exist
+	 * 			<li>发放多张满足【单次消费满】活动的优惠券
 	 */
 	public static int[] issue(DBCon dbCon, Staff staff, Coupon.IssueBuilder builder) throws SQLException, BusinessException{
 		
@@ -183,6 +184,23 @@ public class CouponDao {
 		for(Entry<Integer, Integer> entry : builder.getPromotions()){
 			final Promotion promotion = PromotionDao.getById(dbCon, staff, entry.getKey());
 			final int amount = entry.getValue();
+			
+			if(amount == 0){
+				continue;
+			}
+			
+			if(promotion.getIssueTrigger().getIssueRule().isSingleExceed()){
+				if(amount > 1){
+					throw new BusinessException(("满足【$(promotion)】活动的优惠券只能发放1张").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
+				}
+				List<CouponOperation> issuedCoupons = CouponOperationDao.getByCond(dbCon, staff, new CouponOperationDao.ExtraCond()
+																													   .setCouponType(promotion.getCouponType())
+																													   .setAssociateId(builder.getAssociateId())
+																													   .addOperation(CouponOperation.Operate.ORDER_ISSUE));
+				if(!issuedCoupons.isEmpty()){
+					throw new BusinessException(("本次消费满足【$(promotion)】活动的优惠券已经发放").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
+				}
+			}
 			
 			for(int memberId : builder.getMembers()){
 				try{
