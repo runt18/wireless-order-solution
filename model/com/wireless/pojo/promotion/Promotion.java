@@ -1,9 +1,6 @@
 package com.wireless.pojo.promotion;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -20,7 +17,8 @@ public class Promotion implements Jsonable{
 		private final String entire;
 		private Type type = Type.NORMAL;
 		private final CouponType.InsertBuilder typeBuilder;
-		private final List<Trigger> triggers = new ArrayList<Trigger>();
+		private PromotionTrigger.InsertBuilder issueTriggerBuilder;
+		private PromotionTrigger.InsertBuilder useTriggerBuilder;
 		
 		private CreateBuilder(String title, String body, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
@@ -34,15 +32,40 @@ public class Promotion implements Jsonable{
 			return instance;
 		}
 		
-		public CreateBuilder addTrigger(Trigger trigger){
-			if(!this.triggers.contains(trigger)){
-				this.triggers.add(trigger);
+		public CreateBuilder setIssueTrigger(PromotionTrigger.InsertBuilder builder){
+			if(builder != null && !builder.build().getType().isIssue()){
+				throw new IllegalArgumentException("设置的必须是发券规则");
 			}
+			this.issueTriggerBuilder = builder;
+			return this;
+		}
+		
+		public CreateBuilder setUseTrigger(PromotionTrigger.InsertBuilder builder){
+			if(builder != null && !builder.build().getType().isUse()){
+				throw new IllegalArgumentException("设置的必须是用券规则");
+			}
+			this.useTriggerBuilder = builder;
 			return this;
 		}
 		
 		public CouponType.InsertBuilder getTypeBuilder(){
 			return this.typeBuilder;
+		}
+		
+		public boolean hasIssueTrigger(){
+			return this.issueTriggerBuilder != null;
+		}
+		
+		public boolean hasUseTrigger(){
+			return this.useTriggerBuilder != null;
+		}
+		
+		public PromotionTrigger.InsertBuilder getIssueTriggerBuilder(){
+			return this.issueTriggerBuilder;
+		}
+		
+		public PromotionTrigger.InsertBuilder getUseTriggerBuilder(){
+			return this.useTriggerBuilder;
 		}
 		
 		public Promotion build(){
@@ -52,39 +75,50 @@ public class Promotion implements Jsonable{
 	
 	public static class UpdateBuilder{
 		private final static DateRange UPDATE_FLAG = new DateRange(0, 0);
+		private final static PromotionTrigger.InsertBuilder TRIGGER_UPDATE_FLAG = PromotionTrigger.InsertBuilder.newIssue4Free();
 		private final int id;
 		private DateRange range = UPDATE_FLAG;
 		private String title;
 		private String body;
 		private String entire;
 		private CouponType.UpdateBuilder typeBuilder;
-		private List<Trigger> triggers = null;
+		private PromotionTrigger.InsertBuilder issueTriggerBuilder = TRIGGER_UPDATE_FLAG;
+		private PromotionTrigger.InsertBuilder useTriggerBuilder = TRIGGER_UPDATE_FLAG;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
 		}
 		
-		public UpdateBuilder addTrigger(Trigger trigger){
-			if(triggers == null){
-				triggers = new ArrayList<Trigger>();
+		public UpdateBuilder setIssueTrigger(PromotionTrigger.InsertBuilder builder){
+			if(builder != null && !builder.build().getType().isIssue()){
+				throw new IllegalArgumentException("设置的必须是发券规则");
 			}
-			if(!triggers.contains(trigger)){
-				this.triggers.add(trigger);
-			}
+			this.issueTriggerBuilder = builder;
 			return this;
 		}
 
-		public UpdateBuilder emptyTriggers(){
-			if(triggers == null){
-				triggers = new ArrayList<Trigger>();
-			}else{
-				triggers.clear();
-			}
-			return this;
+		public boolean isIssueTriggerChanged(){
+			return this.issueTriggerBuilder != TRIGGER_UPDATE_FLAG;
 		}
 		
-		public boolean isTriggersChanged(){
-			return this.triggers != null;
+		public PromotionTrigger.InsertBuilder getIssueTriggerBuilder(){
+			return this.issueTriggerBuilder;
+		}
+		
+		public UpdateBuilder setUseTrigger(PromotionTrigger.InsertBuilder builder){
+			if(builder != null && !builder.build().getType().isUse()){
+				throw new IllegalArgumentException("设置的必须是用券规则");
+			}
+			this.useTriggerBuilder = builder;
+			return this;
+		}
+
+		public boolean isUseTriggerChanged(){
+			return this.useTriggerBuilder != TRIGGER_UPDATE_FLAG;
+		}
+		
+		public PromotionTrigger.InsertBuilder getUseTriggerBuilder(){
+			return this.useTriggerBuilder;
 		}
 		
 		public UpdateBuilder setTitle(String title){
@@ -279,49 +313,52 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
-	public static enum Trigger implements Jsonable{
-		WX_SUBSCRIBE(1, "微信关注");
-		
-		Trigger(int val, String desc){
-			this.val = val;
-			this.desc = desc;
-		}
-		
-		private final int val;
-		private final String desc;
-		
-		public static Trigger valueOf(int val){
-			for(Trigger type : values()){
-				if(type.val == val){
-					return type;
-				}
-			}
-			throw new IllegalArgumentException("The trigger type(val = " + val + ") passed is invalid.");
-		}
-		
-		public int getVal(){
-			return this.val;
-		}
-		
-		@Override
-		public String toString(){
-			return this.desc;
-		}
+//	public static enum Trigger implements Jsonable{
+//		WX_SUBSCRIBE(1, "微信关注");
+//		
+//		Trigger(int val, String desc){
+//			this.val = val;
+//			this.desc = desc;
+//		}
+//		
+//		private final int val;
+//		private final String desc;
+//		
+//		public static Trigger valueOf(int val){
+//			for(Trigger type : values()){
+//				if(type.val == val){
+//					return type;
+//				}
+//			}
+//			throw new IllegalArgumentException("The trigger type(val = " + val + ") passed is invalid.");
+//		}
+//		
+//		public int getVal(){
+//			return this.val;
+//		}
+//		
+//		@Override
+//		public String toString(){
+//			return this.desc;
+//		}
+//
+//		@Override
+//		public JsonMap toJsonMap(int flag) {
+//			JsonMap jm = new JsonMap();
+//			jm.putInt("triggerType", this.val);
+//			jm.putString("triggerText", this.desc);
+//			return jm;
+//		}
+//
+//		@Override
+//		public void fromJsonMap(JsonMap jm, int flag) {
+//			
+//		}
+//	}
 
-		@Override
-		public JsonMap toJsonMap(int flag) {
-			JsonMap jm = new JsonMap();
-			jm.putInt("triggerType", this.val);
-			jm.putString("triggerText", this.desc);
-			return jm;
-		}
+	private final static PromotionTrigger USE_TRIGGER_4_FREE = PromotionTrigger.InsertBuilder.newUse4Free().build();
+	private final static PromotionTrigger ISSUE_TRIGGER_4_FREE = PromotionTrigger.InsertBuilder.newIssue4Free().build();
 
-		@Override
-		public void fromJsonMap(JsonMap jm, int flag) {
-			
-		}
-	}
-	
 	private int id;
 	private int restaurantId;
 	private long createDate;
@@ -332,7 +369,8 @@ public class Promotion implements Jsonable{
 	private CouponType couponType;
 	private Rule rule = Rule.FREE;
 	private Type type = Type.NORMAL;
-	private final List<Trigger> triggers = new ArrayList<Trigger>();
+	private PromotionTrigger issueTrigger = ISSUE_TRIGGER_4_FREE;
+	private PromotionTrigger useTrigger = USE_TRIGGER_4_FREE;
 	
 	private OssImage image;
 	
@@ -345,7 +383,12 @@ public class Promotion implements Jsonable{
 		this.entire = builder.entire;
 		this.couponType = builder.typeBuilder.build();
 		this.type = builder.type;
-		this.triggers.addAll(builder.triggers);
+		if(builder.issueTriggerBuilder != null){
+			this.issueTrigger = builder.issueTriggerBuilder.build();
+		}
+		if(builder.useTriggerBuilder != null){
+			this.useTrigger = builder.useTriggerBuilder.build();
+		}
 	}
 	
 	private Promotion(UpdateBuilder builder){
@@ -363,8 +406,8 @@ public class Promotion implements Jsonable{
 		if(builder.isCouponTypeChanged()){
 			this.couponType = builder.typeBuilder.build();
 		}
-		if(builder.isTriggersChanged()){
-			this.triggers.addAll(builder.triggers);
+		if(builder.isIssueTriggerChanged() && builder.issueTriggerBuilder != null){
+			this.issueTrigger = builder.issueTriggerBuilder.build();
 		}
 	}
 	
@@ -496,13 +539,25 @@ public class Promotion implements Jsonable{
 	public boolean hasImage(){
 		return this.image != null;
 	}
-	
-	public void addTrigger(Trigger trigger){
-		this.triggers.add(trigger);
+
+	public void setUseTrigger(PromotionTrigger trigger){
+		if(trigger != null){
+			this.useTrigger = trigger;
+		}
 	}
 	
-	public List<Trigger> getTriggers(){
-		return Collections.unmodifiableList(this.triggers);
+	public PromotionTrigger getUseTrigger(){
+		return this.useTrigger;
+	}
+	
+	public void setIssueTrigger(PromotionTrigger trigger){
+		if(trigger != null){
+			this.issueTrigger = trigger;
+		}
+	}
+	
+	public PromotionTrigger getIssueTrigger(){
+		return this.issueTrigger;
 	}
 	
 	@Override
@@ -539,7 +594,8 @@ public class Promotion implements Jsonable{
 		jm.putInt("pType", this.rule.getVal());
 		jm.putInt("rule", this.rule.getVal());
 		jm.putJsonable("coupon", this.couponType, 0);
-		jm.putJsonableList("triggers", this.triggers, 0);
+		jm.putJsonable("issueTrigger", this.issueTrigger, 0);
+		jm.putJsonable("useTrigger", this.useTrigger, 0);
 		return jm;
 	}
 

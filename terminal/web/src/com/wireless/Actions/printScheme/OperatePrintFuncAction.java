@@ -371,60 +371,6 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 			}
-//			else if(PType.valueOf(pType) == PType.PRINT_TEMP_RECEIPT){
-//				//暂结单
-//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
-//				if(region.length == 0){
-//					builder.setRegionAll();
-//				}else{
-//					for (String r : region) {
-//						builder.addRegion(new Region(Short.parseShort(r)));
-//					}
-//				}
-//				//单尾结束语
-//				if(ending != null && !ending.isEmpty()){
-//					builder.setComment(ending);
-//				}
-//				builder.setRepeat(Integer.parseInt(repeat));
-//				PrintFuncDao.updateFunc(dbCon, staff, builder);
-//				
-//			}else if(printType == PType.PRINT_TRANSFER_TABLE){
-//				//转台单
-//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
-//				if(region.length == 0){
-//					builder.setRegionAll();
-//				}else{
-//					for (String r : region) {
-//						builder.addRegion(new Region(Short.parseShort(r)));
-//					}
-//				}
-//				builder.setRepeat(Integer.parseInt(repeat));
-//				PrintFuncDao.updateFunc(dbCon, staff, builder);
-//				
-//			}else if(printType == PType.PRINT_ALL_HURRIED_FOOD){
-//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
-//				if(region.length == 0){
-//					builder.setRegionAll();
-//				}else{
-//					for (String r : region) {
-//						builder.addRegion(new Region(Short.parseShort(r)));
-//					}
-//				}
-//				builder.setRepeat(Integer.parseInt(repeat));
-//				PrintFuncDao.updateFunc(dbCon, staff, builder);
-//				
-//			}else if(printType == PType.PRINT_TRANSFER_FOOD){
-//				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
-//				if(region.length == 0){
-//					builder.setRegionAll();
-//				}else{
-//					for (String r : region) {
-//						builder.addRegion(new Region(Short.parseShort(r)));
-//					}
-//				}
-//				builder.setRepeat(Integer.parseInt(repeat));
-//				PrintFuncDao.updateFunc(dbCon, staff, builder);
-//			}
 		
 			jObject.initTip(true, "操作成功, 已修改方案");
 		}catch(BusinessException | SQLException e){

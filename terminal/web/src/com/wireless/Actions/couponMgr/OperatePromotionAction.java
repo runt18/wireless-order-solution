@@ -26,6 +26,15 @@ import com.wireless.pojo.util.DateUtil;
 
 public class OperatePromotionAction extends DispatchAction{
 
+	/**
+	 * 新建优惠活动
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String title = request.getParameter("title");
 		final String body = request.getParameter("body");
@@ -71,10 +80,7 @@ public class OperatePromotionAction extends DispatchAction{
 				public void fromJsonMap(JsonMap jm, int flag) {
 				}
 			});
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -87,6 +93,15 @@ public class OperatePromotionAction extends DispatchAction{
 		return null;
 	}
 
+	/**
+	 * 修改优惠活动
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String promotionId = request.getParameter("id");
 		final String title = request.getParameter("title");
@@ -159,10 +174,7 @@ public class OperatePromotionAction extends DispatchAction{
 			PromotionDao.update(staff, promotionUpdateBuilder);
 			
 			jobject.initTip(true, "活动修改成功");
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -267,7 +279,7 @@ public class OperatePromotionAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			PromotionDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
+			PromotionDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
 			
 			jobject.initTip(true, "活动删除成功");
 		}catch(BusinessException e){
