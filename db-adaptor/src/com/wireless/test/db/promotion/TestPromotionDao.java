@@ -104,7 +104,7 @@ public class TestPromotionDao {
 			
 		}finally{
 			if(promotionId != 0){
-				PromotionDao.delete(groupStaff, promotionId);
+				PromotionDao.deleteById(groupStaff, promotionId);
 			}
 			RestaurantDao.update(new Restaurant.UpdateBuilder(group.getId()).clearBranch());
 		}
@@ -133,12 +133,10 @@ public class TestPromotionDao {
 			String htmlTxt = "<br>数量份金沙路<div align=\"center\" style=\"width:100%;\"><img src='$(pic_1)' style=\"max-width:95%;\"></div>谁加路费金沙路费<br><br><div align=\"center\" style=\"width:100%;\"></div><br>";
 			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
 
-			PromotionTrigger.InsertBuilder issueTriggerBuilder = PromotionTrigger.InsertBuilder.newIssue4Free();
-			PromotionTrigger.InsertBuilder useTriggerBuilder = PromotionTrigger.InsertBuilder.newUse4SingleExceed(100);
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
 																	  .newInstance("测试优惠活动", body, typeInsertBuilder, "hello jingjing<br>")
-																	  .setIssueTrigger(issueTriggerBuilder)
-																	  .setUseTrigger(useTriggerBuilder);
+																	  .setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Free())
+																	  .setUseTrigger(PromotionTrigger.InsertBuilder.newUse4SingleExceed(100));
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -171,12 +169,11 @@ public class TestPromotionDao {
 																	   .setPrice(50);
 			body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg2).getObjectUrl());
 			
-			issueTriggerBuilder = PromotionTrigger.InsertBuilder.newIssue4SingleExceed(100);
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange("2016-2-1", "2020-3-1")
 																									 .setTitle("修改优惠活动")
 																									 .setBody(body, "hello jingjing<br>")
 																									 .setCouponTypeBuilder(typeUpdateBuilder)
-																									 .setIssueTrigger(issueTriggerBuilder)
+																									 .setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4SingleExceed(100))
 																									 .setUseTrigger(null)
 																									 ;
 			expectedPromotion = promotionUpdateBuilder.build();
@@ -239,7 +236,7 @@ public class TestPromotionDao {
 			if(promotionId != 0){
 				//OssImage promotionImage2 = OssImageDao.getById(mStaff, promotionImg2);
 				Promotion original = PromotionDao.getById(mStaff, promotionId);
-				PromotionDao.delete(mStaff, promotionId);
+				PromotionDao.deleteById(mStaff, promotionId);
 				try{
 					PromotionDao.getById(mStaff, promotionId);
 				}catch(BusinessException e){

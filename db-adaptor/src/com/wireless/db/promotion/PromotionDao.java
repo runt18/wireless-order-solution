@@ -50,6 +50,11 @@ public class PromotionDao {
 		private Promotion.Type type;
 		private final List<IssueCond> issueRules = new ArrayList<>();
 		private final List<UseCond> useRules = new ArrayList<>();
+
+		public ExtraCond addIssueRule(PromotionTrigger.IssueRule rule){
+			issueRules.add(new IssueCond(rule, null));
+			return this;
+		}
 		
 		public ExtraCond addIssueRule(PromotionTrigger.IssueRule rule, Object extra){
 			issueRules.add(new IssueCond(rule, extra));
@@ -58,6 +63,11 @@ public class PromotionDao {
 
 		public ExtraCond addUseRule(PromotionTrigger.UseRule rule, Object extra){
 			useRules.add(new UseCond(rule, extra));
+			return this;
+		}
+
+		public ExtraCond addUseRule(PromotionTrigger.UseRule rule){
+			useRules.add(new UseCond(rule, null));
 			return this;
 		}
 		
@@ -566,7 +576,7 @@ public class PromotionDao {
 	 * 			<li>throws if the promotion to delete does NOT exist
 	 * 			<li>throws if the promotion to delete NOT belong to 'CREATED' status
 	 */
-	public static void delete(Staff staff, int promotionId) throws SQLException, BusinessException{
+	public static void deleteById(Staff staff, int promotionId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

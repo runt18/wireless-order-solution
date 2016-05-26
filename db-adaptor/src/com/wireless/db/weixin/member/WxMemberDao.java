@@ -17,6 +17,7 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
+import com.wireless.pojo.promotion.PromotionTrigger;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class WxMemberDao {
@@ -151,7 +152,7 @@ public class WxMemberDao {
 		if(associatedMembers.isEmpty()){
 			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
 			//Issue the coupon to this weixin member after subscribing.
-			for(Promotion promotion : PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addTrigger(Promotion.Trigger.WX_SUBSCRIBE))){
+			for(Promotion promotion : PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addIssueRule(PromotionTrigger.IssueRule.WX_SUBSCRIBE))){
 				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId));
 			}
 		}else{
