@@ -32,7 +32,7 @@ public class CouponDao {
 		private Coupon.Status status;
 		private int memberId;
 		private int couponTypeId;
-		private int promotionId;
+		private List<Integer> promotions = new ArrayList<>();
 		private Boolean expired;
 		private CouponOperation.Operate operation;
 		private int associateId;
@@ -81,12 +81,19 @@ public class CouponDao {
 		}
 		
 		public ExtraCond setPromotion(int promotionId){
-			this.promotionId = promotionId;
+			this.promotions.clear();
+			this.promotions.add(promotionId);
 			return this;
 		}
 		
 		public ExtraCond setPromotion(Promotion promotion){
-			this.promotionId = promotion.getId();
+			return setPromotion(promotion.getId());
+		}
+		
+		public ExtraCond addPromotions(List<Promotion> promotions){
+			for(Promotion promotion : promotions){
+				this.promotions.add(promotion.getId());
+			}
 			return this;
 		}
 		
@@ -116,8 +123,15 @@ public class CouponDao {
 			if(couponTypeId != 0){
 				extraCond.append(" AND C.coupon_type_id = " + couponTypeId);
 			}
-			if(promotionId != 0){
-				extraCond.append(" AND C.promotion_id = " + promotionId);
+			final StringBuilder promotionCond = new StringBuilder();
+			for(Integer promotionId : promotions){
+				if(promotionCond.length() > 0){
+					promotionCond.append(",");
+				}
+				promotionCond.append(promotionId);
+			}
+			if(promotionCond.length() != 0){
+				extraCond.append(" AND C.promotion_id IN ( " + promotionCond + " ) ");
 			}
 			if(expired != null){
 				if(expired){
@@ -176,6 +190,7 @@ public class CouponDao {
 	 * @throws BusinessException
 	 * 			throws if any cases below
 	 * 			<li>the promotion does NOT exist
+	 * 			<li>发放多张满足【单次消费满】活动的优惠券
 	 */
 	public static int[] issue(DBCon dbCon, Staff staff, Coupon.IssueBuilder builder) throws SQLException, BusinessException{
 		
@@ -183,6 +198,23 @@ public class CouponDao {
 		for(Entry<Integer, Integer> entry : builder.getPromotions()){
 			final Promotion promotion = PromotionDao.getById(dbCon, staff, entry.getKey());
 			final int amount = entry.getValue();
+			
+			if(amount == 0){
+				continue;
+			}
+			
+			if(promotion.getIssueTrigger().getIssueRule().isSingleExceed()){
+				if(amount > 1){
+					throw new BusinessException(("满足【$(promotion)】活动的优惠券只能发放1张").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
+				}
+				List<CouponOperation> issuedCoupons = CouponOperationDao.getByCond(dbCon, staff, new CouponOperationDao.ExtraCond()
+																													   .setCouponType(promotion.getCouponType())
+																													   .setAssociateId(builder.getAssociateId())
+																													   .addOperation(CouponOperation.Operate.ORDER_ISSUE));
+				if(!issuedCoupons.isEmpty()){
+					throw new BusinessException(("本次消费满足【$(promotion)】活动的优惠券已经发放").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
+				}
+			}
 			
 			for(int memberId : builder.getMembers()){
 				try{

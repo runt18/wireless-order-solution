@@ -19,6 +19,7 @@ import com.wireless.db.member.MemberCondDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -29,6 +30,7 @@ import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
+import com.wireless.pojo.promotion.PromotionTrigger;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
@@ -169,7 +171,12 @@ public class OperateCouponAction extends DispatchAction{
 			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setOperation(CouponOperation.Operate.ORDER_USE, Integer.parseInt(orderId)), null);
 			
 			//获取会员可用的优惠券
-			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond().setStatus(Coupon.Status.ISSUED).setMember(Integer.parseInt(memberId)), null));
+			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond()
+																  .setStatus(Coupon.Status.ISSUED)
+																  .setMember(Integer.parseInt(memberId))
+																  .addPromotions(PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addUseRule(PromotionTrigger.UseRule.FREE)
+																		  																   .addUseRule(PromotionTrigger.UseRule.SINGLE_EXCEED, Integer.valueOf(orderId)))), 
+																  null));
 			
 			//过滤已过期的优惠券
 			Iterator<Coupon> iter = result.iterator();
@@ -184,6 +191,10 @@ public class OperateCouponAction extends DispatchAction{
 			
 			
 		}catch(SQLException e){
+			jObject.initTip(e);
+			e.printStackTrace();
+			
+		}catch(Exception e){
 			jObject.initTip(e);
 			e.printStackTrace();
 		}finally{
