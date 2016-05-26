@@ -64,10 +64,10 @@ public class WxNotifyMemberAction extends DispatchAction{
 				final Token token = Token.newInstance(authorizerToken);
 				/**
 				 * {{first.DATA}}
-				 * 优惠券：{{keyword1.DATA}}
-				 * 来源：{{keyword2.DATA}}
-				 * 过期时间：{{keyword3.DATA}}
-				 * 使用说明：{{keyword4.DATA}}
+				 * 领取人：{{keyword1.DATA}}
+				 * 商品名称：{{keyword2.DATA}}
+				 * 有效期至：{{keyword3.DATA}}
+				 * 订单编号：{{keyword4.DATA}}
 				 * {{remark.DATA}}
 				 */
 				Coupon coupon = CouponDao.getById(staff, co.getCouponId());
@@ -86,10 +86,10 @@ public class WxNotifyMemberAction extends DispatchAction{
 						.setToUser(wxMember.getSerial())
 						.setTemplateId(wxRestaurant.getCouponDrawTemplate())
 						.addKeyword(new Keyword("first", "亲爱的会员，您已成功领取优惠券"))
-						.addKeyword(new Keyword("keyword1", co.getCouponName()))		//优惠券名称
-						.addKeyword(new Keyword("keyword2", co.getOperate().toString()))	//来源
-						.addKeyword(new Keyword("keyword3", DateUtil.format(coupon.getExpired(), DateUtil.Pattern.DATE)))	//过期时间
-						.addKeyword(new Keyword("keyword4", "结账时使用"))				//使用说明
+						.addKeyword(new Keyword("keyword1", co.getMemberName()))		//领取人
+						.addKeyword(new Keyword("keyword2", coupon.getName()))	       //商品名称
+						.addKeyword(new Keyword("keyword3", DateUtil.format(coupon.getExpired(), DateUtil.Pattern.DATE)))	//有效期至
+						.addKeyword(new Keyword("keyword4", "----"))				//订单编号
 						.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
 						.setUrl(url)
 						);
