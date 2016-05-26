@@ -33,7 +33,7 @@ public class Promotion implements Jsonable{
 		}
 		
 		public CreateBuilder setIssueTrigger(PromotionTrigger.InsertBuilder builder){
-			if(!builder.build().getType().isIssue()){
+			if(builder != null && !builder.build().getType().isIssue()){
 				throw new IllegalArgumentException("设置的必须是发券规则");
 			}
 			this.issueTriggerBuilder = builder;
@@ -41,7 +41,7 @@ public class Promotion implements Jsonable{
 		}
 		
 		public CreateBuilder setUseTrigger(PromotionTrigger.InsertBuilder builder){
-			if(!builder.build().getType().isUse()){
+			if(builder != null && !builder.build().getType().isUse()){
 				throw new IllegalArgumentException("设置的必须是用券规则");
 			}
 			this.useTriggerBuilder = builder;
@@ -90,7 +90,7 @@ public class Promotion implements Jsonable{
 		}
 		
 		public UpdateBuilder setIssueTrigger(PromotionTrigger.InsertBuilder builder){
-			if(!builder.build().getType().isIssue()){
+			if(builder != null && !builder.build().getType().isIssue()){
 				throw new IllegalArgumentException("设置的必须是发券规则");
 			}
 			this.issueTriggerBuilder = builder;
@@ -106,7 +106,7 @@ public class Promotion implements Jsonable{
 		}
 		
 		public UpdateBuilder setUseTrigger(PromotionTrigger.InsertBuilder builder){
-			if(!builder.build().getType().isUse()){
+			if(builder != null && !builder.build().getType().isUse()){
 				throw new IllegalArgumentException("设置的必须是用券规则");
 			}
 			this.useTriggerBuilder = builder;
@@ -355,7 +355,10 @@ public class Promotion implements Jsonable{
 //			
 //		}
 //	}
-	
+
+	private final static PromotionTrigger USE_TRIGGER_4_FREE = PromotionTrigger.InsertBuilder.newUse4Free().build();
+	private final static PromotionTrigger ISSUE_TRIGGER_4_FREE = PromotionTrigger.InsertBuilder.newIssue4Free().build();
+
 	private int id;
 	private int restaurantId;
 	private long createDate;
@@ -366,8 +369,8 @@ public class Promotion implements Jsonable{
 	private CouponType couponType;
 	private Rule rule = Rule.FREE;
 	private Type type = Type.NORMAL;
-	private PromotionTrigger issueTrigger;
-	private PromotionTrigger useTrigger;
+	private PromotionTrigger issueTrigger = ISSUE_TRIGGER_4_FREE;
+	private PromotionTrigger useTrigger = USE_TRIGGER_4_FREE;
 	
 	private OssImage image;
 	
@@ -538,27 +541,23 @@ public class Promotion implements Jsonable{
 	}
 
 	public void setUseTrigger(PromotionTrigger trigger){
-		this.useTrigger = trigger;
+		if(trigger != null){
+			this.useTrigger = trigger;
+		}
 	}
 	
 	public PromotionTrigger getUseTrigger(){
 		return this.useTrigger;
 	}
 	
-	public boolean hasUseTrigger(){
-		return this.useTrigger != null;
-	}
-	
 	public void setIssueTrigger(PromotionTrigger trigger){
-		this.issueTrigger = trigger;
+		if(trigger != null){
+			this.issueTrigger = trigger;
+		}
 	}
 	
 	public PromotionTrigger getIssueTrigger(){
 		return this.issueTrigger;
-	}
-	
-	public boolean hasIssueTrigger(){
-		return this.issueTrigger != null;
 	}
 	
 	@Override

@@ -183,6 +183,10 @@ public class PromotionTrigger implements Jsonable {
 			throw new IllegalArgumentException("The use trigger (val = " + val + ") is invalid.");
 		}
 		
+		public boolean isSingleExceed(){
+			return this == SINGLE_EXCEED;
+		}
+		
 		@Override
 		public String toString(){
 			return this.desc;

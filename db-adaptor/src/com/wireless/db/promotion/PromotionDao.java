@@ -8,15 +8,18 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.promotion.PromotionTrigger;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
 
@@ -24,8 +27,17 @@ public class PromotionDao {
 
 	private static class IssueCond{
 		final PromotionTrigger.IssueRule rule;
-		final int extra;
-		IssueCond(PromotionTrigger.IssueRule rule, int extra){
+		final Object extra;
+		IssueCond(PromotionTrigger.IssueRule rule, Object extra){
+			this.rule = rule;
+			this.extra = extra;
+		}
+	}
+
+	private static class UseCond{
+		final PromotionTrigger.UseRule rule;
+		final Object extra;
+		UseCond(PromotionTrigger.UseRule rule, Object extra){
 			this.rule = rule;
 			this.extra = extra;
 		}
@@ -36,7 +48,28 @@ public class PromotionDao {
 		private List<Promotion.Status> statusList = new ArrayList<Promotion.Status>();
 		private Promotion.Rule rule;
 		private Promotion.Type type;
-		private final List<IssueCond> issueConds = new ArrayList<>();
+		private final List<IssueCond> issueRules = new ArrayList<>();
+		private final List<UseCond> useRules = new ArrayList<>();
+
+		public ExtraCond addIssueRule(PromotionTrigger.IssueRule rule){
+			issueRules.add(new IssueCond(rule, null));
+			return this;
+		}
+		
+		public ExtraCond addIssueRule(PromotionTrigger.IssueRule rule, Object extra){
+			issueRules.add(new IssueCond(rule, extra));
+			return this;
+		}
+
+		public ExtraCond addUseRule(PromotionTrigger.UseRule rule, Object extra){
+			useRules.add(new UseCond(rule, extra));
+			return this;
+		}
+
+		public ExtraCond addUseRule(PromotionTrigger.UseRule rule){
+			useRules.add(new UseCond(rule, null));
+			return this;
+		}
 		
 		public ExtraCond setPromotionId(int id){
 			this.promotionId = id;
@@ -477,31 +510,52 @@ public class PromotionDao {
 		//Get the associated issue & use trigger
 		for(Promotion promotion : result){
 			List<PromotionTrigger> triggers = PromotionTriggerDao.getByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setType(PromotionTrigger.Type.ISSUE).setPromotion(promotion));
-			if(!triggers.isEmpty()){
+			if(triggers.isEmpty()){
+				promotion.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Free().setPromotion(promotion).build());
+			}else{
 				promotion.setIssueTrigger(triggers.get(0));
 			}
 			triggers = PromotionTriggerDao.getByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setType(PromotionTrigger.Type.USE).setPromotion(promotion));
-			if(!triggers.isEmpty()){
+			if(triggers.isEmpty()){
+				promotion.setUseTrigger(PromotionTrigger.InsertBuilder.newUse4Free().setPromotion(promotion).build());
+			}else{
 				promotion.setUseTrigger(triggers.get(0));
 			}
 		}
 		
-		final List<Promotion> promotions = new ArrayList<>(result);
-		result.clear();
-		for(IssueCond issueCond : extraCond.issueConds){
-			for(Promotion promotion : promotions){
-				if(promotion.hasIssueTrigger()){
-					if(issueCond.rule == promotion.getIssueTrigger().getIssueRule()){
-						if(issueCond.rule.isSingleExceed()){
-							if(issueCond.extra > promotion.getIssueTrigger().getExtra()){
+		if(!extraCond.issueRules.isEmpty() || !extraCond.useRules.isEmpty()){
+			final List<Promotion> promotions = new ArrayList<>(result);
+			result.clear();
+			
+			//Filter the promotions matched the issue rule.
+			for(IssueCond issueRule : extraCond.issueRules){
+				for(Promotion promotion : promotions){
+					if(issueRule.rule == promotion.getIssueTrigger().getIssueRule()){
+						if(issueRule.rule.isSingleExceed()){
+							Order order = OrderDao.getById(dbCon, staff, ((Integer)issueRule.extra).intValue(), DateType.TODAY);
+							if(order.calcTotalPrice() > promotion.getIssueTrigger().getExtra()){
 								result.add(promotion);
 							}
 						}else{
 							result.add(promotion);
 						}
 					}
-				}else{
-					result.add(promotion);
+				}
+			}
+			
+			//Filter the promotions matched the use rule.
+			for(UseCond useRule : extraCond.useRules){
+				for(Promotion promotion : promotions){
+					if(useRule.rule == promotion.getUseTrigger().getUseRule()){
+						if(useRule.rule.isSingleExceed()){
+							Order order = OrderDao.getById(dbCon, staff, ((Integer)useRule.extra).intValue(), DateType.TODAY);
+							if(order.calcTotalPrice() > promotion.getUseTrigger().getExtra()){
+								result.add(promotion);
+							}
+						}else{
+							result.add(promotion);
+						}
+					}
 				}
 			}
 		}
@@ -522,7 +576,7 @@ public class PromotionDao {
 	 * 			<li>throws if the promotion to delete does NOT exist
 	 * 			<li>throws if the promotion to delete NOT belong to 'CREATED' status
 	 */
-	public static void delete(Staff staff, int promotionId) throws SQLException, BusinessException{
+	public static void deleteById(Staff staff, int promotionId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
