@@ -32,7 +32,7 @@ public class CouponDao {
 		private Coupon.Status status;
 		private int memberId;
 		private int couponTypeId;
-		private int promotionId;
+		private List<Integer> promotions = new ArrayList<>();
 		private Boolean expired;
 		private CouponOperation.Operate operation;
 		private int associateId;
@@ -81,12 +81,19 @@ public class CouponDao {
 		}
 		
 		public ExtraCond setPromotion(int promotionId){
-			this.promotionId = promotionId;
+			this.promotions.clear();
+			this.promotions.add(promotionId);
 			return this;
 		}
 		
 		public ExtraCond setPromotion(Promotion promotion){
-			this.promotionId = promotion.getId();
+			return setPromotion(promotion.getId());
+		}
+		
+		public ExtraCond addPromotions(List<Promotion> promotions){
+			for(Promotion promotion : promotions){
+				this.promotions.add(promotion.getId());
+			}
 			return this;
 		}
 		
@@ -116,8 +123,15 @@ public class CouponDao {
 			if(couponTypeId != 0){
 				extraCond.append(" AND C.coupon_type_id = " + couponTypeId);
 			}
-			if(promotionId != 0){
-				extraCond.append(" AND C.promotion_id = " + promotionId);
+			final StringBuilder promotionCond = new StringBuilder();
+			for(Integer promotionId : promotions){
+				if(promotionCond.length() > 0){
+					promotionCond.append(",");
+				}
+				promotionCond.append(promotionId);
+			}
+			if(promotionCond.length() != 0){
+				extraCond.append(" AND C.promotion_id IN ( " + promotionCond + " ) ");
 			}
 			if(expired != null){
 				if(expired){
