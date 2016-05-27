@@ -1049,6 +1049,20 @@ Ext.onReady(function(){
 										value : ""
 									}]
 								}, {
+									title : '扫码发券二维码',
+									id : 'createQrCode_fieldset_activeMgr',
+									xtype : 'fieldset',
+									layout : 'form',
+									hidden : false,
+									items : [{
+										xtype : 'button',
+										id : 'createQrcode_button_activeMgr',
+										text : '生成二维码',
+										iconCls : 'btn_save',
+										handler : function(){
+										}
+									}]
+								}, {
 								xtype : 'radiogroup',
 								fieldLabel : '用券规则',
 								columns : 3,
