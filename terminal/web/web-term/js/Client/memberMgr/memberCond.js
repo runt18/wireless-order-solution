@@ -747,9 +747,15 @@
       						     {name : 'coupon.name'}
       						])
 						});
+						var issueTrigger = {
+							FREE : {val : 1, desc : "免费发券"},
+							SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
+							WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+						}
 						couponDs.baseParams = {
 								dataSource : 'getByCond',
-								status : 'progress'
+								status : 'progress',
+								issueTriggers : issueTrigger.FREE.val
 						};
 						couponDs.load();
 						
@@ -764,6 +770,11 @@
 							viewConfig : {
 								forceFit : true
 							}
+						});
+						
+						
+						var issueLoadMaskLoading = new Ext.LoadMask(document.body, {
+								msg : '正在发放优惠券...'
 						});
 						
 						var issueCouponWin = new Ext.Window({
@@ -791,6 +802,7 @@
 										Ext.MessageBox.confirm('警示框', '您共发送【'+ amount + '张优惠券】，优惠券类型是:【'+ couponName.join(',') 
 												+'】，发送的会员类型是 :【' + clickTree + '】', function(btn){
 													if(btn == 'yes'){
+														issueLoadMaskLoading.show();
 														Ext.Ajax.request({
 															url : '../../OperateCoupon.do',
 															params : {
@@ -800,7 +812,9 @@
 																condId : clickTreeId
 															},
 															success : function(response){
+																issueLoadMaskLoading.hide();
 																issueCouponWin.close();
+																Ext.example.msg('提示', '发放优惠券成功');
 															}
 														});
 														
