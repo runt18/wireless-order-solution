@@ -171,7 +171,7 @@ Ext.onReady(function(){
 							Ext.getCmp('useRule_active').setValue(true);
 							Ext.getCmp('useRule_active').fireEvent('focus');
 						}else if(jr.root[0].useTrigger.useRule == useRules.SINGLE_EXCEED.val){
-							Ext.getCmp('useSingleMoney_numberfield_active').setValue(jr.root[0].issueTrigger.extra);
+							Ext.getCmp('useSingleMoney_numberfield_active').setValue(jr.root[0].useTrigger.extra);
 							Ext.getCmp('useSingle_active').setValue(true);
 							Ext.getCmp('useSingle_active').fireEvent('focus');
 						}
