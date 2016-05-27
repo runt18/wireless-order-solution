@@ -85,12 +85,12 @@ public class WxMemberDao {
 	 * 			throws if cases below
 	 * 			<li>failed to insert the member related to weixin serial
 	 */
-	public static int interest(Staff staff, String serial) throws SQLException, BusinessException{
+	public static int interest(Staff staff, String serial, String wxServerName) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			int memberId = interest(dbCon, staff, serial);
+			int memberId = interest(dbCon, staff, serial, wxServerName);
 			dbCon.conn.commit();
 			return memberId;
 		}catch(SQLException | BusinessException e){
@@ -116,7 +116,7 @@ public class WxMemberDao {
 	 * 			throws if cases below
 	 * 			<li>failed to insert the member related to weixin serial
 	 */
-	public static int interest(DBCon dbCon, Staff staff, String weixinSerial) throws SQLException, BusinessException{
+	public static int interest(DBCon dbCon, Staff staff, String weixinSerial, String wxServerName) throws SQLException, BusinessException{
 		
 		String sql;
 
@@ -153,7 +153,7 @@ public class WxMemberDao {
 			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
 			//Issue the coupon to this weixin member after subscribing.
 			for(Promotion promotion : PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addIssueRule(PromotionTrigger.IssueRule.WX_SUBSCRIBE))){
-				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId));
+				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId).setWxServer(wxServerName));
 			}
 		}else{
 			memberId = associatedMembers.get(0).getId();
