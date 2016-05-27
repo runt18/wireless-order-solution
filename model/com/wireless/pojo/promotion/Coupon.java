@@ -100,6 +100,7 @@ public class Coupon implements Jsonable{
 		private final CouponOperation.Operate operate;
 		private final int issueAssociateId;
 		private String comment;
+		private String wxServer;
 		
 		public static IssueBuilder newInstance4Fast(){
 			return new IssueBuilder(CouponOperation.Operate.FAST_ISSUE, 0);
@@ -119,6 +120,10 @@ public class Coupon implements Jsonable{
 		
 		public static IssueBuilder newInstance4WxSubscribe(){
 			return new IssueBuilder(CouponOperation.Operate.WX_SUBSCRIBE_ISSUE, 0);
+		}
+
+		public static IssueBuilder newInstance4WxScan(){
+			return new IssueBuilder(CouponOperation.Operate.WX_SCAN_ISSUE, 0);
 		}
 		
 		private IssueBuilder(CouponOperation.Operate operate, int associateId){
@@ -193,6 +198,20 @@ public class Coupon implements Jsonable{
 		public List<Integer> getMembers(){
 			return Collections.unmodifiableList(members);
 		}
+		
+		public IssueBuilder setWxServer(String wxServer){
+			this.wxServer = wxServer;
+			return this;
+		}
+		
+		public String getWxServer(){
+			return this.wxServer;
+		}
+		
+		public boolean hasWxServer(){
+			return this.wxServer != null;
+		}
+		
 	}
 	
 //	public static class CreateBuilder{

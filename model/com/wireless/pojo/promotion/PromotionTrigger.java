@@ -121,7 +121,8 @@ public class PromotionTrigger implements Jsonable {
 	public static enum IssueRule{
 		FREE(1, "免费发券"),
 		SINGLE_EXCEED(2, "单次消费满"),
-		WX_SUBSCRIBE(3, "微信关注")
+		WX_SUBSCRIBE(3, "微信关注"),
+		WX_SCAN(4, "扫码发券")
 		;
 		private final int val;
 		private final String desc;
@@ -150,6 +151,10 @@ public class PromotionTrigger implements Jsonable {
 		
 		public boolean isWxSubscribe(){
 			return this == WX_SUBSCRIBE;
+		}
+
+		public boolean isWxScan(){
+			return this == WX_SCAN;
 		}
 		
 		@Override
