@@ -747,9 +747,15 @@
       						     {name : 'coupon.name'}
       						])
 						});
+						var issueTrigger = {
+							FREE : {val : 1, desc : "免费发券"},
+							SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
+							WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+						}
 						couponDs.baseParams = {
 								dataSource : 'getByCond',
-								status : 'progress'
+								status : 'progress',
+								issueTriggers : issueTrigger.FREE.val
 						};
 						couponDs.load();
 						

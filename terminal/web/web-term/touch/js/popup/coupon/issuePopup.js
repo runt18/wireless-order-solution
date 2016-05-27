@@ -16,13 +16,6 @@ define(function(require, exports, module){
 		var _issueCouponPopup = null;
 		
 		
-		var issueTrigger = {
-			FREE : {val : 1, desc : "免费发券"},
-			SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
-			WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
-		}
-		
-		
 		this.open = function(afterOpen){
 			$.post('../OperatePromotion.do',  {
 					dataSource : 'getByCond', 
@@ -141,9 +134,15 @@ define(function(require, exports, module){
 		};
 	}
 
+	var issueTrigger = {
+		FREE : {val : 1, desc : "免费发券"},
+		SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
+		WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+	}
+	
 	IssueCouponPopup.IssueMode = {
-		FAST : { mode : 1, desc : '快速', triggers : '1'},
-		ORDER : { mode : 2, desc : '账单', triggers : '1,2' }
+		FAST : { mode : 1, desc : '快速', triggers : issueTrigger.FREE.val},
+		ORDER : { mode : 2, desc : '账单', triggers : issueTrigger.FREE.val + "," + issueTrigger.SINGLE_EXCEED.val}
 	};
 	
 	exports.IssueMode = IssueCouponPopup.IssueMode;
@@ -151,5 +150,7 @@ define(function(require, exports, module){
 	exports.newInstance = function(param){
 		return new IssueCouponPopup(param);
 	}
+	
+	
 
 });
