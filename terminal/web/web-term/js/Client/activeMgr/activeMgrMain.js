@@ -73,7 +73,7 @@ Ext.onReady(function(){
 			}
 		},
 		handler : function(){
-			secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + promotionEditor.getValue());
+			secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + promotionEditor.value);
 		}
 	});
 	var btnClear = new Ext.Button({
@@ -151,12 +151,17 @@ Ext.onReady(function(){
 					//加载优惠券设置信息
 					if(jr.root[0].issueTrigger.issueRule){
 						if(jr.root[0].issueTrigger.issueRule == issueRules.FREE.val){
+							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
 							Ext.getCmp('issueFree_active').setValue(true);
+							Ext.getCmp('issueFree_active').fireEvent('focus');
 						}else if(jr.root[0].issueTrigger.issueRule == issueRules.SINGLE_EXCEED.val){
 							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue(jr.root[0].issueTrigger.extra);
 							Ext.getCmp('issueSingle_active').setValue(true);
+							Ext.getCmp('issueSingle_active').fireEvent('focus');
 						}else if(jr.root[0].issueTrigger.issueRule == issueRules.WX_SUBSCRIBE.val){
+							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
 							Ext.getCmp('issueWx_active').setValue(true);
+							Ext.getCmp('issueWx_active').fireEvent('focus');
 						}
 					}
 					
@@ -596,10 +601,16 @@ Ext.onReady(function(){
 									name : 'sendCouponRule',
 									listeners : {
 										check : function(e){
-											if(e.getValue()){
+											if(e && e.getValue()){
 												issueRuleValue = e.inputValue;
 											}
+										},
+										focus : function(e){
+											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											
+											if(e && e.getValue()){
+												issueRuleValue = e.inputValue;
+											}
 										}
 									}
 								},{
@@ -615,7 +626,14 @@ Ext.onReady(function(){
 												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											}
 											
-											if(e.getValue()){
+											if(e && e.getValue()){
+												issueRuleValue = e.inputValue;
+											}
+										},
+										focus : function(e, check){
+											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
+											
+											if(e && e.getValue()){
 												issueRuleValue = e.inputValue;
 											}
 										}
@@ -627,7 +645,14 @@ Ext.onReady(function(){
 									inputValue : 3,
 									listeners : {
 										check : function(e){
-											if(e.getValue()){
+											if(e && e.getValue()){
+												issueRuleValue = e.inputValue;
+											}
+										},
+										focus : function(e){
+											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											
+											if(e && e.getValue()){
 												issueRuleValue = e.inputValue;
 											}
 										}
@@ -698,6 +723,7 @@ Ext.onReady(function(){
 									}]
 								}, {
 								xtype : 'container',
+								hidden : true,
 								items : [{
 									xtype : 'checkbox',
 									boxLabel : '全选'
@@ -705,6 +731,7 @@ Ext.onReady(function(){
 								}, {
 								xtype : 'container',
 								layout : 'column',
+								hidden : true,
 								id : 'weeklyConfig_container_activeMgrMain',
 								items : [{
 									xtype : 'checkbox',
@@ -810,30 +837,6 @@ Ext.onReady(function(){
 					iconCls : 'btn_refresh',
 					handler : function(){
 						promotionTree.getRootNode().reload();
-					}
-				},{
-					id : '',
-					xtype : 'combo',
-					readOnly : false,
-					forceSelection : true,
-					value : -1,
-					width : 80,
-					store : new Ext.data.SimpleStore({
-						fields : ['value', 'text'],
-						data : [[-1, '全部活动'], [1, '纯展示'], [2, '优惠劵']]
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					listeners : {
-						select : function(combo, record, index){
-							var tl = promotionTree.getLoader();
-							tl.baseParams['rule'] = record.data.value;
-							promotionTree.getRootNode().reload();
-						}
 					}
 				}
 			],
