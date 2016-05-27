@@ -165,6 +165,18 @@ Ext.onReady(function(){
 						}
 					}
 					
+					if(jr.root[0].useTrigger.useRule){
+						if(jr.root[0].useTrigger.useRule == useRules.FREE.val){
+							Ext.getCmp('useSingleMoney_numberfield_active').setValue('');
+							Ext.getCmp('useRule_active').setValue(true);
+							Ext.getCmp('useRule_active').fireEvent('focus');
+						}else if(jr.root[0].useTrigger.useRule == useRules.SINGLE_EXCEED.val){
+							Ext.getCmp('useSingleMoney_numberfield_active').setValue(jr.root[0].issueTrigger.extra);
+							Ext.getCmp('useSingle_active').setValue(true);
+							Ext.getCmp('useSingle_active').fireEvent('focus');
+						}
+					}
+					
 					
 					
 				}
@@ -686,6 +698,9 @@ Ext.onReady(function(){
 											if(e.getValue()){
 												useRuleValue = e.inputValue;
 											}
+										},
+										focus : function(){
+											Ext.getCmp('useCouponByOrder_fieldset_activeMgr').hide();
 										}
 									}
 								},{
@@ -704,6 +719,9 @@ Ext.onReady(function(){
 											if(checkbox.getValue()){
 												useRuleValue = checkbox.inputValue;
 											}
+										},
+										focus : function(){
+											Ext.getCmp('useCouponByOrder_fieldset_activeMgr').show();
 										}
 									}
 								}]
