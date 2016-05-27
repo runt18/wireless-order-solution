@@ -808,9 +808,36 @@ Ext.onReady(function(){
 		    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
 			success : function(json){
 				
-				//WINDOW TODO
-				console.log(json);
 				
+				var qrCodeWindow = new Ext.Window({
+					id : 'activeMgrQrCode_window_activeMgr',
+					title : '区域二维码',
+					closable : true,
+					resizeble : false,
+					modal : true,
+					width : 500,
+					height : 550,
+					items : [{
+						id : 'qrCodeView_window_activeMgr',
+						xtype : 'panel',
+						height : 500,
+						width : 480,
+						style : {
+							'margin' : '2% auto'
+						},
+						html : '<img alt="" src="'+ json.root[0].qrCode +'" width="480px" height="480px">'
+					}],
+					bbar : ['->',{
+						text : '下载二维码',
+						iconCls : 'btn_save',
+						handler : function(){
+							
+						}
+					}]
+				});	
+				
+				qrCodeWindow.render(document.body);
+				qrCodeWindow.show();
 				
 			},
 		    error:function(){
@@ -994,7 +1021,7 @@ Ext.onReady(function(){
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
-											
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 										}
 									}
 								},{
@@ -1004,15 +1031,11 @@ Ext.onReady(function(){
 									inputValue : 2,
 									listeners : {
 										check : function(e, check){
-											if(check){
-												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
-											}else{
-												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
-											}
 											
 										},
 										focus : function(e, check){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 											
 										}
 									}
@@ -1027,6 +1050,7 @@ Ext.onReady(function(){
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 											
 										}
 									}
@@ -1039,8 +1063,8 @@ Ext.onReady(function(){
 										check : function(e){
 										},
 										focus : function(e){
+											Ext.getCmp('createQrCode_fieldset_activeMgr').show();
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
-											initQrcode();
 										}
 									}
 								}]
@@ -1070,6 +1094,7 @@ Ext.onReady(function(){
 										text : '生成二维码',
 										iconCls : 'btn_save',
 										handler : function(){
+											initQrcode();
 										}
 									}]
 								}, {
@@ -1279,7 +1304,7 @@ Ext.onReady(function(){
 			//活动发布Window
 			publishPromotionWnd = new Ext.Window({
 				title : '发布优惠活动',
-				width : 400,
+				width : 200,
 				xtype : 'panel',
 				layout : 'column',
 				frame : true,
@@ -1288,21 +1313,13 @@ Ext.onReady(function(){
 					columnWidth : 1,
 					style :'margin-top:5px;',
 					border : false
-				},{
-					columnWidth : 0.1,
-					id : 'weixinissue_Checkbox_activeMgrMain',
-					xtype : 'checkbox'
-				},{
-					columnWidth : 0.4,
-					xtype : 'label',
-					text : '微信关注时自动发券'
 				},
 				{
-					columnWidth : 0.2,
+					columnWidth : 0.4,
 					xtype : 'label',
 					html : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
 				},{
-					columnWidth : 0.3,
+					columnWidth : 0.6,
 					id : 'dateField4PromotionPublish',
 					xtype : 'datefield',
 					fieldLabel : '&nbsp;&nbsp;&nbsp;结束日期',
@@ -1338,15 +1355,6 @@ Ext.onReady(function(){
 							return;
 						}else{
 							params.endDate = Ext.util.Format.date(endDate, 'Y-m-d 00:00:00');
-						}
-						
-						var checkboxStatus = Ext.getCmp('weixinissue_Checkbox_activeMgrMain').getValue();
-						
-						if(checkboxStatus){
-							// 设置优惠活动触发条件
-							params.triggers = Trigger.WX_SUBSCRIBE.type;
-						}else{
-							params.triggers = null;
 						}
 						
 						var publishMask = new Ext.LoadMask(document.body, {
@@ -1414,15 +1422,6 @@ Ext.onReady(function(){
 									promotionToPublish = jr.root[0];
 									Ext.getCmp('dateField4PromotionPublish').setValue(promotionToPublish.promotionEndDate);
 									thiz.setTitle(thiz.title + '---' + promotionToPublish.title);
-									
-									for(var i = 0; i < promotionToPublish.triggers.length; i++){
-										if(promotionToPublish.triggers[i].triggerType == Trigger.WX_SUBSCRIBE.type){
-											Ext.getCmp('weixinissue_Checkbox_activeMgrMain').setValue(true);
-										}else{
-											Ext.getCmp('weixinissue_Checkbox_activeMgrMain').setValue(false);
-										}
-									}
-									
 								}else{
 									Ext.example.msg('异常', jr.msg);
 								}
