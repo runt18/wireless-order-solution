@@ -772,6 +772,11 @@
 							}
 						});
 						
+						
+						var issueLoadMaskLoading = new Ext.LoadMask(document.body, {
+								msg : '正在发放优惠券...'
+						});
+						
 						var issueCouponWin = new Ext.Window({
 							title : '选择发放优惠券',
 							modal : true,
@@ -797,6 +802,7 @@
 										Ext.MessageBox.confirm('警示框', '您共发送【'+ amount + '张优惠券】，优惠券类型是:【'+ couponName.join(',') 
 												+'】，发送的会员类型是 :【' + clickTree + '】', function(btn){
 													if(btn == 'yes'){
+														issueLoadMaskLoading.show();
 														Ext.Ajax.request({
 															url : '../../OperateCoupon.do',
 															params : {
@@ -806,7 +812,9 @@
 																condId : clickTreeId
 															},
 															success : function(response){
+																issueLoadMaskLoading.hide();
 																issueCouponWin.close();
+																Ext.example.msg('提示', '发放优惠券成功');
 															}
 														});
 														
