@@ -34,6 +34,11 @@ public class PromotionTrigger implements Jsonable {
 			return new InsertBuilder(Type.ISSUE, IssueRule.SINGLE_EXCEED, exceed);
 		}
 		
+		//扫码领券
+		public static InsertBuilder newIssue4WxScan(){
+			return new InsertBuilder(Type.ISSUE, IssueRule.WX_SCAN, 0);
+		}
+		
 		//免费发券
 		public static InsertBuilder newIssue4Free(){
 			return new InsertBuilder(Type.ISSUE, IssueRule.FREE, 0);
