@@ -45,18 +45,6 @@ Ext.onReady(function(){
 		return head;
 	}
 	
-	
-	var promotionEditor;
-	var btnPreview;
-	
-	
-	var btnClear;
-	
-	
-	var secendStepWest;
-	
-	var secendStepCenter;
-	
 	//显示优惠活动的Body和相应的Coupon内容
 	function loadPromotion(promotionId){
 		Ext.Ajax.request({
@@ -154,17 +142,6 @@ Ext.onReady(function(){
 		});
 	})();
 	
-
-	
-	var btnUpload;
-	
-	
-	//TODO
-	var imgFile;
-	
-	
-	var form;
-	
 	 //优惠活动向导完成
     function fnFinishPromotion(){
 	
@@ -246,7 +223,14 @@ Ext.onReady(function(){
 	
 	//创建优惠活动的window
 	var createActiveWin = null;
-	//TODO
+	var promotionEditor;
+	var btnPreview;
+	var btnClear;
+	var secendStepCenter;
+	var btnUpload;
+	var imgFile;
+	var form;
+	
 	function initActiveWin(c){
 		promotionEditor = new Ext.form.HtmlEditor({
 			id : 'guide_2nd_promotionEditor',
@@ -395,17 +379,6 @@ Ext.onReady(function(){
 			}
 		});
 		
-		secendStepWest = new Ext.form.FormPanel({
-			width : 510,
-			height : 350,
-			title : '编辑活动内容:',
-			items : [promotionEditor],
-			style : 'marginLeft:40px;',
-			buttonAlign : 'center',
-			buttons : [btnPreview, btnClear]
-		});	
-	
-
 		var panel1 = new Ext.Panel({
 		    border : false,
 		    style : {
@@ -439,6 +412,9 @@ Ext.onReady(function(){
 		                        layout : 'form',
 		                        labelWidth : 70,
 		                        labelAlign : 'right'
+		                    },
+		                    style : {
+		                    	'margin-left' : '40px'
 		                    },
 		                    items : [{
 		                        items : [{
@@ -584,7 +560,10 @@ Ext.onReady(function(){
 		                height : 350,
 		                title : '编辑活动内容:',
 		                items : [promotionEditor],
-		                style : 'marginLeft:40px;',
+		                style : {
+							'margin-left' : '100px',
+							'margin-top' : '40px'
+						},
 		                buttonAlign : 'center',
 		                buttons : [new Ext.Button({
 		                    id : 'guide_2nd_previewBtn',
@@ -596,10 +575,8 @@ Ext.onReady(function(){
 		                    },
 		                    handler : function(thiz, promotion){
 		                        //解决获取不到editor里面内容的问题
-		//			var html = (window.frames[promotionEditor.iframe.name]).document.getElementsByTagName('body')[0].innerHTML;
-		                        var html;
-//		                        secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
-		                    	secendStepCenter.getForm().setValue(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
+								var html = (window.frames[promotionEditor.iframe.name]).document.getElementsByTagName('body')[0].innerHTML;
+		                    	Ext.getCmp('secondStepEastBody').update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
 		                    }
 		                }), new Ext.Button({
 		                    text : '清空',
@@ -770,9 +747,8 @@ Ext.onReady(function(){
 			createActiveWin.promotion = c.promotion;
 		}
 		
-		
 		Ext.getCmp('ceateActiveWindow_activeMgr').show();
-
+		Ext.getCmp('guide_2nd_previewBtn').handler();
 	}	
 		
 	function initQrcode(){
@@ -1507,7 +1483,6 @@ Ext.onReady(function(){
 	}
 	
 	
-	//TODO
 	new Ext.Panel({
 		renderTo : 'divActive',
 		layout : 'border',
