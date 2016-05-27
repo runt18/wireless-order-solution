@@ -198,6 +198,9 @@ public class OperatePromotionAction extends DispatchAction{
 				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.WX_SUBSCRIBE.getVal()){
 					//微信关注发券
 					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Wx());
+				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.WX_SCAN.getVal()){
+					//扫码发券
+					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4WxScan());
 				}
 			}
 			

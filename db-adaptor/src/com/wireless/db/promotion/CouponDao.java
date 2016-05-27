@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.marker.weixin.api.BaseAPI;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -192,7 +196,7 @@ public class CouponDao {
 	 * 			<li>the promotion does NOT exist
 	 * 			<li>发放多张满足【单次消费满】活动的优惠券
 	 */
-	public static int[] issue(DBCon dbCon, Staff staff, Coupon.IssueBuilder builder) throws SQLException, BusinessException{
+	public static int[] issue(DBCon dbCon, final Staff staff, final Coupon.IssueBuilder builder) throws SQLException, BusinessException{
 		
 		final List<Integer> issueCoupons = new ArrayList<Integer>();
 		for(Entry<Integer, Integer> entry : builder.getPromotions()){
@@ -202,7 +206,7 @@ public class CouponDao {
 			if(amount == 0){
 				continue;
 			}
-			
+
 			if(promotion.getIssueTrigger().getIssueRule().isSingleExceed()){
 				if(amount > 1){
 					throw new BusinessException(("满足【$(promotion)】活动的优惠券只能发放1张").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
@@ -257,9 +261,29 @@ public class CouponDao {
 		}
 
 
-		int[] result = new int[issueCoupons.size()];
+		final int[] result = new int[issueCoupons.size()];
 		for(int i = 0; i < result.length; i++){
 			result[i] = issueCoupons.get(i).intValue();
+		}
+		
+		//Send the weixin template msg.
+		if(builder.hasWxServer()){
+			final ScheduledThreadPoolExecutor schedule = new ScheduledThreadPoolExecutor(1);
+			schedule.schedule(new Runnable(){
+				@Override
+				public void run() {
+					for(int couponId : result.clone()){
+						try {
+							//System.out.println("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId());
+							BaseAPI.doPost("http://" + builder.getWxServer() + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId(), "");
+						} catch (Exception ignored) {
+							ignored.printStackTrace();
+						}
+					}
+					schedule.shutdown();
+				}
+				
+			}, 1, TimeUnit.SECONDS);
 		}
 		
 		return result;

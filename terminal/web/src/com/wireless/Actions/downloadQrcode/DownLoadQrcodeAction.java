@@ -22,6 +22,7 @@ public class DownLoadQrcodeAction extends DispatchAction{
 	public ActionForward downLoad(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception{
 		final String qrCodeUrl = request.getParameter("qrcode");
 		final String tableName = request.getParameter("tableName");
+		final String couponName = request.getParameter("couponName");
 		final JObject jObject = new JObject();
 		
 		
@@ -44,7 +45,15 @@ public class DownLoadQrcodeAction extends DispatchAction{
 				final byte[] bytesToQrCode = outStream.toByteArray();
 				
 				if(bytesToQrCode != null && bytesToQrCode.length > 0){
-					String fileName = tableName + ".jpg";
+					String fileName = "";
+					if(tableName != null && !tableName.isEmpty()){
+						fileName = tableName + ".jpg";
+					}
+					
+					if(couponName != null && !couponName.isEmpty()){
+						fileName = couponName + ".jpg";
+					}
+					
 					response.setContentType("application/octet-stream;");
 					response.addHeader("Content-Disposition","attachment;filename=" + fileName);
 					OutputStream os = response.getOutputStream();

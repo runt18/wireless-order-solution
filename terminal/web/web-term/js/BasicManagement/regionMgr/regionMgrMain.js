@@ -16,7 +16,6 @@
 		var region = Ext.getCmp('comboTableRegion');
 		var minimumCost = Ext.getCmp('numMinimumCost');
 		var serviceRate = Ext.getCmp('numServiceRate');
-		
 		if(c.otype == Ext.ux.otype['set']){
 			var data = typeof c.data == 'undefined' ? {} : c.data;
 			var regionData = typeof data.region == 'undefined' ? {} : data.region;  

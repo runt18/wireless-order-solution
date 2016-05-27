@@ -57,6 +57,11 @@ public class CouponOperationDao {
 			this.memberFuzzy = fuzzy;
 			return this;
 		}
+
+		public ExtraCond setMember(Member member){
+			this.memberId = member.getId();
+			return this;
+		}
 		
 		public ExtraCond setMember(int memberId){
 			this.memberId = memberId;

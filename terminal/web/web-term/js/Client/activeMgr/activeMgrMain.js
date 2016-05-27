@@ -72,7 +72,8 @@ Ext.onReady(function(){
 					var issueRules = {
 						FREE : {val : 1, desc : "免费发券"},
 						SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
-						WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+						WX_SUBSCRIBE : {val : 3, desc : "微信关注"},
+						WX_SCAN : {val : 4, desc : '扫码发券'} 
 					}
 								
 					var useRules = {
@@ -80,9 +81,6 @@ Ext.onReady(function(){
 						SINGLE_EXCEED : {val : 2, desc : "单次消费满"}
 					}
 		
-//					Ext.getCmp('issueFree_active').fireEvent('check', Ext.getCmp('issueFree_active'), true);
-//	Ext.getCmp('useRule_active').fireEvent('check', Ext.getCmp('useRule_active'), true);
-					
 					
 					//加载优惠券设置信息
 					if(jr.root[0].issueTrigger.issueRule){
@@ -98,6 +96,10 @@ Ext.onReady(function(){
 							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
 							Ext.getCmp('issueWx_active').setValue(true);
 							Ext.getCmp('issueWx_active').fireEvent('focus');
+						}else if(jr.root[0].issueTrigger.issueRule == issueRules.WX_SCAN.val){
+							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
+							Ext.getCmp('wxScan_active').setValue(true);
+							Ext.getCmp('wxScan_active').fireEvent('focus');
 						}
 					}
 					
@@ -807,7 +809,16 @@ Ext.onReady(function(){
 						text : '下载二维码',
 						iconCls : 'btn_save',
 						handler : function(){
-							
+		    				
+		    				var url = '../../{0}?dataSource={1}&qrcode={2}&couponName={3}';
+								url = String.format(
+									url,
+									'DownLoadQrcode.do',
+									'downLoad',
+									json.root[0].qrCode,
+									node.attributes.title
+								)
+								window.location = url;
 						}
 					}]
 				});	
@@ -905,7 +916,7 @@ Ext.onReady(function(){
 									issueRuleValue = 2;
 								}else if(Ext.getCmp('issueWx_active').getValue()){
 									issueRuleValue = 3;
-								}else if(Ext.getCmp('issueWx_active').getValue()){
+								}else if(Ext.getCmp('wxScan_active').getValue()){
 									issueRuleValue = 4;
 								}
 								
@@ -1068,7 +1079,7 @@ Ext.onReady(function(){
 										xtype : 'button',
 										id : 'createQrcode_button_activeMgr',
 										text : '生成二维码',
-										iconCls : 'btn_save',
+										iconCls : 'btn_add',
 										handler : function(){
 											initQrcode();
 										}
