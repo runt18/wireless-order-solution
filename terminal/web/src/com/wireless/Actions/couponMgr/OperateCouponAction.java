@@ -260,6 +260,10 @@ public class OperateCouponAction extends DispatchAction{
 		}catch(SQLException e){
 			jObject.initTip(e);
 			e.printStackTrace();
+		}catch(Exception e){
+			jObject.initTip(e);
+			e.printStackTrace();
+			
 		}finally{
 			response.getWriter().print(jObject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
 		}
