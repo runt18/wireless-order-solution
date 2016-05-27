@@ -463,8 +463,7 @@ Ext.onReady(function(){
 		
 	
 	
-	var issueRuleValue = null;     //发送规则选中的值
-	var useRuleValue = null;       //用券规则选中的值
+	
 	
 	// 活动框体
 	var promotionPreviewPanel = null;
@@ -536,6 +535,22 @@ Ext.onReady(function(){
 								//优惠活动Id
 								var promotionId = node.attributes.id;
 								
+								var issueRuleValue = null;     //发送规则选中的值
+								var useRuleValue = null;       //用券规则选中的值
+								
+								if(Ext.getCmp('issueFree_active').getValue()){
+									issueRuleValue = 1;
+								}else if(Ext.getCmp('issueSingle_active').getValue()){
+									issueRuleValue = 2;
+								}else if(Ext.getCmp('issueWx_active').getValue()){
+									issueRuleValue = 3;
+								}
+								
+								if(Ext.getCmp('useRule_active').getValue()){
+									useRuleValue = 1;
+								}else if(Ext.getCmp('useSingle_active').getValue()){
+									useRuleValue = 2;
+								}
 								
 								//设定发券规则
 								var issueRule = null;
@@ -613,16 +628,10 @@ Ext.onReady(function(){
 									name : 'sendCouponRule',
 									listeners : {
 										check : function(e){
-											if(e && e.getValue()){
-												issueRuleValue = e.inputValue;
-											}
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											
-											if(e && e.getValue()){
-												issueRuleValue = e.inputValue;
-											}
 										}
 									}
 								},{
@@ -638,16 +647,10 @@ Ext.onReady(function(){
 												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											}
 											
-											if(e && e.getValue()){
-												issueRuleValue = e.inputValue;
-											}
 										},
 										focus : function(e, check){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
 											
-											if(e && e.getValue()){
-												issueRuleValue = e.inputValue;
-											}
 										}
 									}
 								},{
@@ -657,16 +660,10 @@ Ext.onReady(function(){
 									inputValue : 3,
 									listeners : {
 										check : function(e){
-											if(e && e.getValue()){
-												issueRuleValue = e.inputValue;
-											}
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											
-											if(e && e.getValue()){
-												issueRuleValue = e.inputValue;
-											}
 										}
 									}
 								}]
@@ -695,11 +692,9 @@ Ext.onReady(function(){
 									name : 'useCouponRule',
 									listeners : {
 										check : function(e){
-											if(e.getValue()){
-												useRuleValue = e.inputValue;
-											}
 										},
-										focus : function(){
+										focus : function(e){
+											
 											Ext.getCmp('useCouponByOrder_fieldset_activeMgr').hide();
 										}
 									}
@@ -715,12 +710,8 @@ Ext.onReady(function(){
 											}else{
 												Ext.getCmp('useCouponByOrder_fieldset_activeMgr').hide();
 											}
-											
-											if(checkbox.getValue()){
-												useRuleValue = checkbox.inputValue;
-											}
 										},
-										focus : function(){
+										focus : function(e){
 											Ext.getCmp('useCouponByOrder_fieldset_activeMgr').show();
 										}
 									}
@@ -847,7 +838,8 @@ Ext.onReady(function(){
 					text : '创建活动',
 					iconCls : 'btn_add',
 					handler : function(e){
-						Ext.get('divActiveInsert').show();
+						$('#divActiveInsert').show();
+						
 						initActiveWin({type : 'insert'});
 					}
 				},{
@@ -1079,7 +1071,7 @@ Ext.onReady(function(){
 				wx.lm.hide();
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					Ext.get('divActiveInsert').show();
+					$('#divActiveInsert').show();
 					initActiveWin({ type : 'update', promotion : jr.root[0] });
 				}
 			},
