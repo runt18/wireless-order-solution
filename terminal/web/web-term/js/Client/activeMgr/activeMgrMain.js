@@ -786,12 +786,11 @@ Ext.onReady(function(){
 		}
 	
 		var scanType = {
-			SCAN_ORDER : '4'
+			WX_SCAN_ISSUE_COUPON : '5'
 		};
 	
-		loadMask.show();
 		var node = Ext.ux.getSelNode(promotionTree);
-		if(!node){
+		if (!node || node.attributes.id == -1) {
 			Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
 			return;
 		}
@@ -803,14 +802,20 @@ Ext.onReady(function(){
 		    data : {
 		    	dataSource : 'qrCode',
 		    	restaurantId : restaurantID,
-		    	limitStr : scanType.SCAN_ORDER + node.id +  "_" + restaurantID
+		    	limitStr : scanType.WX_SCAN_ISSUE_COUPON + node.attributes.id
 		    },
 		    jsonp: "callback",//服务端用于接收callback调用的function名的参数
 		    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
-			success : function(){
-			
-			}
-		
+			success : function(json){
+				
+				//WINDOW TODO
+				console.log(json);
+				
+				
+			},
+		    error:function(){
+		    	loadMask.hide();
+		    }
 		})
 		
 	
@@ -869,7 +874,8 @@ Ext.onReady(function(){
 								var issueRules = {
 									FREE : {val : 1, desc : "免费发券"},
 									SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
-									WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+									WX_SUBSCRIBE : {val : 3, desc : "微信关注"},
+									WX_SCAN_ISSUE_COUPON : {val : 4, desc : '扫码发券'}
 								}
 								
 								var useRules = {
@@ -896,6 +902,8 @@ Ext.onReady(function(){
 									issueRuleValue = 2;
 								}else if(Ext.getCmp('issueWx_active').getValue()){
 									issueRuleValue = 3;
+								}else if(Ext.getCmp('issueWx_active').getValue()){
+									issueRuleValue = 4;
 								}
 								
 								if(Ext.getCmp('useRule_active').getValue()){
@@ -920,6 +928,8 @@ Ext.onReady(function(){
 									
 								}else if(issueRuleValue == 3){
 									issueRule = issueRules.WX_SUBSCRIBE.val;
+								}else if(issueRuleValue == 4){
+									issueRule = issueRules.WX_SCAN_ISSUE_COUPON.val;
 								}
 								
 								//设定用券规则
