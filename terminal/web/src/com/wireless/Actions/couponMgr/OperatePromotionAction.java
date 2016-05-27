@@ -21,6 +21,7 @@ import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
+import com.wireless.pojo.promotion.PromotionTrigger;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
@@ -45,8 +46,11 @@ public class OperatePromotionAction extends DispatchAction{
 		final String couponName = request.getParameter("couponName");
 		final String price = request.getParameter("price");
 		final String expiredDate = request.getParameter("expiredDate");
-		final String image = request.getParameter("image");		
-		final String triggers = request.getParameter("triggers");
+		final String image = request.getParameter("image");
+		final String issueRule = request.getParameter("issueRule");
+		final String issueSingleMoney = request.getParameter("singleMoney");
+		final String useRule = request.getParameter("useRule");
+		final String useSingleMoney = request.getParameter("useSingleMoney");
 		
 		final String pin = (String) request.getAttribute("pin");
 		final JObject jobject = new JObject();
@@ -59,11 +63,31 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			final Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, body, typeInsertBuilder, entire);
 			
-			//触发条件
-			if(triggers != null && !triggers.isEmpty()){
-				for(String eachTrigger : triggers.split(",")){
-					promotionCreateBuilder.addTrigger(Promotion.Trigger.valueOf(Integer.parseInt(eachTrigger)));
+			//发券规则
+			if(issueRule != null && !issueRule.isEmpty()){
+				if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.FREE.getVal()){
+					//免费发券
+					promotionCreateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Free());
+				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.SINGLE_EXCEED.getVal()){
+					//单次消费满几多发券
+					if(issueSingleMoney != null && !issueSingleMoney.isEmpty()){
+						promotionCreateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4SingleExceed(Integer.parseInt(issueSingleMoney)));
+					}
+				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.WX_SUBSCRIBE.getVal()){
+					//微信关注发券
+					promotionCreateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Wx());
 				}
+			}
+			
+			//用券规则
+			if(useRule != null && !useRule.isEmpty()){
+				if(Integer.parseInt(useRule) == PromotionTrigger.UseRule.FREE.getVal()){
+					promotionCreateBuilder.setUseTrigger(PromotionTrigger.InsertBuilder.newIssue4Free());
+				}else if(Integer.parseInt(useRule) == PromotionTrigger.UseRule.SINGLE_EXCEED.getVal()){
+					if(useSingleMoney != null && !useSingleMoney.isEmpty()){
+						promotionCreateBuilder.setUseTrigger(PromotionTrigger.InsertBuilder.newIssue4SingleExceed(Integer.parseInt(useSingleMoney)));
+					}
+				} 
 			}
 			
 			final int promotionId = PromotionDao.create(StaffDao.verify(Integer.parseInt(pin)), promotionCreateBuilder);
@@ -115,7 +139,10 @@ public class OperatePromotionAction extends DispatchAction{
 		final String price = request.getParameter("price");
 		final String expiredDate = request.getParameter("expiredDate");
 		final String image = request.getParameter("image");		
-		final String triggers = request.getParameter("triggers");
+		final String issueRule = request.getParameter("issueRule");
+		final String issueSingleMoney = request.getParameter("issueSingleMoney");
+		final String useRule = request.getParameter("useRule");
+		final String useSingleMoney = request.getParameter("useSingleMoney");
 		
 		//String orientedId = request.getParameter("oriented");
 		
@@ -160,15 +187,27 @@ public class OperatePromotionAction extends DispatchAction{
 				promotionUpdateBuilder.setRange(0, DateUtil.parseDate(endDate));
 			}
 			
-			//触发条件
-			if(triggers != null){
-				if(triggers.isEmpty()){
-					promotionUpdateBuilder.emptyTriggers();
-				}else{
-					for(String eachTrigger : triggers.split(",")){
-						promotionUpdateBuilder.addTrigger(Promotion.Trigger.valueOf(Integer.parseInt(eachTrigger)));
-					}
+			//发券规则
+			if(issueRule != null && !issueRule.isEmpty()){
+				if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.FREE.getVal()){
+					//免费发券
+					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Free());
+				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.SINGLE_EXCEED.getVal()){
+					//单次消费满几多发券
+					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4SingleExceed(Integer.parseInt(issueSingleMoney)));
+				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.WX_SUBSCRIBE.getVal()){
+					//微信关注发券
+					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Wx());
 				}
+			}
+			
+			//用券规则
+			if(useRule != null && !useRule.isEmpty()){
+				if(Integer.parseInt(useRule) == PromotionTrigger.UseRule.FREE.getVal()){
+					promotionUpdateBuilder.setUseTrigger(PromotionTrigger.InsertBuilder.newUse4Free());
+				}else if(Integer.parseInt(useRule) == PromotionTrigger.UseRule.SINGLE_EXCEED.getVal()){
+					promotionUpdateBuilder.setUseTrigger(PromotionTrigger.InsertBuilder.newUse4SingleExceed(Integer.parseInt(useSingleMoney)));
+				} 
 			}
 			
 			PromotionDao.update(staff, promotionUpdateBuilder);
@@ -191,28 +230,58 @@ public class OperatePromotionAction extends DispatchAction{
 		response.setContentType("text/json; charset=utf-8");
 		//System.out.println(response.getContentType());
 		
-		String pin = (String) request.getAttribute("pin");
-		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String pin = (String) request.getAttribute("pin");
 		
-		String promotionId = request.getParameter("promotionId");
-		String status = request.getParameter("status");
+		final String promotionId = request.getParameter("promotionId");
+		final String status = request.getParameter("status");
+		final String issueTriggers = request.getParameter("issueTriggers");
+		final String useTriggers = request.getParameter("useTriggers");
+		final String orderId = request.getParameter("orderId");
 		
-		PromotionDao.ExtraCond extraCond = new PromotionDao.ExtraCond();
+		final JObject jobject = new JObject();
 		
-		if(promotionId != null && !promotionId.isEmpty()){
-			extraCond.setPromotionId(Integer.parseInt(promotionId));
-		}
-		
-		if(status != null && !status.isEmpty()){
-			if(status.equalsIgnoreCase("progress")){
-				extraCond.setStatus(Promotion.Status.PROGRESS);
-			}
-		}
-		
-		JObject jobject = new JObject();
 		try{
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		
+			final PromotionDao.ExtraCond extraCond = new PromotionDao.ExtraCond();
+			
+			if(promotionId != null && !promotionId.isEmpty()){
+				extraCond.setPromotionId(Integer.parseInt(promotionId));
+			}
+			
+			if(status != null && !status.isEmpty()){
+				if(status.equalsIgnoreCase("progress")){
+					extraCond.setStatus(Promotion.Status.PROGRESS);
+				}
+			}
+			
+			//发券规则
+			if(issueTriggers != null && !issueTriggers.isEmpty()){
+				for(String issueTrigger : issueTriggers.split(",")){
+					PromotionTrigger.IssueRule issueRule = PromotionTrigger.IssueRule.valueOf(Integer.parseInt(issueTrigger));
+					if(issueRule.isSingleExceed()){
+						extraCond.addIssueRule(issueRule, Integer.valueOf(orderId));
+					}else{
+						extraCond.addIssueRule(issueRule);
+					}
+				}
+			}
+			
+			//用券规则
+			if(useTriggers != null && !useTriggers.isEmpty()){
+				for(String useTrigger : useTriggers.split(",")){
+					PromotionTrigger.UseRule useRule = PromotionTrigger.UseRule.valueOf(Integer.parseInt(useTrigger));
+					if(useRule.isSingleExceed()){
+						extraCond.addUseRule(useRule, Integer.parseInt(orderId));
+					}else{
+						extraCond.addUseRule(useRule);
+					}
+				}
+			}
+			
 			jobject.setRoot(PromotionDao.getByCond(staff, extraCond));
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{

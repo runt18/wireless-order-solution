@@ -351,6 +351,7 @@ public class PromotionTrigger implements Jsonable {
 			jm.putInt("issueRule", this.issueRule.val);
 			jm.putString("issueRuleText", this.issueRule.desc);
 		}
+		jm.putInt("extra", this.extra);
 		return jm;
 	}
 

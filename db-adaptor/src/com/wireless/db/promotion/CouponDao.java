@@ -212,7 +212,7 @@ public class CouponDao {
 																													   .setAssociateId(builder.getAssociateId())
 																													   .addOperation(CouponOperation.Operate.ORDER_ISSUE));
 				if(!issuedCoupons.isEmpty()){
-					throw new BusinessException(("本次消费满足【$(promotion)】活动的优惠券已经发放").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
+					throw new BusinessException(("本张账单只能发放1张【$(promotion)】活动的优惠券").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
 				}
 			}
 			

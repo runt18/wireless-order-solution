@@ -1,22 +1,12 @@
 Ext.onReady(function(){
 	//1表示无优惠劵纯展示; 2表示无条件领取优惠劵
 	function updatePromotionCouponPanel(promotionType){
-		if(promotionType == 1){
-			//纯展示
-			$("#promotionPic").attr("title", "上传活动封面图片");
-			Ext.getCmp('guide_2nd_couponDetail').hide();
-			Ext.getCmp('guide_2nd_CouponOption').hide();
-			Ext.getCmp('guide_2nd_promotionEditor').setHeight(440);
-			Ext.getCmp('guide_2nd_occupy').show();
-			
-		}else if(promotionType == 2){
-			//优惠券
-			$("#promotionPic").attr("title", "优惠券图片");
-			Ext.getCmp('guide_2nd_couponDetail').show();
-			Ext.getCmp('guide_2nd_CouponOption').show();
-			Ext.getCmp('guide_2nd_occupy').show();
-			Ext.getCmp('guide_2nd_promotionEditor').setHeight(325);
-		}
+		//优惠券
+		$("#promotionPic").attr("title", "优惠券图片");
+		Ext.getCmp('guide_2nd_couponDetail').show();
+		Ext.getCmp('guide_2nd_CouponOption').show();
+		Ext.getCmp('guide_2nd_occupy').show();
+		Ext.getCmp('guide_2nd_promotionEditor').setHeight(325);
 		Ext.getCmp('guide_2nd_panel').doLayout();
 	}
 	
@@ -140,7 +130,38 @@ Ext.onReady(function(){
 					}else{
 						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="100"  src="../../images/noCouponNow.png" /></div>');
 					}												
-												
+						
+					
+					//TODO
+					var issueRules = {
+						FREE : {val : 1, desc : "免费发券"},
+						SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
+						WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+					}
+								
+					var useRules = {
+						FREE : {val : 1, desc : "免费发券"},
+						SINGLE_EXCEED : {val : 2, desc : "单次消费满"}
+					}
+		
+//					Ext.getCmp('issueFree_active').fireEvent('check', Ext.getCmp('issueFree_active'), true);
+//	Ext.getCmp('useRule_active').fireEvent('check', Ext.getCmp('useRule_active'), true);
+					
+					
+					//加载优惠券设置信息
+					if(jr.root[0].issueTrigger.issueRule){
+						if(jr.root[0].issueTrigger.issueRule == issueRules.FREE.val){
+							Ext.getCmp('issueFree_active').setValue(true);
+						}else if(jr.root[0].issueTrigger.issueRule == issueRules.SINGLE_EXCEED.val){
+							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue(jr.root[0].issueTrigger.extra);
+							Ext.getCmp('issueSingle_active').setValue(true);
+						}else if(jr.root[0].issueTrigger.issueRule == issueRules.WX_SUBSCRIBE.val){
+							Ext.getCmp('issueWx_active').setValue(true);
+						}
+					}
+					
+					
+					
 				}
 			},
 			failure : function(res, opt){
@@ -424,6 +445,10 @@ Ext.onReady(function(){
 	}	
 		
 	
+	
+	var issueRuleValue = null;     //发送规则选中的值
+	var useRuleValue = null;       //用券规则选中的值
+	
 	// 活动框体
 	var promotionPreviewPanel = null;
 	(function(){
@@ -467,7 +492,92 @@ Ext.onReady(function(){
 						frame : true,
 						id : '',
 						region : 'center',
-						height : 150,
+						height : 120,
+						tbar : ['->', {
+							text : '保存',
+							iconCls : 'btn_add',
+							handler : function(e){
+								//TODO
+								var issueRules = {
+									FREE : {val : 1, desc : "免费发券"},
+									SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
+									WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+								}
+								
+								var useRules = {
+									FREE : {val : 1, desc : "免费发券"},
+									SINGLE_EXCEED : {val : 2, desc : "单次消费满"}
+								}
+								
+								//选中的优惠券
+								var node = Ext.ux.getSelNode(promotionTree);
+								if (!node || node.attributes.id == -1) {
+									Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+									return;
+								}
+								
+								//优惠活动Id
+								var promotionId = node.attributes.id;
+								
+								
+								//设定发券规则
+								var issueRule = null;
+								var issueSingeMoney = null;
+								if(issueRuleValue == 1){
+									issueRule = issueRules.FREE.val;
+								}else if (issueRuleValue == 2){
+									issueRule = issueRules.SINGLE_EXCEED.val;
+									if(Ext.getCmp('IssueSingleMoney_numberfield_active').getValue() == ''){
+										Ext.example.msg('提示', '操作失败, 发券满足金额不能为空或者只能填写数字');
+										return;
+									}else{
+										issueSingeMoney = Ext.getCmp('IssueSingleMoney_numberfield_active').getValue();
+									}
+									
+								}else if(issueRuleValue == 3){
+									issueRule = issueRules.WX_SUBSCRIBE.val;
+								}
+								
+								//设定用券规则
+								var useRule = null;
+								var useSingleMoney = null;
+								if(useRuleValue == 1){
+									useRule = useRules.FREE.val;
+								}else if(useRuleValue == 2){
+									useRule = useRules.SINGLE_EXCEED.val;
+									if(Ext.getCmp('useSingleMoney_numberfield_active').getValue() == ''){
+										Ext.example.msg('提示', '操作失败, 用券满足金额不能为空或者只能填写数字');
+										return;
+									}else{
+										useSingleMoney = Ext.getCmp('useSingleMoney_numberfield_active').getValue();
+									}
+								}
+								
+								Ext.Ajax.request({
+									url : '../../OperatePromotion.do',
+									params : {
+										dataSource : 'update',
+										id : promotionId,
+										issueRule : issueRule,
+										issueSingleMoney : issueRule == issueRules.SINGLE_EXCEED.val ? issueSingeMoney : null,
+										useRule : useRule,
+										useSingleMoney : useRule == issueRules.SINGLE_EXCEED.val ? useSingleMoney : null
+									},
+									success : function(res, opt){
+										var jr = Ext.decode(res.responseText);
+										if(jr.success){
+											Ext.example.msg('提示', '设置成功');
+										}else{
+											Ext.example.msg('提示', '设置失败');
+										}
+									},
+									failure : function(res, opt){
+										Ext.example.msg('提示', '设置失败');
+									}
+								})
+								
+							}
+						}],
 						items : [{
 							xtype : 'panel',
 							layout : 'form',
@@ -478,28 +588,50 @@ Ext.onReady(function(){
 								items : [{
 								xtype : 'radiogroup',
 								fieldLabel : '发券规则',
+								id : 'issueRule',
 								items : [{
 									boxLabel : '无规则',
 									inputValue : 1,
+									id : 'issueFree_active',
 									name : 'sendCouponRule',
-									checked : true
+									listeners : {
+										check : function(e){
+											if(e.getValue()){
+												issueRuleValue = e.inputValue;
+											}
+											
+										}
+									}
 								},{
 									boxLabel : '账单发券',
 									name : 'sendCouponRule',
+									id : 'issueSingle_active',
 									inputValue : 2,
 									listeners : {
-										check : function(checkbox, check){
+										check : function(e, check){
 											if(check){
 												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
 											}else{
 												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											}
+											
+											if(e.getValue()){
+												issueRuleValue = e.inputValue;
 											}
 										}
 									}
 								},{
 									boxLabel : '关注发券',
 									name : 'sendCouponRule',
-									inputValue : 3
+									id : 'issueWx_active',
+									inputValue : 3,
+									listeners : {
+										check : function(e){
+											if(e.getValue()){
+												issueRuleValue = e.inputValue;
+											}
+										}
+									}
 								}]
 								}, {
 									title : '账单发券配置',
@@ -509,7 +641,11 @@ Ext.onReady(function(){
 									hidden : true,
 									items : [{
 										xtype : 'numberfield',
-										fieldLabel : '发券满足金额'
+										id : 'IssueSingleMoney_numberfield_active',
+										fieldLabel : '发送满足金额',
+										allowBlank : false,
+										blankText : '类型名称不能为空.',
+										value : ""
 									}]
 								}, {
 								xtype : 'radiogroup',
@@ -518,11 +654,19 @@ Ext.onReady(function(){
 								items : [{
 									boxLabel : '无规则',
 									inputValue : 1,
+									id : 'useRule_active',
 									name : 'useCouponRule',
-									checked : true
+									listeners : {
+										check : function(e){
+											if(e.getValue()){
+												useRuleValue = e.inputValue;
+											}
+										}
+									}
 								},{
 									boxLabel : '账单用券',
 									name : 'useCouponRule',
+									id : 'useSingle_active',
 									inputValue : 2,
 									listeners : {
 										check : function(checkbox, check){
@@ -530,6 +674,10 @@ Ext.onReady(function(){
 												Ext.getCmp('useCouponByOrder_fieldset_activeMgr').show();
 											}else{
 												Ext.getCmp('useCouponByOrder_fieldset_activeMgr').hide();
+											}
+											
+											if(checkbox.getValue()){
+												useRuleValue = checkbox.inputValue;
 											}
 										}
 									}
@@ -542,7 +690,11 @@ Ext.onReady(function(){
 									hidden : true,
 									items : [{
 										xtype : 'numberfield',
-										fieldLabel : '用券满足金额'
+										id : 'useSingleMoney_numberfield_active',
+										fieldLabel : '用券满足金额',
+										allowBlank : false,
+										blankText : '用券满足金额不能为空',
+										value : ""
 									}]
 								}, {
 								xtype : 'container',

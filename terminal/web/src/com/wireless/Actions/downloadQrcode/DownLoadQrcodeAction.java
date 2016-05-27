@@ -1,7 +1,6 @@
 package com.wireless.Actions.downloadQrcode;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -66,7 +65,7 @@ public class DownLoadQrcodeAction extends DispatchAction{
 			response.getWriter().print(jObject.toString());
 		}
 		
-		
+		 
 		return null;
 	}
 	

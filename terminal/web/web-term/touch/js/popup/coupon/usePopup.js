@@ -18,7 +18,7 @@ define(function(require, exports, module){
 			var availableCoupons = [];
 			if(param.orderId){
 				//搜索账单已用的
-				$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByOrder', orderId : param.orderId, memberId : param.useTo}, function(response, status, xhr){
+				$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByOrder', orderId : param.orderId, memberId : param.useTo, orderId : param.orderId}, function(response, status, xhr){
 					if(response.success){
 						if(response.root.length > 0){
 							availableCoupons = availableCoupons.concat(response.root);
