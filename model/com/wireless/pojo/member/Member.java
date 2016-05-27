@@ -608,22 +608,120 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * @throws BusinessException
 	 *             throws if the consume price exceeds total balance to this member account
 	 */
-	public MemberOperation consume(float consumePrice, PayType payType) throws BusinessException{
+	public MemberOperation consume(final float consumePrice, final PayType payType) throws BusinessException{
 
-		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
-		
-		mo.setOperationType(OperationType.CONSUME);
-		mo.setPayType(payType);
-		mo.setPayMoney(consumePrice);
-		
-		if(payType.equals(PayType.MEMBER)){
-			//检查余额是否充足
-			checkBalance(consumePrice);
+		return consume(consumePrice, 0, payType);
+//		float deltaBase = 0, deltaExtra = 0;
+//		if(payType.equals(PayType.MEMBER)){
+//			//检查余额是否充足
+//			checkBalance(consumePrice);
+//
+//			/*
+//			 * 计算账户余额。
+//			 * 先扣除基础账户中的余额，再扣除赠送账户中的余额
+//			 */
+//			if(baseBalance < consumePrice){
+//				deltaBase = baseBalance;
+//				deltaExtra = consumePrice - baseBalance;
+//				
+//				baseBalance = 0;
+//				extraBalance = extraBalance - deltaExtra;
+//				
+//			}else{
+//				deltaBase = consumePrice;
+//				deltaExtra = 0;
+//				baseBalance = baseBalance - consumePrice;
+//			}
+//			
+//			//累计消费金额
+//			usedBalance += consumePrice;
+//			
+//		}
+//		
+//		//累计消费次数
+//		consumptionAmount++;
+//		
+//		//累计消费额
+//		totalConsumption += consumePrice;
+//		
+//		//累计会员当前可使用的积分
+//		int deltaPoint = Math.round(consumePrice * this.getMemberType().getExchangeRate());
+//		point += deltaPoint;
+//		
+//		//累计从消费兑换而增加的积分
+//		totalPoint += deltaPoint;
+//		
+//		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+//		mo.setOperationType(OperationType.CONSUME);
+//		mo.setPayType(payType);
+//		mo.setPayMoney(consumePrice);
+//		mo.setDeltaBaseMoney(deltaBase);
+//		mo.setRemainingBaseMoney(baseBalance);
+//		mo.setDeltaExtraMoney(deltaExtra);
+//		mo.setRemainingExtraMoney(extraBalance);
+//		mo.setDeltaPoint(deltaPoint);
+//		mo.setRemainingPoint(point);
+//		
+//		return mo;
+	}
+	
+	/**
+	 * Perform the consumption operation to this member.
+	 * @param consumePrice
+	 * 			the consumption price
+	 * @param basePrice
+	 * 			the base price to use
+	 * @param payType
+	 * 			the pay type
+	 * @return the member operation to this consumption
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<p>会员余额（从基础账户扣减固定金额）
+	 * 			<li>付款方式不是【会员余额】
+	 * 			<li>基础账户余额不足
+	 * 			<li>赠送账户余额不足
+	 * 			<p>会员余额
+	 * 			<li>账户余额不足
+	 */
+	public MemberOperation consume(final float consumePrice, final float basePrice, final PayType payType) throws BusinessException{
 
-			//使用会员付款时扣除账户余额
-			mo.setPayMoney(consumePrice);
+		float deltaBase = 0, deltaExtra = 0;
+		if(basePrice > 0){
+			//扣减基础账户的情况必须要检查以下内容
 			
-			float deltaBase, deltaExtra;
+			//付款方式必须是【会员余额】
+			if(!payType.equals(PayType.MEMBER)){
+				throw new BusinessException("付款方式必须是【会员余额】");
+			}
+			
+			//总消费额必须小于扣减的基础金额
+			if(consumePrice < basePrice){
+				throw new BusinessException("总消费额不能小于扣减的基础金额");
+			}
+			
+			//基础账户余额必须大于扣减的基础金额
+			if(this.baseBalance < basePrice){
+				throw new BusinessException("对不起, 你的基础账户余额不足");
+			}
+			
+			//赠送账户余额必须大于扣减的赠送金额
+			if(this.extraBalance < consumePrice - basePrice){
+				throw new BusinessException("对不起, 你的赠送账户余额不足");
+			}
+			
+			//计算基础账户的余额
+			deltaBase = basePrice;
+			this.baseBalance = this.baseBalance - basePrice;
+			
+			//计算赠送账户的余额
+			deltaExtra = consumePrice - basePrice;
+			this.extraBalance = this.extraBalance - deltaExtra;
+			
+		}else if(payType.equals(PayType.MEMBER)){
+			//检查账户余额是否充足
+			if(getTotalBalance() < consumePrice){
+				throw new BusinessException("对不起, 你的账户余额不足");
+			}
 			
 			/*
 			 * 计算账户余额。
@@ -641,13 +739,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 				deltaExtra = 0;
 				baseBalance = baseBalance - consumePrice;
 			}
-			
-			//累计消费金额
-			usedBalance += consumePrice;
-			
-			mo.setDeltaBaseMoney(deltaBase);
-			mo.setDeltaExtraMoney(deltaExtra);
 		}
+		
+		//累计消费金额
+		usedBalance += consumePrice;
 		
 		//累计消费次数
 		consumptionAmount++;
@@ -657,21 +752,23 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		
 		//累计会员当前可使用的积分
 		int deltaPoint = Math.round(consumePrice * this.getMemberType().getExchangeRate());
-		mo.setDeltaPoint(deltaPoint);
 		point += deltaPoint;
 		
 		//累计从消费兑换而增加的积分
 		totalPoint += deltaPoint;
 		
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		mo.setOperationType(OperationType.CONSUME);
+		mo.setPayType(payType);
+		mo.setPayMoney(consumePrice);
+		mo.setDeltaBaseMoney(deltaBase);
 		mo.setRemainingBaseMoney(baseBalance);
+		mo.setDeltaExtraMoney(deltaExtra);
 		mo.setRemainingExtraMoney(extraBalance);
+		mo.setDeltaPoint(deltaPoint);
 		mo.setRemainingPoint(point);
 		
 		return mo;
-	}
-	
-	public MemberOperation commission(float comsumePrice) throws BusinessException{
-		return null;
 	}
 	
 	/**

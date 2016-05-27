@@ -1497,6 +1497,9 @@ public class MemberDao {
 		}
 		int amount = 0;
 		for(Member member : getByCond(dbCon, staff, extraCond, null)){
+			if(member.getTotalBalance() > 0){
+				throw new BusinessException("会员余额不为0, 不能删除", StaffError.MEMBER_REMOVE_NOT_ALLOW);
+			}
 			String sql;
 			//Delete the coupon associated with this member
 			CouponDao.deleteByCond(dbCon, staff, new CouponDao.ExtraCond().setMember(member.getId()));
@@ -1747,25 +1750,28 @@ public class MemberDao {
 		dbCon.stmt.executeUpdate(sql);
 
 		//获取门店的佣金比例
-		Represent represent = RepresentDao.getByCond(dbCon, staff, null).get(0);
-		if(represent.isProgress() && represent.getComissionRate() > 0){
-			//获取关系链
-			final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
-			if(!recommends.isEmpty()){
-				
-				//获取推荐人
-				Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
-				
-				//计算出佣金充额(四舍五入)
-				int commission = Math.round(consumePrice * represent.getComissionRate());
-				
-				//为推荐人充值佣金 
-				if(commission > 0){
-					charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+		try{
+			Represent represent = RepresentDao.getByCond(dbCon, staff, null).get(0);
+			if(represent.isProgress() && represent.getComissionRate() > 0){
+				//获取关系链
+				final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
+				if(!recommends.isEmpty()){
+					
+					//获取推荐人
+					Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
+					
+					//计算出佣金充额(四舍五入)
+					int commission = Math.round(consumePrice * represent.getComissionRate());
+					
+					//为推荐人充值佣金 
+					if(commission > 0){
+						charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+					}
 				}
 			}
+		}catch(BusinessException | SQLException ignored){
+			ignored.printStackTrace();
 		}
-		
 		return mo;
 	}
 	

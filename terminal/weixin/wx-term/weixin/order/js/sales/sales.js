@@ -1,6 +1,5 @@
 
 $(function(){
-	Util.lbar('', function(html){ $(document.body).append(html);  });
 	
 	var params = null;
 	if(Util.mp.params.pid){
