@@ -461,7 +461,46 @@ Ext.onReady(function(){
 	
 	}	
 		
+	function initQrcode(){
+		var hostName = window.location.hostname;
+		if(hostName == 'e-tones.net'){
+			hostName = 'wx.e-tones.net';
+		}else if(hostName == 'localhost'){
+			hostName = 'ts.e-tones.net';
+		}else{
+			hostName = window.location.host;
+		}
 	
+		var scanType = {
+			SCAN_ORDER : '4'
+		};
+	
+		loadMask.show();
+		var node = Ext.ux.getSelNode(promotionTree);
+		if(!node){
+			Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+			return;
+		}
+		
+		$.ajax({
+		    type : "post",
+		    url : "http://" + hostName + "/wx-term/WxOperateQrCode.do",
+		    dataType : "jsonp",
+		    data : {
+		    	dataSource : 'qrCode',
+		    	restaurantId : restaurantID,
+		    	limitStr : scanType.SCAN_ORDER + node.id +  "_" + restaurantID
+		    },
+		    jsonp: "callback",//服务端用于接收callback调用的function名的参数
+		    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
+			success : function(){
+			
+			}
+		
+		})
+		
+	
+	}
 	
 	
 	
@@ -513,7 +552,6 @@ Ext.onReady(function(){
 							text : '保存',
 							iconCls : 'btn_add',
 							handler : function(e){
-								//TODO
 								var issueRules = {
 									FREE : {val : 1, desc : "免费发券"},
 									SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
@@ -621,8 +659,9 @@ Ext.onReady(function(){
 								xtype : 'radiogroup',
 								fieldLabel : '发券规则',
 								id : 'issueRule',
+								columns : 2,
 								items : [{
-									boxLabel : '无规则',
+									boxLabel : '无条件',
 									inputValue : 1,
 									id : 'issueFree_active',
 									name : 'sendCouponRule',
@@ -654,16 +693,30 @@ Ext.onReady(function(){
 										}
 									}
 								},{
-									boxLabel : '关注发券',
+									boxLabel : '微信首次关注发券',
 									name : 'sendCouponRule',
 									id : 'issueWx_active',
 									inputValue : 3,
 									listeners : {
 										check : function(e){
+											
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											
+										}
+									}
+								}, {
+									boxLabel : '扫码发券',
+									name : 'sendCouponRule',
+									id : 'wxScan_active',
+									inputValue : 4,
+									listeners : {
+										check : function(e){
+										},
+										focus : function(e){
+											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											initQrcode();
 										}
 									}
 								}]
@@ -686,7 +739,7 @@ Ext.onReady(function(){
 								fieldLabel : '用券规则',
 								columns : 3,
 								items : [{
-									boxLabel : '无规则',
+									boxLabel : '无条件',
 									inputValue : 1,
 									id : 'useRule_active',
 									name : 'useCouponRule',
