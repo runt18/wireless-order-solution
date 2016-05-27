@@ -45,68 +45,17 @@ Ext.onReady(function(){
 		return head;
 	}
 	
-	var promotionEditor = new Ext.form.HtmlEditor({
-		id : 'guide_2nd_promotionEditor',
-		hideLabel : true,
-		width : 510,
-		height : 325,
-		//value : '<div style="margin: 10px; padding: 0px; font-family: Simsun; line-height: 22px; color: rgb(135, 206, 250); font-weight: bold;"><font size="5"><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;">一、会员充值赠</span><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt;">送</span><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;">消费金额</span></font></div><div style="margin: 10px; padding: 0px; color: rgb(34, 34, 34); font-family: Simsun; line-height: 22px; word-wrap: break-word;"><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.充值2000元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">100元消费额</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">再送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">进口红酒一支</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;"><font size="5">（每人每月限送一次）</font></span><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><p class="MsoNormal" style="font-size: 16px; margin: 0px; padding: 0px;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdURya5Y1NpicnZv2iaJ9tTCgKPrvcJMc3yGTiaRN6ibiaFfUvWgibb3fRPKeD8xVllYgGeUib8ogoEb2WTFw/0?wxfmt=jpeg" data-ratio="0.6067193675889329" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdURya5Y1NpicnZv2iaJ9tTCgKPrvcJMc3yGTiaRN6ibiaFfUvWgibb3fRPKeD8xVllYgGeUib8ogoEb2WTFw/640?wxfmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">二、会员充值</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">积分</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.会员充值消费送积分（1元积1分）</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;"><font size="5">2.积分可以换菜式或礼品</font></span><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><br><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtSe3Tib7ytcBElwpRUxibArbcSjGG1TdeRQODz5BjHrCVQiaD9rpZeibUIQ/0?wx_fmt=jpeg" data-ratio="1.075098814229249" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtSe3Tib7ytcBElwpRUxibArbcSjGG1TdeRQODz5BjHrCVQiaD9rpZeibUIQ/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtW2Wdn44F4f4SsjEsQuYdbibTGibSVYGbGInGydu8F5HuKGX7wIXtwsXw/0?wx_fmt=jpeg" data-ratio="0.6561264822134387" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtW2Wdn44F4f4SsjEsQuYdbibTGibSVYGbGInGydu8F5HuKGX7wIXtwsXw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtMvRJlA5g2PeQnleg4zXcQYzdSFAVbR9BlveqjavvBVVkiaicUeGKKYjQ/0?wx_fmt=jpeg" data-ratio="0.616600790513834" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtMvRJlA5g2PeQnleg4zXcQYzdSFAVbR9BlveqjavvBVVkiaicUeGKKYjQ/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtDo2cKt17B2Ty9a7dTTGmnet6mzfZ4jaxJwSP4rD2bRv9ETiarSd1MzA/0?wx_fmt=jpeg" data-ratio="1.391304347826087" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtDo2cKt17B2Ty9a7dTTGmnet6mzfZ4jaxJwSP4rD2bRv9ETiarSd1MzA/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">三、会员专享出品优惠</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="MsoNormal" style="margin: 0px; padding: 0px;"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold; background-color: rgb(255, 255, 255);">1.会员专享：点心出品</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold; background-color: rgb(255, 255, 255);">9.5折</span></font></p><span style="height: auto !important; width: auto !important;"><font size="5"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt129Wib5Xo4Aj1AQbaQzpOUOlIdxyknFF4EYiaX73NKicB8St0nRvv6ZPg/0?wx_fmt=jpeg" data-ratio="0.6225296442687747" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt129Wib5Xo4Aj1AQbaQzpOUOlIdxyknFF4EYiaX73NKicB8St0nRvv6ZPg/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></font></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtNkxvsdby99gU3DG2sq4qeQ5fQrlTH935JRyzwMyATSic0QFZCuN2shQ/0?wx_fmt=png" data-ratio="0.541501976284585" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtNkxvsdby99gU3DG2sq4qeQ5fQrlTH935JRyzwMyATSic0QFZCuN2shQ/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.会员专享：菜式出品</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">9.5折</span></font><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><br><p style="font-size: 16px; margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtPTafOpPpbOKNcDLEq9CdbYfaGjWupHltkQP3hOZY6eceRmicAGhnInA/0?wx_fmt=png" data-ratio="0.6737967914438503" data-w="374" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtPTafOpPpbOKNcDLEq9CdbYfaGjWupHltkQP3hOZY6eceRmicAGhnInA/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><p style="font-size: 16px; margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt01oxpuyAHAJBLNia8Z6joH35TIdZHAWHBrFxgDthp6FuE5ia0tXYKa0w/0?wx_fmt=png" data-ratio="0.614314115308151" data-w="503" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt01oxpuyAHAJBLNia8Z6joH35TIdZHAWHBrFxgDthp6FuE5ia0tXYKa0w/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">四、会员生日到店消费</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">礼包</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.到店消费满500元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">:红酒一瓶价值128元;</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><font size="5">&nbsp;</font></span></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.消费满1000元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">：红酒一瓶价值188元</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">生日蛋糕一个。</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><font size="5">&nbsp;</font></span></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">3.要求:提前一天订餐</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><br><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtL2Z119LtzdHN5JSSnQR5q4VAxDvF0DzPLBtGIo932KfzTOI4OIIrHg/0?wx_fmt=jpeg" data-ratio="0.8043478260869565" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtL2Z119LtzdHN5JSSnQR5q4VAxDvF0DzPLBtGIo932KfzTOI4OIIrHg/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">五、会员专享茶位优惠</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.会员大厅茗茶免费，非会员2元/位</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.功夫茶会员4元/位，非会员6元/位</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><br><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtEfJicPAtHiay0eU1mNUJf9bNLDdheiauSIZnzPzALjx6cmhTKasVibPIZA/0?wx_fmt=png" data-ratio="0.7312252964426877" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtEfJicPAtHiay0eU1mNUJf9bNLDdheiauSIZnzPzALjx6cmhTKasVibPIZA/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5"><br>六、会员专享细则说明</font></span></span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5">1.要求充值消费，充值以100元为单位</font></span></span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;">2.卡内的消费金额，可用于易德福（明苑）</span></span></font><span style="font-size: x-large;"> 酒家的消费结算。(即充即用) </span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5">3.如有增加或更改以易德福(明苑) 酒家最新   公布为准。</font></span></span></p><br><b><font size="5">订餐（咨询）电话：0760-88777888<br></font></b><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>',
-		enableAlignments: false,
-        enableColors: true,
-        enableFont: false,
-        enableFontSize: true,
-        enableFormat: true,
-        enableLinks: false,
-        enableLists: false,
-        enableSourceEdit: true,
-        plugins : [new Ext.ux.plugins.HEInsertImage({
-        	url : '../../OperateImage.do?dataSource=upload&ossType=1'
-        })]
-	});
 	
-	var btnPreview = new Ext.Button({
-		id : 'guide_2nd_previewBtn',
-		text : '预览',
-		listeners : {
-			render : function(thiz){
-				thiz.getEl().setWidth(100, true);
-			}
-		},
-		handler : function(){
-			secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + promotionEditor.value);
-		}
-	});
-	var btnClear = new Ext.Button({
-		text : '清空',
-		listeners : {
-			render : function(thiz){
-				thiz.getEl().setWidth(100, true);
-			}
-		},
-		handler : function(){
-			promotionEditor.setValue();
-			secendStepCenter.body.update(promotionEditor.getValue());
-		}
-	});
+	var promotionEditor;
+	var btnPreview;
 	
-	var secendStepWest = new Ext.form.FormPanel({
-		width : 510,
-		height : 350,
-		title : '编辑活动内容:',
-		items : [promotionEditor],
-		style : 'marginLeft:40px;',
-		buttonAlign : 'center',
-		buttons : [btnPreview, btnClear]
-	});
-	var secendStepCenter = new Ext.Panel({
-		id : 'secondStepEastBody',
-		region : 'east',
-		width : 360,
-		height : 525,
-		bodyStyle : 'word-wrap:break-word;',
-		style : 'marginLeft:635px;background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
-		html : '&nbsp;'
-	});	
+	
+	var btnClear;
+	
+	
+	var secendStepWest;
+	
+	var secendStepCenter;
 	
 	//显示优惠活动的Body和相应的Coupon内容
 	function loadPromotion(promotionId){
@@ -132,7 +81,6 @@ Ext.onReady(function(){
 					}												
 						
 					
-					//TODO
 					var issueRules = {
 						FREE : {val : 1, desc : "免费发券"},
 						SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
@@ -207,89 +155,15 @@ Ext.onReady(function(){
 	})();
 	
 
-	var btnUpload = new Ext.Button({
-		columnWidth : 0.4,
-		hidden : true,
-        text : '上传图片',
-        listeners : {
-        	render : function(thiz){
-        		thiz.getEl().setWidth(60, true);
-        	}
-        },
-        handler : function(e){
-        	var check = true, img = '';
-        	if(Ext.isIE){
-        		Ext.getDom(imgFile.getId()).select();
-        		img = document.selection.createRange().text;
-        	}else{
- 	        	img = Ext.getDom(imgFile.getId()).value;
-        	}
-        	if(typeof(img) != 'undefined' && img.length > 0){
-	 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
-	 	        check = false;
-	 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
-	 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
-	 	        		check = true;
-		 	           	break;
-		 	        }
-	 	        }
-	 	        if(!check){
-		 	       	Ext.example.msg('提示', '图片类型不正确.');
-		 	        return;
- 	        	}
-        	}else{
-        		Ext.example.msg('提示', '未选择图片.');
- 	        	return;
-        	}
-        	coupon_uploadMask.show();
-        	Ext.Ajax.request({
-        		url : '../../OperateImage.do?dataSource=upload&ossType=3',
- 	   			isUpload : true,
- 	   			form : form.getForm().getEl(),
- 	   			success : function(response, options){
- 	   				coupon_uploadMask.hide();
- 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
- 	   				if(jr.success){
-// 	   					Ext.ux.showMsg(jr);
-	  	   				var ossImage = jr.root[0];
-	 	   				createActiveWin.image = ossImage.image;
-	 	   				createActiveWin.ossId = ossImage.imageId;	   				
- 	   				}else{
- 	   					Ext.ux.showMsg(jr);
- 	   					Ext.getCmp('couponTypeBox').setImg();
- 	   				}
-
- 	   				
- 	   			},
- 	   			failure : function(response, options){
- 	   				coupon_uploadMask.hide();
- 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
- 	   			}
-        	});
-        }
-	});	
 	
-	var imgFile = Ext.ux.plugins.createImageFile({
-		id : 'couponTypeBox',
-		img : couponPicBox,
-		width : 100,
-		height : 100,
-		callback : function(){
-			btnUpload.handler();
-		}
-	});		
+	var btnUpload;
 	
-	var form = new Ext.form.FormPanel({
-		columnWidth : .6,
-		labelWidth : 60,
-		fileUpload : true,
-		items : [imgFile],
-		listeners : {
-	    	render : function(e){
-	    		Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
- 	  		}
-	    }
-	});		
+	
+	//TODO
+	var imgFile;
+	
+	
+	var form;
 	
 	 //优惠活动向导完成
     function fnFinishPromotion(){
@@ -370,18 +244,447 @@ Ext.onReady(function(){
 	
 	};
 	
-	
 	//创建优惠活动的window
 	var createActiveWin = null;
-		
+	//TODO
 	function initActiveWin(c){
+		promotionEditor = new Ext.form.HtmlEditor({
+			id : 'guide_2nd_promotionEditor',
+			hideLabel : true,
+			width : 510,
+			height : 325,
+			//value : '<div style="margin: 10px; padding: 0px; font-family: Simsun; line-height: 22px; color: rgb(135, 206, 250); font-weight: bold;"><font size="5"><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;">一、会员充值赠</span><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt;">送</span><span class="15" style="line-height: 18.75pt; text-indent: 0pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;">消费金额</span></font></div><div style="margin: 10px; padding: 0px; color: rgb(34, 34, 34); font-family: Simsun; line-height: 22px; word-wrap: break-word;"><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.充值2000元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">100元消费额</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">再送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">进口红酒一支</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;"><font size="5">（每人每月限送一次）</font></span><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><p class="MsoNormal" style="font-size: 16px; margin: 0px; padding: 0px;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdURya5Y1NpicnZv2iaJ9tTCgKPrvcJMc3yGTiaRN6ibiaFfUvWgibb3fRPKeD8xVllYgGeUib8ogoEb2WTFw/0?wxfmt=jpeg" data-ratio="0.6067193675889329" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdURya5Y1NpicnZv2iaJ9tTCgKPrvcJMc3yGTiaRN6ibiaFfUvWgibb3fRPKeD8xVllYgGeUib8ogoEb2WTFw/640?wxfmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">二、会员充值</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">积分</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.会员充值消费送积分（1元积1分）</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;"><font size="5">2.积分可以换菜式或礼品</font></span><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><br><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtSe3Tib7ytcBElwpRUxibArbcSjGG1TdeRQODz5BjHrCVQiaD9rpZeibUIQ/0?wx_fmt=jpeg" data-ratio="1.075098814229249" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtSe3Tib7ytcBElwpRUxibArbcSjGG1TdeRQODz5BjHrCVQiaD9rpZeibUIQ/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtW2Wdn44F4f4SsjEsQuYdbibTGibSVYGbGInGydu8F5HuKGX7wIXtwsXw/0?wx_fmt=jpeg" data-ratio="0.6561264822134387" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtW2Wdn44F4f4SsjEsQuYdbibTGibSVYGbGInGydu8F5HuKGX7wIXtwsXw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtMvRJlA5g2PeQnleg4zXcQYzdSFAVbR9BlveqjavvBVVkiaicUeGKKYjQ/0?wx_fmt=jpeg" data-ratio="0.616600790513834" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtMvRJlA5g2PeQnleg4zXcQYzdSFAVbR9BlveqjavvBVVkiaicUeGKKYjQ/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtDo2cKt17B2Ty9a7dTTGmnet6mzfZ4jaxJwSP4rD2bRv9ETiarSd1MzA/0?wx_fmt=jpeg" data-ratio="1.391304347826087" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtDo2cKt17B2Ty9a7dTTGmnet6mzfZ4jaxJwSP4rD2bRv9ETiarSd1MzA/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">三、会员专享出品优惠</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="MsoNormal" style="margin: 0px; padding: 0px;"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold; background-color: rgb(255, 255, 255);">1.会员专享：点心出品</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold; background-color: rgb(255, 255, 255);">9.5折</span></font></p><span style="height: auto !important; width: auto !important;"><font size="5"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt129Wib5Xo4Aj1AQbaQzpOUOlIdxyknFF4EYiaX73NKicB8St0nRvv6ZPg/0?wx_fmt=jpeg" data-ratio="0.6225296442687747" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt129Wib5Xo4Aj1AQbaQzpOUOlIdxyknFF4EYiaX73NKicB8St0nRvv6ZPg/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></font></span><br style="margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtNkxvsdby99gU3DG2sq4qeQ5fQrlTH935JRyzwMyATSic0QFZCuN2shQ/0?wx_fmt=png" data-ratio="0.541501976284585" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtNkxvsdby99gU3DG2sq4qeQ5fQrlTH935JRyzwMyATSic0QFZCuN2shQ/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.会员专享：菜式出品</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">9.5折</span></font><span style="font-size: 18pt; font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></p><br><p style="font-size: 16px; margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtPTafOpPpbOKNcDLEq9CdbYfaGjWupHltkQP3hOZY6eceRmicAGhnInA/0?wx_fmt=png" data-ratio="0.6737967914438503" data-w="374" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtPTafOpPpbOKNcDLEq9CdbYfaGjWupHltkQP3hOZY6eceRmicAGhnInA/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><p style="font-size: 16px; margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt01oxpuyAHAJBLNia8Z6joH35TIdZHAWHBrFxgDthp6FuE5ia0tXYKa0w/0?wx_fmt=png" data-ratio="0.614314115308151" data-w="503" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavt01oxpuyAHAJBLNia8Z6joH35TIdZHAWHBrFxgDthp6FuE5ia0tXYKa0w/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></p><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">四、会员生日到店消费</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">礼包</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.到店消费满500元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">:红酒一瓶价值128元;</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><font size="5">&nbsp;</font></span></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.消费满1000元</span><span class="15" style="font-family: 宋体; color: rgb(112, 48, 160); letter-spacing: 0pt; font-weight: bold;">送</span><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">：红酒一瓶价值188元</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">生日蛋糕一个。</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><font size="5">&nbsp;</font></span></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">3.要求:提前一天订餐</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><br><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="jpeg" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtL2Z119LtzdHN5JSSnQR5q4VAxDvF0DzPLBtGIo932KfzTOI4OIIrHg/0?wx_fmt=jpeg" data-ratio="0.8043478260869565" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtL2Z119LtzdHN5JSSnQR5q4VAxDvF0DzPLBtGIo932KfzTOI4OIIrHg/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; white-space: pre-wrap; background-color: rgb(255, 255, 255); height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br><br><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">五、会员专享茶位优惠</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">1.会员大厅茗茶免费，非会员2元/位</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><p class="p" style="margin: 0pt; padding: 0pt; text-indent: 0pt; line-height: 18.75pt; background-color: rgb(255, 255, 255);"><font size="5"><span class="15" style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt; font-weight: bold;">2.功夫茶会员4元/位，非会员6元/位</span><span style="font-family: 宋体; color: rgb(62, 62, 62); letter-spacing: 0pt;"><o:p></o:p></span></font></p><br><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="height: auto !important; width: auto !important;"><img data-s="300,640" data-type="png" data-src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtEfJicPAtHiay0eU1mNUJf9bNLDdheiauSIZnzPzALjx6cmhTKasVibPIZA/0?wx_fmt=png" data-ratio="0.7312252964426877" data-w="" src="http://mmbiz.qpic.cn/mmbiz/fLiaKGIbUibdWAC6mbFibFosPTdeltQIiavtEfJicPAtHiay0eU1mNUJf9bNLDdheiauSIZnzPzALjx6cmhTKasVibPIZA/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5" style="border: 0px; vertical-align: middle; margin: 0px; padding: 0px; max-width: 100%; height: auto !important; box-sizing: border-box !important; word-wrap: break-word !important; width: auto !important; visibility: visible !important;"></span><br style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5"><br>六、会员专享细则说明</font></span></span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5">1.要求充值消费，充值以100元为单位</font></span></span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;">2.卡内的消费金额，可用于易德福（明苑）</span></span></font><span style="font-size: x-large;"> 酒家的消费结算。(即充即用) </span></p><p style="margin: 0px; padding: 0px; max-width: 100%; clear: both; min-height: 1em; white-space: pre-wrap; color: rgb(62, 62, 62); font-family: \'Helvetica Neue\', Helvetica, \'Hiragino Sans GB\', \'Microsoft YaHei\', Arial, sans-serif; line-height: 25px; background-color: rgb(255, 255, 255); box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><span style="margin: 0px; padding: 0px; max-width: 100%; box-sizing: border-box !important; word-wrap: break-word !important;"><font size="5">3.如有增加或更改以易德福(明苑) 酒家最新   公布为准。</font></span></span></p><br><b><font size="5">订餐（咨询）电话：0760-88777888<br></font></b><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>',
+			enableAlignments: false,
+	        enableColors: true,
+	        enableFont: false,
+	        enableFontSize: true,
+	        enableFormat: true,
+	        enableLinks: false,
+	        enableLists: false,
+	        enableSourceEdit: true,
+	        plugins : [new Ext.ux.plugins.HEInsertImage({
+	        	url : '../../OperateImage.do?dataSource=upload&ossType=1'
+	        })]
+		});
+		
+		
+		imgFile = Ext.ux.plugins.createImageFile({
+			id : 'couponTypeBox',
+			img : couponPicBox,
+			width : 100,
+			height : 100,
+			callback : function(){
+				btnUpload.handler();
+			}
+		});	
+		
+		form = new Ext.form.FormPanel({
+			columnWidth : 0.6,
+			labelWidth : 60,
+			fileUpload : true,
+			items : [imgFile],
+			listeners : {
+		    	render : function(e){
+		    		Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+	 	  		}
+		    }
+		});	
+		
+		btnUpload = new Ext.Button({
+			columnWidth : 0.4,
+			hidden : true,
+	        text : '上传图片',
+	        listeners : {
+	        	render : function(thiz){
+	        		thiz.getEl().setWidth(60, true);
+	        	}
+	        },
+	        handler : function(e){
+	        	var check = true, img = '';
+	        	if(Ext.isIE){
+	        		Ext.getDom(imgFile.getId()).select();
+	        		img = document.selection.createRange().text;
+	        	}else{
+	 	        	img = Ext.getDom(imgFile.getId()).value;
+	        	}
+	        	if(typeof(img) != 'undefined' && img.length > 0){
+		 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+		 	        check = false;
+		 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+		 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+		 	        		check = true;
+			 	           	break;
+			 	        }
+		 	        }
+		 	        if(!check){
+			 	       	Ext.example.msg('提示', '图片类型不正确.');
+			 	        return;
+	 	        	}
+	        	}else{
+	        		Ext.example.msg('提示', '未选择图片.');
+	 	        	return;
+	        	}
+	        	coupon_uploadMask.show();
+	        	Ext.Ajax.request({
+	        		url : '../../OperateImage.do?dataSource=upload&ossType=3',
+	 	   			isUpload : true,
+	 	   			form : form.getForm().getEl(),
+	 	   			success : function(response, options){
+	 	   				coupon_uploadMask.hide();
+	 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+	 	   				if(jr.success){
+	// 	   					Ext.ux.showMsg(jr);
+		  	   				var ossImage = jr.root[0];
+		 	   				createActiveWin.image = ossImage.image;
+		 	   				createActiveWin.ossId = ossImage.imageId;	   				
+	 	   				}else{
+	 	   					Ext.ux.showMsg(jr);
+	 	   					Ext.getCmp('couponTypeBox').setImg();
+	 	   				}
+	
+	 	   				
+	 	   			},
+	 	   			failure : function(response, options){
+	 	   				coupon_uploadMask.hide();
+	 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+	 	   			}
+	        	});
+	        }
+		});	
+		
+		secendStepCenter = new Ext.Panel({
+			id : 'secondStepEastBody',
+			region : 'east',
+			width : 360,
+			height : 525,
+			bodyStyle : 'word-wrap:break-word;',
+			style : 'marginLeft:635px;background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
+			html : '&nbsp;'
+		});	
+		
+		
+		btnClear = new Ext.Button({
+			text : '清空',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				promotionEditor.setValue();
+				secendStepCenter.body.update(promotionEditor.getValue());
+			}
+		});
+		
+		
+		btnPreview = new Ext.Button({
+			id : 'guide_2nd_previewBtn',
+			text : '预览',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(thiz, promotion){
+				//解决获取不到editor里面内容的问题
+	//			var html = (window.frames[promotionEditor.iframe.name]).document.getElementsByTagName('body')[0].innerHTML;
+				var html;
+//				secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
+				
+				Ext.getCmp('secondStepEastBody').getForm().setValue(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
+			}
+		});
+		
+		secendStepWest = new Ext.form.FormPanel({
+			width : 510,
+			height : 350,
+			title : '编辑活动内容:',
+			items : [promotionEditor],
+			style : 'marginLeft:40px;',
+			buttonAlign : 'center',
+			buttons : [btnPreview, btnClear]
+		});	
+	
+
+		var panel1 = new Ext.Panel({
+		    border : false,
+		    style : {
+		    	'margin' : '0 auto',
+		    	'width' : '100%'
+		    },
+		    items : [{
+		        layout : 'border',
+		        frame : true,
+		        border : false,
+		        height : 545,
+		        items : [{
+		            xtype : 'panel',
+		            region : 'center',
+		            width :620,
+		            height : 535,
+		            layout : 'column',
+		            frame : true,
+		            defaults : {
+		                layout : 'form',
+		                labelWidth : 70,
+		                labelAlign : 'right'
+		//					columnWidth : .33
+		            },
+		            items : [{
+		                id : 'guide_2nd_CouponOption',
+		                items : [{
+		                    id : 'westPanel',
+		                    xtype : 'panel',
+		                    defaults : {
+		                        layout : 'form',
+		                        labelWidth : 70,
+		                        labelAlign : 'right'
+		                    },
+		                    items : [{
+		                        items : [{
+		                            xtype : 'label',
+		                            html : '&nbsp;&nbsp;选择优惠劵:&nbsp;&nbsp;'
+		                        }]
+		                    },{
+		                        items : [{
+		                            xtype : 'radio',
+		                            id : 'radioDefaultCoupon',
+		                            name : 'radioActiveType',
+		                            inputValue : 1,
+		                            hideLabel : true,
+		                            checked : true,
+		                            boxLabel : '10元券&nbsp;&nbsp;',
+		                            listeners : {
+		                                render : function(e){
+		                                    e.getEl().dom.parentNode.style.paddingLeft = '10px';
+		                                    e.getEl().dom.parentNode.style.paddingTop = '5px';
+		                                },
+		                                check : function(e){
+		                                    if(e.getValue()){
+		                                        changeCouponModel(1);
+		                                    }
+		                                }
+		                            }
+		                        }]
+		                    },{
+		                        items : [{
+		                            xtype : 'radio',
+		                            name : 'radioActiveType',
+		                            inputValue : 2,
+		                            hideLabel : true,
+		                            boxLabel : '20元券&nbsp;&nbsp;',
+		                            listeners : {
+		                                render : function(e){
+		                                    e.getEl().dom.parentNode.style.paddingLeft = '10px';
+		                                },
+		                                check : function(e){
+		                                    if(e.getValue()){
+		                                    }
+		                                }
+		                            }
+		                        }]
+		                    },{
+		                        items : [{
+		                            xtype : 'radio',
+		                            id : 'radioSelfCoupon',
+		                            name : 'radioActiveType',
+		                            inputValue : 3,
+		                            hideLabel : true,
+		                            boxLabel : '自定义',
+		                            listeners : {
+		                                render : function(e){
+		                                    e.getEl().dom.parentNode.style.paddingLeft = '10px';
+		                                },
+		                                check : function(e){
+		                                    if(e.getValue()){
+		                                        changeCouponModel(3);
+		                                    }
+		                                }
+		                            }
+		                        }]
+		                    }]
+		                }]
+		
+		            },{
+		                id : 'guide_2nd_couponDetail',
+		                items : [{
+		                    id : 'centerPanel',
+		                    xtype : 'panel',
+		                    layout : 'column',
+		                    width : 220,
+		                    style : 'paddingTop:20px;',
+		                    defaults : {
+		                        layout : 'form',
+		                        labelWidth : 80
+		//						labelAlign : 'right'
+		                    },
+		                    items : [{
+		                        items : [{
+		                            id : 'guide_2nd_couponName',
+		                            xtype : 'textfield',
+		                            fieldLabel : '优惠劵名称',
+		                            value : '10元优惠劵',
+		                            allowBlank : false
+		                        }]
+		                    },{
+		                        items : [{
+		                            id : 'guide_2nd_couponPrice',
+		                            xtype : 'textfield',
+		                            value : 10,
+		                            fieldLabel : '&nbsp;&nbsp;&nbsp;面额',
+		                            allowBlank : false
+		                        }]
+		                    }, {
+		                        items : [{
+		                            id : 'guide_2nd_couponExpired',
+		                            xtype : 'datefield',
+		                            width : 130,
+		                            fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
+		                            format : 'Y-m-d',
+		                            readOnly : false,
+		                            allowBlank : false,
+		                            minValue : new Date(),
+		                            value : new Date(),
+		                            blankText : '日期不能为空.',
+		                            listeners : {
+		                                invalid : function(thiz){
+		                                    thiz.clearInvalid();
+		                                }
+		                            }
+		                        }]
+		                    }]
+		                }]
+		
+		            },{
+		                id : 'active_secendStep2CouponImg',
+		                xtype : 'container',
+		                layout : 'column',
+		                items : [{
+		                    xtype : 'panel',
+		                    width : 280,
+		                    layout : 'column',
+		                    style : 'marginLeft:18px;',
+		                    frame : true,
+		                    items : [couponPicBox, form,{
+		                        items : [{
+		                            xtype : 'label',
+		                            style : 'width : 130px;',
+		                            html : '<sapn style="font-size:13px;color:green;font-weight:bold">图片大小不能超过100K</span>'
+		                        }]
+		                    },btnUpload],
+		                    listeners : {
+		                        render : function(e){
+		                            Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+		                        }
+		                    }
+		                }]
+		
+		            },new Ext.form.FormPanel({
+		                width : 510,
+		                height : 350,
+		                title : '编辑活动内容:',
+		                items : [promotionEditor],
+		                style : 'marginLeft:40px;',
+		                buttonAlign : 'center',
+		                buttons : [new Ext.Button({
+		                    id : 'guide_2nd_previewBtn',
+		                    text : '预览',
+		                    listeners : {
+		                        render : function(thiz){
+		                            thiz.getEl().setWidth(100, true);
+		                        }
+		                    },
+		                    handler : function(thiz, promotion){
+		                        //解决获取不到editor里面内容的问题
+		//			var html = (window.frames[promotionEditor.iframe.name]).document.getElementsByTagName('body')[0].innerHTML;
+		                        var html;
+//		                        secendStepCenter.body.update(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
+		                    	secendStepCenter.getForm().setValue(buildPromotionHeader(Ext.getCmp('guide_2nd_title').getValue()) + (html ? html : (promotionEditor.value ? promotionEditor.value : '')));
+		                    }
+		                }), new Ext.Button({
+		                    text : '清空',
+		                    listeners : {
+		                        render : function(thiz){
+		                            thiz.getEl().setWidth(100, true);
+		                        }
+		                    },
+		                    handler : function(){
+		                        promotionEditor.setValue();
+		                        secendStepCenter.body.update(promotionEditor.getValue());
+		                    }
+		                })]
+		            })]
+		        },new Ext.Panel({
+		            id : 'secondStepEastBody',
+		            region : 'east',
+		            width : 360,
+		            height : 525,
+		            bodyStyle : 'word-wrap:break-word;',
+		            style : 'background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
+		            html : '&nbsp;'
+		        })]
+		    }]
+		});
+
+
+
+
+		var panel2 = new Ext.Panel({
+		    id : 'guide_2nd_panel',
+		    style : {
+		    	'margin' : '0 auto',
+		    	'margin-top' : '5px',
+		    	'width' : '100%'
+		    },
+		    border : false,
+		    items : [{
+		        layout : 'column',
+		        frame : true,
+		        border : false,
+		
+		        defaults : {
+		            layout : 'form',
+		            labelWidth : 70,
+		            labelAlign : 'right',
+		            columnWidth : .33
+		        },
+		        items : [{
+		            labelWidth : 180,
+		            items : [{
+		                id : 'guide_2nd_occupy',
+		                xtype : 'label',
+		                style : 'color:#DFE8F6',
+		                html : '单次消费积分满/累计积分满-有优惠劵'
+		            }]
+		        },{
+		            columnWidth : .3,
+		            items : [{
+		                id : 'guide_2nd_title',
+		                xtype : 'textfield',
+		                width : 200,
+		                fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
+		                style : 'overflow: hidden;',
+		                allowBlank : false,
+		                listeners : {
+		                    blur : function(){
+		                        Ext.getCmp('guide_2nd_previewBtn').handler();
+		                    }
+		                }
+		            }]
+		        }]
+		    }]
+		});
+				
+				
 		createActiveWin = new Ext.Window({
 			title : '设置优惠活动',
 			resizable : false,
+			id : 'ceateActiveWindow_activeMgr',
 			modal : true,
 			width : 1100,
 			height : 650,
-			contentEl : 'divActiveInsert',
+			autoDestroy : true,
+			items : [panel2, panel1],
 			listeners : {
 				show : function(thiz){
 					if(thiz.otype == 'insert'){
@@ -399,7 +702,7 @@ Ext.onReady(function(){
 						Ext.getCmp('couponTypeBox').setImg();
 						
 						Ext.getCmp('secondStepEastBody').body.update('');
-						
+						 
 						createActiveWin.image = '';
 						
 					}else if(thiz.otype == 'update'){
@@ -414,7 +717,7 @@ Ext.onReady(function(){
 						Ext.getDom('radioSelfCoupon').checked = true; 
 						Ext.getCmp('couponTypeBox').setImg(thiz.promotion.coupon.ossImage ? thiz.promotion.coupon.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
 						//手动调用预览，更新显示图文
-						btnPreview.handler();
+//						btnPreview.handler('' ,thiz.promotion);
 						updatePromotionCouponPanel(thiz.promotion.pType);
 					}
 					
@@ -424,12 +727,21 @@ Ext.onReady(function(){
 						//创建活动Win关闭后，清除图片的信息
 	 	   				thiz.image = null;
 	 	   				thiz.ossId = null;							
+				},
+				close : function(){
+					createActiveWin.removeAll();
+//					panel1.destory();
+//					panel2.destory();
+					createActiveWin = null;
+					panel1 = null;
+					panel2 = null;
 				}
 			},
 			keys : [{
 					 key : Ext.EventObject.ESC,
 					 fn : function(){ 
 						 createActiveWin.hide();
+						 $('#ceateActiveWindow_activeMgr').remove($('#ceateActiveWindow_activeMgr'));
 					 },
 					 scope : this 
 			 }],
@@ -448,6 +760,7 @@ Ext.onReady(function(){
 				iconCls : 'btn_close',
 				handler : function(){
 					createActiveWin.hide();
+					$('#ceateActiveWindow_activeMgr').remove();
 				}
 			}]
 		})
@@ -457,11 +770,83 @@ Ext.onReady(function(){
 			createActiveWin.promotion = c.promotion;
 		}
 		
-		createActiveWin.show();
-	
+		
+		Ext.getCmp('ceateActiveWindow_activeMgr').show();
+
 	}	
 		
+	function initQrcode(){
+		var hostName = window.location.hostname;
+		if(hostName == 'e-tones.net'){
+			hostName = 'wx.e-tones.net';
+		}else if(hostName == 'localhost'){
+			hostName = 'ts.e-tones.net';
+		}else{
+			hostName = window.location.host;
+		}
 	
+		var scanType = {
+			WX_SCAN_ISSUE_COUPON : '5'
+		};
+	
+		var node = Ext.ux.getSelNode(promotionTree);
+		if (!node || node.attributes.id == -1) {
+			Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+			return;
+		}
+		
+		$.ajax({
+		    type : "post",
+		    url : "http://" + hostName + "/wx-term/WxOperateQrCode.do",
+		    dataType : "jsonp",
+		    data : {
+		    	dataSource : 'qrCode',
+		    	restaurantId : restaurantID,
+		    	limitStr : scanType.WX_SCAN_ISSUE_COUPON + node.attributes.id
+		    },
+		    jsonp: "callback",//服务端用于接收callback调用的function名的参数
+		    jsonpCallback:"success_jsonpCallback",//(可选)callback的function名称, 不设置时有默认的名称
+			success : function(json){
+				
+				
+				var qrCodeWindow = new Ext.Window({
+					id : 'activeMgrQrCode_window_activeMgr',
+					title : '区域二维码',
+					closable : true,
+					resizeble : false,
+					modal : true,
+					width : 500,
+					height : 550,
+					items : [{
+						id : 'qrCodeView_window_activeMgr',
+						xtype : 'panel',
+						height : 500,
+						width : 480,
+						style : {
+							'margin' : '2% auto'
+						},
+						html : '<img alt="" src="'+ json.root[0].qrCode +'" width="480px" height="480px">'
+					}],
+					bbar : ['->',{
+						text : '下载二维码',
+						iconCls : 'btn_save',
+						handler : function(){
+							
+						}
+					}]
+				});	
+				
+				qrCodeWindow.render(document.body);
+				qrCodeWindow.show();
+				
+			},
+		    error:function(){
+		    	loadMask.hide();
+		    }
+		})
+		
+	
+	}
 	
 	
 	
@@ -513,11 +898,11 @@ Ext.onReady(function(){
 							text : '保存',
 							iconCls : 'btn_add',
 							handler : function(e){
-								//TODO
 								var issueRules = {
 									FREE : {val : 1, desc : "免费发券"},
 									SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
-									WX_SUBSCRIBE : {val : 3, desc : "微信关注"}
+									WX_SUBSCRIBE : {val : 3, desc : "微信关注"},
+									WX_SCAN_ISSUE_COUPON : {val : 4, desc : '扫码发券'}
 								}
 								
 								var useRules = {
@@ -544,6 +929,8 @@ Ext.onReady(function(){
 									issueRuleValue = 2;
 								}else if(Ext.getCmp('issueWx_active').getValue()){
 									issueRuleValue = 3;
+								}else if(Ext.getCmp('issueWx_active').getValue()){
+									issueRuleValue = 4;
 								}
 								
 								if(Ext.getCmp('useRule_active').getValue()){
@@ -568,6 +955,8 @@ Ext.onReady(function(){
 									
 								}else if(issueRuleValue == 3){
 									issueRule = issueRules.WX_SUBSCRIBE.val;
+								}else if(issueRuleValue == 4){
+									issueRule = issueRules.WX_SCAN_ISSUE_COUPON.val;
 								}
 								
 								//设定用券规则
@@ -621,8 +1010,9 @@ Ext.onReady(function(){
 								xtype : 'radiogroup',
 								fieldLabel : '发券规则',
 								id : 'issueRule',
+								columns : 2,
 								items : [{
-									boxLabel : '无规则',
+									boxLabel : '无条件',
 									inputValue : 1,
 									id : 'issueFree_active',
 									name : 'sendCouponRule',
@@ -631,7 +1021,7 @@ Ext.onReady(function(){
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
-											
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 										}
 									}
 								},{
@@ -641,29 +1031,40 @@ Ext.onReady(function(){
 									inputValue : 2,
 									listeners : {
 										check : function(e, check){
-											if(check){
-												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
-											}else{
-												Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
-											}
 											
 										},
 										focus : function(e, check){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 											
 										}
 									}
 								},{
-									boxLabel : '关注发券',
+									boxLabel : '微信首次关注发券',
 									name : 'sendCouponRule',
 									id : 'issueWx_active',
 									inputValue : 3,
 									listeners : {
 										check : function(e){
+											
 										},
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 											
+										}
+									}
+								}, {
+									boxLabel : '扫码发券',
+									name : 'sendCouponRule',
+									id : 'wxScan_active',
+									inputValue : 4,
+									listeners : {
+										check : function(e){
+										},
+										focus : function(e){
+											Ext.getCmp('createQrCode_fieldset_activeMgr').show();
+											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 										}
 									}
 								}]
@@ -682,11 +1083,26 @@ Ext.onReady(function(){
 										value : ""
 									}]
 								}, {
+									title : '扫码发券二维码',
+									id : 'createQrCode_fieldset_activeMgr',
+									xtype : 'fieldset',
+									layout : 'form',
+									hidden : false,
+									items : [{
+										xtype : 'button',
+										id : 'createQrcode_button_activeMgr',
+										text : '生成二维码',
+										iconCls : 'btn_save',
+										handler : function(){
+											initQrcode();
+										}
+									}]
+								}, {
 								xtype : 'radiogroup',
 								fieldLabel : '用券规则',
 								columns : 3,
 								items : [{
-									boxLabel : '无规则',
+									boxLabel : '无条件',
 									inputValue : 1,
 									id : 'useRule_active',
 									name : 'useCouponRule',
@@ -888,7 +1304,7 @@ Ext.onReady(function(){
 			//活动发布Window
 			publishPromotionWnd = new Ext.Window({
 				title : '发布优惠活动',
-				width : 400,
+				width : 200,
 				xtype : 'panel',
 				layout : 'column',
 				frame : true,
@@ -897,21 +1313,13 @@ Ext.onReady(function(){
 					columnWidth : 1,
 					style :'margin-top:5px;',
 					border : false
-				},{
-					columnWidth : 0.1,
-					id : 'weixinissue_Checkbox_activeMgrMain',
-					xtype : 'checkbox'
-				},{
-					columnWidth : 0.4,
-					xtype : 'label',
-					text : '微信关注时自动发券'
 				},
 				{
-					columnWidth : 0.2,
+					columnWidth : 0.4,
 					xtype : 'label',
 					html : '&nbsp;&nbsp;&nbsp;&nbsp;结束时间:'
 				},{
-					columnWidth : 0.3,
+					columnWidth : 0.6,
 					id : 'dateField4PromotionPublish',
 					xtype : 'datefield',
 					fieldLabel : '&nbsp;&nbsp;&nbsp;结束日期',
@@ -947,15 +1355,6 @@ Ext.onReady(function(){
 							return;
 						}else{
 							params.endDate = Ext.util.Format.date(endDate, 'Y-m-d 00:00:00');
-						}
-						
-						var checkboxStatus = Ext.getCmp('weixinissue_Checkbox_activeMgrMain').getValue();
-						
-						if(checkboxStatus){
-							// 设置优惠活动触发条件
-							params.triggers = Trigger.WX_SUBSCRIBE.type;
-						}else{
-							params.triggers = null;
 						}
 						
 						var publishMask = new Ext.LoadMask(document.body, {
@@ -1023,15 +1422,6 @@ Ext.onReady(function(){
 									promotionToPublish = jr.root[0];
 									Ext.getCmp('dateField4PromotionPublish').setValue(promotionToPublish.promotionEndDate);
 									thiz.setTitle(thiz.title + '---' + promotionToPublish.title);
-									
-									for(var i = 0; i < promotionToPublish.triggers.length; i++){
-										if(promotionToPublish.triggers[i].triggerType == Trigger.WX_SUBSCRIBE.type){
-											Ext.getCmp('weixinissue_Checkbox_activeMgrMain').setValue(true);
-										}else{
-											Ext.getCmp('weixinissue_Checkbox_activeMgrMain').setValue(false);
-										}
-									}
-									
 								}else{
 									Ext.example.msg('异常', jr.msg);
 								}
@@ -1116,6 +1506,8 @@ Ext.onReady(function(){
 		);
 	}
 	
+	
+	//TODO
 	new Ext.Panel({
 		renderTo : 'divActive',
 		layout : 'border',
@@ -1124,228 +1516,231 @@ Ext.onReady(function(){
 		items : [promotionTree, promotionPreviewPanel]
 	});
 	
-		new Ext.Panel({
-			id : 'guide_2nd_panel',
-			renderTo :'active_secendStep',
-			width :1015,
-			border : false,
-	 		items : [{
-				layout : 'column',
-				frame : true,
-				border : false,
-	
-				defaults : {
-					layout : 'form',
-					labelWidth : 70,
-					labelAlign : 'right',
-					columnWidth : .33
-				},
-				items : [{
-					labelWidth : 180,
-					items : [{
-						id : 'guide_2nd_occupy',
-						xtype : 'label',
-						style : 'color:#DFE8F6',
-						html : '单次消费积分满/累计积分满-有优惠劵'
-					}]
-				},{
-					columnWidth : .3,
-					items : [{
-						id : 'guide_2nd_title',
-						xtype : 'textfield',
-						width : 200,
-						fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
-						style : 'overflow: hidden;',
-						allowBlank : false,
-						listeners : {
-							blur : function(){
-								Ext.getCmp('guide_2nd_previewBtn').handler();
-							}
-						}
-					}]
-				}]
-			}]
-	});
-	
-	new Ext.Panel({
-		renderTo :'active_secendStep2',
-		width :1015,
-		border : false,
-		items : [{
-			layout : 'border',
-			frame : true,
-			border : false,
-			height : 545,
-			items : [{
-	 			xtype : 'panel',
-	 			region : 'center',
-	 			width :620,
-	 			height : 535,
-				layout : 'column',
-				frame : true,
-				defaults : {
-					layout : 'form',
-					labelWidth : 70,
-					labelAlign : 'right'
+	//TODO
+//		new Ext.Panel({
+//			id : 'guide_2nd_panel',
+//			renderTo :'active_secendStep',
+//			width :1015,
+//			border : false,
+//	 		items : [{
+//				layout : 'column',
+//				frame : true,
+//				border : false,
+//	
+//				defaults : {
+//					layout : 'form',
+//					labelWidth : 70,
+//					labelAlign : 'right',
 //					columnWidth : .33
-				},
-				items : [{
-					id : 'guide_2nd_CouponOption',
-					items : [{
-						id : 'westPanel',
-						xtype : 'panel',
-						defaults : {
-							layout : 'form',
-							labelWidth : 70,
-							labelAlign : 'right'
-						},
-						items : [{
-							items : [{
-								xtype : 'label',
-								html : '&nbsp;&nbsp;选择优惠劵:&nbsp;&nbsp;'
-							}]			
-						},{
-							items : [{
-								xtype : 'radio',
-								id : 'radioDefaultCoupon',
-								name : 'radioActiveType',
-								inputValue : 1,
-								hideLabel : true,
-								checked : true,
-								boxLabel : '10元券&nbsp;&nbsp;',
-								listeners : {
-									render : function(e){
-										e.getEl().dom.parentNode.style.paddingLeft = '10px';
-										e.getEl().dom.parentNode.style.paddingTop = '5px';
-									},
-									check : function(e){
-										if(e.getValue()){
-											changeCouponModel(1);
-										}
-									}
-								}
-							}]			
-						},{
-							items : [{
-								xtype : 'radio',
-								name : 'radioActiveType',
-								inputValue : 2,
-								hideLabel : true,
-								boxLabel : '20元券&nbsp;&nbsp;',
-								listeners : {
-									render : function(e){
-										e.getEl().dom.parentNode.style.paddingLeft = '10px';
-									},						
-									check : function(e){
-										if(e.getValue()){
-										}
-									}
-								}
-							}]			
-						},{
-							items : [{
-								xtype : 'radio',
-								id : 'radioSelfCoupon',
-								name : 'radioActiveType',
-								inputValue : 3,
-								hideLabel : true,
-								boxLabel : '自定义',
-								listeners : {
-									render : function(e){
-										e.getEl().dom.parentNode.style.paddingLeft = '10px';
-									},						
-									check : function(e){
-										if(e.getValue()){
-											changeCouponModel(3);
-										}
-									}
-								}
-							}]			
-						}]
-					}]					
-				
-			},{
-				id : 'guide_2nd_couponDetail',
-				items : [{
-					id : 'centerPanel',
-					xtype : 'panel',
-					layout : 'column',
-					width : 220,
-					style : 'paddingTop:20px;',
-					defaults : {
-						layout : 'form',
-						labelWidth : 80
-//						labelAlign : 'right'
-					},
-					items : [{
-						items : [{
-							id : 'guide_2nd_couponName',
-							xtype : 'textfield',
-							fieldLabel : '优惠劵名称',
-							value : '10元优惠劵',
-							allowBlank : false
-						}]
-					},{
-						items : [{
-							id : 'guide_2nd_couponPrice',
-							xtype : 'textfield',
-							value : 10,
-							fieldLabel : '&nbsp;&nbsp;&nbsp;面额',
-							allowBlank : false
-						}]
-					}, {
-						items : [{
-							id : 'guide_2nd_couponExpired',
-							xtype : 'datefield',
-							width : 130,
-							fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
-							format : 'Y-m-d',
-							readOnly : false,
-							allowBlank : false,
-							minValue : new Date(),
-							value : new Date(),
-							blankText : '日期不能为空.',
-							listeners : {
-								invalid : function(thiz){
-									thiz.clearInvalid();
-								}
-							}				
-						}]				
-					}]
-				}]					
-				
-			},{
-				id : 'active_secendStep2CouponImg',
-				items : [{
-					xtype : 'panel',
-					width : 280,
-					layout : 'column',
-					style : 'marginLeft:18px;',
-					frame : true,
-					items : [couponPicBox, form,{
-							columnWidth : 0.6,
-							items : [{
-								xtype : 'label',
-								html : '&nbsp;&nbsp;'
-							}]						
-						},{
-							items : [{
-								xtype : 'label',
-								style : 'width : 130px;',
-								html : '<sapn style="font-size:13px;color:green;font-weight:bold">图片大小不能超过100K</span>'
-							}]							
-						},btnUpload],
-					listeners : {
-		 	    		render : function(e){
-		 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
-			 	  		}
-		 	    	}	
-				}]					
-				
-			},secendStepWest]
-			},secendStepCenter]
-		}]
-	});	
+//				},
+//				items : [{
+//					labelWidth : 180,
+//					items : [{
+//						id : 'guide_2nd_occupy',
+//						xtype : 'label',
+//						style : 'color:#DFE8F6',
+//						html : '单次消费积分满/累计积分满-有优惠劵'
+//					}]
+//				},{
+//					columnWidth : .3,
+//					items : [{
+//						id : 'guide_2nd_title',
+//						xtype : 'textfield',
+//						width : 200,
+//						fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
+//						style : 'overflow: hidden;',
+//						allowBlank : false,
+//						listeners : {
+//							blur : function(){
+//								Ext.getCmp('guide_2nd_previewBtn').handler();
+//							}
+//						}
+//					}]
+//				}]
+//			}]
+//	});
+	
+	
+	//TODO
+//	new Ext.Panel({
+//		renderTo :'active_secendStep2',
+//		width :1015,
+//		border : false,
+//		items : [{
+//			layout : 'border',
+//			frame : true,
+//			border : false,
+//			height : 545,
+//			items : [{
+//	 			xtype : 'panel',
+//	 			region : 'center',
+//	 			width :620,
+//	 			height : 535,
+//				layout : 'column',
+//				frame : true,
+//				defaults : {
+//					layout : 'form',
+//					labelWidth : 70,
+//					labelAlign : 'right'
+////					columnWidth : .33
+//				},
+//				items : [{
+//					id : 'guide_2nd_CouponOption',
+//					items : [{
+//						id : 'westPanel',
+//						xtype : 'panel',
+//						defaults : {
+//							layout : 'form',
+//							labelWidth : 70,
+//							labelAlign : 'right'
+//						},
+//						items : [{
+//							items : [{
+//								xtype : 'label',
+//								html : '&nbsp;&nbsp;选择优惠劵:&nbsp;&nbsp;'
+//							}]			
+//						},{
+//							items : [{
+//								xtype : 'radio',
+//								id : 'radioDefaultCoupon',
+//								name : 'radioActiveType',
+//								inputValue : 1,
+//								hideLabel : true,
+//								checked : true,
+//								boxLabel : '10元券&nbsp;&nbsp;',
+//								listeners : {
+//									render : function(e){
+//										e.getEl().dom.parentNode.style.paddingLeft = '10px';
+//										e.getEl().dom.parentNode.style.paddingTop = '5px';
+//									},
+//									check : function(e){
+//										if(e.getValue()){
+//											changeCouponModel(1);
+//										}
+//									}
+//								}
+//							}]			
+//						},{
+//							items : [{
+//								xtype : 'radio',
+//								name : 'radioActiveType',
+//								inputValue : 2,
+//								hideLabel : true,
+//								boxLabel : '20元券&nbsp;&nbsp;',
+//								listeners : {
+//									render : function(e){
+//										e.getEl().dom.parentNode.style.paddingLeft = '10px';
+//									},						
+//									check : function(e){
+//										if(e.getValue()){
+//										}
+//									}
+//								}
+//							}]			
+//						},{
+//							items : [{
+//								xtype : 'radio',
+//								id : 'radioSelfCoupon',
+//								name : 'radioActiveType',
+//								inputValue : 3,
+//								hideLabel : true,
+//								boxLabel : '自定义',
+//								listeners : {
+//									render : function(e){
+//										e.getEl().dom.parentNode.style.paddingLeft = '10px';
+//									},						
+//									check : function(e){
+//										if(e.getValue()){
+//											changeCouponModel(3);
+//										}
+//									}
+//								}
+//							}]			
+//						}]
+//					}]					
+//				
+//			},{
+//				id : 'guide_2nd_couponDetail',
+//				items : [{
+//					id : 'centerPanel',
+//					xtype : 'panel',
+//					layout : 'column',
+//					width : 220,
+//					style : 'paddingTop:20px;',
+//					defaults : {
+//						layout : 'form',
+//						labelWidth : 80
+////						labelAlign : 'right'
+//					},
+//					items : [{
+//						items : [{
+//							id : 'guide_2nd_couponName',
+//							xtype : 'textfield',
+//							fieldLabel : '优惠劵名称',
+//							value : '10元优惠劵',
+//							allowBlank : false
+//						}]
+//					},{
+//						items : [{
+//							id : 'guide_2nd_couponPrice',
+//							xtype : 'textfield',
+//							value : 10,
+//							fieldLabel : '&nbsp;&nbsp;&nbsp;面额',
+//							allowBlank : false
+//						}]
+//					}, {
+//						items : [{
+//							id : 'guide_2nd_couponExpired',
+//							xtype : 'datefield',
+//							width : 130,
+//							fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
+//							format : 'Y-m-d',
+//							readOnly : false,
+//							allowBlank : false,
+//							minValue : new Date(),
+//							value : new Date(),
+//							blankText : '日期不能为空.',
+//							listeners : {
+//								invalid : function(thiz){
+//									thiz.clearInvalid();
+//								}
+//							}				
+//						}]				
+//					}]
+//				}]					
+//				
+//			},{
+//				id : 'active_secendStep2CouponImg',
+//				items : [{
+//					xtype : 'panel',
+//					width : 280,
+//					layout : 'column',
+//					style : 'marginLeft:18px;',
+//					frame : true,
+//					items : [couponPicBox, form,{
+//							columnWidth : 0.6,
+//							items : [{
+//								xtype : 'label',
+//								html : '&nbsp;&nbsp;'
+//							}]						
+//						},{
+//							items : [{
+//								xtype : 'label',
+//								style : 'width : 130px;',
+//								html : '<sapn style="font-size:13px;color:green;font-weight:bold">图片大小不能超过100K</span>'
+//							}]							
+//						},btnUpload],
+//					listeners : {
+//		 	    		render : function(e){
+//		 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+//			 	  		}
+//		 	    	}	
+//				}]					
+//				
+//			},secendStepWest]
+//			},secendStepCenter]
+//		}]
+//	});	
 	
 	
 	//活动树悬浮栏
