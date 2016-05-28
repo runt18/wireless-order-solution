@@ -2,7 +2,6 @@ package com.wireless.Actions.inventoryMgr.material;
 
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,37 +11,39 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.DBCon;
-import com.wireless.db.Params;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.stockMgr.MonthlyBalanceDao;
-import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockInitDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
 
 public class OperateMaterialInitlAction extends DispatchAction{
-
-	public ActionForward getInitMaterial(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		JObject jobject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		String deptId = request.getParameter("deptId");
-		String cateType = request.getParameter("cateType");
-		String cateId = request.getParameter("cateId");
-		String name = request.getParameter("name");
+	
+	/**
+	 * 获取所有商品
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getInitMaterial(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String deptId = request.getParameter("deptId");
+		final String cateType = request.getParameter("cateType");
+		final String cateId = request.getParameter("cateId");
+		final String name = request.getParameter("name");
 		
 		try{
-			StockInitDao.ExtraCond extra = new StockInitDao.ExtraCond();
+			final StockInitDao.ExtraCond extra = new StockInitDao.ExtraCond();
+			
 			
 			if(cateType != null && !cateType.isEmpty()){
 				extra.setCateType(Integer.parseInt(cateType));
@@ -56,21 +57,10 @@ public class OperateMaterialInitlAction extends DispatchAction{
 				extra.setName(name);
 			}
 			
-			List<Material> ms = StockInitDao.getMaterialStockByDeptId(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(deptId), extra, null);
-/*			if(deptId.equals("-1")){
-				ms = StockInitDao.getMaterialStock(StaffDao.verify(Integer.parseInt(pin)), extra, null);
-			}else{
-				ms = StockInitDao.getMaterialStockByDeptId(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(deptId), extra, null);
-//			}			
- */
-			
-			jobject.setRoot(ms);
+			jobject.setRoot(StockInitDao.getMaterialStockByDeptId(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(deptId), extra, null));
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -78,66 +68,40 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		return null;
 	}
 
+	
+	/**
+	 * 修改部门仓库库存量
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward updateDeptStock(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jObject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		String deptId = request.getParameter("deptId");
-		String editData = request.getParameter("editData");
-		String cateType = request.getParameter("cateType");
+		final JObject jObject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String deptId = request.getParameter("deptId");
+		final String editData = request.getParameter("editData");
+		final String cateType = request.getParameter("cateType");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		DBCon dbCon = new DBCon();
-		dbCon.connect();
 		try{
 			if(!editData.isEmpty()){
 
-				//保存初始化数据之前先初始化一次
-				//删除月结明细记录
-				String sql = "DELETE MD FROM " + Params.dbName + ".monthly_balance_detail MD " + 
-						" JOIN " + Params.dbName + ".monthly_balance M ON M.id = MD.monthly_balance_id " +
-						" WHERE M.restaurant_id = " + staff.getRestaurantId();
-				dbCon.stmt.executeUpdate(sql);	
-				
-				//删除月结记录
-				sql = "DELETE FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId();
-				dbCon.stmt.executeUpdate(sql);
-				
 				Calendar c = Calendar.getInstance();
 				c.add(Calendar.MONTH, -1);
 				//初始化库存账单为上个月31
 				String initDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH);
 				
 				InsertBuilder builder = StockAction.InsertBuilder.stockInit(staff.getRestaurantId(), DateUtil.parseDate(initDate))
-						.setOriStockId("")
-						.setOperatorId(staff.getId()).setOperator(staff.getName())
-						.setComment("")
-						.setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)))
-						.setDeptIn(Short.parseShort(deptId));
+																 .setOriStockId("")
+																 .setOperatorId(staff.getId()).setOperator(staff.getName())
+																 .setComment("")
+																 .setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)))
+															 	 .setDeptIn(Short.parseShort(deptId));
 				
 				for (String md : editData.split("<li>")) {
 					String[] m = md.split(",");
-					
-//					List<MaterialDept> list = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + m[0] + " AND MD.dept_id = " + deptId, null);
-//					Material material = MaterialDao.getById(staff, Integer.parseInt(m[0]));
-//					if(list.isEmpty()){
-//						material.setStock(material.getStock() + Float.parseFloat(m[1]));
-//						
-//						MaterialDept mDept = new MaterialDept();
-//						mDept.setMaterial(material);
-//						mDept.setStock(Float.parseFloat(m[1]));
-//						mDept.setDeptId(Integer.parseInt(deptId));
-//						mDept.setRestaurantId(staff.getRestaurantId());
-//						MaterialDeptDao.insertMaterialDept(staff, mDept);	
-//						
-//						MaterialDao.update(material);
-//					}else{
-//						MaterialDept mDept = list.get(0);
-//						float delta = Float.parseFloat(m[1]) - mDept.getStock();
-//						material.setStock(material.getStock() + delta);
-//						MaterialDao.update(material);
-//						
-//						mDept.setStock(Float.parseFloat(m[1]));
-//						MaterialDeptDao.updateMaterialDept(staff, mDept);
-//					}
 					
 					builder.addDetail(new StockActionDetail(Integer.parseInt(m[0]), Float.parseFloat(m[2]), Float.parseFloat(m[1])));
 
@@ -145,30 +109,32 @@ public class OperateMaterialInitlAction extends DispatchAction{
 				//设置总额
 				builder.setInitActualPrice(builder.getTotalPrice());
 				
-				//添加并审核
-				int stockActionId = StockActionDao.insert(dbCon, staff, builder);
-				StockActionDao.audit(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
-				
-				MonthlyBalance.InsertBuilder monthBuild = new MonthlyBalance.InsertBuilder(staff.getRestaurantId(), staff.getName());
-
-				MonthlyBalanceDao.insert(monthBuild, staff);
+				StockInitDao.insert(staff, builder);
 				jObject.initTip(true, "保存成功");				
 			}
 
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jObject.initTip4Exception(e);
 		}finally{
-			dbCon.disconnect();
 			response.getWriter().print(jObject.toString());
 		}
 
 		return null;
 	}
 	
+	
+	
+	
+	/**
+	 * 清空数据
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward init(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
@@ -179,9 +145,6 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		}catch(SQLException | BusinessException	e){
 			e.printStackTrace();
 			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -189,9 +152,18 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		return null;
 	}	
 	
-	public ActionForward isInit(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	
+	
+	/**
+	 * 判定初始化后是否有出入库操作
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward isInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
 		try{
@@ -203,9 +175,6 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip4Exception(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

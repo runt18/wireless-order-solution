@@ -9,20 +9,6 @@
 		text-align:center;
 	}
 </style>
-<script type="text/javascript">
-	var stockBasicGrid, stockDetailGrid;
-	var stockTaskNavWin, firstStepPanel, secondStepPanelCenter, dateTimePanel;
-	var Supplier = {};
-	var secondStepPanelNorth;
-	var menuStockDetailPrice, menuStockDetailAmount;
-	var winParams = {
-		st : [[1, '入库'], [2, '出库']],
-		cate : [[-1, '全部'], [1, '商品'], [2, '原料']],
-		sst : [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [4, '退货'], [5, '出库调拨'], [6, '报损'], [7, '盘盈'], [8, '盘亏'], [9, '消耗']]
-	};
-	var currRecordMaterialId;
-</script>
-
 <script type="text/javascript" src="../../js/InventoryManagement/stockActionMgr/stockActionMgrMain.js"></script>
 </head>
 <body>
@@ -33,6 +19,8 @@
 		总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height:20px;width:90px;font-size:18px;font-weight:bolder;" />
 				 &nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height:20px;width:90px;font-size:18px;font-weight:bolder;" />
 				 &nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style="height:20px;width:90px;font-size:18px;font-weight:bolder;color:red"/>
+	</div>
+	<div id="stockActionPrint">
 	</div>
 </body>
 </html>

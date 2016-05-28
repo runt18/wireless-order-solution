@@ -34,9 +34,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
 		JObject jobject = new JObject();
@@ -118,10 +116,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward update(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		try{
@@ -173,10 +168,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward cancel(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward cancel(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		try{
@@ -208,10 +200,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward audit(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward audit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		try{
@@ -245,10 +234,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward miss(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward miss(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		
 		JObject jobject = new JObject();
 		try{
@@ -284,10 +270,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward checkCurrentMonth(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward checkCurrentMonth(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		try{
@@ -319,10 +302,7 @@ public class OperateStockTakeAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward checkStockAction(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward checkStockAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		
 		JObject jobject = new JObject();
 		try{

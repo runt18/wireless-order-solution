@@ -51,9 +51,15 @@ public class StockActionDao {
 		private boolean isHistory;						//是否查询历史库单
 		private boolean isCurrentMonth;					//是否查询当前会计月份
 		private Staff staff;
+		private String comment;
 		
 		ExtraCond setStaff(Staff staff){
 			this.staff = staff;
+			return this;
+		}
+		
+		public ExtraCond setComment(String comment){
+			this.comment = comment;
 			return this;
 		}
 		
@@ -180,7 +186,7 @@ public class StockActionDao {
 			
 			if(this.isHistory){
 				try {
-					long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+					long monthly = MonthlyBalanceDao.getCurrentMonthTime(staff);
 					String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
 					extraCond.append(" AND S.ori_stock_date < '" + curmonth + "'");
 				} catch (SQLException | BusinessException ignored) {
@@ -190,7 +196,7 @@ public class StockActionDao {
 			
 			if(this.isCurrentMonth){
 				try {
-					long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+					long monthly = MonthlyBalanceDao.getCurrentMonthTime(staff);
 					String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
 					extraCond.append(" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
 				} catch (SQLException | BusinessException ignored) {
@@ -234,6 +240,10 @@ public class StockActionDao {
 				extraCond.append(" AND S.supplier_id = " + this.supplierId);
 			}
 			
+			if(comment != null && !comment.isEmpty()){
+				extraCond.append(" AND S.comment LIKE '%" + this.comment + "%' ");
+			}
+			
 			return extraCond.toString();
 		}
 	}
@@ -275,12 +285,16 @@ public class StockActionDao {
 		//获取当前工作月
 		Calendar c = Calendar.getInstance();
 		c.setTime(new Date());
-		
 		//获取月份最大天数
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+		
+		/**
+		 * 录入库单的最大值
+		 * 录入的库单只能在 【当前时间】 之前
+		 */
 		long maxDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + day);
 		
-		//比较盘点时间和月结时间,取最大值
+		//比较 时间和月结时间,取最大值
 		String sql = " SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
 					 " UNION ALL " +
 					 " SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
@@ -288,6 +302,10 @@ public class StockActionDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("date") != null){
+				/**
+				 * 录入库单的最小值
+				 * 录入的库单只能在 【当前会计月份第一天】 【最后一张已经审核的盘点单】 之后
+				 */
 				minDate = dbCon.rs.getTimestamp("date").getTime();
 			}
 		}
@@ -944,6 +962,9 @@ public class StockActionDao {
 		dbCon.rs.close();
 		
 
+		/**
+		 * 反审核能修改库单时间  库单时间    小于【会计月份的最后一天】  大于【最后一次的月结时间】 或  【盘点时间】 
+		 */
 		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
 		if(minDate != 0 && builder.getOriStockDate() < minDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
@@ -1375,9 +1396,9 @@ public class StockActionDao {
 	 * @throws SQLException
 	 */
 	public static long getStockActionInsertTime(DBCon dbCon, Staff staff) throws SQLException{
-		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
-				" UNION ALL " +
-				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND (status = " + StockTake.Status.AUDIT.getVal() + " OR status = " + StockTake.Status.CHECKING.getVal() + ")) M";
+		String selectMaxDate = " SELECT MAX(date) as date FROM (SELECT  MAX(date_add(month, interval 1 MONTH)) date FROM " + Params.dbName + ".monthly_balance WHERE restaurant_id = " + staff.getRestaurantId() + 
+							   " UNION ALL " +
+							   " SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId() + " AND (status = " + StockTake.Status.AUDIT.getVal() + " OR status = " + StockTake.Status.CHECKING.getVal() + ")) M";
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		final long minDay;
 		if(dbCon.rs.next()){
