@@ -27,38 +27,52 @@ public class QueryCostAnalyzeReportAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		String beginDate = request.getParameter("beginDate");
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String beginDate = request.getParameter("beginDate");
 			String endDate = "";
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<CostAnalyze> list = new ArrayList<CostAnalyze>();
 			Calendar c = Calendar.getInstance();
+			
 			if(beginDate == null){
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				//默认使用当前时间实时查询
 				beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
 				
 				endDate = sdf.format(new Date());
-				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate, endDate, null);
+				list = CostAnalyzeReportDao.getByCond(staff, new CostAnalyzeReportDao.ExtraCond().setDateRange(beginDate, endDate), null);
 			}else{
 				endDate = beginDate + "-31 23:59:59";
-				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate + "-01", endDate, null);
+				list = CostAnalyzeReportDao.getByCond(staff, new CostAnalyzeReportDao.ExtraCond().setDateRange(beginDate + "-01", endDate), null);
 			}
-			jobject.setTotalProperty(list.size());
+			
+			jobject.setTotalProperty(list.size() + 1);
 			
 			if(!list.isEmpty()){
-				CostAnalyze sum = new CostAnalyze();
+				final CostAnalyze sum = new CostAnalyze();
 				for (CostAnalyze costAnalyze : list) {
+					//期初
 					sum.setPrimeMoney(sum.getPrimeMoney() + costAnalyze.getPrimeMoney());
+					//采购
 					sum.setPickMaterialMoney(sum.getPickMaterialMoney() + costAnalyze.getPickMaterialMoney());
+					//领料
 					sum.setStockInTransferMoney(sum.getStockInTransferMoney() + costAnalyze.getStockInTransferMoney());
+					//其他入库
+					sum.setStockSpillMoney(sum.getStockSpillMoney() + costAnalyze.getStockSpillMoney());
+					//盘盈
+					sum.setStockTakeMoreMoney(sum.getStockTakeMoreMoney() + costAnalyze.getStockTakeMoreMoney());
+					//退货
 					sum.setStockOutMoney(sum.getStockOutMoney() + costAnalyze.getStockOutMoney());
+					//退料
 					sum.setStockOutTransferMoney(sum.getStockOutTransferMoney() + costAnalyze.getStockOutTransferMoney());
+					//其他出库
+					sum.setStockDamageMoney(sum.getStockDamageMoney() + costAnalyze.getStockDamageMoney());
+					//盘亏
+					sum.setStockTakeLessMoney(sum.getStockTakeLessMoney() + costAnalyze.getStockTakeLessMoney());
+					//期末
 					sum.setEndMoney(sum.getEndMoney() + costAnalyze.getEndMoney());
-					sum.setCostMoney(sum.getCostMoney() + costAnalyze.getCostMoney());
-					sum.setSalesMoney(sum.getSalesMoney() + costAnalyze.getSalesMoney());
 				}
 				
 				list.add(sum);

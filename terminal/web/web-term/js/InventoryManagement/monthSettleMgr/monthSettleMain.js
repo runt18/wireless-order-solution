@@ -75,7 +75,8 @@ function operateMaterialPrice(){
 		success : function(res, opt){
 			monthSettleWin.hide();
 			Ext.Ajax.request({
-	 			url : '../../UpdateCurrentMonth.do',
+	 			url : '../../OperateMonthlyBalance.do',
+				params : {dataSource : 'updateMonthlyBalance'},
 	 			success : function(res, opt){
 					var jr = Ext.decode(res.responseText);
 					if(jr.success){
@@ -123,10 +124,8 @@ function monthSettleHandler(){
 
 function showMonthSettleDetail(){
 	Ext.Ajax.request({
-		url : '../../QueryCurrentMonth.do',
-		params : {
-			restaurantID : restaurantID
-		},
+		url : '../../OperateMonthlyBalance.do',
+		params : {dataSource : 'getCurrentMonthly'},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){

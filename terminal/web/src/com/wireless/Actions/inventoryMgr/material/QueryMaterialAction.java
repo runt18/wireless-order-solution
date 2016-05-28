@@ -29,57 +29,52 @@ import com.wireless.util.DataPaging;
 
 public class QueryMaterialAction extends DispatchAction{
 	
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
+		final JObject jobject = new JObject();
+		final String isPaging = request.getParameter("isPaging");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String pin = (String)request.getAttribute("pin");
+		final String contentAll = request.getParameter("contentAll");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String name = request.getParameter("name");
+		final String cateId = request.getParameter("cateId");
+		final String cateType = request.getParameter("cateType");
+		final String materialId = request.getParameter("materialId");
+		MaterialDao.ExtraCond extra = new MaterialDao.ExtraCond();
 		
-		JObject jobject = new JObject();
 		List<Material> root = null;
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		String pin = (String)request.getAttribute("pin");
-		String contentAll = request.getParameter("contentAll");
-		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
 		List<Jsonable> list = new ArrayList<>();
 		try{
 			
-			//String restaurantID = (String) request.getAttribute("restaurantID");
-			String name = request.getParameter("name");
-			String cateId = request.getParameter("cateId");
-			String cateType = request.getParameter("cateType");
-			String materialId = request.getParameter("materialId");
-			MaterialDao.ExtraCond extra = new MaterialDao.ExtraCond();
-			
 			if(cateType != null && !cateType.trim().isEmpty() && !cateType.equals("-1")){
-				//extra += (" AND MC.type = " + cateType);
 				extra.setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			
 			if(name != null && !name.trim().isEmpty()){
-				//extra += (" AND M.name like '%" + name + "%' ");
 				extra.setName(name);
 			}
 			if(cateId != null && !cateId.trim().isEmpty() && !cateId.equals("-1")){
-				//extra += (" AND MC.cate_id = " + cateId);
 				extra.setCate(Integer.parseInt(cateId));
 			}
 			if(materialId != null && !materialId.trim().isEmpty()){
-				//extra += (" AND M.material_id = " + materialId);
 				extra.setId(Integer.parseInt(materialId));
 			}
-//			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-//			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			
 			root = MaterialDao.getByCond(staff, extra);
 			
 		}catch(SQLException e){
 			jobject.initTip(e);
-			e.printStackTrace();
-		}catch(Exception e){
-			jobject.initTip4Exception(e);
 			e.printStackTrace();
 		}finally{
 			if(root != null){
@@ -193,6 +188,8 @@ public class QueryMaterialAction extends DispatchAction{
 		return null;
 	}*/
 	
+	
+	
 	/**
 	 * 
 	 * @param mapping
@@ -202,9 +199,7 @@ public class QueryMaterialAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward stockTakeDetail(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward stockTakeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
 		JObject jobject = new JObject();
@@ -235,10 +230,17 @@ public class QueryMaterialAction extends DispatchAction{
 		return null;
 	}
 	
-	public ActionForward selectToBeGood(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward selectToBeGood(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		String isPaging = request.getParameter("isPaging");
@@ -270,15 +272,11 @@ public class QueryMaterialAction extends DispatchAction{
 			jobject.initTip(e);
 			e.printStackTrace();
 			
-		}catch(Exception e){
-			jobject.initTip4Exception(e);
-			e.printStackTrace();
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}	
 
-	
 	
 }

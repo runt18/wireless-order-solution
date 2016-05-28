@@ -1,20 +1,23 @@
-
-var suppllierGridTbar;
 Ext.onReady(function(){
+	var suppllierGridTbar;
 	var cm = new Ext.grid.ColumnModel([
        new Ext.grid.RowNumberer(),
        {header: '部门 ', dataIndex: 'deptName'},
        {header: '期初余额', dataIndex: 'primeMoney', align : 'right',  renderer : Ext.ux.txtFormat.gridDou},
-       {header: '领料金额', dataIndex: 'useMaterialMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '拨入金额', dataIndex: 'stockInTransferMoney', align : 'right', width : 120, renderer : Ext.ux.txtFormat.gridDou},
-       {header: '退料金额', dataIndex: 'stockOutMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '拨出金额', dataIndex: 'stockOutTransferMoney', align : 'right', width : 120, renderer : Ext.ux.txtFormat.gridDou},
+       {header: '采购金额', dataIndex: 'useMaterialMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '领料金额', dataIndex: 'stockInTransferMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '其他入库额', dataIndex: 'stockSpillMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '盘盈金额', dataIndex: 'stockTakeMoreMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '退货金额', dataIndex: 'stockOutMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '退料金额', dataIndex: 'stockOutTransferMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '其他出库额', dataIndex: 'stockDamageMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '盘亏金额', dataIndex: 'stockTakeLessMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '期末金额', dataIndex: 'endMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
-       {header: '成本金额', dataIndex: 'costMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
-       {header: '销售金额', dataIndex: 'salesMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
-       {header: '毛利额', dataIndex: 'profit', align : 'right', width : 150, renderer : Ext.ux.txtFormat.gridDou},
-       {header: '毛利率', id: 'profitRate', dataIndex: 'profitRate', align : 'right', renderer : Ext.ux.txtFormat.percent}
-        
+       {header: '成本金额', dataIndex: 'costMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '销售金额', dataIndex: 'salesMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '毛利额', dataIndex: 'profit', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '毛利率', dataIndex: 'profitRate', align : 'right', renderer : Ext.ux.txtFormat.gridDou}
+       
 	]);
 	cm.defaultSortable = true;
 	
@@ -24,9 +27,13 @@ Ext.onReady(function(){
 				{name: 'deptName'},
 				{name: 'primeMoney'},
 				{name: 'useMaterialMoney'},
-				{name: 'stockOutMoney'},
 				{name: 'stockInTransferMoney'},
+				{name: 'stockSpillMoney'},
+				{name: 'stockTakeMoreMoney'},
+				{name: 'stockOutMoney'},
 				{name: 'stockOutTransferMoney'},
+				{name: 'stockDamageMoney'},
+				{name: 'stockTakeLessMoney'},
 				{name: 'endMoney'},
 				{name: 'costMoney'},
 				{name: 'salesMoney'},
@@ -106,8 +113,8 @@ Ext.onReady(function(){
 				sumRow.style.fontWeight = 'bold';					
 			}
 			costAnalyzeGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-			costAnalyzeGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
-			costAnalyzeGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+//			costAnalyzeGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
+//			costAnalyzeGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
 		}
 	});	
 	

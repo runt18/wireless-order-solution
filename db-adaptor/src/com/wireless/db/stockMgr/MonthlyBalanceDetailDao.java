@@ -20,14 +20,15 @@ public class MonthlyBalanceDetailDao {
 	 * @throws SQLException
 	 */
 	public static int insert(DBCon dbCon, MonthlyBalanceDetail detail) throws SQLException{
-		String sql = "INSERT INTO " + Params.dbName + ".monthly_balance_detail(monthly_balance_id, restaurant_id, dept_id, dept_name, opening_balance, ending_balance) " +
-						"VALUES( " +
-						detail.getMonthlyBalanceId() + ", " +
-						detail.getRestaurantId() + ", " +
-						detail.getDeptId() + ", " +
-						"'" + detail.getDeptName() + "', " +
-						detail.getOpeningBalance() + ", " +
-						detail.getEndingBalance() + ")";
+		String sql = "INSERT INTO " + Params.dbName + ".monthly_balance_detail(" + 
+					 "monthly_balance_id, restaurant_id, dept_id, dept_name, opening_balance, ending_balance) " +
+					 "VALUES( " +
+					 detail.getMonthlyBalanceId() + ", " +
+					 detail.getRestaurantId() + ", " +
+					 detail.getDeptId() + ", " +
+					 "'" + detail.getDeptName() + "', " +
+					 detail.getOpeningBalance() + ", " +
+					 detail.getEndingBalance() + ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();

@@ -111,9 +111,10 @@ var monthSettleWin = new Ext.Window({
 				}
 			});*/
 			Ext.Ajax.request({
-				url : '../../QueryCurrentMonth.do',
+				url : '../../OperateMonthlyBalance.do',
 				params : {
-					restaurantID : restaurantID
+					dataSource : 'getCurrentMonthly'
+//					restaurantID : restaurantID
 				},
 				success : function(res, opt){
 					var jr = Ext.decode(res.responseText);
@@ -176,7 +177,8 @@ var monthSettleWin = new Ext.Window({
 		 		Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
 		 	}else{			
 				Ext.Ajax.request({
-		 			url : '../../UpdateCurrentMonth.do',
+		 			url : '../../OperateMonthlyBalance.do',
+					params : {dataSource : 'updateMonthlyBalance'},
 		 			success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){

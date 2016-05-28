@@ -22,10 +22,7 @@ import com.wireless.util.DataPaging;
 
 public class QueryStockTakeAction extends Action{
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		List<StockTake> root = null;
@@ -42,7 +39,7 @@ public class QueryStockTakeAction extends Action{
 				extraCond += " AND ST.status = " + status;
 			}
 			// 只能查询当前会计月份数据
-			String curmonth = new SimpleDateFormat("yyyy-MM").format(MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId()));
+			String curmonth = new SimpleDateFormat("yyyy-MM").format(MonthlyBalanceDao.getCurrentMonthTime(staff));
 			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
 			
 			orderClause += (" ORDER BY ST.status, ST.start_date ");
