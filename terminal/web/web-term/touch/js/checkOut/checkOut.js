@@ -197,18 +197,44 @@ uo.showOrder = function(){
 		element.onclick= function(){
 			var _selectedTable = null;
 			var orderFood = uo.order.orderFoods[parseInt($(element).attr('data-index'))-1];		
-			var askTablePopup = new AskTablePopup({
-				tables : WirelessOrder.tables,
-				title : '转菜',
-				middle : function(){
-					var prefectTable = askTablePopup.prefect();
-					if(prefectTable){
+			
+			seajs.use('askTable', function(askTable){
+				var askTablePopup = askTable.newInstance({
+					tables : WirelessOrder.tables,
+					title : '转菜',
+					middle : function(){
+						var prefectTable = askTablePopup.prefect();
+						if(prefectTable){
+							var foodCount = $('#foodAmountText_input_ask').val();
+							Util.LM.show();
+							$.post('../OperateOrderFood.do', {
+								dataSource : 'transFood',
+								orderId : uo.order.id,
+								tableId : prefectTable.id,
+								transFoods : orderFood.orderFoodId + ',' + foodCount
+							}, function(data){
+								Util.LM.hide();
+								if(data.success){
+									askTablePopup.close();
+									Util.msg.tip(data.msg);
+									//刷新账单
+									initOrderData({order : uo.order});
+								}else{
+									Util.msg.tip(data.msg);
+								}
+							});
+						}else{
+							Util.msg.tip('没有此餐台, 请重新输入');
+						}
+					},
+					tableSelect : function(selectedTable){
+						_selectedTable = selectedTable;
 						var foodCount = $('#foodAmountText_input_ask').val();
 						Util.LM.show();
 						$.post('../OperateOrderFood.do', {
 							dataSource : 'transFood',
 							orderId : uo.order.id,
-							tableId : prefectTable.id,
+							tableId : _selectedTable.id,
 							transFoods : orderFood.orderFoodId + ',' + foodCount
 						}, function(data){
 							Util.LM.hide();
@@ -221,40 +247,16 @@ uo.showOrder = function(){
 								Util.msg.tip(data.msg);
 							}
 						});
-					}else{
-						Util.msg.tip('没有此餐台, 请重新输入');
 					}
-				},
-				tableSelect : function(selectedTable){
-					_selectedTable = selectedTable;
-					var foodCount = $('#foodAmountText_input_ask').val();
-					Util.LM.show();
-					$.post('../OperateOrderFood.do', {
-						dataSource : 'transFood',
-						orderId : uo.order.id,
-						tableId : _selectedTable.id,
-						transFoods : orderFood.orderFoodId + ',' + foodCount
-					}, function(data){
-						Util.LM.hide();
-						if(data.success){
-							askTablePopup.close();
-							Util.msg.tip(data.msg);
-							//刷新账单
-							initOrderData({order : uo.order});
-						}else{
-							Util.msg.tip(data.msg);
-						}
-					});
-					
-				}
-			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#foodAmount_td_ask').show();
-				$('#foodAmountText_input_ask').val(orderFood.count);
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
+				});
+				askTablePopup.open(function(){
+					$('#left_a_askTable').hide();
+					$('#foodAmount_td_ask').show();
+					$('#foodAmountText_input_ask').val(orderFood.count);
+					$('#middle_a_askTable').css('width', '48%');
+					$('#right_a_askTable').css('width', '50%');
+				});
+			})
 		}
 	});	
 	uo.showNorthForUpdateOrder();
@@ -1277,80 +1279,86 @@ $(function(){
 		//转台
 		$('#checkOutTranTable_a_tableSelect').click(function(){
 			var _selectedTable = null;
-			var askTablePopup = new AskTablePopup({
-				tables : WirelessOrder.tables,
-				title : '转台',
-				middle : function(){
-					var sourceTable = uo.table;
-					var destAlias = $('#left_input_askTable').val();
-					
-					var destTable = WirelessOrder.tables.getByAlias(destAlias);
-					
-					if(!sourceTable || !destTable){
-						Util.msg.tip('查找餐台出错,请检查台号是否正确');
-						return;
+			
+			seajs.use('askTable', function(askTable){
+				var askTablePopup = askTable.newInstance({
+					tables : WirelessOrder.tables,
+					title : '转台',
+					middle : function(){
+						var sourceTable = uo.table;
+						var destAlias = $('#left_input_askTable').val();
+						
+						var destTable = WirelessOrder.tables.getByAlias(destAlias);
+						
+						if(!sourceTable || !destTable){
+							Util.msg.tip('查找餐台出错,请检查台号是否正确');
+							return;
+						}
+						
+						Util.LM.show();
+						
+						$.post('../OperateTable.do', {
+							dataSource : 'transTable',
+							oldTableId : sourceTable.id,
+							newTableId : destTable.id,
+							orientedPrinter : getcookie(document.domain + '_printers')
+						},function(data){
+							Util.LM.hide();
+							if(data.success){
+								askTablePopup.close(function(){
+									Util.msg.tip(data.msg);
+									//返回餐台选择界面
+									ts.loadData();
+								}, 200);
+							}else{
+								Util.msg.tip(data.msg);				
+							}			
+						}).error(function(){
+							Util.LM.hide();
+							Util.msg.tip('操作失败, 请刷新页面重试');		
+						});	
+						
+					},
+					tableSelect : function(selectedTable){
+						_selectedTable = selectedTable;
+						var sourceTable = uo.table;
+						
+						var destTable = _selectedTable;
+						
+						Util.LM.show();
+						
+						$.post('../OperateTable.do', {
+							dataSource : 'transTable',
+							oldTableId : sourceTable.id,
+							newTableId : destTable.id,
+							orientedPrinter : getcookie(document.domain + '_printers')
+						},function(data){
+							Util.LM.hide();
+							if(data.success){
+								askTablePopup.close(function(){
+									Util.msg.tip(data.msg);
+									//返回餐台选择界面
+									ts.loadData();
+								}, 200);
+							}else{
+								Util.msg.tip(data.msg);				
+							}			
+						}).error(function(){
+							Util.LM.hide();
+							Util.msg.tip('操作失败, 请刷新页面重试');		
+						});	
 					}
-					
-					Util.LM.show();
-					
-					$.post('../OperateTable.do', {
-						dataSource : 'transTable',
-						oldTableId : sourceTable.id,
-						newTableId : destTable.id,
-						orientedPrinter : getcookie(document.domain + '_printers')
-					},function(data){
-						Util.LM.hide();
-						if(data.success){
-							askTablePopup.close(function(){
-								Util.msg.tip(data.msg);
-								//返回餐台选择界面
-								ts.loadData();
-							}, 200);
-						}else{
-							Util.msg.tip(data.msg);				
-						}			
-					}).error(function(){
-						Util.LM.hide();
-						Util.msg.tip('操作失败, 请刷新页面重试');		
-					});	
-					
-				},
-				tableSelect : function(selectedTable){
-					_selectedTable = selectedTable;
-					var sourceTable = uo.table;
-					
-					var destTable = _selectedTable;
-					
-					Util.LM.show();
-					
-					$.post('../OperateTable.do', {
-						dataSource : 'transTable',
-						oldTableId : sourceTable.id,
-						newTableId : destTable.id,
-						orientedPrinter : getcookie(document.domain + '_printers')
-					},function(data){
-						Util.LM.hide();
-						if(data.success){
-							askTablePopup.close(function(){
-								Util.msg.tip(data.msg);
-								//返回餐台选择界面
-								ts.loadData();
-							}, 200);
-						}else{
-							Util.msg.tip(data.msg);				
-						}			
-					}).error(function(){
-						Util.LM.hide();
-						Util.msg.tip('操作失败, 请刷新页面重试');		
-					});	
-					
-				}
+				});
+				askTablePopup.open(function(){
+					$('#left_a_askTable').hide();
+					$('#middle_a_askTable').css('width', '48%');
+					$('#right_a_askTable').css('width', '50%');
+				});
 			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
+			
+			
+			
+			
 		});
 		
 		//全单转菜
@@ -1358,18 +1366,44 @@ $(function(){
 			$('#updateFoodOtherOperateCmp').popup('close');
 			setTimeout(function(){
 				var _selectedTable = null;
-				var askTablePopup = new AskTablePopup({
-					tables : WirelessOrder.tables,
-					title : '全单转菜',
-					middle :function(){
-						var perfectMatched = askTablePopup.prefect();
-						if(perfectMatched){
+				
+				seajs.use('askTable', function(askTable){
+					var askTablePopup = askTable.newInstance({
+						tables : WirelessOrder.tables,
+						title : '全单转菜',
+						middle :function(){
+							var perfectMatched = askTablePopup.prefect();
+							if(perfectMatched){
+								Util.LM.show();
+								$.post('../OperateOrderFood.do', {
+									dataSource : 'transFood',
+									orderId : uo.order.id,
+									tableId : perfectMatched.id,
+									transFoods : -1		
+								},function(data){
+									Util.LM.hide();
+									if(data.success){
+										Util.msg.tip(data.msg);
+										askTablePopup.close(function(){
+											//刷新账单
+											initOrderData({order : uo.order});
+										}, 200);
+									}else{
+										Util.msg.tip(data.msg);				
+									}			
+								});
+							}else{
+								Util.msg.tip('没有此餐台,请重新输入');
+							}
+						},
+						tableSelect : function(selectedTable){
+							_selectedTable = selectedTable;
 							Util.LM.show();
 							$.post('../OperateOrderFood.do', {
 								dataSource : 'transFood',
 								orderId : uo.order.id,
-								tableId : perfectMatched.id,
-								transFoods : -1		
+								tableId : _selectedTable.id,
+								transFoods : -1	
 							},function(data){
 								Util.LM.hide();
 								if(data.success){
@@ -1382,36 +1416,14 @@ $(function(){
 									Util.msg.tip(data.msg);				
 								}			
 							});
-						}else{
-							Util.msg.tip('没有此餐台,请重新输入');
 						}
-					},
-					tableSelect : function(selectedTable){
-						_selectedTable = selectedTable;
-						Util.LM.show();
-						$.post('../OperateOrderFood.do', {
-							dataSource : 'transFood',
-							orderId : uo.order.id,
-							tableId : _selectedTable.id,
-							transFoods : -1	
-						},function(data){
-							Util.LM.hide();
-							if(data.success){
-								Util.msg.tip(data.msg);
-								askTablePopup.close(function(){
-									//刷新账单
-									initOrderData({order : uo.order});
-								}, 200);
-							}else{
-								Util.msg.tip(data.msg);				
-							}			
-						});
-					}
-				});
-				askTablePopup.open(function(){
-					$('#left_a_askTable').hide();
-					$('#middle_a_askTable').css('width', '48%');
-					$('#right_a_askTable').css('width', '50%');
+					});
+					
+					askTablePopup.open(function(){
+						$('#left_a_askTable').hide();
+						$('#middle_a_askTable').css('width', '48%');
+						$('#right_a_askTable').css('width', '50%');
+					});
 				});
 			}, 500);
 		});

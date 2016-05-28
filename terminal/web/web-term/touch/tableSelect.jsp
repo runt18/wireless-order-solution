@@ -65,7 +65,8 @@
 			'wxOrderListPopup' : './js/popup/wxOrderList/wxOrderList',
 			'printBind' : './js/popup/print/print',
 			'feastPay' : './js/popup/feastPay/feastPay',
-			'handlerTable' : './js/popup/handlerTable/handlerTable'
+			'handlerTable' : './js/popup/handlerTable/handlerTable',
+			'askTable' : './js/popup/table/ask'
 		}
 	});
 </script>
@@ -104,8 +105,6 @@
 <script type="text/javascript" src="./js/popup/jqmPopup.js?v=<%=v %>"></script>
 <!-- JqmPopupDiv弹出控件 -->
 <script type="text/javascript" src="./js/popup/jqmPopupDiv.js?v=<%=v %>"></script>
-<!-- 查台等控件绑定 -->
-<script type="text/javascript" src="./js/popup/table/ask.js?v=<%=v %>"></script>
 <!-- 明细控件绑定 -->
 <script type="text/javascript" src="./js/popup/detail/detail.js?v=<%=v %>"></script>
 <!-- 微信预定 -->

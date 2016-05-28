@@ -810,70 +810,72 @@ $(function(){
 		
 		//查台按钮
 		$('#searchTable_a_tableSelect').click(function(){
-			var askTablePopup = null;
-			askTablePopup = new AskTablePopup({
-				tables : WirelessOrder.tables,
-				title : '查台',
-				middleText : '点菜(+)',
-				middle : function(){
-					var prefectMatched = askTablePopup.prefect();
-					if(prefectMatched){
-						askTablePopup.close(function(){
-							updateTable({
-								id : prefectMatched.id,
-								alias : !prefectMatched.id ? prefectMatched.alias : ''
-							});	
-						}, 200);
-					}else{
-						Util.msg.tip('没有此餐台,请重新输入');
-					}
-					
-				},
-				left : function(){
-					//结账
-					var perfectMatched = askTablePopup.prefect();
-					
-					if(perfectMatched){
-						if(perfectMatched.statusValue == WirelessOrder.TableList.Status.BUSY.val){
+			
+			seajs.use('askTable', function(askTable){
+				var askTablePopup = askTable.newInstance({
+					tables : WirelessOrder.tables,
+					title : '查台',
+					middleText : '点菜(+)',
+					middle : function(){
+						var prefectMatched = askTablePopup.prefect();
+						if(prefectMatched){
 							askTablePopup.close(function(){
-								$('#tableSelect_div_askTable').off('keydown');
 								updateTable({
-									toPay : true,
-									id : perfectMatched.id,
-									alias : !perfectMatched.id ? perfectMatched.alias : ''
-								});
+									id : prefectMatched.id,
+									alias : !prefectMatched.id ? prefectMatched.alias : ''
+								});	
 							}, 200);
 						}else{
-							Util.msg.tip('餐台是空闲状态，不能结账');
+							Util.msg.tip('没有此餐台,请重新输入');
 						}
-					}else{
-						Util.msg.tip('没有此餐台,请重新输入');
+						
+					},
+					left : function(){
+						//结账
+						var perfectMatched = askTablePopup.prefect();
+						
+						if(perfectMatched){
+							if(perfectMatched.statusValue == WirelessOrder.TableList.Status.BUSY.val){
+								askTablePopup.close(function(){
+									$('#tableSelect_div_askTable').off('keydown');
+									updateTable({
+										toPay : true,
+										id : perfectMatched.id,
+										alias : !perfectMatched.id ? perfectMatched.alias : ''
+									});
+								}, 200);
+							}else{
+								Util.msg.tip('餐台是空闲状态，不能结账');
+							}
+						}else{
+							Util.msg.tip('没有此餐台,请重新输入');
+						}
+					},
+					tableSelect : function(selectedTable){
+						askTablePopup.close(function(){
+							updateTable({
+								id : selectedTable.id,
+								alias : selectedTable.alias
+							});	
+						}, 200);
 					}
-				},
-				tableSelect : function(selectedTable){
-					askTablePopup.close(function(){
-						updateTable({
-							id : selectedTable.id,
-							alias : selectedTable.alias
-						});	
-					}, 200);
-				}
-			});
-			
-			askTablePopup.open(function(self){
+				});
 				
-				$('#tableSelect_div_askTable').on('keydown', function(event){
-					if(event.keyCode == '107'){
-						//快捷键'+'
-						$('#middle_a_askTable').click();
-					}else if(event.keyCode == '13'){
-						//快捷键'Enter'
-						$('#left_a_askTable').click();
-					}
-					//取消事件的冒泡行为
-					event.stopPropagation();
+				askTablePopup.open(function(self){
+					$('#tableSelect_div_askTable').on('keydown', function(event){
+						if(event.keyCode == '107'){
+							//快捷键'+'
+							$('#middle_a_askTable').click();
+						}else if(event.keyCode == '13'){
+							//快捷键'Enter'
+							$('#left_a_askTable').click();
+						}
+						//取消事件的冒泡行为
+						event.stopPropagation();
+					});
 				});
 			});
+			
 		});
 	
 		//快餐模式按钮
@@ -930,98 +932,102 @@ $(function(){
 		
 		//转台
 		$('#tranTable_a_tableSelect').click(function(){
-			var askTablePopup = new AskTablePopup({
-				title : '转台',
-				middle : function(){
-					var sourceTable = null;
-					var sourceAlias = $('#left_input_askTable').val();
-					var destAliasd = $('#tranNum_input_ask').val();
-					
-					sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
-					
-					var destTable = WirelessOrder.tables.getByAlias(destAliasd);
-					
-					if(!sourceTable || !destTable){
-						Util.msg.tip('查找餐台出错,请检查台号是否正确');
-						return;
-					}
-					
-					Util.LM.show();
-					
-					$.post('../OperateTable.do', {
-						dataSource : 'transTable',
-						oldTableId : sourceTable.id,
-						newTableId : destTable.id
-					}, function(data){
-						Util.LM.hide();
-						if(data.success){
-							askTablePopup.close();
-							initTableData();
-							Util.msg.tip(data.msg);
-							ts.loadData();
-						}else{
-							Util.msg.tip(data.msg);
+			seajs.use('askTable', function(askTable){
+				var askTablePopup = askTable.newInstance({
+					title : '转台',
+					middle : function(){
+						var sourceTable = null;
+						var sourceAlias = $('#left_input_askTable').val();
+						var destAliasd = $('#tranNum_input_ask').val();
+						
+						sourceTable = WirelessOrder.tables.getByAlias(sourceAlias);
+						
+						var destTable = WirelessOrder.tables.getByAlias(destAliasd);
+						
+						if(!sourceTable || !destTable){
+							Util.msg.tip('查找餐台出错,请检查台号是否正确');
+							return;
 						}
-					}).error(function(){
-						Util.LM.hide();
-						Util.msg.tip('操作失败,请刷新页面重试');
-					});
-				}
-			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#tranNum_td_ask').show();
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
+						
+						Util.LM.show();
+						
+						$.post('../OperateTable.do', {
+							dataSource : 'transTable',
+							oldTableId : sourceTable.id,
+							newTableId : destTable.id
+						}, function(data){
+							Util.LM.hide();
+							if(data.success){
+								askTablePopup.close();
+								initTableData();
+								Util.msg.tip(data.msg);
+								ts.loadData();
+							}else{
+								Util.msg.tip(data.msg);
+							}
+						}).error(function(){
+							Util.LM.hide();
+							Util.msg.tip('操作失败,请刷新页面重试');
+						});
+					}
+				});
+				
+				askTablePopup.open(function(){
+					$('#left_a_askTable').hide();
+					$('#tranNum_td_ask').show();
+					$('#middle_a_askTable').css('width', '48%');
+					$('#right_a_askTable').css('width', '50%');
+				});
+			});	
 		});
 		
 		//拆台
 		$('#apartTable_a_tableSelect').click(function(){
-			var _selectedTable = null;
-			var askTablePopup = new AskTablePopup({
-				tables : WirelessOrder.tables,
-				title : '拆台',
-				middle : function(){
-					Util.msg.tip('请选中一张餐桌或者编号');
-				},
-				tableSelect : function(selectedTable){
-					$('#matchedTables_div_askTable').hide();
-					$('#suffix_div_ask').show();
-					_selectedTable = selectedTable;
-				},
-				suffixSelect : function(suffixValue){
-					Util.LM.show();
-					var suffix = suffixValue;
-					$.post('../OperateTable.do', {
-						dataSource : 'apartTable',
-						tableID : _selectedTable.id,
-						suffix : suffix,
-						comment : $("#apartComment_input_ask").val()
-					}, function(result){
-						Util.LM.hide();
-						if(result.success){
-							askTablePopup.close(function(){
-								uo.entry({
-									table : result.root[0]
-								});
-							}, 200);
-						}else{
-							Util.msg.tip(result.msg);
-						}
-					}).error(function(){
-						Util.LM.hide();
-						Util.msg.tip('操作失败, 请刷新页面重试');		
-					});		
-				}
-				
+			seajs.use('askTable', function(askTable){
+				var askTablePopup = askTable.newInstance({
+					tables : WirelessOrder.tables,
+					title : '拆台',
+					middle : function(){
+						Util.msg.tip('请选中一张餐桌或者编号');
+					},
+					tableSelect : function(selectedTable){
+						$('#matchedTables_div_askTable').hide();
+						$('#suffix_div_ask').show();
+						_selectedTable = selectedTable;
+					},
+					suffixSelect : function(suffixValue){
+						Util.LM.show();
+						var suffix = suffixValue;
+						$.post('../OperateTable.do', {
+							dataSource : 'apartTable',
+							tableID : _selectedTable.id,
+							suffix : suffix,
+							comment : $("#apartComment_input_ask").val()
+						}, function(result){
+							Util.LM.hide();
+							if(result.success){
+								askTablePopup.close(function(){
+									uo.entry({
+										table : result.root[0]
+									});
+								}, 200);
+							}else{
+								Util.msg.tip(result.msg);
+							}
+						}).error(function(){
+							Util.LM.hide();
+							Util.msg.tip('操作失败, 请刷新页面重试');		
+						});		
+					}
+				});
+				askTablePopup.open(function(){
+					$('#left_a_askTable').hide();
+					$('#apartComment_tr_ask').show();
+					$('#middle_a_askTable').css('width', '48%');
+					$('#right_a_askTable').css('width', '50%');
+				});
 			});
-			askTablePopup.open(function(){
-				$('#left_a_askTable').hide();
-				$('#apartComment_tr_ask').show();
-				$('#middle_a_askTable').css('width', '48%');
-				$('#right_a_askTable').css('width', '50%');
-			});
+			
 		});
 					
 		//当日账单
