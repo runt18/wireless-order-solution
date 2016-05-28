@@ -21,47 +21,46 @@ function CreateInSeatDiv(param){
 			
 			//选择餐桌按钮
 			self.find('[id="left_a_seat"]').click(function(){
-				var askTablePopup = null;
-				askTablePopup = new AskTablePopup({
-					title : '入座选桌',
-					tables : WirelessOrder.tables,
-					tableSelect : function(selectedTable){
-						var hasTables = true;
-						
-						for(var i = 0; i < _seatTables.length; i++){
-							if(_seatTables[i].id == selectedTable.id){
-								_seatTables.splice(i, 1);
-								hasTables = false;
-								break;
+				seajs.use('askTable', function(askTable){
+					var askTablePopup = askTable.newInstance({
+						title : '入座选桌',
+						tables : WirelessOrder.tables,
+						tableSelect : function(selectedTable){
+							var hasTables = true;
+							
+							for(var i = 0; i < _seatTables.length; i++){
+								if(_seatTables[i].id == selectedTable.id){
+									_seatTables.splice(i, 1);
+									hasTables = false;
+									break;
+								}
 							}
-						}
-						
-						if(hasTables){
-							if(WirelessOrder.tables.getById(selectedTable.id).isBusy()){
-								Util.msg.tip("此餐台已使用, 不能选择");
-								return;
+							
+							if(hasTables){
+								if(WirelessOrder.tables.getById(selectedTable.id).isBusy()){
+									Util.msg.tip("此餐台已使用, 不能选择");
+									return;
+								}
+								_seatTables.push(WirelessOrder.tables.getById(selectedTable.id));
 							}
-							_seatTables.push(WirelessOrder.tables.getById(selectedTable.id));
+							
+							initTables(_seatTables, 'seat');
+							askTablePopup.close();
 						}
-						
-						initTables(_seatTables, 'seat');
-						askTablePopup.close();
-					}
+					});
+					
+					askTablePopup.open(function(){
+						$('#left_a_askTable').hide();
+						$('#middle_a_askTable').css('width', '48%');
+						$('#right_a_askTable').css('width', '50%');
+					});
 				});
-				
-				askTablePopup.open(function(){
-					$('#left_a_askTable').hide();
-					$('#middle_a_askTable').css('width', '48%');
-					$('#right_a_askTable').css('width', '50%');
-				});
-				
 			});
 			
 			//入座的回调函数
 			self.find('[id="seat_a_seat"]').click(function(){
 				param.seat(_seatTables);
 			});
-			
 			
 		}
 	})
