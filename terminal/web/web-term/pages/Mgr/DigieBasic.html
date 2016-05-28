@@ -35,6 +35,10 @@
 
 <script type="text/javascript" src="../../extjs/ext-plugins-define.js"></script>
 
+<script type="text/javascript" src="../../jquery/jQuery.print.js"></script>
+<!--script type="text/javascript" src="../../jquery/jquery.printFinal.js"></script-->
+<!--script type="text/javascript" src="../../jquery/jquery.PrintArea.js"></script-->
+<!--script type="text/javascript" src="../../jquery/jquery.jqprint-0.3.js"></script-->
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 
@@ -183,9 +187,10 @@ Ext.onReady(function(){
 							var date = new Date();
 							var presentMonth = date.getMonth() + 1;
 							Ext.Ajax.request({
-								url : '../../QueryCurrentMonth.do',
+								url : '../../OperateMonthlyBalance.do',
 								params : {
-									restaurantID : restaurantID
+									dataSource : 'getCurrentMonthly'
+//									restaurantID : restaurantID
 								},
 								success : function(res, opt){
 									var jr = Ext.decode(res.responseText);

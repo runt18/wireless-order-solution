@@ -380,6 +380,10 @@
 			type="com.wireless.Actions.inventoryMgr.monthlySettle.QueryCurrentMonthAction"
 			scope="request">
 		</action>
+		<action path="/OperateMonthlyBalance"
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.OperateMonthlyBalanceAction"
+			parameter="dataSource">
+		</action>
 		<action path="/QueryPrintFunc"
 			type="com.wireless.Actions.printScheme.QueryPrintFuncAction" scope="request">
 		</action>

@@ -123,6 +123,9 @@ public class StockAction implements Jsonable{
 		}
 
 		public String getOriStockId() {
+			if(oriStockId == null){
+				oriStockId = "";
+			}
 			return oriStockId;
 		}
 		public InsertBuilder setOriStockId(String oriStockId){
@@ -496,11 +499,11 @@ public class StockAction implements Jsonable{
 		MATERIAL_SPILL(6, "原料报溢", "原料报损");*/
 
 		STOCK_IN(1, "采购"),
-		STOCK_IN_TRANSFER(2, "入库调拨"),
-		SPILL(3, "报溢"),
+		STOCK_IN_TRANSFER(2, "领料"),
+		SPILL(3, "其他入库"),
 		STOCK_OUT(4, "退货"),
-		STOCK_OUT_TRANSFER(5, "出库调拨"),
-		DAMAGE(6, "报损"),
+		STOCK_OUT_TRANSFER(5, "退料"),
+		DAMAGE(6, "其他入库"),
 		MORE(7, "盘盈"),
 		LESS(8, "盘亏"),
 		CONSUMPTION(9, "消耗"),

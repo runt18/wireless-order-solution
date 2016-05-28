@@ -10,20 +10,29 @@ public class StockReport implements Jsonable{
 	private float primeAmount;		//期初数量
 	private float primeMoney;		//期初金额
 	private float stockIn;			//入库采购
-	private float stockInTransfer;	//入库调拨
+	private float stockInTransfer;	//领料
 	private float stockTakeMore;	//盘盈
-	private float stockSpill;		//入库报溢
+	private float stockSpill;		//其他入库
 	private float stockOut;			//出库退货
-	private float stockOutTransfer; //出库调拨
+	private float stockOutTransfer; //退料
 	private float stockTakeLess;	//盘亏
-	private float stockDamage;		//出库报损
+	private float stockDamage;		//其他出库
 	private float consumption;		//消耗
 	private float finalAmount;		//期末数量
 	private float finalPrice;		//参考成本
 	private float finalMoney;		//期末金额
+	private float comsumeMoney;		//销售金额
 	
 	public Material getMaterial() {
 		return material;
+	}
+	
+	public float getComsumeMoney(){
+		return this.comsumeMoney;
+	}
+	
+	public void setComsumeMoney(float money){
+		this.comsumeMoney = money;
 	}
 	
 	/**

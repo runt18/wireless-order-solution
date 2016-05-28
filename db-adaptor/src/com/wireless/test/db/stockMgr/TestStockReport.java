@@ -29,7 +29,7 @@ public class TestStockReport {
 	
 	
 	@Test
-	public void testStockReport() throws SQLException, ParseException, BusinessException{
+	public void testStockReport() throws SQLException, ParseException, BusinessException, Exception{
 		//TODO
 		StockReportDao.getByCond(mStaff, null);
 //		String begin = "2013-04-01";

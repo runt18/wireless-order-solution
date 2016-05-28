@@ -358,7 +358,7 @@ Ext.onReady(function(){
 			},
 			handler : function(){
 				promotionEditor.setValue();
-				secendStepCenter.body.update(promotionEditor.getValue());
+				Ext.getCmp('secondStepEastBody').update(promotionEditor.getValue());
 			}
 		});
 		
@@ -589,7 +589,7 @@ Ext.onReady(function(){
 		                    },
 		                    handler : function(){
 		                        promotionEditor.setValue();
-		                        secendStepCenter.body.update(promotionEditor.getValue());
+		                        Ext.getCmp('secondStepEastBody').update(promotionEditor.getValue());
 		                    }
 		                })]
 		            })]

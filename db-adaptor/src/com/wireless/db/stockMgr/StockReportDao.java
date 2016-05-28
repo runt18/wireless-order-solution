@@ -93,7 +93,7 @@ public class StockReportDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<StockReport> getByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<StockReport> getByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException, Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -114,12 +114,12 @@ public class StockReportDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static List<StockReport> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+	public static List<StockReport> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException, Exception{
 		String sql;
 		
 		sql = " SELECT D.material_id, MAX(D.name) AS material_name " + 
-			  //" ,MAX(M.price) AS material_price " +
-			  " ,MAX(IFNULL(COST.cost, M.price)) AS material_price " +
+			  " ,MAX(M.price) AS material_price " +
+			  //" ,MAX(IFNULL(COST.cost, M.price)) AS material_price " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount, 0)) AS stock_in " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_in = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_in_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_out = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_out_transfer " +
@@ -130,14 +130,16 @@ public class StockReportDao {
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.DAMAGE.getVal() + " , D.amount, 0)) AS stock_damage " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.LESS.getVal() + " , D.amount, 0)) AS stock_take_less " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount, 0)) AS stock_consumption " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount * D.price, 0)) AS stock_consume_price " +
 			  " FROM " + Params.dbName + ".stock_action_detail D " +
 			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
 			  " JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
  			  " JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
-			  " LEFT JOIN " + Params.dbName + ".monthly_cost COST ON M.material_id = COST.material_id " +
-			  " LEFT JOIN " + Params.dbName + ".monthly_balance MB ON MB.id = COST.monthly_balance_id " +
+			  //" LEFT JOIN " + Params.dbName + ".monthly_cost COST ON M.material_id = COST.material_id " +
+			  //" LEFT JOIN " + Params.dbName + ".monthly_balance MB ON MB.id = COST.monthly_balance_id " +
 			  " WHERE 1 = 1 " +
-			  " AND MB.month BETWEEN '" + extraCond.range.getEndingFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" +
+			  //( monthlyBalanceId > 0 ? " AND MB.id = " + monthlyBalanceId : "") +
+//			  " AND MB.month BETWEEN '" + extraCond.range.getOpeningFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" +
 			  " AND S.restaurant_id = " + staff.getRestaurantId() +
 			  " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ")" +
 			  (extraCond != null ? extraCond.toString() : "") +
@@ -172,6 +174,8 @@ public class StockReportDao {
 			report.setStockTakeLess(dbCon.rs.getFloat("stock_take_less"));
 			//出库消耗
 			report.setConsumption(dbCon.rs.getFloat("stock_consumption"));
+			//销售金额
+			report.setComsumeMoney(dbCon.rs.getFloat("stock_consume_price"));
 			
 			result.add(report);
 			
@@ -193,6 +197,7 @@ public class StockReportDao {
 			      " WHERE 1 = 1 " + 
 			      " AND S.`status` IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") " +
 			      " AND S.restaurant_id = " + staff.getRestaurantId() +
+			      " AND S.approve_date < '" + extraCond.range.getEndingFormat() + "'" + 
 			      " GROUP BY D.material_id " +
 		      ")" +
 		      " AND remaining > 0 "; 
@@ -204,7 +209,7 @@ public class StockReportDao {
 		while(dbCon.rs.next()){
 			boolean isExist = false;
 			for(StockReport eachReport : result){
-				if(eachReport.getMaterial().getId() == dbCon.rs.getInt("id")){
+				if(eachReport.getMaterial().getId() == dbCon.rs.getInt("material_id")){
 					isExist = true;
 					break;
 				}
@@ -225,6 +230,61 @@ public class StockReportDao {
 		}
 			  
 		for(StockReport report : result){
+//			Calendar c = Calendar.getInstance();
+//			c.setTimeInMillis(DateUtil.parseDate(extraCond.range.getOpeningFormat()));
+//			String date = c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DAY_OF_MONTH);
+//			sql = " SELECT id FROM " + Params.dbName + ".monthly_balance " + 
+//				  " WHERE 1 = 1 " +
+//				  " AND month BETWEEN '" + date + "' AND '" + extraCond.range.getEndingFormat() + "'" + 
+//				  " ORDER BY id DESC LIMIT 1";
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			if(dbCon.rs.next()){
+//				monthlyBalanceId = dbCon.rs.getInt("id");
+//			}
+//			dbCon.rs.close();
+//			
+//			if(monthlyBalanceId > 0){
+//				sql = " SELECT M.month, M.restaurant_id, C.material_id, C.cost FROM " + Params.dbName + ".monthly_balance M " + 
+//					  " JOIN " + Params.dbName + ".monthly_cost C ON M.id = C.monthly_balance_id " + 
+//					  " WHERE 1 = 1 " + 
+//					  " AND M.id = " + monthlyBalanceId + 
+//					  " AND C.material_id = " + report.getMaterial().getId();
+//				
+//				dbCon.rs = dbCon.stmt.executeQuery(sql);
+//				if(dbCon.rs.next()){
+//					float cost = dbCon.rs.getFloat("cost");
+//					report.setPrimeMoney(report.getPrimeAmount() * cost);
+//				}
+//			}
+			
+			
+			sql = " SELECT id FROM " + Params.dbName + ".monthly_balance " + 
+				  " WHERE 1 = 1 " +
+				  " AND month BETWEEN '" + extraCond.range.getOpeningFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" + 
+				  " ORDER BY id DESC LIMIT 1";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			int monthlyBalanceId = 0;
+			if(dbCon.rs.next()){
+				monthlyBalanceId = dbCon.rs.getInt("id");
+			}
+			dbCon.rs.close();
+			
+			if(monthlyBalanceId > 0){
+				sql = " SELECT M.month, M.restaurant_id, C.material_id, C.cost FROM " + Params.dbName + ".monthly_balance M " + 
+					  " JOIN " + Params.dbName + ".monthly_cost C ON M.id = C.monthly_balance_id " + 
+					  " WHERE 1 = 1 " + 
+					  " AND M.id = " + monthlyBalanceId + 
+					  " AND C.material_id = " + report.getMaterial().getId();
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					float cost = dbCon.rs.getFloat("cost");
+					report.setFinalPrice(cost);
+					report.setPrimeMoney(report.getPrimeAmount() * cost);
+					report.setFinalMoney(report.getFinalAmount() * cost);
+				}
+			}
+			
 			List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																					.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
 																					.setOriDate(null, extraCond.range.getOpeningFormat())
@@ -244,6 +304,15 @@ public class StockReportDao {
 				}
 				//期初数量
 				report.setPrimeAmount(primeAmount);
+				
+				
+				//TODO
+//				List<MonthlyBalance> monthlyBalance = MonthlyBalanceDao.getMonthlyBalance(staff, new MonthlyBalanceDao.ExtraCond().setRange(extraCond.range.getOpeningFormat()), " ORDER BY month DESC");
+//				
+//				if(monthlyBalance.size() > 0){
+////					monthlyBalance.get(0);
+//				}
+				
 				//期初金额
 				report.setPrimeMoney(primeAmount * report.getFinalPrice());
 			}

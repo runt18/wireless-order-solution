@@ -7,10 +7,12 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
 import com.wireless.pojo.util.DateUtil;
 
 public class StockInitDao {
@@ -63,6 +65,58 @@ public class StockInitDao {
 			return extraCond.toString();
 		}
 	}
+	
+	
+	/**
+	 * insert
+	 * @param dbCon
+	 * @param staff
+	 * @param builder
+	 * @param editData
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int insert(Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try {
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			int initId = insert(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return initId;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		} finally {
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
+	 * insert
+	 * @param dbCon
+	 * @param staff
+	 * @param builder
+	 * @param editData
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+		if(builder.build().getSubType() != StockAction.SubType.INIT){
+			throw new BusinessException("初始化方法调用有误");
+		}
+		//添加并审核
+		int stockActionId = StockActionDao.insert(dbCon, staff, builder);
+		StockActionDao.audit(dbCon, staff, StockAction.AuditBuilder.newStockActionAudit(stockActionId).setStockInitApproverDate());
+		
+		MonthlyBalanceDao.init(dbCon, staff);
+		
+		return stockActionId;
+	}
+	
 	
 	/**
 	 * Get a dept's material stock
@@ -234,6 +288,7 @@ public class StockInitDao {
 		sql = "DELETE FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(sql);
 		
+		//TODO
 		//删除月结明细记录
 		sql = "DELETE MD FROM " + Params.dbName + ".monthly_balance_detail MD " + 
 				" JOIN " + Params.dbName + ".monthly_balance M ON M.id = MD.monthly_balance_id " +

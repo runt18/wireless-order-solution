@@ -4,34 +4,78 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
 public class CostAnalyze implements Jsonable{
+/*
+	private int deptId;						//部门id
+	private String deptName;				//部门名
+	private float primeMoney;				//期初金额
+	private float pickMaterialMoney;		//领料金额
+	private float stockOutMoney;			//退料金额
+	private float stockInTransferMoney;		//拨入金额
+	private float stockOutTransferMoney;	//拨出金额
+	private float endMoney;					//期末金额
+	private float costMoney;				//成本金额
+	private float salesMoney = 0;			//销售金额
+	private float profit;					//毛利额
+	private float profitRate;				//毛利率
+*/
+	
+	private int deptId;						//部门id
+	private String deptName;				//部门名
+	private float primeMoney;				//期初金额
+	private float pickMaterialMoney;		//采购金额
+	private float stockOutMoney;			//退货金额
+	private float stockInTransferMoney;		//领料金额
+	private float stockOutTransferMoney;	//退料金额
+	private float endMoney;					//期末金额
+	private float costMoney;				//成本金额
+	private float salesMoney = 0;			//销售金额
+	private float profit;					//毛利额
+	private float profitRate;				//毛利率
 
-	private int deptId;
-	private String deptName;
-	private float primeMoney;
-	//private float useMaterialMoney;
-	//领料
-	private float pickMaterialMoney;
-	//退料
-	private float stockOutMoney;
-	//拨入
-	private float stockInTransferMoney;
-	//拨出
-	private float stockOutTransferMoney;
-	private float endMoney;
-	private float costMoney;
-	private float salesMoney = 0;
-	private float profit;
-	private float profitRate;
 	
+	private float stockSpillMoney;			//其他入库额
+	private float stockDamageMoney;			//其他出库额
+	private float stockTakeMoreMoney;		//盘盈金额
+	private float stockTakeLessMoney;		//盘亏金额	
 	
-	public CostAnalyze(){
-		
-	}
+	public CostAnalyze(){}
 	
 	public CostAnalyze(int id){
 		this.deptId = id;
 	}
 	
+	public float getStockSpillMoney() {
+		return stockSpillMoney;
+	}
+
+	public void setStockSpillMoney(float stockSpillMoney) {
+		this.stockSpillMoney = stockSpillMoney;
+	}
+
+	public float getStockDamageMoney() {
+		return stockDamageMoney;
+	}
+
+	public void setStockDamageMoney(float stockDamageMoney) {
+		this.stockDamageMoney = stockDamageMoney;
+	}
+
+	public float getStockTakeMoreMoney() {
+		return stockTakeMoreMoney;
+	}
+
+	public void setStockTakeMoreMoney(float stockTakeMoreMoney) {
+		this.stockTakeMoreMoney = stockTakeMoreMoney;
+	}
+
+	public float getStockTakeLessMoney() {
+		return stockTakeLessMoney;
+	}
+
+	public void setStockTakeLessMoney(float stockTakeLessMoney) {
+		this.stockTakeLessMoney = stockTakeLessMoney;
+	}
+
 	public int getDeptId() {
 		return deptId;
 	}
@@ -170,6 +214,14 @@ public class CostAnalyze implements Jsonable{
 		jm.putFloat("salesMoney", this.getSalesMoney());
 		jm.putFloat("profit", this.getProfit());
 		jm.putFloat("profitRate", this.getProfitRate());
+		jm.putFloat("stockSpillMoney", this.getStockSpillMoney());
+		jm.putFloat("stockDamageMoney", this.getStockDamageMoney());
+		jm.putFloat("stockTakeMoreMoney", this.getStockTakeMoreMoney());
+		jm.putFloat("stockTakeLessMoney", this.getStockTakeLessMoney());
+//		private float stockSpillMoney;			//其他入库额
+//		private float stockDamageMoney;			//其他出库额
+//		private float stockTakeMoreMoney;		//盘盈金额
+//		private float stockTakeLessMoney;		//盘亏金额	
 		
 		return jm;
 	}

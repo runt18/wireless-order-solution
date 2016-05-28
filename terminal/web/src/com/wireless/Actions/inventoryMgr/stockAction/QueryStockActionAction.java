@@ -40,6 +40,7 @@ public class QueryStockActionAction extends Action{
 		final String isPaging = request.getParameter("isPaging");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
+		final String comment = request.getParameter("comment");
 		final JObject jObject = new JObject();
 		try{
 
@@ -103,6 +104,9 @@ public class QueryStockActionAction extends Action{
 			if(subType != null && !subType.trim().isEmpty() && !subType.equals("-1")){
 				//extraCond += (" AND S.sub_type = " + subType.trim());
 				extraCond.addSubType(StockAction.SubType.valueOf(Integer.parseInt(subType)));
+			}
+			if(comment != null && !comment.isEmpty()){
+				extraCond.setComment(comment);
 			}
 			
 			List<StockAction> root = StockActionDao.getByCond(staff, extraCond.setContainsDetail(true), " ORDER BY S.status, S.ori_stock_date ");

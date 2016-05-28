@@ -129,7 +129,10 @@ public class StockTakeDao {
 		StockTake sTake = builder.build();
 		String deptName;
 		String MaterialCateName;
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
+		String selectDept = " SELECT name FROM " + Params.dbName + ".department " + 
+							" WHERE dept_id = " + builder.getDept().getId() + 
+							" AND restaurant_id = " + staff.getRestaurantId();
+		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString(1);
@@ -184,7 +187,7 @@ public class StockTakeDao {
 	 */
 	public static boolean beforeInsertStockTake(Staff term) throws SQLException, BusinessException{
 		long currentDate = 0;
-		currentDate = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(term.getRestaurantId());
+		currentDate = MonthlyBalanceDao.getCurrentMonthTime(term);
 		Calendar c = Calendar.getInstance();
 		c.setTime(new Date(currentDate));
 		c.add(Calendar.MONTH, +1);
@@ -240,7 +243,9 @@ public class StockTakeDao {
 		
 		String deptName;
 
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
+		String selectDept = " SELECT name FROM " + Params.dbName + ".department WHERE " + 
+							" dept_id = " + builder.getDept().getId() + 
+							" AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString("name");
@@ -808,12 +813,12 @@ public class StockTakeDao {
 		List<Integer> result;
 
 		sql = "UPDATE " + Params.dbName + ".stock_take" + 
-				" SET approver = " + "'" + builder.getApprover() + "', " +
-				" approver_id = " + builder.getApproverId() + ", " +
-				" finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
-				" status = " + builder.getStatus().getVal() +
-				" WHERE id = " + builder.getId() + 
-				" AND restaurant_id = " + staff.getRestaurantId();
+			  " SET approver = " + "'" + builder.getApprover() + "', " +
+			  " approver_id = " + builder.getApproverId() + ", " +
+			  " finish_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
+			  " status = " + builder.getStatus().getVal() +
+			  " WHERE id = " + builder.getId() + 
+			  " AND restaurant_id = " + staff.getRestaurantId();
 	
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
