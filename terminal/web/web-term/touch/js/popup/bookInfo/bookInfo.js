@@ -33,37 +33,41 @@ function CreateAddBookInfo(param){
 			
 			//左边按钮方法
 			self.find('[id="left_a_books"]').click(function(){
-				var askTablePopup = null;
-				askTablePopup = new AskTablePopup({
-					title : '选择餐桌',	
-					tables : WirelessOrder.tables,
-					tableSelect : function(selectedTable){
-						var hasTables = true;
-						for(var i = 0; i < _tables.length; i++){
-							if(_tables[i].id == selectedTable.id){
-								_tables.splice(i, 1);
-								if(_tables.length == 0){
-									self.find('[id="bookTableList_tr_books"]').hide();
+				
+				seajs.use('askTable', function(askTable){
+					var askTablePopup = askTable.newInstance({
+						title : '选择餐桌',	
+						tables : WirelessOrder.tables,
+						tableSelect : function(selectedTable){
+							var hasTables = true;
+							for(var i = 0; i < _tables.length; i++){
+								if(_tables[i].id == selectedTable.id){
+									_tables.splice(i, 1);
+									if(_tables.length == 0){
+										self.find('[id="bookTableList_tr_books"]').hide();
+									}
+									hasTables = false;
+									break;
 								}
-								hasTables = false;
-								break;
 							}
+							
+							if(hasTables){
+								_tables.push(WirelessOrder.tables.getById(selectedTable.id));
+							}
+								//显示预订添加界面餐台
+							self.find('[id="bookTableList_tr_books"]').show();
+							initTables(_tables);
+							askTablePopup.close();
 						}
-						
-						if(hasTables){
-							_tables.push(WirelessOrder.tables.getById(selectedTable.id));
-						}
-							//显示预订添加界面餐台
-						self.find('[id="bookTableList_tr_books"]').show();
-						initTables(_tables);
-						askTablePopup.close();
-					}
+					});
+					
+					askTablePopup.open(function(){
+						$('#left_a_askTable').hide();
+						$('#middle_a_askTable').css('width', '48%');
+						$('#right_a_askTable').css('width', '50%');
+					});
 				});
-				askTablePopup.open(function(){
-					$('#left_a_askTable').hide();
-					$('#middle_a_askTable').css('width', '48%');
-					$('#right_a_askTable').css('width', '50%');
-				});
+				
 			});
 			
 			//中间的方法

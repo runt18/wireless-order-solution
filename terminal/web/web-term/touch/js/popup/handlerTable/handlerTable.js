@@ -81,43 +81,44 @@ define(function(require, exports, module){
 				
 				//左边按钮方法
 				self.find('[id="left_a_handlerTable"]').click(function(){
-						var askTablePopup = null;
-						askTablePopup = new AskTablePopup({
-							title : '选择餐桌',
-							tables : WirelessOrder.tables,
-							tableSelect : function(selectedTable){
-								var hasTables = true;
-								for(var i = 0; i < _selectedTable.length; i++){
-									if(_selectedTable[i].id == selectedTable.id){
-										_selectedTable.splice(i, 1);
-										hasTables = false;
-										break;
-									}
+					var askTable = require('../table/ask.js');
+					var askTablePopup = askTable.newInstance({
+						title : '选择餐桌',
+						tables : WirelessOrder.tables,
+						tableSelect : function(selectedTable){
+							var hasTables = true;
+							for(var i = 0; i < _selectedTable.length; i++){
+								if(_selectedTable[i].id == selectedTable.id){
+									_selectedTable.splice(i, 1);
+									hasTables = false;
+									break;
 								}
-								
-								if(hasTables){
-									if(param.type && param.type == "multiOpenTable"){
-										if(WirelessOrder.tables.getById(selectedTable.id).statusValue == 1){
-											Util.msg.tip("此餐台已使用, 不能选择");
-											return;
-										}
-									}else if(param.type && param.type == "spellingTable"){
-										if(WirelessOrder.tables.getById(selectedTable.id).statusValue == 0){
-											Util.msg.tip("此餐台未开台, 不能选择");
-											return;
-										}
-									}
-									_selectedTable.push(WirelessOrder.tables.getById(selectedTable.id));
-								}
-								initTables(_selectedTable);
-								askTablePopup.close();
 							}
-						});
-						askTablePopup.open(function(){
-							$('#left_a_askTable').hide();
-							$('#middle_a_askTable').css('width', '48%');
-							$('#right_a_askTable').css('width', '50%');
-						});
+							
+							if(hasTables){
+								if(param.type && param.type == "multiOpenTable"){
+									if(WirelessOrder.tables.getById(selectedTable.id).statusValue == 1){
+										Util.msg.tip("此餐台已使用, 不能选择");
+										return;
+									}
+								}else if(param.type && param.type == "spellingTable"){
+									if(WirelessOrder.tables.getById(selectedTable.id).statusValue == 0){
+										Util.msg.tip("此餐台未开台, 不能选择");
+										return;
+									}
+								}
+								_selectedTable.push(WirelessOrder.tables.getById(selectedTable.id));
+							}
+							initTables(_selectedTable);
+							askTablePopup.close();
+						}
+					});
+					
+					askTablePopup.open(function(){
+						$('#left_a_askTable').hide();
+						$('#middle_a_askTable').css('width', '48%');
+						$('#right_a_askTable').css('width', '50%');
+					});
 				});
 				
 				//右边按钮
