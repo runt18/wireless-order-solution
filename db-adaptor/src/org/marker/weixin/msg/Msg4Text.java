@@ -50,8 +50,9 @@ public class Msg4Text extends Msg {
 		return this.content;
 	}
 
-	public void setContent(String content) {
+	public Msg4Text setContent(String content) {
 		this.content = content;
+		return this;
 	}
 
 	public String getMsgId() {
