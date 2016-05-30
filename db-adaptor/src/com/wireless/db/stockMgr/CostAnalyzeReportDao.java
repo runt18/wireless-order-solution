@@ -16,6 +16,7 @@ public class CostAnalyzeReportDao {
 	public static class ExtraCond{
 		private String beginDate;
 		private String endDate;
+		private int deptId;
 		
 		public ExtraCond setDateRange(String begin, String end){
 			if(begin != null && !begin.isEmpty()){
@@ -24,7 +25,11 @@ public class CostAnalyzeReportDao {
 			if(end != null && !end.isEmpty()){
 				this.endDate = end;
 			}
-			
+			return this;
+		}
+		
+		public ExtraCond setDeptId(int deptId){
+			this.deptId = deptId;
 			return this;
 		}
 		
@@ -38,9 +43,7 @@ public class CostAnalyzeReportDao {
 			}else if(beginDate == null && beginDate.isEmpty() && endDate != null && !endDate.isEmpty()){
 				extraCond.append(" AND ori_stock_date < " + beginDate);
 			}
-			
 			return extraCond.toString();
-
 		}
 	}
 	
@@ -59,7 +62,15 @@ public class CostAnalyzeReportDao {
 	 */
 	public static List<CostAnalyze> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException, Exception{
 		List<CostAnalyze> result = new ArrayList<>();
-		List<Department> departments = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+		DepartmentDao.ExtraCond departExtraCond = new DepartmentDao.ExtraCond();
+		List<Department> departments;
+		if(extraCond.deptId != 0){
+			departExtraCond.setId(extraCond.deptId);
+			departments = DepartmentDao.getByCond(staff, departExtraCond, orderClause);
+		}else{
+			departments = DepartmentDao.getDepartments4Inventory(staff);
+		}
+
 		for(Department department : departments){
 			CostAnalyze costAnalyze = new CostAnalyze();
 			List<StockReport> stockReports = StockReportDao.getByCond(staff, new StockReportDao.ExtraCond().setDept(department.getId())
