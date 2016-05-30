@@ -162,7 +162,7 @@ $(function(){
 												//结账
 												var perfectMatched = askPopup.prefect();
 												if(perfectMatched){
-													askPopup.close(function(){
+													askTablePopup.close(function(){
 														of.entry({
 															orderFoodOperateType : 'normal',
 															initFoods : result.root[0].foods,
@@ -176,7 +176,7 @@ $(function(){
 											}
 										},
 										tableSelect : function(selectedTable){
-											askPopup.close(function(){
+											askTablePopup.close(function(){
 												of.entry({
 													orderFoodOperateType : 'normal',
 													initFoods : result.root[0].foods,
