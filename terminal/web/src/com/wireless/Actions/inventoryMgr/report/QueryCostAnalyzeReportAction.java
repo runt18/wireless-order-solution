@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.CostAnalyzeReportDao;
+import com.wireless.db.stockMgr.CostAnalyzeReportDao.ExtraCond;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -31,21 +32,27 @@ public class QueryCostAnalyzeReportAction extends Action {
 		final String pin = (String)request.getAttribute("pin");
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String deptId = request.getParameter("deptId");
 		String beginDate = request.getParameter("beginDate");
 		try{
 			String endDate = "";
 			List<CostAnalyze> list = new ArrayList<CostAnalyze>();
 			Calendar c = Calendar.getInstance();
+			final ExtraCond extraCond = new CostAnalyzeReportDao.ExtraCond();
+			
+			if(deptId != null && !deptId.isEmpty() && Integer.parseInt(deptId) >= 0){
+				extraCond.setDeptId(Integer.parseInt(deptId));
+			}
 			
 			if(beginDate == null){
 				//默认使用当前时间实时查询
 				beginDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-01";
 				
 				endDate = sdf.format(new Date());
-				list = CostAnalyzeReportDao.getByCond(staff, new CostAnalyzeReportDao.ExtraCond().setDateRange(beginDate, endDate), null);
+				list = CostAnalyzeReportDao.getByCond(staff, extraCond.setDateRange(beginDate, endDate), null);
 			}else{
 				endDate = beginDate + "-31 23:59:59";
-				list = CostAnalyzeReportDao.getByCond(staff, new CostAnalyzeReportDao.ExtraCond().setDateRange(beginDate + "-01", endDate), null);
+				list = CostAnalyzeReportDao.getByCond(staff, extraCond.setDateRange(beginDate + "-01", endDate), null);
 			}
 			
 			jobject.setTotalProperty(list.size() + 1);
