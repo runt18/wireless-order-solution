@@ -160,7 +160,7 @@ $(function(){
 												Util.msg.tip("请选择餐桌");
 											}else{
 												//结账
-												var perfectMatched = askPopup.prefect();
+												var perfectMatched = askTablePopup.prefect();
 												if(perfectMatched){
 													askTablePopup.close(function(){
 														of.entry({
@@ -223,7 +223,7 @@ $(function(){
 											$('#tables_div_askTable a').buttonMarkup('refresh');
 											$('#tables_div_askTable a').each(function(index, element){
 												element.onclick = function(){
-													askPopup.close(function(){
+													askTablePopup.close(function(){
 														of.entry({
 															orderFoodOperateType : 'normal',
 															initFoods : result.root[0].foods,
