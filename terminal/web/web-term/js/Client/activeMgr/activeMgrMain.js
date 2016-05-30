@@ -234,6 +234,30 @@ Ext.onReady(function(){
 	var form;
 	
 	function initActiveWin(c){
+		if(createActiveWin){
+			$('#' + createActiveWin.id).remove();
+		}
+		if(promotionEditor){
+			$('#' + promotionEditor.id).remove();
+		}
+		if(btnPreview){
+			$('#' + btnPreview.id).remove();
+		}
+		if(btnClear){
+			$('#' + btnClear.id).remove();
+		}
+		if(secendStepCenter){
+			$('#' + secendStepCenter.id).remove();
+		}
+		if(btnUpload){
+			$('#' + btnUpload.id).remove();
+		}
+		if(imgFile){
+			$('#' + imgFile.id).remove();
+		}
+		if(form){
+			$('#' + form.id).remove();
+		}
 		promotionEditor = new Ext.form.HtmlEditor({
 			id : 'guide_2nd_promotionEditor',
 			hideLabel : true,
