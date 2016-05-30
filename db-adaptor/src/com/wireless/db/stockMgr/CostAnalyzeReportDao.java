@@ -94,7 +94,7 @@ public class CostAnalyzeReportDao {
 					
 					primeMoney += stockReport.getPrimeMoney();													//期初金额
 					pickMaterialMoney += stockReport.getStockIn() * stockReport.getFinalPrice();				//采购金额
-					stockOutMoney += stockReport.getStockOut();													//退货金额
+					stockOutMoney += stockReport.getStockOut() * stockReport.getFinalPrice();					//退货金额
 					stockInTransferMoney += stockReport.getStockInTransfer() * stockReport.getFinalPrice();		//领料金额
 					stockOutTransferMoney += stockReport.getStockOutTransfer() * stockReport.getFinalPrice();	//退料金额
 					endMoney += stockReport.getFinalMoney();													//期末金额
