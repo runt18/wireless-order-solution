@@ -2189,7 +2189,13 @@ Ext.onReady(function(){
 			    		var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
 			    		stockTaskNavWin.hide();
 			    		if(sn){
-			    			printerContainerWin(sn);
+			    			var cols = [{name : '货品名称', dataIndex : 'materialName'},
+			    						{name : '数量', dataIndex : 'amount'},
+			    						{name : '单价', dataIndex : 'price'},
+			    						{name : '总价', dataIndex : '', renderer : function(data){
+											return data.amount * data.price;			    						
+			    						}}];
+			    			Ext.ux.printContain(1, cols, sn.data.stockDetails, sn);
 			    		}
 			    	}
 				},{
@@ -2276,186 +2282,6 @@ Ext.onReady(function(){
 		
 	}
 
-	function printerContainerWin(param){
-
-		var html = '<table id="stockActionDetailPanel" border="2" class="tb_base" style="width : 98%;font-size:26px;" >' + 	
-						'<tr>'+
-							'<th class="table_title text_center" style="font-size:26px;border-color:#000;">货品名称</th>' +
-							'<th class="table_title text_center" style="font-size:26px;border-color:#000;">数量</th>' +
-							'<th class="table_title text_center" style="font-size:26px;border-color:#000;">单价</th>' +
-							'<th class="table_title text_center" style="font-size:26px;border-color:#000;">总价</th>' +
-						'</tr>';
-	
-		if(param.data.stockDetails && param.data.stockDetails.length > 0){
-			param.data.stockDetails.forEach(function(el, index){
-				var temp = '<tr>'+
-						'<td class="text_center" style="border-color:#000;">' + el.materialName + '</td>' +
-						'<td class="text_center" style="border-color:#000;">' + el.amount + '</td>' +
-						'<td class="text_center" style="border-color:#000;">' + el.price + '</td>' +
-						'<td class="text_center" style="border-color:#000;">' + el.amount * el.price + '</td>' +
-					'</tr>';
-				
-				html += temp;
-			});
-		}
-		
-		html += '</table>';
-
-		printerContainer = new Ext.Window({
-			id : 'stockActionPrintWindow',
-			style : {
-				'overflow' : 'visible'
-			},
-			width : 1000,
-			height : 700,
-			resizable : false,
-			items : [{
-				xtype : 'panel',
-				id : 'stockActionPrintWinView',
-				height : 700,
-				width : 1000,
-				frame : true,
-				layout : 'column',
-				items : [{
-					xtype : 'label',
-					id : 'printStockActionHead',
-					columnWidth : 1,
-					style : {
-						'font-size' : '30px',
-						'text-align' : 'center',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					},
-					text : param.data.typeText + '--' + param.data.cateTypeText + param.data.subTypeText + '(' + param.data.id + ')'
-				}, {
-					xtype : 'label',
-					text : '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '----'),
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'label',
-					text : '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '----'),
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'label',
-					text : '货单日期：' + param.data.oriStockDateFormat,
-					columnWidth : 0.4,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'label',
-					text : '制单人：' + param.data.operatorName,
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				},{
-					xtype : 'label',
-					text : '制作时间：' + param.data.birthDateFormat,
-					columnWidth : 0.3,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'label',
-					text : '原始单号：' + (param.data.oriStockId ? param.data.oriStockId : '----'),
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				},{
-					xtype : 'container',
-					columnWidth : 1,
-					layout : 'column',
-					items : [{
-					xtype : 'label',
-					text : '总数量：' + (param.data.amount ? param.data.amount : '----'),
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'label',
-					text : '总金额：' + (param.data.price ? param.data.price : '----'),
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'label',
-					text : '实际金额：' + (param.data.actualPrice ? param.data.actualPrice : '----'),
-					columnWidth : 0.25,
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}]
-				}, {
-					xtype : 'label',
-					columnWidth : 1,
-					text : '备注：' + (param.data.comment ? param.data.comment : '----'),
-					style : {
-						'font-size' : '24px',
-						'margin-top' : '5px',
-						'font-weight' : 'bold'
-					}
-				}, {
-					xtype : 'panel',
-					columnWidth : 1,
-					contentEl : 'stockActionPrint',
-					html : html
-				}]
-			}],
-			bbar : ['->', {
-		    	text : '确认打印',
-		    	iconCls : 'icon_tb_print_detail',
-		    	id : 'toIgnoreBtnOfPrint_checkPrint',
-		    	handler : function(){
-		    		Ext.getCmp('stockActionPrintWindow').setPosition('0', '0');
-
-		    		$('#stockActionPrintWindow').print({
-		    		});
-	    			
-	    			Ext.getCmp('stockActionPrintWindow').center();
-		    		
-		    	}
-			}, {
-		    	iconCls : 'btn_cancel',
-		    	xtype : 'button',
-		    	id : 'toIgnoreBtnOfPrint_cancel',
-		    	text : '取消',
-		    	handler : function(){
-	    			printerContainer.hide();
-	    		}
-		    }]
-			
-		});
-		printerContainer.show();
-		
-	}
 	
 	
 	function showStockCountMenu(){
