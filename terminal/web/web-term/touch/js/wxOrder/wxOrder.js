@@ -223,7 +223,7 @@ $(function(){
 											$('#tables_div_askTable a').buttonMarkup('refresh');
 											$('#tables_div_askTable a').each(function(index, element){
 												element.onclick = function(){
-													askPopup.close(function(){
+													askTablePopup.close(function(){
 														of.entry({
 															orderFoodOperateType : 'normal',
 															initFoods : result.root[0].foods,
