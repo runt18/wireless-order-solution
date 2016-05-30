@@ -160,7 +160,7 @@ $(function(){
 												Util.msg.tip("请选择餐桌");
 											}else{
 												//结账
-												var perfectMatched = askPopup.prefect();
+												var perfectMatched = askTablePopup.prefect();
 												if(perfectMatched){
 													askTablePopup.close(function(){
 														of.entry({
