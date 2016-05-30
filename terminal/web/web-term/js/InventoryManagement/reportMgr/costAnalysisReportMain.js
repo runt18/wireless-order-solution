@@ -58,6 +58,52 @@ Ext.onReady(function(){
             plugins: 'monthPickerPlugin',  
             format: 'Y-m'
             //editable: false
+		}, {
+			xtype : 'tbtext', text : '部门:'
+		}, {
+			xtype : 'combo',
+			id : 'deptComb_comboBox_costAnalys',
+			forceSelection : true,
+			width : 110,
+			maxheight : 300,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../OperateDept.do',
+						params: { 
+					    	dataSource : 'getByCond',
+					    	inventory : true
+					    }, 
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						},
+						fialure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					Ext.getCmp('btnSearch').handler();	
+				}
+				
+			}
+			
 		},'->', {
 			text : '刷新',
 			id : 'btnSearch',
@@ -65,6 +111,7 @@ Ext.onReady(function(){
 			handler : function(){
 				var gs = costAnalyzeGrid.getStore();
 				gs.baseParams['beginDate'] = Ext.getCmp('car_beginDate').getValue().format('Y-m');
+				gs.baseParams['deptId'] = Ext.getCmp('deptComb_comboBox_costAnalys').getValue();
 				gs.load();
 			}
 		}]
@@ -84,6 +131,9 @@ Ext.onReady(function(){
 	    height : '500',
 	    border : true,
 	    frame : true,
+	    viewConfig : {
+			forceFit : true
+		},
 	    store : ds,
 	    loadMask : {
 	    	msg : "数据加载中，请稍等..."
@@ -135,5 +185,5 @@ Ext.onReady(function(){
 	});
 	
 	//页面打开即加载数据
-//	Ext.getCmp('btnSearch').handler();
+	Ext.getCmp('btnSearch').handler();
 });	
