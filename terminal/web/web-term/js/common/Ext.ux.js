@@ -55,9 +55,10 @@ Ext.ux.printContain = function(type, cols, data, param){
 		if(type == dataType.stockActionData.val){
 			var stockActionData = {};
 			stockActionData.title = param.data.typeText + '--' + param.data.cateTypeText + param.data.subTypeText + '(' + param.data.id + ')';
-			stockActionData.deptOut = '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '----');
-			stockActionData.deptIn = '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '----');
+			stockActionData.deptOut = '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '');
+			stockActionData.deptIn = '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '');
 			stockActionData.oriStockDate = '货单日期：' + param.data.oriStockDateFormat;
+			stockActionData.supplier = '供应商：' + (param.data.supplier ? param.data.supplier.name : '');
 			stockActionData.operatorName = '制单人：' + param.data.operatorName;
 			stockActionData.birthDate = '制作时间：' + param.data.birthDateFormat;
 			stockActionData.oriStockId = '原始单号：' + (param.data.oriStockId ? param.data.oriStockId : '----');
@@ -71,8 +72,8 @@ Ext.ux.printContain = function(type, cols, data, param){
 									  	'<td colspan="4" >' + stockActionData.title + '</td>' +
 									  '</tr>' +
 							   		  '<tr>' +
-							   		  	'<td>' + stockActionData.deptIn + '</td>' +
-							   		  	'<td>' + stockActionData.deptOut + '</td>' +
+							   		  	'<td>' + (param.data.deptIn.name ? stockActionData.deptIn : stockActionData.supplier) + '</td>' +
+							   		  	'<td>' + (param.data.deptOut.name ? stockActionData.deptOut : stockActionData.supplier) + '</td>' +
 							   		  	'<td>' + stockActionData.oriStockDate + '</td>' +
 							   		  	'<td></td>' +
 							   		  '</tr>'+
