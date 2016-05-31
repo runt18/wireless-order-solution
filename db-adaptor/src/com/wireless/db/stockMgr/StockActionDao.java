@@ -292,6 +292,7 @@ public class StockActionDao {
 		 * 录入库单的最大值
 		 * 录入的库单只能在 【当前时间】 之前
 		 */
+		//TODO
 		long maxDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + day);
 		
 		//比较 时间和月结时间,取最大值

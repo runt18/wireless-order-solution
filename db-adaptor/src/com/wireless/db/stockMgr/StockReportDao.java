@@ -199,7 +199,7 @@ public class StockReportDao {
 			      " WHERE 1 = 1 " + 
 			      " AND S.`status` IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") " +
 			      " AND S.restaurant_id = " + staff.getRestaurantId() +
-			      " AND S.approve_date < '" + extraCond.range.getEndingFormat() + "'" + 
+			      " AND S.approve_date <= '" + extraCond.range.getEndingFormat() + "'" + 
 			      (extraCond.deptId >= 0 ? " AND (S.dept_in = " + extraCond.deptId + " OR S.dept_out = " + extraCond.deptId + ")" : "") + 
 			      (extraCond.materialCateType != null ? (" AND S.cate_type = " + extraCond.materialCateType.getValue()) : "") +
 			      (extraCond.materialCateId != 0 ? (" AND MC.cate_id = " + extraCond.materialCateId) : "") +
