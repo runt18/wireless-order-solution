@@ -345,6 +345,9 @@ Ext.onReady(function(){
 		loadMask : {
 			msg : '正在加载数据中...'
 		},
+		viewConfig : {
+			forceFit : true
+		},
         animCollapse: false,
         autoScroll : true,
 		store : ds,

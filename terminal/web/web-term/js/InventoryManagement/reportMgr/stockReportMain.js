@@ -1,5 +1,6 @@
 Ext.onReady(function(){
 	var materialCateData = {root:[]};
+	var materialTypeDate = [[-1,'全部'],[1,'商品'],[2,'原料']];
 	
 	var logOutBut = new Ext.ux.ImageButton({
 		imgPath : '../../images/ResLogout.png',
@@ -183,16 +184,93 @@ Ext.onReady(function(){
 	var date = new Date();
 	date.setMonth(date.getMonth()-1);
 
+	
+	//TODO
 	var stockTakeTbar = new Ext.Toolbar({
 		items : [
 		{
 			xtype : 'tbtext',
-			text : String.format(
-				Ext.ux.txtFormat.typeName,
-				'货品','cateTypeValue','全部货品'
-			)
+			text : '类别:'
+		}, {
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			width : 123,
+			listWidth :120,
+			id : 'materialType_stockReport',
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+		        select : function(combo, record, index){  
+					Ext.getCmp('materialCateCombo_stockReport').handler();
+					Ext.getCmp('search_btn_stockReport').handler();
+		        },
+				render : function(thiz){
+					thiz.store.loadData(materialTypeDate);
+					thiz.setValue(-1);
+				}
+			}
+		},{xtype : 'tbtext', text : '类型:'},
+		{
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			id : 'materialCateCombo_stockReport',
+			width : 123,
+			listWidth :120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+		        select : function(combo, record, index){  
+		        	Ext.getCmp('search_btn_stockReport').handler();
+		        },
+				render : function(thiz){
+					thiz.handler();
+				}
+			},
+			handler : function(){
+				var materialType = Ext.getCmp('materialType_stockReport');
+				if(materialType.getValue() >= 0){
+					$.ajax({
+						url : '../../QueryMaterialCate.do',
+						type : 'post',
+						dataType : 'json',
+						data : {
+							dataSource : 'normal',
+							type : materialType.getValue()
+						},
+						success : function(req, status, xhr){
+							var data = [];
+							data.push([-1, '全部']);
+							if(req.root.length > 0){
+								req.root.forEach(function(el, index){
+									data.push([el.id, el.name]);
+								});
+							}
+							Ext.getCmp('materialCateCombo_stockReport').store.loadData(data);
+							Ext.getCmp('materialCateCombo_stockReport').setValue(-1);
+						},
+						error : function(xhr, status, err){
+						
+						}
+					});
+				}
+			}
 		},
-
 		{xtype : 'tbtext', text : '查看日期:'},
 		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 		{
@@ -232,8 +310,8 @@ Ext.onReady(function(){
 					materialId = materialComb.getValue();
 				}
 				sgs.baseParams['beginDate'] = Ext.getCmp('beginDate_dateField_stockReport').getValue().format('Y-m');
-				sgs.baseParams['cateType'] = cateType;
-				sgs.baseParams['cateId'] = cateId;
+				sgs.baseParams['cateType'] = Ext.getCmp('materialType_stockReport').getValue();
+				sgs.baseParams['cateId'] = Ext.getCmp('materialCateCombo_stockReport').getValue();
 				sgs.baseParams['materialId'] = materialId;
 				sgs.baseParams['deptId'] = deptComb.getValue();
 				//load两种加载方式,远程和本地
@@ -291,7 +369,51 @@ Ext.onReady(function(){
 
 	
 	
+	var materialCateStore = new Ext.data.Store({
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do'}),
+		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'}
+		])
+	});
+	
+	/**
+	 * 类别
+	 */
+	var materialCateComb = new Ext.form.ComboBox({
+		fidldLabel : '类别:',
+		forceSelection : true,
+		width : 110,
+		store : materialCateStore,
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		readOnly : false,
+		listeners : {
+	        select : function(combo, record, index){ 
+//	        	materialComb.allowBlank = true;
+//	        	materialComb.reset();
+//	        	materialStore.load({  
+//		            params: {  
+//		            	cateType : materialTypeComb.value,
+//		            	cateId : combo.value,  
+//		            	dataSource : 'normal'
+//		            }  
+//	            });   
+//	        	Ext.getCmp('btnStockDistributionSearch').handler();
+			}
+	
+		}
+		
+	});
+	
+	
+	
 	 stockReportTree = new Ext.tree.TreePanel({
+	 	hidden : true,
 		title : '货品类型',
 		region : 'west',
 		width : 160,
@@ -355,7 +477,6 @@ Ext.onReady(function(){
 		loadMask : { msg: '数据请求中,请稍等......' },
 		tbar : stockTakeTbar,
 		bbar : pagingBar
-
 	});
 	
 	
@@ -398,7 +519,6 @@ Ext.onReady(function(){
 		//子集
 		items : [stockReportTree,stockReportGrid]
 	});
-	
     //加载页面执行查询
     Ext.getCmp('search_btn_stockReport').handler();
 });
