@@ -10,6 +10,148 @@ Ext.ux.errorCode = {
 	ORDER_EXPIRED : 9195 //账单已过期
 };
 
+Ext.ux.printContain = function(type, cols, data, param){
+		var printerContainer;
+		var dataType = {
+			stockActionData : {val : 1 ,desc : '出入库单表格'}
+		}
+		
+		//head start
+		var html = '<table id="stockActionDetailPanel" border="2" class="tb_base" style="width : 98%;font-size:26px;" >' + 	
+				   '<tr>';
+		var dataIndexArr = [];
+		cols.forEach(function(el, index){
+			html += '<th class="table_title text_center" style="font-size:26px;border-color:#000;">' + el.name + '</th>';
+			dataIndexArr.push({dataIndex : el.dataIndex, renderer : el.renderer});
+		});	
+		
+		html += '</tr>';
+		
+		//data start
+		if(data && data.length > 0){
+				data.forEach(function(el, index){
+				var temp = '<tr>';
+					if(dataIndexArr.length > 0){
+						dataIndexArr.forEach(function(ele, index){
+							if(ele.renderer && typeof ele.renderer == 'function'){
+								temp += '<td class="text_center" style="border-color:#000;">' + ele.renderer(el) + '</td>';
+							}else{
+								temp += '<td class="text_center" style="border-color:#000;">' + el[ele.dataIndex] + '</td>';
+							}
+						});
+					}else{
+						alert('dataIndex is null');
+					}
+				temp += '</tr>';
+				
+				html += temp;
+			});
+		}
+		
+		html += '</table>';
+		
+		
+		//head start
+		if(type == dataType.stockActionData.val){
+			var stockActionData = {};
+			stockActionData.title = param.data.typeText + '--' + param.data.cateTypeText + param.data.subTypeText + '(' + param.data.id + ')';
+			stockActionData.deptOut = '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '----');
+			stockActionData.deptIn = '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '----');
+			stockActionData.oriStockDate = '货单日期：' + param.data.oriStockDateFormat;
+			stockActionData.operatorName = '制单人：' + param.data.operatorName;
+			stockActionData.birthDate = '制作时间：' + param.data.birthDateFormat;
+			stockActionData.oriStockId = '原始单号：' + (param.data.oriStockId ? param.data.oriStockId : '----');
+			stockActionData.amount = '总数量：' + (param.data.amount ? param.data.amount : '----');
+			stockActionData.price = '总金额：' + (param.data.price ? param.data.price : '----');
+			stockActionData.actualPrice = '实际金额：' + (param.data.actualPrice ? param.data.actualPrice : '----');
+			stockActionData.comment = '备注：' + (param.data.comment ? param.data.comment : '----');
+			
+			var stockActionHead = '<table id="stockActionDetailPanel" style="width : 98%;font-size:26px;" >' +
+									  '<tr class="text_center">' +
+									  	'<td colspan="4" >' + stockActionData.title + '</td>' +
+									  '</tr>' +
+							   		  '<tr>' +
+							   		  	'<td>' + stockActionData.deptIn + '</td>' +
+							   		  	'<td>' + stockActionData.deptOut + '</td>' +
+							   		  	'<td>' + stockActionData.oriStockDate + '</td>' +
+							   		  	'<td></td>' +
+							   		  '</tr>'+
+							   		  '<tr>' +
+							   		  	'<td>' + stockActionData.operatorName + '</td>' +
+							   		  	'<td>' + stockActionData.birthDate + '</td>' +
+							   		  	'<td>' + stockActionData.oriStockId + '</td>' +
+							   		  	'<td></td>' +
+							   		  '</tr>'+
+							   		  '<tr>' +
+							   		  	'<td>' + stockActionData.amount + '</td>' +
+							   		  	'<td>' + stockActionData.price + '</td>' +
+							   		  	'<td>' + stockActionData.actualPrice + '</td>' +
+							   		  	'<td></td>' +
+							   		  '</tr>'+
+							   		  '<tr>' +
+							   		  	'<td colspan="4">' + stockActionData.comment + '</td>' +
+							   		  '</tr>'+
+						  		  '</table>';
+		}
+	
+		printerContainer = new Ext.Window({
+			id : 'stockActionPrintWindow',
+			style : {
+				'overflow' : 'visible'
+			},
+			width : 1000,
+			height : 700,
+			resizable : false,
+			items : [{
+				xtype : 'panel',
+				height : 700,
+				width : 1000,
+				frame : true,
+				layout : 'column',
+				items : [{
+					xtype : 'panel',
+					html : stockActionHead,
+					columnWidth : 1
+				},{
+					xtype : 'panel',
+					columnWidth : 1,
+					html : html
+				}]
+			}],
+			bbar : ['->', {
+		    	text : '确认打印',
+		    	iconCls : 'icon_tb_print_detail',
+		    	id : 'toIgnoreBtnOfPrint_checkPrint',
+		    	handler : function(){
+		    		Ext.getCmp('stockActionPrintWindow').setPosition('0', '0');
+	
+		    		$('#stockActionPrintWindow').print({
+		    		});
+	    			
+	    			Ext.getCmp('stockActionPrintWindow').center();
+		    		
+		    	}
+			}, {
+		    	iconCls : 'btn_cancel',
+		    	xtype : 'button',
+		    	id : 'toIgnoreBtnOfPrint_cancel',
+		    	text : '取消',
+		    	handler : function(){
+	    			Ext.getCmp('stockActionPrintWindow').hide();
+	    			$('#stockActionPrintWindow').remove();
+	    			printerContainer = null;
+	    		}
+		    }]
+			
+		});
+		Ext.getCmp('stockActionPrintWindow').show();
+		
+}
+
+
+
+
+
 /*************************************
  * 部分通用显示格式
  */
