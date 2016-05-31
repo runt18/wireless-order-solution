@@ -1964,14 +1964,24 @@ Ext.onReady(function(){
 				Ext.getDom('txtActualPrice').value = totalPrice.toFixed(2);
 			}
 			
-			$('[data-type=deleteStockDetailOperate]').click(function(){
-				setAmountForStockActionDetail({otype:Ext.ux.otype['delete']});
+			$('[data-type=deleteStockDetailOperate]').each(function(index, el){
+				el.onclick = function(){
+					setAmountForStockActionDetail({otype:Ext.ux.otype['delete']});				
+				}
 			});				
 		});
-
+		
+		var isProcessing = false;
 		secondStepPanelCenter.getStore().on('add', function(thiz, rs){
-			secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
+			if(!isProcessing){
+				isProcessing = true;
+				setTimeout(function(){
+					secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
+					isProcessing = false;
+				}, 100);
+			}
 		});
+		
 		secondStepPanelCenter.getStore().on('remove', function(thiz, rs){
 			secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
 		});

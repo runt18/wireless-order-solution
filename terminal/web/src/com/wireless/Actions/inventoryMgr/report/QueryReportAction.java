@@ -61,11 +61,11 @@ public class QueryReportAction extends Action {
 				extraCond.setDept(Integer.parseInt(deptId));
 			}
 			
-			if(cateId != null && !cateId.isEmpty()){
+			if(cateId != null && !cateId.isEmpty() && Integer.parseInt(cateId) >= 0){
 				extraCond.setMaterialCate(Integer.parseInt(cateId));
 			}
 			
-			if(cateType != null && !cateType.isEmpty()){
+			if(cateType != null && !cateType.isEmpty() && Integer.parseInt(cateType) >= 0){
 				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			

@@ -348,11 +348,12 @@ public class OperateStockActionAction extends DispatchAction{
 //							.setCateType(cate);
 //				}
 //			}
-			
-			String[] content = detail.split("<sp>");
-			for(String temp : content){
-				String[] item = temp.split("<spst>");
-				builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
+			if(detail != null && !detail.isEmpty()){
+				String[] content = detail.split("<sp>");
+				for(String temp : content){
+					String[] item = temp.split("<spst>");
+					builder.addDetail(new StockActionDetail(Integer.valueOf(item[0]), Float.valueOf(item[1]), Float.valueOf(item[2])));
+				}
 			}
 			StockActionDao.update(staff, Integer.valueOf(id), builder);
 			jobject.initTip(true, "操作成功, 已修改库存单信息.");
