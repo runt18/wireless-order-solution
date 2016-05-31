@@ -693,7 +693,7 @@ Ext.onReady(function(){
 		}
 		stockTaskNavWin.center();
 		stockTaskNavWin.show();
-		
+		Ext.getCmp('btnPrintStockAction').show();
 		if(data['statusValue'] == 1 || c.reAudit){
 			stockTaskNavWin.otype = Ext.ux.otype['update'];
 			if(c.reAudit){
@@ -704,7 +704,6 @@ Ext.onReady(function(){
 				otype : Ext.ux.otype['set'],
 				data : data
 			});
-			Ext.getCmp('btnPrintStockAction').show();
 			Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
 			//货品添加可用
 			Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
