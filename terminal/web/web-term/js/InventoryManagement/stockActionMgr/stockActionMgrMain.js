@@ -219,7 +219,7 @@ Ext.onReady(function(){
 								supplier : supplier.getValue(),
 								deptOut : deptOut.getValue(),
 								oriStockId : oriStockId.getValue(),
-								oriStockDate : oriStockDate.getValue().getTime() + 86000000,
+								oriStockDate : oriStockDate.getValue().getTime(),// + 86000000
 								comment : comment.getValue(),
 								type : stockType,
 								cate : stockCate,
@@ -693,7 +693,7 @@ Ext.onReady(function(){
 		}
 		stockTaskNavWin.center();
 		stockTaskNavWin.show();
-		
+		Ext.getCmp('btnPrintStockAction').show();
 		if(data['statusValue'] == 1 || c.reAudit){
 			stockTaskNavWin.otype = Ext.ux.otype['update'];
 			if(c.reAudit){
@@ -704,7 +704,6 @@ Ext.onReady(function(){
 				otype : Ext.ux.otype['set'],
 				data : data
 			});
-			Ext.getCmp('btnPrintStockAction').show();
 			Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
 			//货品添加可用
 			Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
@@ -2161,9 +2160,6 @@ Ext.onReady(function(){
 		    });
 		}
 	
-	
-	
-		
 		var secondStepPanel = Ext.getCmp('stock_secondStepPanel');
 		if(!secondStepPanel){
 			secondStepPanel = new Ext.Panel({
@@ -2189,13 +2185,20 @@ Ext.onReady(function(){
 			    defaults : {
 			        border:false
 			    },
-			    bbar: ['->', {
+			    bbar: ['->',{ 
+			    	text : '导入库单',
+			    	iconCls : 'btn_edit',
+			    	id : 'importStockActionForm',
+			    	handler : function(){
+			    		Ext.ux.importShowerWin(1);
+			    	}
+			    } ,
+				{
 			    	text : '打印',
 			    	id : 'btnPrintStockAction',
 			    	iconCls : 'icon_tb_print_detail',
 			    	hidden : true,
 			    	handler : function(){
-//				    		$('#stockTaskNavWin').print({});
 			    		var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
 			    		stockTaskNavWin.hide();
 			    		if(sn){

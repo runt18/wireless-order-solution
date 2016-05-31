@@ -55,10 +55,10 @@ Ext.ux.printContain = function(type, cols, data, param){
 		if(type == dataType.stockActionData.val){
 			var stockActionData = {};
 			stockActionData.title = param.data.typeText + '--' + param.data.cateTypeText + param.data.subTypeText + '(' + param.data.id + ')';
-			stockActionData.deptOut = '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '');
-			stockActionData.deptIn = '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '');
+			stockActionData.deptOut = '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '----');
+			stockActionData.deptIn = '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '----');
 			stockActionData.oriStockDate = '货单日期：' + param.data.oriStockDateFormat;
-			stockActionData.supplier = '供应商：' + (param.data.supplier ? param.data.supplier.name : '');
+			stockActionData.supplier = '供应商：' + (param.data.supplier ? param.data.supplier.name : '----');
 			stockActionData.operatorName = '制单人：' + param.data.operatorName;
 			stockActionData.birthDate = '制作时间：' + param.data.birthDateFormat;
 			stockActionData.oriStockId = '原始单号：' + (param.data.oriStockId ? param.data.oriStockId : '----');
@@ -149,7 +149,9 @@ Ext.ux.printContain = function(type, cols, data, param){
 		
 }
 
-
+Ext.ux.importShowerWin = function(param){
+	
+}
 
 
 

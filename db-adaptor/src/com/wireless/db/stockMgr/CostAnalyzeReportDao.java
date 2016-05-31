@@ -104,7 +104,11 @@ public class CostAnalyzeReportDao {
 					stockTakeLessMoney += stockReport.getStockTakeLess() * stockReport.getFinalPrice();			//盘亏金额
 					salesMoney += stockReport.getComsumeMoney();	//销售金额
 				}
-				//期初金额+领料金额+拨入金额-退料金额-拨出金额-期末金额=成本金额
+				
+				//成本金额 = 期初金额 + 采购金额 + 领料金额  - 退货金额 - 退料金额 - 期末金额
+				/**
+				 * 报损盘亏报溢盘盈 算为   有成本  0收入类型
+				 */
 				costMoney += primeMoney + pickMaterialMoney + stockInTransferMoney - stockOutMoney - stockOutTransferMoney - endMoney;//成本金额
 				
 				profit += salesMoney - costMoney;															//毛利金额
