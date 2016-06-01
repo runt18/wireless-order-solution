@@ -49,54 +49,52 @@ public class WxNotifyMemberAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward issue(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		final String coupons = request.getParameter("couponId");
+		final String couponId = request.getParameter("couponId");
 		final String staffId = request.getParameter("staffId");
 		final Staff staff = StaffDao.getById(Integer.parseInt(staffId));
-		for(String couponId : coupons.split(",")){
-			final CouponOperation co = CouponOperationDao.getByCond(staff, new CouponOperationDao.ExtraCond().setCoupon(Integer.parseInt(couponId)).setOperateType(CouponOperation.OperateType.ISSUE)).get(0);
-			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-			if(wxRestaurant.hasCouponDrawTemplate() && wxRestaurant.hasQrCode()){
-				final WxMember wxMember = WxMemberDao.getByMember(staff, co.getMemberId());
-				//String appId = "wx49b3278a8728ff76";
-				//String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
-				//final Token token = Token.newInstance(appId, appSecret);
-				final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-				final Token token = Token.newInstance(authorizerToken);
-				/**
-				 * {{first.DATA}}
-				 * 领取人：{{keyword1.DATA}}
-				 * 商品名称：{{keyword2.DATA}}
-				 * 有效期至：{{keyword3.DATA}}
-				 * 订单编号：{{keyword4.DATA}}
-				 * {{remark.DATA}}
-				 */
-				Coupon coupon = CouponDao.getById(staff, co.getCouponId());
-				String serverName;
-				if(request.getServerName().equals("e-tones.net")){
-					serverName = "wx.e-tones.net";
-				}else{
-					serverName = request.getServerName(); 
-				}
-				final String url = "http://" + serverName + "/wx-term/weixin/order/sales.html?pid=" + coupon.getPromotion().getId() + 
-								   "&fid=" + wxMember.getSerial() + 
-								   "&r=" + wxRestaurant.getWeixinSerial() +
-								   "&time=1450689776892";
-				//System.out.println(
-				Template.send(token, new Template.Builder()
-						.setToUser(wxMember.getSerial())
-						.setTemplateId(wxRestaurant.getCouponDrawTemplate())
-						.addKeyword(new Keyword("first", "亲爱的会员，您已成功领取优惠券"))
-						.addKeyword(new Keyword("keyword1", co.getMemberName()))		//领取人
-						.addKeyword(new Keyword("keyword2", coupon.getName()))	       //商品名称
-						.addKeyword(new Keyword("keyword3", DateUtil.format(coupon.getExpired(), DateUtil.Pattern.DATE)))	//有效期至
-						.addKeyword(new Keyword("keyword4", "----"))				//订单编号
-						.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
-						.setUrl(url)
-						);
-				//);
+		final CouponOperation co = CouponOperationDao.getByCond(staff, new CouponOperationDao.ExtraCond().setCoupon(Integer.parseInt(couponId)).setOperateType(CouponOperation.OperateType.ISSUE)).get(0);
+		final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+		if(wxRestaurant.hasCouponDrawTemplate() && wxRestaurant.hasQrCode()){
+			final WxMember wxMember = WxMemberDao.getByMember(staff, co.getMemberId());
+			//String appId = "wx49b3278a8728ff76";
+			//String appSecret = "0ba130d87e14a1a37e20c78a2b0ee3ba";
+			//final Token token = Token.newInstance(appId, appSecret);
+			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+			final Token token = Token.newInstance(authorizerToken);
+			/**
+			 * {{first.DATA}}
+			 * 领取人：{{keyword1.DATA}}
+			 * 商品名称：{{keyword2.DATA}}
+			 * 有效期至：{{keyword3.DATA}}
+			 * 订单编号：{{keyword4.DATA}}
+			 * {{remark.DATA}}
+			 */
+			Coupon coupon = CouponDao.getById(staff, co.getCouponId());
+			String serverName;
+			if(request.getServerName().equals("e-tones.net")){
+				serverName = "wx.e-tones.net";
+			}else{
+				serverName = request.getServerName(); 
 			}
-			
+			final String url = "http://" + serverName + "/wx-term/weixin/order/sales.html?pid=" + coupon.getPromotion().getId() + 
+							   "&fid=" + wxMember.getSerial() + 
+							   "&r=" + wxRestaurant.getWeixinSerial() +
+							   "&time=1450689776892";
+			//System.out.println(
+			Template.send(token, new Template.Builder()
+					.setToUser(wxMember.getSerial())
+					.setTemplateId(wxRestaurant.getCouponDrawTemplate())
+					.addKeyword(new Keyword("first", ("亲爱的会员，您已成功领取【$(coupon_name)】优惠券").replace("$(coupon_name)", coupon.getName())))
+					.addKeyword(new Keyword("keyword1", co.getMemberName()))		//领取人
+					.addKeyword(new Keyword("keyword2", coupon.getName()))	       //商品名称
+					.addKeyword(new Keyword("keyword3", DateUtil.format(coupon.getExpired(), DateUtil.Pattern.DATE)))	//有效期至
+					.addKeyword(new Keyword("keyword4", "----"))				//订单编号
+					.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
+					.setUrl(url)
+					);
+			//);
 		}
+			
 
 		return null;
 	}
@@ -186,7 +184,7 @@ public class WxNotifyMemberAction extends DispatchAction{
 						.setToUser(wxMember.getSerial())
 						//.setToUser("odgTwt4tqd_mu-q9EY02rqHrp_M0")
 						.setTemplateId(wxRestaurant.getPaymentTemplate())
-						.addKeyword(new Keyword("first", "您好，消费已成功"))
+						.addKeyword(new Keyword("first", ("您好, 消费已成功, 付款方式是【$(pay_type)】").replace("$(pay_type)", order.getPaymentType().getName())))
 						.addKeyword(new Keyword("keyword1", NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(lastOperation.getPayMoney())))
 						.addKeyword(new Keyword("keyword2", wxRestaurant.getNickName()))
 						.addKeyword(new Keyword("keyword3", Integer.toString(lastOperation.getDeltaPoint())))

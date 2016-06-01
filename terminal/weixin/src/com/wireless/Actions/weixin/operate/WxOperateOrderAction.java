@@ -475,7 +475,7 @@ public class WxOperateOrderAction extends DispatchAction {
 									}
 
 									//用微信支付的方式结账
-									Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(orderId, PayType.WX, true);
+									Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(orderId, PayType.WX).setSms(true);
 									resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
 									if(resp.header.type == Type.NAK){
 										throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));

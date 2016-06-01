@@ -65,6 +65,8 @@ import com.wireless.db.book.BookDao;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -81,6 +83,8 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.represent.Represent;
+import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -99,7 +103,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		WAITER(1, "微信店小二"),
 		TEMP_PAY(2, "账单暂结"),
 		REPRESENT(3, "我要代言"),
-		SCAN_ORDER(4, "扫码下单");
+		SCAN_ORDER(4, "扫码下单"),
+		WX_SCAN_ISSUE_COUPON(5, "扫码发券");
 		
 		public final int val;
 		public final String desc;
@@ -195,6 +200,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	
 	private final HttpServletRequest request;
 	
+	private final String serverName;
+	
 	public static enum EventKey{
 		SELF_ORDER_EVENT_KEY("self_order_event_key", "自助点餐"),
 		SELF_BOOK_EVENT_KEY("self_book_event_key", "自助预订"),
@@ -225,11 +232,14 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		}
 	}
 	
-	public WxHandleMessage(HttpServletRequest request, WxSession session, String root){
+	public WxHandleMessage(HttpServletRequest request, WxSession session){
 		super(session);
 		
 		this.request = request;
+
+		this.serverName = request.getLocalAddr();
 		
+		final String root = "http://" + this.serverName + "/wx-term";
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
 		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=food.html";
 		this.WEIXIN_BOOK = root + "/weixin/order/branches.html?redirect_url=book.html";
@@ -389,7 +399,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-				WxMemberDao.interest(staff, msg.getFromUserName());
+				WxMemberDao.interest(staff, msg.getFromUserName(), this.serverName);
 				if(msg.getTicket().isEmpty()){
 					final List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
 					if(reply.isEmpty()){
@@ -424,13 +434,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 				final int restaurantId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 				final Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 
-				WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-				String picUrl;
-				if(wxRestaurant.hasWeixinLogo()){
-					picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
-				}else{
-					picUrl = "";
-				}
+				final String picUrl = getPicUrl(staff);
 				if(msg.getEventKey().equals(EventKey.NAVI_EVENT_KEY.val)){
 					//餐厅导航
 					session.callback(createNavi(msg));
@@ -505,13 +509,14 @@ public class WxHandleMessage extends HandleMessageAdapter {
 								
 							});
 							for(Promotion promotion : promotions){
+								final String couponPicUrl;
 								if(promotion.getCouponType().hasImage()){
-									picUrl = promotion.getCouponType().getImage().getObjectUrl();
+									couponPicUrl = promotion.getCouponType().getImage().getObjectUrl();
 								}else{
-									picUrl = "";
+									couponPicUrl = "";
 								}
 								couponItem.addItem(new Data4Item(promotion.getTitle(), "", 
-												   picUrl, createUrl(msg, WEIXIN_COUPON) + "&pid=" + promotion.getId()));
+										couponPicUrl, createUrl(msg, WEIXIN_COUPON) + "&pid=" + promotion.getId()));
 							}
 						}
 						session.callback(couponItem);
@@ -637,17 +642,10 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		}
 		if(qrParam.type == QrCodeType.WAITER){
 			//扫描带参二维码,进入微信店小二
-			final int groupId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+//			/final int groupId = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
 			final int orderId = Integer.valueOf(qrParam.param);
 			final int branchId = getRestaurantByOrder(orderId);
 			final Staff staff = StaffDao.getAdminByRestaurant(branchId);
-			WxRestaurant wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(groupId));
-			final String picUrl;
-			if(wxRestaurant.hasWeixinLogo()){
-				picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
-			}else{
-				picUrl = "";
-			}
 			
 			HttpSession httpSession = request.getSession(true);
 			httpSession.setAttribute("fid", msg.getToUserName());
@@ -661,7 +659,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 														  .append("服务员 ：" + order.getWaiter()).append("\r\n")
 														  .append("点击去微信店小二，可自助浏览菜品信息，呼叫服务，自助下单");
 			session.callback(new Msg4ImageText(msg).addItem(
-					new Data4Item("微信店小二(餐台：" + order.getDestTbl().getName() + ")", desc.toString(), picUrl,
+					new Data4Item("微信店小二(餐台：" + order.getDestTbl().getName() + ")", desc.toString(), getPicUrl(staff),
 								  createUrl4Session(WEIXIN_WAITER + "?orderId=" + orderId + "&branchId=" + branchId, httpSession))));
 			
 		}else if(qrParam.type == QrCodeType.REPRESENT){
@@ -675,12 +673,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			Map<Member, MemberOperation[]> result = MemberDao.chain(staff, new Member.ChainBuilder(subscriber, referrer));
 
 			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-			final String picUrl;
-			if(wxRestaurant.hasWeixinLogo()){
-				picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
-			}else{
-				picUrl = "";
-			}
 			String desc = ("通过$(referrer)的推荐，您已成为$(restaurant)的会员，并获得$(recommend_money)的充值赠额和$(recommend_point)的赠送积分。" +
 						  "\r\n" +
 					      "点击去会员中心查看详情>>>>")
@@ -688,7 +680,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					      .replace("$(restaurant)", RestaurantDao.getById(rid).getName())
 					      .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
 					      .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
-			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("关注有礼", desc, picUrl, createUrl(msg, WEIXIN_MEMBER))));
+			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("关注有礼", desc, getPicUrl(staff), createUrl(msg, WEIXIN_MEMBER))));
 			
 			//发送微信模板信息通知推荐人获得赠送充值和积分的消息
 			if(wxRestaurant.hasChargeTemplate()){
@@ -749,11 +741,6 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			httpSession.setAttribute("branchId", Integer.toString(restaurantId));
 			httpSession.setMaxInactiveInterval(3600 * 2);
 			
-//			final StringBuilder desc = new StringBuilder().append("欢迎客户：" + WxMemberDao.getBySerial(staff, msg.getFromUserName())).append("\r\n")
-//					  .append("餐台：" + table.getName()).append("\r\n")
-//					  .append("开台时间：" + DateUtil.format(new Date())).append("\r\n")
-//					  .append("点击进入自助点餐界面，自助点菜");
-			
 			final String desc = ("欢迎客官：{wxMemberName}\r\n"
 								+ "餐台：{tableName}\r\n"
 								+ "开台时间：{severingTime}\r\n"
@@ -761,25 +748,48 @@ public class WxHandleMessage extends HandleMessageAdapter {
 														 .replace("{tableName}", table.getName())
 														 .replace("{severingTime}", DateUtil.format(new Date()));
 			
-			final String picUrl;
-			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-			if(wxRestaurant.hasWeixinLogo()){
-				picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();
-			}else{
-				picUrl = "";
-			}
-			
 			session.callback(new Msg4ImageText(msg).addItem(
-					new Data4Item("欢迎使用扫码下单(餐台：" + table.getName() + ")", desc, picUrl,
+					new Data4Item("欢迎使用扫码下单(餐台：" + table.getName() + ")", desc, getPicUrl(staff),
 								  createUrl4Session(WEIXIN_WAITER + "?tableId=" + table.getId() + "&branchId=" + restaurantId + 
 										  			"&m=" + msg.getFromUserName() + "&r=" + msg.getToUserName(), httpSession))));
+			
+		}else if(qrParam.type == QrCodeType.WX_SCAN_ISSUE_COUPON){
+			//扫码领券
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			final int promotionId = Integer.parseInt(qrParam.param);
+			final Promotion promotion = PromotionDao.getById(staff, promotionId);
+			if(promotion.getIssueTrigger().getIssueRule().isWxScan()){
+				final Member subscriber = MemberDao.getByWxSerial(staff, msg.getFromUserName());
+				List<CouponOperation> issuedCoupons = CouponOperationDao.getByCond(staff, new CouponOperationDao.ExtraCond()
+																											    .setCouponType(promotion.getCouponType())
+																												.setMember(subscriber)
+																												.addOperation(CouponOperation.Operate.WX_SCAN_ISSUE));
+				//防止扫码多次重复领券
+				if(issuedCoupons.isEmpty()){
+					CouponDao.issue(staff, Coupon.IssueBuilder.newInstance4WxScan().addPromotion(promotion).addMember(subscriber).setWxServer(this.serverName));
+				}else{
+					final String title = ("对不起, 您已经领取过【$(promotion)】活动的优惠券").replace("$(promotion)", promotion.getTitle());
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title, "点击去会员中心查看>>>>", getPicUrl(staff), createUrl(msg, WEIXIN_MEMBER))));
+
+				}
+			}
+		}
+	}
+	
+	private String getPicUrl(Staff staff) throws SQLException, BusinessException{
+		final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+		if(wxRestaurant.hasWeixinLogo()){
+			return wxRestaurant.getWeixinLogo().getObjectUrl();
+		}else{
+			return "";
 		}
 	}
 	
 	/**
 	 *获取大众点评数据
 	 */
-	private String HttpRequest(String requestUrl) {
+	private String httpRequest(String requestUrl) {
         StringBuffer sb = new StringBuffer();
         InputStream ips = getInputStream(requestUrl);
         InputStreamReader isreader = null;
@@ -852,7 +862,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
     	String codes = stringBuilder.toString();  
     	String sign = org.apache.commons.codec.digest.DigestUtils.shaHex(codes).toUpperCase();    	
     	
-		String data = HttpRequest("http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign="+sign+"&business_id=" + businessId +"&city=%E5%B9%BF%E5%B7%9E");
+		String data = httpRequest("http://api.dianping.com/v1/deal/get_deals_by_business_id?appkey=6373481645&sign="+sign+"&business_id=" + businessId +"&city=%E5%B9%BF%E5%B7%9E");
 		
 		if(JSON.parseObject(data).getString("status").equals("OK") && !JSON.parseObject(data).getString("count").equals("0")){
 			return true;
