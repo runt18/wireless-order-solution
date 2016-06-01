@@ -65,6 +65,8 @@ define(function(require, exports, module){
 					+ '<td>{memberType}</td>'
 					+ '<td>{otype}</td>'
 					+ '<td class="text_right">{money}</td>'
+					+ '<td class="text_right">{baseBalance}</td>'
+					+ '<td class="text_right">{extraBalance}</td>'
 					+ '<td class="text_right">{deltaPoint}</td>'
 					+ '<td>{staffName}</td>'
 					+ '<td>{comment}</td>'
@@ -106,6 +108,8 @@ define(function(require, exports, module){
 								memberType : result.root[i].member.memberType.name,
 								otype : result.root[i].operateTypeText,
 								money : result.root[i].payMoney ? result.root[i].payMoney : (result.root[i].deltaTotalMoney ? result.root[i].deltaTotalMoney : 0),	
+								baseBalance : result.root[i].deltaBaseMoney ? result.root[i].deltaBaseMoney : 0,
+								extraBalance : result.root[i].deltaExtraMoney ? result.root[i].deltaExtraMoney : 0,
 								deltaPoint : result.root[i].deltaPoint > 0 ? '+'+result.root[i].deltaPoint : result.root[i].deltaPoint,
 								staffName : result.root[i].staffName,
 								comment : result.root[i].comment
