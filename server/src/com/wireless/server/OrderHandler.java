@@ -511,11 +511,11 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doTransOrderFood(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
-		Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
-		OrderDao.TransResult result = OrderDao.transfer(staff, builder);
+		final Order.TransferBuilder builder = new Parcel(request.body).readParcel(Order.TransferBuilder.CREATOR);
+		final OrderDao.TransResult result = OrderDao.transfer(staff, builder);
 		//Print the transfer food.
 		new PrintHandler(staff).process(JobContentFactory.instance().createTransFoodContent(PType.PRINT_TRANSFER_FOOD, 
-				staff, getAvailPrinters(staff, null), 
+				staff, getAvailPrinters(staff, builder.getPrinters()), 
 				builder.getSourceOrderId(), result.srcTbl, result.destTbl, result.transFoods));
 
 		return new RespACK(request.header);
@@ -524,7 +524,7 @@ class OrderHandler implements Runnable{
 	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
 		Table.TransferBuilder builder = new Parcel(request.body).readParcel(Table.TransferBuilder.CREATOR);
 		int orderId = TableDao.transfer(staff, builder);
-		ServerConnector.instance().ask(ReqPrintContent.buildTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())).build());
+		ServerConnector.instance().ask(ReqPrintContent.buildTransTbl(staff, orderId, new Table.Builder(builder.getSrcTbl().getId()), new Table.Builder(builder.getDestTbl().getId())).setPrinters(builder.getPrinters()).build());
 		return new RespACK(request.header);
 	}
 	
