@@ -10,7 +10,7 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
-
+					
 					/QueryRestaurants.do,
 					/VerifyLogin.do,
 					/QueryStaff.do,
@@ -78,7 +78,6 @@
 		<init-param>
 			<param-name>db_host</param-name>
 			<param-value>192.168.33.100</param-value>
-			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -90,7 +89,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>root</param-value>
+			<param-value>HelloZ315</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -148,7 +147,6 @@
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>
-		
 		<welcome-file>index.jsp</welcome-file>
 		<welcome-file>default.html</welcome-file>
 		<welcome-file>default.htm</welcome-file>

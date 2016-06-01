@@ -201,7 +201,7 @@ public class PayType implements Parcelable, Comparable<PayType>, Jsonable{
 	
 	@Override
 	public String toString(){
-		return this.name;
+		return this.getName();
 	}
 
 	public final static int PAY_TYPE_PARCELABLE_SIMPLE = 0;
