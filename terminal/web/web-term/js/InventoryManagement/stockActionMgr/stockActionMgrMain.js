@@ -2189,8 +2189,9 @@ Ext.onReady(function(){
 			    	text : '导入库单',
 			    	iconCls : 'btn_edit',
 			    	id : 'importStockActionForm',
+			    	hidden : true,
 			    	handler : function(){
-			    		Ext.ux.importShowerWin(1);
+			    		Ext.ux.importShowerWin();
 			    	}
 			    } ,
 				{
