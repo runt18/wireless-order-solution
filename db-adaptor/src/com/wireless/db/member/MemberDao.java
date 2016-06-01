@@ -1432,11 +1432,7 @@ public class MemberDao {
 			update(dbCon, staff, builder);
 			dbCon.conn.commit();
 			
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-			
-		}catch(BusinessException e){
+		}catch(SQLException | BusinessException e){
 			dbCon.conn.rollback();
 			throw e;
 			
