@@ -652,7 +652,13 @@ $(function(){
 		
 		//会员余额结账
 		$('#memberPay_a_payment').click(function(){
+			var extraPrice = null;
+			if($('#memberPaymentGiftPrice').attr('check')){
+				extraPrice = $('#useLimit_input_payment').val();
+			}
+			
 			paySubmit({
+				extraPrice : extraPrice,
 				submitType : PayTypeEnum.MEMBER,
 				postPayment : function(resultJSON){
 					if(resultJSON.success){
@@ -1003,15 +1009,32 @@ $(function(){
 				
 				$('#payment4MemberCertainName').text(orderMsg.member.name);
 				$('#payment4MemberCertainType').text(orderMsg.member.memberType.name);
-				$('#payment4MemberCertainBalance').text(orderMsg.member.totalBalance);
+				$('#payment4MemberCertainBalance').text(orderMsg.member.baseBalance);
+				$('#payment4MemberCertainGift').text(orderMsg.member.extraBalance);
 				$('#payment4MemberCertainPoint').text(orderMsg.member.point);	
 				$('#payment4MemberCertainPhone').text(orderMsg.member.mobile ? orderMsg.member.mobile : '----');
 				$('#payment4MemberCertainCard').text(orderMsg.member.memberCard ? orderMsg.member.memberCard : '----');	
+				
+				$('#memberPaymentGiftPrice').attr('checked', false);
+				$('#memberPaymentGiftPrice').checkboxradio('refresh');
+				
+				if(!$('#memberPaymentGiftPrice').attr('checked')){
+					$('#useLimit_input_payment').attr('disabled', true);
+				}
 				
 				$('#showMemberInfoWin').popup('open');
 			}
 		});
 		
+		//会员余额结账里赠送金额的checkbox
+		$('#memberPaymentGiftPrice').click(function(){
+			if($('#memberPaymentGiftPrice').attr('checked')){
+				$('#useLimit_input_payment').attr('disabled', false);
+			}else{
+				$('#useLimit_input_payment').attr('disabled', true);
+			}
+			
+		});
 		
 		//退菜明细
 		$('#spanSeeCancelFoodAmount_label_tableSelect').click(function(){
@@ -1070,6 +1093,7 @@ $(function(){
 	function paySubmit(c) {
 	
 		c = c || {
+			extraPrice : null,                   //赠送余额使用限制
 			submitType : PayTypeEnum.CASH,		//结账类型
 			postPayment : null,					//结账处理函数
 			authCode : null,                   //扫描二维码的值  
@@ -1147,7 +1171,8 @@ $(function(){
 				payTypeCash : c.mixedIncome ? c.mixedIncome : '',
 				sendSms : sendSms,
 				orientedPrinter : getcookie(document.domain + '_printers'),			//特定打印机打印
-				authCode : c.authCode ? c.authCode : null             //扫描二维码的值
+				authCode : c.authCode ? c.authCode : null,             //扫描二维码的值
+				extraPrice : c.extraPrice ? c.extraPrice : ''
 			},
 			dataType : 'json',
 			success : function(resultJSON, status, xhr){

@@ -19,6 +19,8 @@ function CreateInSeatDiv(param){
 				$('#shadowForPopup').hide();
 			});
 			
+			!isNaN(eraseQuota)
+			
 			//选择餐桌按钮
 			self.find('[id="left_a_seat"]').click(function(){
 				seajs.use('askTable', function(askTable){

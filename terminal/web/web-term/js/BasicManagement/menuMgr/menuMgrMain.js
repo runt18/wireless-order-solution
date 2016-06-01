@@ -2229,7 +2229,7 @@ function basicOperationBasicHandler(c){
 			if(foodPrices){
 				foodPrices += '&';
 			}
-			foodPrices += (food_pricePlans[i].id + ',' + Ext.getCmp('numBasicForPrice'+food_pricePlans[i].id).getValue());  
+			fodPrices += (food_pricePlans[i].id + ',' + Ext.getCmp('numBasicForPrice'+food_pricePlans[i].id).getValue());  
 		}
 	}
 	
@@ -2240,7 +2240,7 @@ function basicOperationBasicHandler(c){
 			//过滤已经删除了的单位价格
 			if(unit && price){
 				//过滤信息没有填齐全的单位价格
-				if(unit.getValue() && price.getValue()){
+				if(unit.getValue() && parseInt(price.getValue()) >= 0){
 					
 					if(multiFoodPrices){
 						multiFoodPrices += '&';
