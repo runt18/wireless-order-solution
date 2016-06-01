@@ -149,8 +149,32 @@ Ext.ux.printContain = function(type, cols, data, param){
 		
 }
 
-Ext.ux.importShowerWin = function(param){
-	
+Ext.ux.importShowerWin = function(){
+	var importShowerWin;
+	importShowerWin = new Ext.Window({
+		width : 900,
+		height : 520,
+		style : {
+			'overflow' : 'visible'
+		},
+		resizable : false,
+		bbar : ['->', {
+		    	text : '导入',
+		    	iconCls : 'btn_save',
+		    	handler : function(){
+		    	}
+			}, {
+		    	iconCls : 'btn_cancel',
+		    	xtype : 'button',
+		    	text : '取消',
+		    	handler : function(){
+		    		importShowerWin.hide();
+		    		$('#' + importShowerWin.id).remove();
+	    		}
+	    }]
+	});
+	importShowerWin.show();
+	importShowerWin.center();
 }
 
 
