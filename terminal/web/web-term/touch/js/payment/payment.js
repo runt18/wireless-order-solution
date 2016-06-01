@@ -653,7 +653,7 @@ $(function(){
 		//会员余额结账
 		$('#memberPay_a_payment').click(function(){
 			var extraPrice = null;
-			if($('#memberPaymentGiftPrice').attr('check')){
+			if($('#memberPaymentGiftPrice').attr('checked')){
 				extraPrice = $('#useLimit_input_payment').val();
 			}
 			
@@ -662,7 +662,7 @@ $(function(){
 				submitType : PayTypeEnum.MEMBER,
 				postPayment : function(resultJSON){
 					if(resultJSON.success){
-						Util.msg.alert({msg : '结账成功!', topTip : true});
+						Util.msg.tip('结账成功!');
 						$('#memberPayCancel_a_payment').click();
 						setTimeout(function(){
 							if(WirelessOrder.systemStatus.isFastFood()){
@@ -674,10 +674,7 @@ $(function(){
 							}
 						}, 250);
 					}else{
-						Util.msg.alert({
-							msg : resultJSON.data,
-							renderTo : 'paymentMgr'
-						});
+						Util.msg.tip(resultJSON.data);
 					}
 				}
 			});
@@ -1016,11 +1013,9 @@ $(function(){
 				$('#payment4MemberCertainCard').text(orderMsg.member.memberCard ? orderMsg.member.memberCard : '----');	
 				
 				$('#memberPaymentGiftPrice').attr('checked', false);
-				$('#memberPaymentGiftPrice').checkboxradio('refresh');
+				$('#useLimit_input_payment').attr('disabled', true);
 				
-				if(!$('#memberPaymentGiftPrice').attr('checked')){
-					$('#useLimit_input_payment').attr('disabled', true);
-				}
+				$('#memberPaymentGiftPrice').checkboxradio('refresh');
 				
 				$('#showMemberInfoWin').popup('open');
 			}
@@ -1030,8 +1025,10 @@ $(function(){
 		$('#memberPaymentGiftPrice').click(function(){
 			if($('#memberPaymentGiftPrice').attr('checked')){
 				$('#useLimit_input_payment').attr('disabled', false);
+				$('#useLimit_input_payment').val('');
 			}else{
 				$('#useLimit_input_payment').attr('disabled', true);
+				$('#useLimit_input_payment').val('');
 			}
 			
 		});
