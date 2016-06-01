@@ -1705,6 +1705,8 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
+	 * @param extraPrice
+	 * 			the extra price to use
 	 * @param coupon
 	 * 			the coupon to use, null means no coupon
 	 * @param payType
@@ -1719,12 +1721,12 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account
 	 *			<li>the member account to consume is NOT found
 	 */
-	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, float extraPrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.consume(consumePrice, payType);
+		MemberOperation mo = member.consume(consumePrice, extraPrice, payType);
 		
 		//Set the associate order id
 		mo.setOrderId(orderId);
@@ -1779,6 +1781,8 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
+	 * @param extraPrice
+	 * 			the extra price to use
 	 * @param payType
 	 * 			the payment type referred to {@link PayType}
 	 * @param orderId
@@ -1791,13 +1795,13 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account<br>
 	 *			<li>the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, float extraPrice, PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.consume(dbCon, staff, memberId, consumePrice, payType, orderId);
+			MemberOperation mo = MemberDao.consume(dbCon, staff, memberId, consumePrice, extraPrice, payType, orderId);
 			dbCon.conn.commit();
 			return mo;
 			
