@@ -1,6 +1,7 @@
 package com.wireless.Actions.couponMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -12,7 +13,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.marker.weixin.api.BaseAPI;
 
 import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.member.MemberCondDao;
@@ -216,12 +216,10 @@ public class OperateCouponAction extends DispatchAction{
 		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		final String memberId = request.getParameter("memberId");
-		final String orderId = request.getParameter("orderId");
 		final JObject jObject = new JObject();
 		
 		try{
-			//获取账单已用的优惠券
-			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setOperation(CouponOperation.Operate.ORDER_USE, Integer.parseInt(orderId)), null);
+			final List<Coupon> result = new ArrayList<>();
 			
 			//获取会员可用的优惠券
 			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond()
@@ -389,30 +387,31 @@ public class OperateCouponAction extends DispatchAction{
 					builder.addMember(member);
 				}
 			}
-			
-			final int[] coupons = CouponDao.issue(staff, builder);
-			
+
 			final String serverName;
 			if(request.getServerName().equals("e-tones.net")){
 				serverName = "wx.e-tones.net";
 			}else{
 				serverName = request.getServerName();
 			}
+			
+			CouponDao.issue(staff, builder.setWxServer(serverName));
+			
 			//Perform to send the weixin charge msg to member.
-			new Thread(new Runnable(){
-				@Override
-				public void run() {
-					for(int couponId : coupons){
-						try {
-							//System.out.println("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId());
-							BaseAPI.doPost("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId(), "");
-						} catch (Exception ignored) {
-							ignored.printStackTrace();
-						}
-					}
-				}
-				
-			}).run();
+//			new Thread(new Runnable(){
+//				@Override
+//				public void run() {
+//					for(int couponId : coupons){
+//						try {
+//							//System.out.println("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId());
+//							BaseAPI.doPost("http://" + serverName + "/wx-term/WxNotifyMember.do?dataSource=issue&couponId=" + couponId + "&staffId=" + staff.getId(), "");
+//						} catch (Exception ignored) {
+//							ignored.printStackTrace();
+//						}
+//					}
+//				}
+//				
+//			}).run();
 			jobject.initTip(true, "优惠券发放成功");
 			
 		}catch(BusinessException | SQLException e){

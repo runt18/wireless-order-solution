@@ -85,7 +85,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 				payType = PayType.MEMBER;
 			}
 			
-			payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), payType, false);
+			payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), payType).setSms(false);
 			
 			
 //			if(pricePlanId != null && !pricePlanId.trim().isEmpty() && !pricePlanId.equals("-1")){

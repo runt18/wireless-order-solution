@@ -35,25 +35,29 @@ public class PayOrderAction extends Action{
 	
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+		final String pin = (String)request.getAttribute("pin");
+		final String settleParam = request.getParameter("payType");
+		final String payTypeValue = request.getParameter("payManner");
+		final String cashIncome = request.getParameter("cashIncome");
+		final String eraseQuota = request.getParameter("eraseQuota");
+		final String comment = request.getParameter("comment");
+		final String customNum = request.getParameter("customNum");
+		final String tempPay = request.getParameter("tempPay");
+		final String isPrint = request.getParameter("isPrint");
+		final String orientedPrinter = request.getParameter("orientedPrinter");
+		final String authCode = request.getParameter("authCode");
+		final String sendSms = request.getParameter("sendSms");
+		final String extraBalance = request.getParameter("extraBalance");
 		
 		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\", \"billNo\":\"$(billNo)\"}";
 		try {
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final int orderId = Integer.parseInt(request.getParameter("orderID"));
 
-			final String settleParam = request.getParameter("payType");
-			final String payMannerParam = request.getParameter("payManner");
-			final String cashIncome = request.getParameter("cashIncome");
-			final String eraseQuota = request.getParameter("eraseQuota");
-			final String comment = request.getParameter("comment");
-			final String customNum = request.getParameter("customNum");
-			final String tempPay = request.getParameter("tempPay");
-			final String isPrint = request.getParameter("isPrint");
-			final String orientedPrinter = request.getParameter("orientedPrinter");
-			final String authCode = request.getParameter("authCode");
-			
+
 			final Order.SettleType settleType;
 			if(settleParam != null && !settleParam.isEmpty()){
 				settleType = Order.SettleType.valueOf(Integer.parseInt(settleParam));
@@ -62,15 +66,23 @@ public class PayOrderAction extends Action{
 			}
 
 			final PayType payType;
-			if(payMannerParam != null && !payMannerParam.isEmpty()){
-				payType = new PayType(Integer.parseInt(payMannerParam));
+			if(payTypeValue != null && !payTypeValue.isEmpty()){
+				payType = new PayType(Integer.parseInt(payTypeValue));
 			}else{
 				payType = PayType.CASH;
 			}
 			
 			final Order.PayBuilder payBuilder;
 			if(settleType == Order.SettleType.MEMBER){
-				payBuilder = Order.PayBuilder.build4Member(orderId, payType, Boolean.parseBoolean(request.getParameter("sendSms")));
+				payBuilder = Order.PayBuilder.build4Member(orderId, payType);
+				//是否发送短信
+				if(sendSms != null && !sendSms.isEmpty()){
+					payBuilder.setSms(Boolean.parseBoolean(sendSms));
+				}
+				//是否扣减固定的赠送账户金额
+				if(extraBalance != null && !extraBalance.isEmpty()){
+					payBuilder.setExtraBalance(Float.parseFloat(extraBalance));
+				}
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
 			}
