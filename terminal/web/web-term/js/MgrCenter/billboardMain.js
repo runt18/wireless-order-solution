@@ -77,7 +77,6 @@ function initWinBillboard(){
 			store : new Ext.data.JsonStore({
 				fields : [ 'id', 'name' ],
 				root : 'root',
-				data : restaurantData
 			}),
 			valueField : 'id',
 			displayField : 'name',
@@ -329,7 +328,6 @@ function operateWXInfo(){
 			store : new Ext.data.JsonStore({
 				fields : [ 'id', 'name' ],
 				root : 'root',
-				data : restaurantData
 			}),
 			valueField : 'id',
 			displayField : 'name',
