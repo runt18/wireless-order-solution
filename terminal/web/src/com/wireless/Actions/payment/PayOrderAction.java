@@ -48,7 +48,7 @@ public class PayOrderAction extends Action{
 		final String orientedPrinter = request.getParameter("orientedPrinter");
 		final String authCode = request.getParameter("authCode");
 		final String sendSms = request.getParameter("sendSms");
-		final String extraBalance = request.getParameter("extraBalance");
+		final String extraPrice = request.getParameter("extraPrice");
 		
 		String jsonResp = "{\"success\":$(result), \"data\":\"$(value)\", \"billNo\":\"$(billNo)\"}";
 		try {
@@ -80,8 +80,8 @@ public class PayOrderAction extends Action{
 					payBuilder.setSms(Boolean.parseBoolean(sendSms));
 				}
 				//是否扣减固定的赠送账户金额
-				if(extraBalance != null && !extraBalance.isEmpty()){
-					payBuilder.setExtraBalance(Float.parseFloat(extraBalance));
+				if(extraPrice != null && !extraPrice.isEmpty()){
+					payBuilder.setExtraPrice(Float.parseFloat(extraPrice));
 				}
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType);
