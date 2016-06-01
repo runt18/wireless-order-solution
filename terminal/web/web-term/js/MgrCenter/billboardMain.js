@@ -257,8 +257,7 @@ function loadRestaurantData(){
 	Ext.Ajax.request({
 		url : '../../OperateRestaurant.do',
 		params : {
-			dataSource : 'getByCond',
-			isCookie : true
+			dataSource : 'getByCond'
 		},
 		success : function(response, options){
 			var jr = Ext.decode(response.responseText);
@@ -280,6 +279,10 @@ function bbGridOperateRenderer(){
 		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		   + '<a href="javascript:operateBillboard({otype:\'delete\'})">删除</a>';
 };
+
+function bbGridOperateRenderer2(v){
+	return v.substring(0, 10) + "..."; 
+}
 
 function operateWXInfo(){
 	if(!winBillboard){
@@ -335,6 +338,7 @@ function operateWXInfo(){
 			triggerAction : 'all',
 			selectOnFocus : true
 		});
+		
 		var expired = new Ext.form.DateField({
 			fieldLabel : '过期时间',
 			width : 200,
@@ -529,10 +533,10 @@ Ext.onReady(function(){
 			[true, false, true, true], 
 			['类型', 'typeDesc', 50, 'center'],
 			['公告标题', 'title', 100],
-			['公告内容', 'desc', '', '', 'function(v){ return v.substring(0, 10) + "..."; }'],
+			['公告内容', 'desc', '', '', bbGridOperateRenderer2],
 			['发布时间', 'createdFormat', 100],
 			['过期时间', 'expiredFormat', 100],
-			['操作', 'operation', 100, 'center', 'bbGridOperateRenderer']
+			['操作', 'operation', 100, 'center', bbGridOperateRenderer]
 		],
 		['id', 'title', 'desc', 'created', 'createdFormat', 'expired', 'expiredFormat', 'typeVal', 'typeDesc', 'restaurant'],
 		[['isPaging', true], ['dataSource', 'normal']],
