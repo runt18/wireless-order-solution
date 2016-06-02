@@ -694,6 +694,8 @@ Ext.onReady(function(){
 		stockTaskNavWin.center();
 		stockTaskNavWin.show();
 		Ext.getCmp('btnPrintStockAction').show();
+		Ext.getCmp('importStockActionForm').hide();
+
 		if(data['statusValue'] == 1 || c.reAudit){
 			stockTaskNavWin.otype = Ext.ux.otype['update'];
 			if(c.reAudit){
@@ -1323,7 +1325,7 @@ Ext.onReady(function(){
 					gs.baseParams['stockType'] = st.getValue();
 					gs.baseParams['cateType'] = cate.getValue();
 					gs.baseParams['dept'] = dept.getValue();
-					gs.baseParams['oriStockId'] = oriStockId.getValue();
+					gs.baseParams['fuzzId'] = oriStockId.getValue();
 					gs.baseParams['status'] = status.getValue() != -1 ? status.getValue() : '';
 					gs.baseParams['supplier'] = supplier.getValue();
 					gs.baseParams['subType'] = subType.getValue();
@@ -2191,7 +2193,7 @@ Ext.onReady(function(){
 			    	id : 'importStockActionForm',
 			    	hidden : true,
 			    	handler : function(){
-			    		Ext.ux.importShowerWin();
+			    		Ext.ux.importShowerWin({store : secondStepPanelCenter.getStore()});
 			    	}
 			    } ,
 				{
@@ -2220,6 +2222,7 @@ Ext.onReady(function(){
 			    	disabled : true,
 			    	handler : function(e){
 			    		stockTaskNavHandler(e);
+			    		Ext.getCmp('importStockActionForm').hide();	
 			    	}
 			    }, {
 		    		text : '下一步',
@@ -2230,6 +2233,9 @@ Ext.onReady(function(){
 		    			stockTaskNavHandler(e);
 		    			Ext.getCmp('sam_secondStepPanelWest').setWidth(230);
 		    			Ext.getCmp('stock_secondStepPanel').doLayout();
+		    			if(Ext.getCmp('btnNextForStockNav').getText() == '完成' && !Ext.getCmp('btnNextForStockNav').disabled){
+							Ext.getCmp('importStockActionForm').show();		    			
+		    			}
 			    	}
 		    	}, {
 		    		text : '审核',
@@ -2288,6 +2294,7 @@ Ext.onReady(function(){
 			    		});
 			    		
 			    		Ext.getCmp('btnPrintStockAction').hide();
+			    		Ext.getCmp('importStockActionForm').hide();	
 			    	}
 			    }
 			});

@@ -41,6 +41,8 @@ public class QueryStockActionAction extends Action{
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String comment = request.getParameter("comment");
+		final String isWithOutSum = request.getParameter("isWithOutSum");
+		final String fuzzId = request.getParameter("fuzzId");
 		final JObject jObject = new JObject();
 		try{
 
@@ -93,7 +95,10 @@ public class QueryStockActionAction extends Action{
 				//extraCond += (" AND (S.ori_stock_id LIKE '%" + oriStockId.trim() + "%' OR S.id = '" + oriStockId.trim() + "')");
 				extraCond.setOriId(oriStockId);
 			}
-			if(status != null && !status.trim().isEmpty()){
+			if(fuzzId != null && !fuzzId.trim().isEmpty()){
+				extraCond.setFuzzId(fuzzId);	
+			}
+			if(status != null && !status.trim().isEmpty() && Integer.parseInt(status) >= 0){
 				//extraCond += (" AND S.status = " + status.trim());
 				extraCond.addStatus(StockAction.Status.valueOf(Integer.parseInt(status)));
 			}
@@ -122,7 +127,7 @@ public class QueryStockActionAction extends Action{
 				}
 			}
 
-			if(!root.isEmpty()){
+			if(!root.isEmpty() && isWithOutSum == null){
 				jObject.setTotalProperty(root.size());
 				float price = 0, actualPrice = 0;
 				for (StockAction stockAction : root) {

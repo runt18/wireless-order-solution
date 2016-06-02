@@ -52,9 +52,15 @@ public class StockActionDao {
 		private boolean isCurrentMonth;					//是否查询当前会计月份
 		private Staff staff;
 		private String comment;
+		private String fuzzId;
 		
 		ExtraCond setStaff(Staff staff){
 			this.staff = staff;
+			return this;
+		}
+		
+		public ExtraCond setFuzzId(String fuzzId){
+			this.fuzzId = fuzzId;
 			return this;
 		}
 		
@@ -242,6 +248,10 @@ public class StockActionDao {
 			
 			if(comment != null && !comment.isEmpty()){
 				extraCond.append(" AND S.comment LIKE '%" + this.comment + "%' ");
+			}
+			
+			if(fuzzId != null && Integer.parseInt(fuzzId) >= 0){
+				extraCond.append(" AND (S.ori_stock_id LIKE '%" + this.fuzzId + "%'" + " OR CAST(S.id AS CHAR) LIKE '%" + this.fuzzId + "%')");
 			}
 			
 			return extraCond.toString();
