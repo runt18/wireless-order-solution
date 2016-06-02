@@ -250,7 +250,7 @@ public class StockActionDao {
 				extraCond.append(" AND S.comment LIKE '%" + this.comment + "%' ");
 			}
 			
-			if(fuzzId != null && Integer.parseInt(fuzzId) >= 0){
+			if(fuzzId != null){
 				extraCond.append(" AND (S.ori_stock_id LIKE '%" + this.fuzzId + "%'" + " OR CAST(S.id AS CHAR) LIKE '%" + this.fuzzId + "%')");
 			}
 			

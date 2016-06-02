@@ -149,7 +149,7 @@ Ext.ux.printContain = function(type, cols, data, param){
 		
 }
 
-Ext.ux.importShowerWin = function(Param){
+Ext.ux.importShowerWin = function(params){
 	var winParams = {
 		st : [[1, '入库'], [2, '出库']],
 		cate : [[-1, '全部'], [1, '商品'], [2, '原料']],
@@ -158,7 +158,7 @@ Ext.ux.importShowerWin = function(Param){
 	var stockInDate = [[-1, '全部'], [1, '采购'], [2, '领料'], [3, '其他入库'], [7, '盘盈']];
 	var stockOutDate = [[-1, '全部'], [4, '退货'], [5, '退料'], [6, '其他出库'], [8, '盘亏'], [9, '消耗']];
 	
-	var param = Param || {
+	var param = params || {
 		store : null
 	};
 	
@@ -166,6 +166,7 @@ Ext.ux.importShowerWin = function(Param){
 	
 	var importStockActionGridPanel;
 	var stockTypeCombo, stockSubTypeCombo, materialTypeCombo, deptCombo, statusCombo, supplierCombo, searchBtn;
+	
 	searchBtn = new Ext.Button({
 		text : '搜索',
     	iconCls : 'btn_search',
