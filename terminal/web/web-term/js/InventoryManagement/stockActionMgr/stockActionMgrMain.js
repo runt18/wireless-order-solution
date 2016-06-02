@@ -1806,8 +1806,17 @@ Ext.onReady(function(){
 		    	}]
 		    });
 		}
+		
+//		var tempLoadMask = new Ext.LoadMask(document.body, {
+//			msg : '正在加载货品, 请稍候......',
+//			remove : true
+//		});
+		
 		var stockAddMarterialGridTbar = new Ext.Toolbar({
 				height : 26,
+				loadMask : {
+					msg : '数据加载中,请稍后....'
+				},
 				items : [{
 					xtype : 'tbtext',
 					text : '选择货品:&nbsp;&nbsp;'
@@ -1817,13 +1826,15 @@ Ext.onReady(function(){
 					fieldLabel : '选择货品',
 					forceSelection : true,
 					listWidth : 250,
+					loadMask : {
+						msg : '数据加载中,请稍后....'
+					},
 					height : 200,
 					maxHeight : 300,
 					store : new Ext.data.JsonStore({
 						url : '../../QueryMaterial.do',
 						baseParams : {
 							dataSource : 'normal',
-							
 							restaurantID : restaurantID
 						},
 						root : 'root',
@@ -1889,6 +1900,10 @@ Ext.onReady(function(){
 					}
 				}]
 		});
+		
+//		Ext.getCmp('comboSelectMaterialForStockAction').getStore().on('load', function(){
+//			tempLoadMask.hide();
+//		});
 	    
 		if(!secondStepPanelCenter){
 			

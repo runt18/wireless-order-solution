@@ -52,6 +52,7 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.db.stockMgr.StockReportDao;
+import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -88,6 +89,7 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockDetailReport;
 import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -2600,6 +2602,129 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 		
 	}	
+	
+	
+	/**
+	 * 盘点结果导出
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward stockTakeResult(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)throws Exception{
+		
+		response.setContentType("application/vnd.ms-excel;");
+		
+		final String pin = (String)request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String stockTakeId = request.getParameter("stockTakeId");
+		
+		
+		
+		StockTake stockTake = StockTakeDao.getStockTakeAndDetailById(staff, Integer.parseInt(stockTakeId));
+		System.out.println(stockTake);
+		String title = "盘点结果列表";
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("盘点结果列表.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 6000);
+		sheet.setColumnWidth(1, 6000);
+		sheet.setColumnWidth(2, 6000);
+		sheet.setColumnWidth(3, 6000);
+		sheet.setColumnWidth(4, 6000);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 4));
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("部门: " + stockTake.getDept().getName() + " (" + stockTake.getStatus().getText() + ")"
+				);
+
+		cell.setCellStyle(headerDetailStyle);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 4));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 4));
+		
+		//列头
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("货品名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("盘点数");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("账面数");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("盘亏数");
+		cell.setCellStyle(headerStyle);
+
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("盘盈数");
+		cell.setCellStyle(headerStyle);
+		
+		for (StockTakeDetail stockTakeDetail : stockTake.getStockTakeDetails()) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(stockTakeDetail.getMaterial().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(stockTakeDetail.getActualAmount());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(stockTakeDetail.getExpectAmount());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue((stockTakeDetail.getDeltaAmount() > 0 ? 0 : Math.abs(stockTakeDetail.getDeltaAmount())));
+			cell.setCellStyle(numStyle);			
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue((stockTakeDetail.getDeltaAmount() > 0 ? stockTakeDetail.getDeltaAmount() : 0));
+			cell.setCellStyle(numStyle);			
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+	}
 	
 	/**
 	 * 会员充值/取款明细导出excel

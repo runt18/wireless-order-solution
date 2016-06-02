@@ -142,6 +142,7 @@ function insertStockTakeHandler(){
 				Ext.getCmp('btnAuditStockTake').hide();
 				Ext.getCmp('btnSaveStockTake').show();
 				Ext.getCmp('btnExportStockTake').show();
+				Ext.getCmp('btnExportStockTakeAfterCount').hide();
 			}else{
 				jr['icon'] = Ext.Msg.WARNING; 
 				Ext.ux.showMsg(jr);
@@ -171,6 +172,7 @@ function updateStockTakeHandler(){
 	cate.setDisabled(true);
 	cateId.setDisabled(true);
 	Ext.getCmp('btnExportStockTake').show();
+	Ext.getCmp('btnExportStockTakeAfterCount').hide();
 	if(data['statusValue'] == 1){
 		stockTakeWin.otype = Ext.ux.otype['update'];
 		stockTakeWin.show();
@@ -187,6 +189,7 @@ function updateStockTakeHandler(){
 		Ext.getCmp('btnAuditStockTake').hide();
 		Ext.getCmp('btnSaveStockTake').hide();
 		Ext.getCmp('btnExportStockTake').hide();
+		Ext.getCmp('btnExportStockTakeAfterCount').show();
 	}else{
 		data['statusValue'] = 1;
 		stockTakeWin.otype = Ext.ux.otype['select'];
@@ -196,6 +199,7 @@ function updateStockTakeHandler(){
 		Ext.getCmp('btnAuditStockTake').show();
 		Ext.getCmp('btnSaveStockTake').hide();
 		Ext.getCmp('btnExportStockTake').hide();
+		Ext.getCmp('btnExportStockTakeAfterCount').show();
 	}
 	operateStockTakeDate({
 		otype : Ext.ux.otype['set'],
@@ -729,7 +733,24 @@ function initWin(){
 			closable : false,
 			layout : 'border',
 			items : [stockTakeWinNorth, stockTakeWinCenter],
-			bbar : ['->',{
+			bbar : ['->', {
+				text : '导出盘点结果',
+				id : 'btnExportStockTakeAfterCount',
+				hidden : true,
+				iconCls : 'icon_tb_exoprt_excel',
+				handler : function(){
+					
+					var url = '../../{0}?dataSource={1}&stockTakeId={2}';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							'stockTakeResult',
+							stockTakeGrid.getSelectionModel().getSelected().data.id
+					);
+					window.location = url;
+					
+				}
+			},{
 				text : '导出盘点',
 				id : 'btnExportStockTake',
 				iconCls : 'icon_tb_exoprt_excel',
