@@ -728,7 +728,7 @@
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="bookSeatOrderFood_a_orderFood">入座</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="multiOpenTable_a_tableSelect">多台开席</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="normalOrderFood_a_orderFood">下单</a>
-			 	<a data-role="button" data-theme="e" data-inline="true" style="width:150px;" class="bottomBtnFont" id="brand_a_orderFood">牌号结账</a>
+			 	<a data-role="button" data-theme="e" data-inline="true" style="width:120px;" class="bottomBtnFont" id="brand_a_orderFood">牌号结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="fastPay_a_orderFood">结账</a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#orderMore_div_orderFood" id="orderFoodMore_a_orderFood">下单>></a>
 			 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="aliasOrderFood_a_orderFood">助记码</a>
@@ -1157,17 +1157,9 @@
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPhone">----</label></td>       
 	    		<td class="readMemberTd">会员类型:</td>
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainType">----</label></td>
-	    		<td class="readMemberTd">会员积分:</td>
-	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPoint">----</label></td>   
-	    		   		
-	    	</tr> 
-	    	<tr>
-	    		<td class="readMemberTd">会员卡号:</td>
-	    		<td class="readMemberTdValue"><label id="payment4MemberCertainCard">----</label></td>   
-    			
-    			<td>
+	    		<td>
 					<label>
-				        <input type="checkbox" id="memberPaymentGiftPrice">赠送金额:  
+				        <input type="checkbox" id="memberPaymentGiftPrice">赠送扣额:  
 				    </label>	 
 				    		
 	    		</td>
@@ -1175,12 +1167,18 @@
 	    		<td>
 	    			<input id="useLimit_input_payment" onkeypress="intOnly()"> 
 	    		</td>
-    			
-	    		<td colspan="2">
+	    	</tr> 
+	    	<tr>
+	    		<td class="readMemberTd">会员卡号:</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainCard">----</label></td>   
+    			<td class="readMemberTd">会员积分:</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPoint">----</label></td>   
+	    		<td >
 					<label>
 				        <input type="checkbox" id="memberPaymentSendSMS">是否发送短信
 				    </label>	    		
 	    		</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPoint"></label></td>   
 	    	</tr>	    
 	    </table>
 	    
