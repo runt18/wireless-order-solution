@@ -149,19 +149,488 @@ Ext.ux.printContain = function(type, cols, data, param){
 		
 }
 
-Ext.ux.importShowerWin = function(){
+Ext.ux.importShowerWin = function(params){
+	var winParams = {
+		st : [[1, '入库'], [2, '出库']],
+		cate : [[-1, '全部'], [1, '商品'], [2, '原料']],
+		sst : [[1, '采购'], [2, '领料'], [3, '其他入库'], [4, '退货'], [5, '退料'], [6, '其他出库'], [7, '盘盈'], [8, '盘亏'], [9, '消耗']]
+	};
+	var stockInDate = [[-1, '全部'], [1, '采购'], [2, '领料'], [3, '其他入库'], [7, '盘盈']];
+	var stockOutDate = [[-1, '全部'], [4, '退货'], [5, '退料'], [6, '其他出库'], [8, '盘亏'], [9, '消耗']];
+	
+	var param = params || {
+		store : null
+	};
+	
+	
+	
+	var importStockActionGridPanel;
+	var stockTypeCombo, stockSubTypeCombo, materialTypeCombo, deptCombo, statusCombo, supplierCombo, searchBtn;
+	
+	searchBtn = new Ext.Button({
+		text : '搜索',
+    	iconCls : 'btn_search',
+    	handler : function(){
+    		var stockType = stockTypeCombo.getValue();
+    		var stockSubType = stockSubTypeCombo.getValue();
+    		var cateType = materialTypeCombo.getValue();
+    		var dept = deptCombo.getValue();
+    		var status = statusCombo.getValue();
+    		var supplier = supplierCombo.getValue();
+    		var oriStockId = oriStockIdTextField.getValue();
+			var comment = commentTextField.getValue();
+			var panelStore = importStockActionGridPanel.getStore();
+
+			panelStore.baseParams['stockType'] = stockType;
+			panelStore.baseParams['subType'] = stockSubType;
+			panelStore.baseParams['cateType'] = cateType;
+			panelStore.baseParams['dept'] = dept;
+			panelStore.baseParams['status'] = status;
+			panelStore.baseParams['supplier'] = supplier;
+			panelStore.baseParams['fuzzId'] = oriStockId;
+			panelStore.baseParams['comment'] = comment;
+			
+			panelStore.load();
+		}
+	});
+	
+	
+	stockTypeCombo = new Ext.form.ComboBox ({
+		xtype : 'combo',
+		readOnly : false,
+		forceSelection : true,
+		width : 60,
+		value : 1,
+		store : new Ext.data.SimpleStore({
+			data : winParams.st,
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		allowBlank : false,
+		listeners : {
+			select : function(thiz){
+				if(thiz.getValue() == 1){
+					stockSubTypeCombo.store.loadData(stockInDate);
+					stockSubTypeCombo.setValue(1);
+				}else{
+					stockSubTypeCombo.store.loadData(stockOutDate);
+					stockSubTypeCombo.setValue(-1);
+				}
+				searchBtn.handler();
+			}
+		}
+	});
+			
+	stockSubTypeCombo = new Ext.form.ComboBox ({
+		xtype : 'combo',
+		readOnly : false,
+		forceSelection : true,
+		width : 90,
+		value : 1,
+		store : new Ext.data.SimpleStore({
+			data : stockInDate,
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			select : function(){
+				searchBtn.handler();
+			}
+		}
+	});
+			
+	materialTypeCombo = new Ext.form.ComboBox ({
+		xtype : 'combo',
+		readOnly : false,
+		forceSelection : true,
+		width : 60,
+		value : -1,
+		store : new Ext.data.SimpleStore({
+			data : winParams.cate,
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		allowBlank : false,
+		listeners : {
+			select : function(){
+				searchBtn.handler();
+			}
+		}
+	});
+	
+	deptCombo = new Ext.form.ComboBox ({
+		xtype : 'combo',
+		fieldLabel : '仓库',
+		width : 100,
+		readOnly : false,
+		forceSelection : true,
+		store : new Ext.data.SimpleStore({
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		allowBlank : false,
+		blankText : '盘点仓库不允许为空.',
+		listeners : {
+			select : function(){
+				searchBtn.handler();
+			},
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../OperateDept.do',
+					params : {
+						dataSource : 'getByCond',
+						inventory : true
+						
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			}
+		}
+	});
+			
+	statusCombo = new Ext.form.ComboBox({
+		xtype : 'combo',
+		readOnly : false,
+		forceSelection : true,
+		width : 80,
+		value : -1,
+		store : new Ext.data.SimpleStore({
+			data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 冲红']],
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		allowBlank : false,
+		listeners : {
+			select : function(){
+				searchBtn.handler();
+			}
+		}
+	});
+	
+	supplierCombo = new Ext.form.ComboBox({
+		readOnly : false,
+		forceSelection : true,
+		width : 103,
+		listWidth : 120,
+		store : new Ext.data.SimpleStore({
+			fields : ['supplierID', 'name']
+		}),
+		valueField : 'supplierID',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../QuerySupplier.do',
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['supplierID'], jr.root[i]['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			},
+			select : function(){
+				searchBtn.handler();
+			}
+		}
+		
+	});
+	
+	var toolBar1;
+	toolBar1 = new Ext.Toolbar({
+		height : 30,
+		columnWidth : 1,
+		style : {
+			'line-height' : '30px'		
+		},
+		items : [{
+			xtype : 'tbtext',
+			text : '货单类型:'
+		}, stockTypeCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;业务类型:'
+		}, stockSubTypeCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;货品类型:'
+		}, materialTypeCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;仓库:'
+		}, deptCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;审核状态:'
+		}, statusCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;供应商:'
+		}, supplierCombo]
+	});
+
+	var oriStockIdTextField;
+	oriStockIdTextField = new Ext.form.TextField({
+		width : 80,
+		keys : {
+			key : 13, //enter键
+			scope : this,
+			fn : function(){
+				searchBtn.handler();
+			}
+		}
+	});
+	
+	var commentTextField;
+	commentTextField = new Ext.form.TextField({
+			width : 200,
+			keys : {
+				key : 13, //enter键
+				scope : this,
+				fn : function(){
+					searchBtn.handler();
+				}
+			}
+		});
+	
+	var toolBar2;
+	toolBar2 = new Ext.Toolbar({
+		height : 30,
+		columnWidth : 1,
+		style : {
+			'line-height' : '30px'		
+		},
+		items : [{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;货单编号/原始单号:'
+		}, oriStockIdTextField,{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;库单备注:'
+		},commentTextField,'->',searchBtn]
+	});
+	
+	
+	var toolBar;		
+	toolBar = new Ext.Toolbar({
+		style : {
+			'margin-top' : '2px' 
+		},
+		autoHeight : true,
+		layout : 'column',
+		items : [toolBar1, toolBar2]
+	});
+		
+	
+	var colModel;
+	colModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(),
+		{
+			header : '库单号',
+			dataIndex : 'id'		
+		},
+		{
+			header : '库单类型',
+			dataIndex : 'subTypeText'
+		},
+		{
+			header : '入货仓/供应商',
+			dataIndex : 'deptIn.name',
+			renderer : function(dataOfDataIndex, colCls, store){
+				if(dataOfDataIndex){
+					return '(入货仓)' + dataOfDataIndex;
+				}else{
+					return '(供应商)' + store.json.supplier.name;
+				}
+			}
+		},
+		{
+			header : '出库仓/供应商',
+			dataIndex : 'deptOut.name',
+			renderer : function(dataOfDataIndex, colCls, store){
+				if(dataOfDataIndex){
+					return '(出货仓)' + dataOfDataIndex;
+				}else{
+					return '(供应商)' + store.json.supplier.name;
+				}
+			}		
+		},
+		{
+			header : '库单状态',
+			dataIndex : 'statusText'		
+		},
+		{
+			header : '库单时间',
+			dataIndex : 'oriStockDateFormat'		
+		},
+		{
+			header : '操作',
+			dataIndex : 'operation',
+			renderer : function(){
+				return '<a href="javascript:void(0);" data-type="importStockAction_A_ux">导入</a>';
+			}
+		}
+	]);
+	
+	var store;
+	store = new Ext.data.Store({
+		proxy : new Ext.data.HttpProxy({url : '../../QueryStockAction.do'}),
+		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [{
+			name : 'id'
+		},{
+			name : 'subTypeText'
+		},{
+			name : 'deptIn.name'
+		},{
+			name : 'deptOut.name'
+		},{
+			name : 'statusText'
+		},{
+			name : 'oriStockDateFormat'
+		},{
+			name : 'operation'
+		}]),
+		baseParams : {
+			start : 0,
+			limit : 8,
+			isWithOutSum : true
+		}
+	});
+	
+	
+	var pagingbar
+	pagingbar = new Ext.PagingToolbar({
+		pageSize : 8,
+		store : store,
+		displayInfo : true,
+		displayMsg : '显示第{0} 条到{1} 条记录，共{2}条',
+		emptyMsg : '没有记录'
+	}); 
+			
+	importStockActionGridPanel = new Ext.grid.GridPanel({
+		frame : false,
+		height : 400,
+		style : {
+			'width' : '100%'
+		},
+		viewConfig : {
+			forceFit : true
+		},
+		cm : colModel,
+		loadMask : {
+			msg : '数据加载中,请稍后....'
+		},
+		store : store,
+		bbar : pagingbar,
+		keys : {
+			key : 13, //enter键
+			scope : this,
+			fn : function(){
+				searchBtn.handler();
+			}
+		}
+	});
+	
+	var enterKey = new Ext.KeyMap(document, {  
+        key: 13,  // Enter  
+        fn: function()  
+        {  
+           searchBtn.handler();
+        },  
+        scope: this  
+    });  
+	
+	
 	var importShowerWin;
 	importShowerWin = new Ext.Window({
+		title : '库单导入',
 		width : 900,
 		height : 520,
 		style : {
 			'overflow' : 'visible'
 		},
 		resizable : false,
+		items : [importStockActionGridPanel],
+		tbar : toolBar,
 		bbar : ['->', {
 		    	text : '导入',
 		    	iconCls : 'btn_save',
+		    	hidden : true,
 		    	handler : function(){
+		    		selectCol = importStockActionGridPanel.getSelectionModel().getSelected();
+		    		if(selectCol){
+						var details = selectCol.json.stockDetails;		    		
+		    		}else{
+		    			Ext.example.msg('错误提示', '请选择单据');
+		    			return;
+		    		}
+		    		if(param.store){
+						param.store.removeAll();		    			
+		    			if(details && details.length > 0){
+		    				details.forEach(function(el, index){
+		    					param.store.add(new StockDetailRecord({
+			    					material : el,
+			    					id : el.stockActionId,
+			    					'material.id' : el.materialId,
+			    					'material.cateName' : '',
+			    					'material.name' : el.materialName,
+			    					amount : el.amount,
+			    					price : el.price
+			    				}));
+		    				});
+		    			}else{
+		    				Ext.example.msg('错误提示', '该单剧没有材料存在');
+		    				return;
+		    			}
+		    			importShowerWin.hide();
+		    			$('#' + importShowerWin.id).remove();
+		    			Ext.example.msg('成功提示', '导入成功');
+		    			
+		    		}else{
+		    			Ext.example.msg('错误提示', '没有指定导入的表格');
+		    		}
 		    	}
 			}, {
 		    	iconCls : 'btn_cancel',
@@ -175,6 +644,44 @@ Ext.ux.importShowerWin = function(){
 	});
 	importShowerWin.show();
 	importShowerWin.center();
+	importStockActionGridPanel.store.on('load', function(){
+		$('[data-type=importStockAction_A_ux]').click(function(){
+			selectCol = importStockActionGridPanel.getSelectionModel().getSelected();
+    		if(selectCol){
+				var details = selectCol.json.stockDetails;		    		
+    		}else{
+    			Ext.example.msg('错误提示', '请选择单据');
+    			return;
+    		}
+    		if(param.store){
+				param.store.removeAll();		    			
+    			if(details && details.length > 0){
+    				details.forEach(function(el, index){
+    					param.store.add(new StockDetailRecord({
+	    					material : el,
+	    					id : el.stockActionId,
+	    					'material.id' : el.materialId,
+	    					'material.cateName' : '',
+	    					'material.name' : el.materialName,
+	    					amount : el.amount,
+	    					price : el.price
+	    				}));
+    				});
+    			}else{
+    				Ext.example.msg('错误提示', '该单剧没有材料存在');
+    				return;
+    			}
+    			importShowerWin.hide();
+    			$('#' + importShowerWin.id).remove();
+    			Ext.example.msg('成功提示', '导入成功');
+    			
+    		}else{
+    			Ext.example.msg('错误提示', '没有指定导入的表格');
+    		}
+			
+		});
+	});
+	importStockActionGridPanel.store.load();
 }
 
 

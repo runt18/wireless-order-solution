@@ -79,6 +79,93 @@ ADD COLUMN `total_commission` FLOAT NULL DEFAULT NULL COMMENT '' AFTER `used_poi
 ALTER TABLE `wireless_order_db`.`material` 
 ADD COLUMN `alarm_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `status`;
 
+-- -----------------------------------------------------
+-- Update the branch id to each coupon operation
+-- -----------------------------------------------------
+UPDATE `wireless_order_db`.`coupon_operation`
+SET branch_id = restaurant_id;
+
+-- -----------------------------------------------------
+-- Add the field 'min_commission_amount' & 'max_commission_amount' to table 'member_cond'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_cond` 
+ADD COLUMN `min_commission_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `max_fans_amount`,
+ADD COLUMN `max_commission_amount` INT NULL DEFAULT NULL COMMENT '' AFTER `min_commission_amount`;
+
+-- -----------------------------------------------------
+-- Add the field 'order_notify_template' to table 'weixin_restaurant'
+-- -----------------------------------------------------
+ALTER TABLE wireless_order_db.weixin_restaurant 
+ADD order_notify_template varchar(100) AFTER `coupon_timeout_template`;
+
+-- -----------------------------------------------------
+-- Add the field 'default_order_type' to table 'weixin_restaurant'
+-- -----------------------------------------------------
+ALTER TABLE wireless_order_db.weixin_restaurant 
+ADD default_order_type int(10) DEFAULT NULL;
+
+-- -----------------------------------------------------
+-- Insert the '微信客人' staff to each restaurant
+-- -----------------------------------------------------
+INSERT INTO `wireless_order_db`.`staff`
+(`restaurant_id`, `role_id`, `name`, `tele`, `pwd`, `type`)
+SELECT restaurant_id, role_id, '微信客人', tele, pwd, 3 FROM `wireless_order_db`.`staff` WHERE type = 2;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`monthly_cost`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`monthly_cost` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`monthly_cost` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+  `material_id` INT NULL COMMENT '',
+  `monthly_balance_id` INT NULL COMMENT '',
+  `cost` FLOAT NULL COMMENT '',
+  PRIMARY KEY (`id`)  COMMENT '',
+  INDEX `ix_material_id` (`material_id` ASC)  COMMENT '')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Drop the table `wireless_order_db`.`monthly_balance_detail`
+-- -----------------------------------------------------
+DROP TABLE `wireless_order_db`.`monthly_balance_detail`;
+
+-- -----------------------------------------------------
+-- Add the field 'gift_desc' to table 'represent'
+-- -----------------------------------------------------
+ALTER TABLE wireless_order_db.represent ADD gift_desc varchar(500);
+
+-- -----------------------------------------------------
+-- Add the field 'total_refund' to table 'member'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member` 
+ADD COLUMN `total_refund` FLOAT NULL DEFAULT 0 AFTER `total_charge`;
+
+-- -----------------------------------------------------
+-- Update the total refund to each member
+-- -----------------------------------------------------
+UPDATE wireless_order_db.member M
+JOIN (
+	SELECT member_name, member_id, SUM(charge_money) AS refund_money 
+	FROM wireless_order_db.member_operation_history 
+	AND operate_type = 6
+	GROUP by member_id
+) AS TMP ON M.member_id = TMP.member_id
+SET M.total_refund = ABS(TMP.refund_money);
+
+-- -----------------------------------------------------
+-- Add the field 'extra' to table 'print_func'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`print_func` 
+ADD COLUMN `extra` INT NULL DEFAULT NULL COMMENT '' AFTER `enabled`;
+
+-- -----------------------------------------------------
+-- Add the field 'prefect_member_status' to table 'weixin_restaurant'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
+ADD COLUMN `prefect_member_status` INT NULL DEFAULT NULL AFTER `default_order_type`;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

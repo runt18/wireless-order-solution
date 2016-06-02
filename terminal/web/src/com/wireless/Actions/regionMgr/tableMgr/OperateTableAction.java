@@ -203,17 +203,17 @@ public class OperateTableAction extends DispatchAction{
 		
 		final int srcTblId = Integer.parseInt(request.getParameter("oldTableId"));
 		final int destTblId = Integer.parseInt(request.getParameter("newTableId"));
-//		final String orientedPrinter = request.getParameter("orientedPrinter");		
+		final String orientedPrinter = request.getParameter("orientedPrinter");		
 		final JObject jObject = new JObject();
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			final Table.TransferBuilder builder = new Table.TransferBuilder(new Table.Builder(srcTblId), new Table.Builder(destTblId));
 			//加载特定打印机
-//			if(orientedPrinter != null && !orientedPrinter.isEmpty()){
-//				for(String printerId : orientedPrinter.split(",")){
-//					builder.addPrinter(Integer.parseInt(printerId));
-//				}
-//			}
+			if(orientedPrinter != null && !orientedPrinter.isEmpty()){
+				for(String printerId : orientedPrinter.split(",")){
+					builder.addPrinter(Integer.parseInt(printerId));
+				}
+			}
 
 			// print the transfer table receipt
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(staff, builder));

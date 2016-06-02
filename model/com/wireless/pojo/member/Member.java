@@ -1078,9 +1078,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeString(this.getMemberCard());
 			dest.writeInt(this.getConsumptionAmount());
 			dest.writeLong(this.getLastConsumption());
-			//FIXME
-			dest.writeParcelList(null, 0);
-			dest.writeParcel(null, 0);
 			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
 			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
 		}
@@ -1106,9 +1103,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setMemberCard(source.readString());
 			setConsumptionAmount(source.readInt());
 			setLastConsumption(source.readLong());
-			//FIXME
-			source.readParcelList(null);
-			source.readParcel(null);
 			setFavorFoods(source.readParcelList(Food.CREATOR));
 			setRecommendFoods(source.readParcelList(Food.CREATOR));
 		}
