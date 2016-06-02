@@ -1464,7 +1464,8 @@ $(function(){
 						data : {
 							dataSource : 'print',
 							restaurantId : data.root[0].id,
-							orderId : uo.order.id
+							orderId : uo.order.id,
+							orientedPrinter : getcookie(document.domain + '_printers')
 						},
 						dataType : 'jsonp',
 						jsonp : 'callback',

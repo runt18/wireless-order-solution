@@ -84,7 +84,7 @@ function loadInformation(){
 	
 	kitchenTree = new Ext.tree.TreePanel({
 		id : 'kitchens',
-		height : 220,
+		height : 100,
 		hidden : true,
 		border : true,
 		rootVisible : true,
@@ -99,7 +99,7 @@ function loadInformation(){
 			},
 			listeners : {
 				load : function(thiz, node, res){
-					node.eachChild(function(child) { 
+					node.eachChild(function(child){ 
 						if(child.hasChildNodes()){
 							child.eachChild(function(childSon) { 
 								setParentNodeCheckState(childSon);
@@ -107,7 +107,7 @@ function loadInformation(){
 						}
 					}); 
 					//treePanel长度过长问题
-					$('#kitchens .x-panel-body-noheader').height(220);
+					$('#kitchens .x-panel-body-noheader').height(80);
 				}
 			}
 		}),
@@ -176,7 +176,7 @@ function setParentNodeCheckState(node){
 				checkBox.checked = false;
 			}
 		}
-		this.setParentNodeCheckState(parentNode);
+//		this.setParentNodeCheckState(parentNode);
 		
 	}
 
@@ -205,6 +205,11 @@ function init(){
 			id : 'chkIsNeedToTotalPrice',
 			checked : false,
 			boxLabel : '是否显示总价'
+		}, {
+			xtype : 'checkbox',
+			id : 'chkIsNeedToTotalAmount',
+			checked : true,
+			boxLabel : '数量是否叠加'			
 		}, {
 			xtype : 'checkbox',
 			id : 'chkIsNeedToAdd',
@@ -288,6 +293,7 @@ function init(){
 						dept : depts,
 						regions : regions,
 						printerId : sn.attributes.printerId,
+						//TODO isNeedToTotalAmount : Ext.getCmp('chkIsNeedToTotalAmount').checked
 						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
 						displayTotalPrice : Ext.getDom('chkIsNeedToTotalPrice').checked,
@@ -1173,6 +1179,7 @@ function showPanel(v){
 	//获取退菜btn
 	var cancelFoodBtn = Ext.getCmp('chkIsNeedToCancel');
 	var addFoodBtn = Ext.getCmp('chkIsNeedToAdd');
+	var totalAmount = Ext.getCmp('chkIsNeedToTotalAmount');
 	var totalPriceBtn = Ext.getCmp('chkIsNeedToTotalPrice');
 	
 	var paperDemoCmp = Ext.query("#showPrintPaper .x-panel-body")[0];
@@ -1186,15 +1193,17 @@ function showPanel(v){
 		if(v == 1){
 			Ext.getCmp('printCommentPanel').show();
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
+			totalPriceBtn.show();
+			totalPriceBtn.setBoxLabel('是否显示总价');
 		}else{
 			Ext.getCmp('printCommentPanel').hide();
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E7%82%B9%E8%8F%9C%E6%80%BB%E5%8D%95.jpg)';
+			totalPriceBtn.hide();
 		}
 		
-		totalPriceBtn.show();
-		totalPriceBtn.setBoxLabel('是否显示总价');
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
+		totalAmount.hide();
 //		cancelFoodBtn.show();
 //		cancelFoodBtn.setBoxLabel('打印退菜总单');
 //		addFoodBtn.show();
@@ -1210,6 +1219,9 @@ function showPanel(v){
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
 		addFoodBtn.show();
 		addFoodBtn.setBoxLabel('打印加菜分单');
+		totalAmount.show();
+		totalAmount.setBoxLabel('数量是否叠加');
+		
 		totalPriceBtn.hide();
 	}else if(v == 18){//客显
 		Ext.getCmp('kitchens').hide();
@@ -1233,6 +1245,7 @@ function showPanel(v){
 		Ext.getCmp('regions').show();
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
+		totalAmount.hide();
 		totalPriceBtn.hide();
 		
 		if(v == 127){//暂结
@@ -1306,7 +1319,6 @@ function deletePrintFuncOperationHandler(){
 	
 	
 }
-
 var DISPLAY_SUMMARY_TOTAL = 1 << 1;    //是否显示总价
 
 //打印方案初始化
@@ -1395,6 +1407,9 @@ function printFuncOperactionHandler(c){
 						}else{
 							Ext.getDom('chkIsNeedToAdd').checked = false;
 						}
+						
+						//TODO
+						
 						//是否有退菜
 						if(jr.other.cancel){
 							Ext.getDom('chkIsNeedToCancel').checked = true;
@@ -1487,7 +1502,6 @@ function printFuncOperactionHandler(c){
 		
 		comment.setValue(ss.data.comment);
 		
-		//TODO 是否显示总价
 		
 	}
 	Ext.getCmp('addPrintFuncWin').center();

@@ -1026,9 +1026,13 @@ $(function(){
 			if($('#memberPaymentGiftPrice').attr('checked')){
 				$('#useLimit_input_payment').attr('disabled', false);
 				$('#useLimit_input_payment').val('');
+				NumKeyBoardAttacher.instance().attach($('#useLimit_input_payment')[0]);
+				$('#useLimit_input_payment').focus();
+				
 			}else{
 				$('#useLimit_input_payment').attr('disabled', true);
 				$('#useLimit_input_payment').val('');
+				NumKeyBoardAttacher.instance().detach($('#useLimit_input_payment')[0]);
 			}
 			
 		});
