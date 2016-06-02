@@ -122,7 +122,6 @@
 <!-- 重连socket -->
 <script type="text/javascript" src="./js/socket/reconnecting-websocket.js"></script>
 
-
 <!--禁止触摸时选中文字  -->
 <script type="text/javascript">
 	document.onselectstart = function(){
@@ -1148,30 +1147,40 @@
 	    	<tr>
 	    		<td class="readMemberTd">会员名称:</td>
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainName">----</label></td>
-	    		<td class="readMemberTd">会员余额:</td>
-	    		<td class="readMemberTdValue"><label id="payment4MemberCertainBalance">----</label></td>    	
-	    		<td class="readMemberTd">会员手机:</td>
-	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPhone">----</label></td>       			
+	    		<td class="readMemberTd">基础余额:</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainBalance">----</label></td>  
+	    		<td class="readMemberTd">赠送余额:</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainGift">----</label></td>  	
 	    	</tr>
 	    	<tr>
+	    		<td class="readMemberTd">会员手机:</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPhone">----</label></td>       
 	    		<td class="readMemberTd">会员类型:</td>
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainType">----</label></td>
 	    		<td class="readMemberTd">会员积分:</td>
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPoint">----</label></td>   
-	    		<td class="readMemberTd">会员卡号:</td>
-	    		<td class="readMemberTdValue"><label id="payment4MemberCertainCard">----</label></td>     		   		
+	    		   		
 	    	</tr> 
 	    	<tr>
+	    		<td class="readMemberTd">会员卡号:</td>
+	    		<td class="readMemberTdValue"><label id="payment4MemberCertainCard">----</label></td>   
+    			
+    			<td>
+					<label>
+				        <input type="checkbox" id="memberPaymentGiftPrice">赠送金额:  
+				    </label>	 
+				    		
+	    		</td>
+	    		
+	    		<td>
+	    			<input id="useLimit_input_payment" onkeypress="intOnly()"> 
+	    		</td>
+    			
 	    		<td colspan="2">
 					<label>
 				        <input type="checkbox" id="memberPaymentSendSMS">是否发送短信
 				    </label>	    		
 	    		</td>
-<!-- 	    		<td colspan="2">
-					<label>
-				        <input type="checkbox" id="memberPaymentPrintCore">是否打印二维码
-				    </label>	    		
-	    		</td> -->
 	    	</tr>	    
 	    </table>
 	    

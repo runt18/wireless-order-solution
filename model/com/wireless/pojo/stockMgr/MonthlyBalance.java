@@ -13,7 +13,7 @@ public class MonthlyBalance implements Jsonable{
 	private int restaurantId;
 	private String StaffName;
 	private long month;
-	private List<MonthlyCost> monthlyCost = new ArrayList<>();
+	private List<MonthlyCost> monthlyCost = new ArrayList<MonthlyCost>();
 //	private List<MonthlyBalanceDetail> details = SortedList.newInstance(new Comparator<MonthlyBalanceDetail>(){
 //		@Override
 //		public int compare(MonthlyBalanceDetail arg0, MonthlyBalanceDetail arg1) {
@@ -100,7 +100,7 @@ public class MonthlyBalance implements Jsonable{
 		private int restaurantId;
 		private String StaffName;
 		private long month;
-		private List<MonthlyCost> monthlyCost = new ArrayList<>();
+		private List<MonthlyCost> monthlyCost = new ArrayList<MonthlyCost>();
 		
 		public int getId() {
 			return id;

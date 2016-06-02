@@ -160,7 +160,8 @@ define(function(require, exports, module){
 		function loadMemberInfo(member, self, coupon){
 			self.find('[id=name_lable_memberRead]').text(member.name);
 			self.find('[id=memberType_label_memberRead]').text(member.memberType.name);
-			self.find('[id=balance_label_memberRead]').text(member.totalBalance);
+			self.find('[id=baseBalance_label_memberRead]').text(member.baseBalance ?　member.baseBalance : '----');
+			self.find('[id=extraBalance_label_memberRead]').text(member.extraBalance ? member.extraBalance : '----');
 			self.find('[id=point_label_memberRead]').text(member.point);
 			self.find('[id=phone_label_memberRead]').text(member.mobile ? member.mobile : '----');
 			self.find('[id=payment4MemberCard]').text(member.memberCard ? member.memberCard : '----');	

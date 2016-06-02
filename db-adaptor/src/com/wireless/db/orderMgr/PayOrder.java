@@ -278,7 +278,8 @@ public class PayOrder {
 			
 			//Perform the member consumption if settle by member.
 			if(orderCalculated.isSettledByMember()){
-				MemberDao.consume(dbCon, staff, orderCalculated.getMemberId(), orderCalculated.getActualPrice(), 
+				MemberDao.consume(dbCon, staff, orderCalculated.getMemberId(), 
+								  orderCalculated.getActualPrice(), payBuilder.getExtraPrice(), 
 								  orderCalculated.getPaymentType(),
 								  orderCalculated.getId());
 			}

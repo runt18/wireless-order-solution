@@ -50,7 +50,7 @@ public class RepaidOrderAction extends Action{
 			final Order.PayBuilder payBuilder;
 			//get the pay manner to this order
 			if(settleType == Order.SettleType.MEMBER){
-				payBuilder = Order.PayBuilder.build4Member(orderId, payType4Pay, false);
+				payBuilder = Order.PayBuilder.build4Member(orderId, payType4Pay).setSms(false);
 			}else{
 				payBuilder = Order.PayBuilder.build4Normal(orderId, payType4Pay);
 			}

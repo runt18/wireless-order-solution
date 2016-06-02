@@ -78,12 +78,14 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		public void writeToParcel(Parcel dest, int flag) {
 			dest.writeParcel(srcTbl, Table.TABLE_PARCELABLE_SIMPLE);
 			dest.writeParcel(destTbl, Table.TABLE_PARCELABLE_SIMPLE);
+			dest.writeParcelList(printers, Printer.PARCEL_PRINTER_SIMPLE);
 		}
 
 		@Override
 		public void createFromParcel(Parcel source) {
 			srcTbl = source.readParcel(Table.CREATOR);
 			destTbl = source.readParcel(Table.CREATOR);
+			printers.addAll(source.readParcelList(Printer.CREATOR));
 		}
 		
 		public final static Parcelable.Creator<TransferBuilder> CREATOR = new Parcelable.Creator<TransferBuilder>() {

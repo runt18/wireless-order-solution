@@ -669,53 +669,53 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * Perform the consumption operation to this member.
 	 * @param consumePrice
 	 * 			the consumption price
-	 * @param basePrice
-	 * 			the base price to use
+	 * @param extraPrice
+	 * 			the extra price to use
 	 * @param payType
 	 * 			the pay type
 	 * @return the member operation to this consumption
 	 * @throws BusinessException
 	 * 			throws if any cases below
-	 * 			<p>会员余额（从基础账户扣减固定金额）
+	 * 			<p>会员余额（从赠送账户扣减固定金额）
 	 * 			<li>付款方式不是【会员余额】
 	 * 			<li>基础账户余额不足
 	 * 			<li>赠送账户余额不足
 	 * 			<p>会员余额
 	 * 			<li>账户余额不足
 	 */
-	public MemberOperation consume(final float consumePrice, final float basePrice, final PayType payType) throws BusinessException{
+	public MemberOperation consume(final float consumePrice, final float extraPrice, final PayType payType) throws BusinessException{
 
 		float deltaBase = 0, deltaExtra = 0;
-		if(basePrice > 0){
-			//扣减基础账户的情况必须要检查以下内容
+		if(extraPrice > 0){
+			//扣减赠送账户的情况必须要检查以下内容
 			
 			//付款方式必须是【会员余额】
 			if(!payType.equals(PayType.MEMBER)){
 				throw new BusinessException("付款方式必须是【会员余额】");
 			}
 			
-			//总消费额必须小于扣减的基础金额
-			if(consumePrice < basePrice){
-				throw new BusinessException("总消费额不能小于扣减的基础金额");
-			}
-			
-			//基础账户余额必须大于扣减的基础金额
-			if(this.baseBalance < basePrice){
-				throw new BusinessException("对不起, 你的基础账户余额不足");
+			//总消费额必须小于扣减的赠送金额
+			if(consumePrice < extraPrice){
+				throw new BusinessException("总消费额不能小于扣减的赠送金额");
 			}
 			
 			//赠送账户余额必须大于扣减的赠送金额
-			if(this.extraBalance < consumePrice - basePrice){
+			if(this.extraBalance < extraPrice){
 				throw new BusinessException("对不起, 你的赠送账户余额不足");
 			}
 			
-			//计算基础账户的余额
-			deltaBase = basePrice;
-			this.baseBalance = this.baseBalance - basePrice;
+			//基础账户余额必须大于扣减的基础金额
+			if(this.baseBalance < consumePrice - extraPrice){
+				throw new BusinessException("对不起, 你的基础账户余额不足");
+			}
 			
 			//计算赠送账户的余额
-			deltaExtra = consumePrice - basePrice;
+			deltaExtra = extraPrice;
 			this.extraBalance = this.extraBalance - deltaExtra;
+			
+			//计算接触账户的余额
+			deltaBase = consumePrice - extraPrice;
+			this.baseBalance = this.baseBalance - deltaBase;
 			
 		}else if(payType.equals(PayType.MEMBER)){
 			//检查账户余额是否充足
@@ -1078,9 +1078,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeString(this.getMemberCard());
 			dest.writeInt(this.getConsumptionAmount());
 			dest.writeLong(this.getLastConsumption());
-			//FIXME
-			dest.writeParcelList(null, 0);
-			dest.writeParcel(null, 0);
 			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
 			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
 		}
@@ -1106,9 +1103,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setMemberCard(source.readString());
 			setConsumptionAmount(source.readInt());
 			setLastConsumption(source.readLong());
-			//FIXME
-			source.readParcelList(null);
-			source.readParcel(null);
 			setFavorFoods(source.readParcelList(Food.CREATOR));
 			setRecommendFoods(source.readParcelList(Food.CREATOR));
 		}

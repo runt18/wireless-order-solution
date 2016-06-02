@@ -207,7 +207,7 @@ public class TestMember {
 		final int orderId = 10;
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(branchStaff, expected.getId(), 50, PayType.MEMBER, orderId);
+		MemberOperation mo = MemberDao.consume(branchStaff, expected.getId(), 50, 0, PayType.MEMBER, orderId);
 		expected.consume(50, PayType.MEMBER);
 		
 		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
@@ -217,7 +217,7 @@ public class TestMember {
 		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(branchStaff, expected.getId(), 50, PayType.CASH, orderId);
+		mo = MemberDao.consume(branchStaff, expected.getId(), 50, 0, PayType.CASH, orderId);
 		expected.consume(50, PayType.CASH);
 		
 		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
@@ -400,14 +400,14 @@ public class TestMember {
 		final int orderId = 10;
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, PayType.MEMBER, orderId);
+		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, 0, PayType.MEMBER, orderId);
 		expect.consume(50, PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(mStaff, expect.getId(), 50, PayType.CASH, orderId);
+		mo = MemberDao.consume(mStaff, expect.getId(), 50, 0, PayType.CASH, orderId);
 		expect.consume(50, PayType.CASH);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));

@@ -102,14 +102,14 @@ public class OperateMemberAction extends DispatchAction{
 				builder.setAge(Member.Age.valueOf(Integer.parseInt(age)));
 			}
 			
-			int memberID = MemberDao.insert(staff, builder);
+			final int memberId = MemberDao.insert(staff, builder);
 			jObject.initTip(true, "操作成功, 新会员资料已添加.");
 			
 			if(firstActualCharge != null && !firstActualCharge.isEmpty()){
 				if(firstCharge.isEmpty()){
 					firstCharge = "0";
 				}
-				MemberOperation mo = MemberDao.charge(staff, memberID, Float.valueOf(firstCharge), Float.valueOf(firstActualCharge), ChargeType.valueOf(Integer.valueOf(rechargeType)));
+				MemberOperation mo = MemberDao.charge(staff, memberId, Float.valueOf(firstCharge), Float.valueOf(firstActualCharge), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 				jObject.setMsg(jObject.getMsg() + "会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
@@ -136,7 +136,7 @@ public class OperateMemberAction extends DispatchAction{
 				}
 			}
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
 		}catch(Exception e){
@@ -246,9 +246,9 @@ public class OperateMemberAction extends DispatchAction{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			MemberDao.deleteById(staff, Integer.valueOf(id));
 			jObject.initTip(true, "操作成功, 会员资料已删除.");
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jObject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
 			jObject.initTip4Exception(e);
@@ -268,18 +268,18 @@ public class OperateMemberAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward charge(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
-		JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String memberId = request.getParameter("memberID");
+		final String rechargeMoney = request.getParameter("rechargeMoney");
+		final String payMannerMoney = request.getParameter("payMannerMoney");
+		final String rechargeType = request.getParameter("rechargeType");
+		final String comment = request.getParameter("comment");
+		final String isPrint = request.getParameter("isPrint");
+		final String sendSms = request.getParameter("sendSms");
+		final String orientedPrinters = request.getParameter("orientedPrinter");		
+		final JObject jObject = new JObject();
 		try{
-			final String pin = (String)request.getAttribute("pin");
-			final String memberId = request.getParameter("memberID");
-			final String rechargeMoney = request.getParameter("rechargeMoney");
-			final String payMannerMoney = request.getParameter("payMannerMoney");
-			final String rechargeType = request.getParameter("rechargeType");
-			final String comment = request.getParameter("comment");
-			final String isPrint = request.getParameter("isPrint");
-			final String sendSms = request.getParameter("sendSms");
-			final String orientedPrinters = request.getParameter("orientedPrinter");
+
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -401,7 +401,7 @@ public class OperateMemberAction extends DispatchAction{
 					}
 				}
 			}
-		}catch(BusinessException e){	
+		}catch(BusinessException | SQLException e){	
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -422,29 +422,25 @@ public class OperateMemberAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward adjustPoint(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward adjustPoint(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String memberId = request.getParameter("memberId");
+		final String point = request.getParameter("point");
+		final String adjust = request.getParameter("adjust");		
+		final JObject jObject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String memberId = request.getParameter("memberId");
-			String point = request.getParameter("point");
-			String adjust = request.getParameter("adjust");
-			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			MemberDao.adjustPoint(staff, Integer.valueOf(memberId), Integer.valueOf(point), Member.AdjustType.valueOf(Integer.valueOf(adjust)));
-			jobject.initTip(true, "操作成功, 会员积分调整成功.");
-		}catch(BusinessException e){
+			jObject.initTip(true, "操作成功, 会员积分调整成功.");
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jObject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

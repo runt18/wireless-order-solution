@@ -335,7 +335,7 @@ public class TestCommitOrderDao {
 			
 			Order.DiscountBuilder discountBuilder = Order.DiscountBuilder.build4Member(orderId, expectedMember);
 			Order.UpdateBuilder updateBuilder = new Order.UpdateBuilder(actualOrder).addOri(actualOrder.getOrderFoods());
-			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
+			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER).setSms(false);
 			OrderDao.repaid(mStaff, new Order.RepaidBuilder(updateBuilder, payBuilder).setDiscountBuilder(discountBuilder));
 			
 			Member actualMember = MemberDao.getById(mStaff, expectedMember.getId());
@@ -353,7 +353,7 @@ public class TestCommitOrderDao {
 			
 			discountBuilder = Order.DiscountBuilder.build4Member(orderId, expectedMember);
 			updateBuilder = new Order.UpdateBuilder(actualOrder).addOri(actualOrder.getOrderFoods());
-			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
+			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER).setSms(false);
 			
 			expectedMember.restore(MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
 			expectedMo = expectedMember.reConsume(actualOrder.getActualPrice(), PayType.MEMBER);
@@ -377,7 +377,7 @@ public class TestCommitOrderDao {
 			
 			discountBuilder = Order.DiscountBuilder.build4Member(orderId, expectedNewMember);
 			updateBuilder = new Order.UpdateBuilder(actualOrder).addOri(actualOrder.getOrderFoods());
-			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER, false);
+			payBuilder = PayBuilder.build4Member(orderId, PayType.MEMBER).setSms(false);
 			
 			MemberOperation expectedOriMo = expectedOriMember.restore(MemberOperationDao.getLastConsumptionByOrder(mStaff, actualOrder));
 			
