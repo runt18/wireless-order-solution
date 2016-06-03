@@ -45,6 +45,7 @@ public class UpdateMenuAction extends Action {
 		final String limitCount = request.getParameter("limitCount");
 		
 		final String commission = request.getParameter("commission");
+		final String split = request.getParameter("split");
 		final String foodAliasId = request.getParameter("foodAliasID");
 		final String foodImage = request.getParameter("foodImage");
 		final String multiFoodPrices = request.getParameter("multiFoodPrices");
@@ -125,6 +126,13 @@ public class UpdateMenuAction extends Action {
 			}else{
 				builder.setLimit(false, 0);
 			}
+			
+			//是否数量不累加
+			if(split != null && !split.isEmpty() && Boolean.parseBoolean(split)){
+				builder.setSplit(true);
+			}else{
+				builder.setSplit(false);
+			}	
 			
 			//菜品图片
 			if(foodImage != null && !foodImage.isEmpty()){

@@ -244,8 +244,12 @@ public class OperateMemberAction extends DispatchAction{
 			final String pin = (String)request.getAttribute("pin");
 			final String id = request.getParameter("id");
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			MemberDao.deleteById(staff, Integer.valueOf(id));
-			jObject.initTip(true, "操作成功, 会员资料已删除.");
+			if(id != null && !id.isEmpty() && Integer.parseInt(id) > 0){
+				MemberDao.deleteById(staff, Integer.parseInt(id));
+				jObject.initTip(true, "操作成功, 会员资料已删除.");
+			}else{
+				jObject.initTip(false, "操作失败, 会员资料不正确.");
+			}
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
