@@ -9,7 +9,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
-import com.wireless.pojo.printScheme.PrintFunc;
+import com.wireless.pojo.printScheme.PrintFunc.SummaryOptions;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
 import com.wireless.print.content.decorator.ExtraFormatDecorator;
@@ -24,7 +24,7 @@ public class SummaryContent extends ConcreteContent {
 	private final Order mOrder;
 	private final FoodDetailContent.DetailType mDetailType;
 	private String ending;
-	private int extra;
+	private SummaryOptions options;
 	
 	public SummaryContent(Order order, String waiter, PType printType, PStyle style, FoodDetailContent.DetailType detailType) {
 		super(printType, style);
@@ -43,8 +43,8 @@ public class SummaryContent extends ConcreteContent {
 		mDetailType = detailType;
 	}
 
-	public SummaryContent setExtra(int extra){
-		this.extra = extra;
+	public SummaryContent setOptions(SummaryOptions options){
+		this.options = options;
 		return this;
 	}
 	
@@ -118,8 +118,7 @@ public class SummaryContent extends ConcreteContent {
 		
 		final StringBuilder var4 = new StringBuilder();
 		if(mPrintType == PType.PRINT_ORDER || mPrintType == PType.PRINT_ALL_EXTRA_FOOD || mPrintType == PType.PRINT_ORDER_PATCH){
-			PrintFunc.SummaryOptions options = new PrintFunc.SummaryOptions(extra);
-			if(options.containsTotal()){
+			if(this.options.containsTotal()){
 				var4.append(new ExtraFormatDecorator(
 								new RightAlignedDecorator("Ð¡¼Æ£º" + NumericUtil.CURRENCY_SIGN + mOrder.calcTotalPrice(), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X));
 			}

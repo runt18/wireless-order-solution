@@ -116,7 +116,7 @@ public class JobContentFactory {
 										   						   			  staff.getName(),
 										   						   			  printType, 
 										   						   			  printer.getStyle(), detailType).setEnding(func.getComment())
-										   				   												     .setExtra(func.getExtra())));
+										   				   												     .setOptions(func.getSummaryOptions())));
 						}else{
 							//Generate the summary to specific departments.
 							final List<OrderFood> ofToDept = new ArrayList<OrderFood>();
@@ -136,7 +136,7 @@ public class JobContentFactory {
 							   						   			  staff.getName(),
 							   						   			  printType, 
 							   						   			  printer.getStyle(), detailType).setEnding(func.getComment())
-							   				   													 .setExtra(func.getExtra())));
+							   				   													 .setOptions(func.getSummaryOptions())));
 							}
 						}
 						
@@ -148,6 +148,73 @@ public class JobContentFactory {
 			
 		}else{
 			return null;
+		}
+	}
+	
+	private void addDetail(PType printType, Staff staff, Printer printer, PrintFunc func, Order order, FoodDetailContent.DetailType detailType, final List<JobContent> jobContents, OrderFood of){
+		if(of.asFood().isCombo()){
+			for(ComboFood childFood : of.asFood().getChildFoods()){
+				if(func.isKitchenAll()){
+					//Add the detail content of this child order food to the job contents.
+					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+												   new OrderDetailContent(of, 
+														   				  childFood, 
+														   				  order, 
+														   				  staff.getName(), 
+														   				  printType, 
+														   				  printer.getStyle(), detailType)));
+				}else{
+					for(Kitchen kitchen : func.getKitchens()){
+						final int printKitchenId;
+						if(childFood.asFood().hasPrintKitchen()){
+							printKitchenId = childFood.asFood().getPrintKitchenId();
+						}else{
+							printKitchenId = childFood.asFood().getKitchen().getId();
+						}
+						if(kitchen.getId() == printKitchenId){
+							//Add the detail content of this child order food matched the kitchen to the job contents.
+							jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+														   new OrderDetailContent(of, 
+																   				  childFood, 
+																   				  order, 
+																   				  staff.getName(), 
+																   				  printType, 
+																   				  printer.getStyle(), detailType)));
+							break;
+						}
+					}
+				}
+			}
+		}else{
+			if(func.isKitchenAll()){
+				//Add the detail content of this order food to the job contents.
+				jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+											   new OrderDetailContent(of, 
+													   				  order, 
+													   				  staff.getName(), 
+													   				  printType, 
+													   				  printer.getStyle(), detailType)));
+			}else{
+				for(Kitchen kitchen : func.getKitchens()){
+					final int printKitchenId;
+					if(of.asFood().hasPrintKitchen()){
+						printKitchenId = of.asFood().getPrintKitchenId();
+					}else{
+						printKitchenId = of.asFood().getKitchen().getId();
+					}
+					if(kitchen.getId() == printKitchenId){
+						//Add the detail content of this order food matched the kitchen to the job contents.
+						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+													   new OrderDetailContent(of, 
+															   				  order, 
+															   				  staff.getName(), 
+															   				  printType, 
+															   				  printer.getStyle(), detailType)));
+						break;
+					}
+				}
+			}
+
 		}
 	}
 	
@@ -171,69 +238,14 @@ public class JobContentFactory {
 				for(PrintFunc func : printer.getPrintFuncs()){
 					if(func.isTypeMatched(printType) && func.isRegionMatched(order.getRegion())){
 						for(OrderFood of : order.getOrderFoods()){
-							if(of.asFood().isCombo()){
-								for(ComboFood childFood : of.asFood().getChildFoods()){
-									if(func.isKitchenAll()){
-										//Add the detail content of this child order food to the job contents.
-										jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-																	   new OrderDetailContent(of, 
-																			   				  childFood, 
-																			   				  order, 
-																			   				  staff.getName(), 
-																			   				  printType, 
-																			   				  printer.getStyle(), detailType)));
-									}else{
-										for(Kitchen kitchen : func.getKitchens()){
-											final int printKitchenId;
-											if(childFood.asFood().hasPrintKitchen()){
-												printKitchenId = childFood.asFood().getPrintKitchenId();
-											}else{
-												printKitchenId = childFood.asFood().getKitchen().getId();
-											}
-											if(kitchen.getId() == printKitchenId){
-												//Add the detail content of this child order food matched the kitchen to the job contents.
-												jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-																			   new OrderDetailContent(of, 
-																					   				  childFood, 
-																					   				  order, 
-																					   				  staff.getName(), 
-																					   				  printType, 
-																					   				  printer.getStyle(), detailType)));
-												break;
-											}
-										}
-									}
+							if(of.asFood().isSplit() && of.getCount() % Float.valueOf(of.getCount()) == 0){
+								int amount = Float.valueOf(of.getCount()).intValue();
+								for(int i = 0; i < amount; i++){
+									of.setCount(1);
+									addDetail(printType, staff, printer, func, order, detailType, jobContents, of);
 								}
 							}else{
-								if(func.isKitchenAll()){
-									//Add the detail content of this order food to the job contents.
-									jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-																   new OrderDetailContent(of, 
-																		   				  order, 
-																		   				  staff.getName(), 
-																		   				  printType, 
-																		   				  printer.getStyle(), detailType)));
-								}else{
-									for(Kitchen kitchen : func.getKitchens()){
-										final int printKitchenId;
-										if(of.asFood().hasPrintKitchen()){
-											printKitchenId = of.asFood().getPrintKitchenId();
-										}else{
-											printKitchenId = of.asFood().getKitchen().getId();
-										}
-										if(kitchen.getId() == printKitchenId){
-											//Add the detail content of this order food matched the kitchen to the job contents.
-											jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-																		   new OrderDetailContent(of, 
-																				   				  order, 
-																				   				  staff.getName(), 
-																				   				  printType, 
-																				   				  printer.getStyle(), detailType)));
-											break;
-										}
-									}
-								}
-
+								addDetail(printType, staff, printer, func, order, detailType, jobContents, of);
 							}
 						}
 					}
@@ -646,4 +658,5 @@ public class JobContentFactory {
 
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
+	
 }
