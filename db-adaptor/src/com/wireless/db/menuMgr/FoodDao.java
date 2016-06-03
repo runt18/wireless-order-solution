@@ -523,6 +523,8 @@ public class FoodDao {
 	
 	/**
 	 * Delete the food to a specific id.
+	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param foodId
@@ -530,16 +532,15 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			<li>throws if the food is still used by any order which is unpaid<br>
-	 * 			<li>throws if the food is the sub to any combo<br>
-	 * 			<li>throws if if the food has stock status
+	 * 			<li>throws if the food is still used by any order which is unpaid
+	 * 			<li>throws if the food is the sub to any combo
 	 */
-	public static void delete(Staff staff, int foodId) throws SQLException, BusinessException{
+	public static void deleteById(Staff staff, int foodId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			delete(dbCon, staff, foodId);
+			deleteById(dbCon, staff, foodId);
 			dbCon.conn.commit();
 			
 		}catch(Exception e){
@@ -561,66 +562,79 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			<li>throws if the food is still used by any order which is unpaid<br>
-	 * 			<li>throws if the food is the sub to any combo<br>
-	 * 			<li>throws if if the food has stock status
+	 * 			<li>throws if the food is still used by any order which is unpaid
+	 * 			<li>throws if the food is the sub to any combo
 	 */
-	public static void delete(DBCon dbCon, Staff staff, int foodId) throws SQLException, BusinessException{
-		String sql;
-		
-		//Check to see whether the food is used by unpaid order.
-		sql = " SELECT food_id " +
-			  " FROM " + Params.dbName + ".order_food OF " +
-			  " JOIN " + Params.dbName + ".order O ON 1 = 1 " + 
-			  " AND OF.order_id = O.id " +
-			  " AND O.restaurant_id = " + staff.getRestaurantId() +
-			  " AND O.status = " + Order.Status.UNPAID.getVal() +
-			  " WHERE OF.food_id = " + foodId +
-			  " LIMIT 1 ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(FoodError.FOOD_IN_USED);
-		}
-		dbCon.rs.close();
-		
-		//Check to see whether the food is the sub to any combo.
-		sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE 1 = 1 " +
-			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  " AND sub_food_id = " + foodId +
-			  " LIMIT 1 ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(FoodError.DELETE_FAIL_SINCE_COMBO_SUB_FOOD);
-		}
-		dbCon.rs.close();
-		
-		//Delete the associated combo info
-		sql = " DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + foodId;
-		dbCon.stmt.executeUpdate(sql);
-
-		//Check to see whether or not the food to delete contains image.
-		sql  =" SELECT oss_image_id FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			if(dbCon.rs.getInt("oss_image_id") != 0){
-				//Delete the associated oss image.
-				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(dbCon.rs.getInt("oss_image_id")));
-			}
-		}
-		dbCon.rs.close();
-		
-		//Delete the associated price plan.
-		sql = " DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + foodId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Delete the associated food unit
-		FoodUnitDao.deleteByCond(dbCon, staff, new FoodUnitDao.ExtraCond().addFood(foodId));
-		
-		//Delete the food info
-		sql = " DELETE FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
-		if(dbCon.stmt.executeUpdate(sql) == 0){
+	public static void deleteById(DBCon dbCon, Staff staff, int foodId) throws SQLException, BusinessException{
+		if(deleteByCond(dbCon, staff, new ExtraCond().setId(foodId)) == 0){
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}
+	}
+	
+	/**
+	 * Delete the foods to specific extra condition {@link ExtraCond}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the amount to food deleted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any cases below.
+	 * 	 		<li>throws if the food is still used by any order which is unpaid<br>
+	 * 			<li>throws if the food is the sub to any combo<br>
+	 */
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		int amount = 0;
+		for(Food f : getByCond(dbCon, staff, extraCond, null)){
+			String sql;
+			
+			//Check to see whether the food is used by unpaid order.
+			checkUsed(dbCon, staff, f);
+			
+			//Check to see whether the food is the sub to any combo.
+			sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE 1 = 1 " +
+				  " AND restaurant_id = " + staff.getRestaurantId() +
+				  " AND sub_food_id = " + f.getFoodId() +
+				  " LIMIT 1 ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				throw new BusinessException(FoodError.DELETE_FAIL_SINCE_COMBO_SUB_FOOD);
+			}
+			dbCon.rs.close();
+			
+			//Delete the associated combo info
+			sql = " DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + f.getFoodId();
+			dbCon.stmt.executeUpdate(sql);
+
+			//Check to see whether or not the food to delete contains image.
+			sql  =" SELECT oss_image_id FROM " + Params.dbName + ".food WHERE food_id = " + f.getFoodId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getInt("oss_image_id") != 0){
+					//Delete the associated oss image.
+					OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(dbCon.rs.getInt("oss_image_id")));
+				}
+			}
+			dbCon.rs.close();
+			
+			//Delete the associated price plan.
+			sql = " DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + f.getFoodId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the associated food unit
+			FoodUnitDao.deleteByCond(dbCon, staff, new FoodUnitDao.ExtraCond().addFood(f));
+			
+			//Delete the food info
+			sql = " DELETE FROM " + Params.dbName + ".food WHERE food_id = " + f.getFoodId();
+			if(dbCon.stmt.executeUpdate(sql) != 0){
+				amount++;
+			}
+		}
+		return amount;
 	}
 	
 	/**
@@ -672,20 +686,8 @@ public class FoodDao {
 		Food f = builder.build();
 
 		if(builder.isCheckUsed()){
-			//Check to see whether the food is used by unpaid order.
-			sql = " SELECT food_id " +
-				  " FROM " + Params.dbName + ".order_food OF " +
-				  " JOIN " + Params.dbName + ".order O ON 1 = 1 " + 
-				  " AND OF.order_id = O.id " +
-				  " AND O.restaurant_id = " + staff.getRestaurantId() +
-				  " AND O.status = " + Order.Status.UNPAID.getVal() +
-				  " WHERE OF.food_id = " + f.getFoodId() +
-				  " LIMIT 1 ";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				throw new BusinessException(FoodError.FOOD_IN_USED);
-			}
-			dbCon.rs.close();
+			//Check the food to update is used.
+			checkUsed(dbCon, staff, f);
 			
 			//Check to see whether the alias is duplicated.
 			if(builder.isAliasChanged() && f.getAliasId() != 0){
@@ -739,6 +741,9 @@ public class FoodDao {
 			if(food4Status.isLimit()){
 				f.setLimitAmount(food4Status.getLimitAmount());
 			}
+		}
+		if(builder.isSplitChanged()){
+			f.setSplit(food4Status.isSplit());
 		}
 		f.setTemp(false);
 		
@@ -1474,6 +1479,40 @@ public class FoodDao {
 			}
 		}
 		return amount;
+	}
+	
+	private static void checkUsed(DBCon dbCon, Staff staff, Food f) throws SQLException, BusinessException{
+		String sql;
+		//Check to see whether the food is used by unpaid order.
+		sql = " SELECT O.table_name " +
+			  " FROM " + Params.dbName + ".order_food OF " +
+			  " JOIN " + Params.dbName + ".order O ON 1 = 1 " + 
+			  " AND OF.order_id = O.id " +
+			  " AND O.restaurant_id = " + staff.getRestaurantId() +
+			  " AND O.status = " + Order.Status.UNPAID.getVal() +
+			  " WHERE OF.food_id = " + f.getFoodId() +
+			  " LIMIT 1 ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(("此菜品在【$(table)】使用, 不能修改").replace("$(table)", dbCon.rs.getString("table_name")), FoodError.FOOD_IN_USED);
+		}
+		dbCon.rs.close();
+		
+		//Check to see whether the combo associated with this food is used by unpaid order.
+		sql = " SELECT O.table_name " +
+			  " FROM " + Params.dbName + ".order_food OF " +
+			  " JOIN " + Params.dbName + ".order O ON OF.order_id = O.id " +
+			  " JOIN " + Params.dbName + ".combo C ON OF.food_id = C.food_id " +
+			  " WHERE O.restaurant_id = " + staff.getRestaurantId() +
+			  " AND O.status = " + Order.Status.UNPAID.getVal() +
+			  " AND C.sub_food_id = " + f.getFoodId() +
+			  " LIMIT 1 ";	
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(("此菜品在【$(table)】使用, 不能修改").replace("$(table)", dbCon.rs.getString("table_name")), FoodError.FOOD_IN_USED);
+		}
+		dbCon.rs.close();
 	}
 	
 	/**
