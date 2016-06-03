@@ -48,13 +48,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			if(builder.extra == null){
 				builder.extra = 0;
 			}
-			int extra = builder.extra.intValue(); 
-			if(onOff){
-				extra |= DISPLAY_SUMMARY_TOTAL;
-			}else{
-				extra &= ~DISPLAY_SUMMARY_TOTAL;
-			}
-			builder.extra = extra;
+			SummaryOptions options = new SummaryOptions(builder.extra.intValue());
+			options.setDisplayTotal(onOff);
+			builder.extra = options.extra;
 			return this;
 		}
 		
@@ -104,6 +100,16 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			this.printerId = printerId;
 			this.extraEnabled = extraEnabled;
 			this.cancelEnabled = cancelEnabled;
+		}
+		
+		public DetailUpdateBuilder setOverlay(boolean onOff){
+			if(builder.extra == null){
+				builder.extra = 0;
+			}
+			final DetailOptions options = new DetailOptions(builder.extra.intValue());
+			options.setOverlay(onOff);
+			builder.extra = options.extra;
+			return this;
 		}
 		
 		public DetailUpdateBuilder setRegionAll(){
@@ -309,24 +315,54 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	//Options to summary
 	public static class SummaryOptions{
 		
-		private final int extra;
+		private final static int DISPLAY_SUMMARY_TOTAL = 1 << 1;		//点菜总单显示小计
 		
-		public SummaryOptions(PrintFunc func){
-			this.extra = func.extra;
-		}
-
-		public SummaryOptions(int extra){
+		private int extra;
+		
+		SummaryOptions(int extra){
 			this.extra = extra;
 		}
-
+		
+		public SummaryOptions setDisplayTotal(boolean onOff){
+			if(onOff){
+				this.extra |= DISPLAY_SUMMARY_TOTAL;
+			}else{
+				this.extra &= ~DISPLAY_SUMMARY_TOTAL;
+			}
+			return this;
+		}
+		
 		public boolean containsTotal(){
 			return (this.extra & DISPLAY_SUMMARY_TOTAL) != 0;
 		}
 	}
 	
-	private final static int DISPLAY_SUMMARY_TOTAL = 1 << 1;		//点菜总单显示小计
+	//Options to detail.
+	public static class DetailOptions{
+		private final static int DETAIL_OVERLAY = 1 << 1;		//点菜分单数量累加
+		
+		private int extra;
+		
+		DetailOptions(int extra){
+			this.extra = extra;
+		}
+		
+		public void setOverlay(boolean onOff){
+			if(onOff){
+				this.extra |= DETAIL_OVERLAY;
+			}else{
+				this.extra &= ~DETAIL_OVERLAY;
+			}
+		}
+		
+		public boolean isOverlay(){
+			return (this.extra & DETAIL_OVERLAY) != 0;
+		}
+	}
+	
 	
 	/**
 	 * The helper class to create the print function of summary.
@@ -338,7 +374,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final List<Region> mRegions = SortedList.newInstance();
 		private final List<Department> mDepts = SortedList.newInstance();
 		private String comment;
-		private int extra;
+		private final SummaryOptions options = new SummaryOptions(0);
 		
 		public SummaryBuilder(int printerId, PType type){
 			if(type == PType.PRINT_ORDER || type == PType.PRINT_ALL_CANCELLED_FOOD){
@@ -350,11 +386,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 		
 		public SummaryBuilder setDisplayTotal(boolean onOff){
-			if(onOff){
-				this.extra |= DISPLAY_SUMMARY_TOTAL;
-			}else{
-				this.extra &= ~DISPLAY_SUMMARY_TOTAL;
-			}
+			options.setDisplayTotal(onOff);
 			return this;
 		}
 		
@@ -409,6 +441,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private final boolean extraEnabled;
 		private final boolean cancelEnabled;
 		private List<Region> regions = SortedList.newInstance();
+		private final DetailOptions options = new DetailOptions(0);
 		
 		public DetailBuilder(Printer printer, boolean extraEnabled, boolean cancelEnabled){
 			this(printer.getId(), extraEnabled, cancelEnabled);
@@ -418,6 +451,11 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			this.mPrinterId = printerId;
 			this.extraEnabled = extraEnabled;
 			this.cancelEnabled = cancelEnabled;
+		}
+		
+		public DetailBuilder setOverlay(boolean onOff){
+			options.setOverlay(onOff);
+			return this;
 		}
 		
 		public DetailBuilder setRepeat(int repeat){
@@ -451,8 +489,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			final PrintFunc[] result = new PrintFunc[2];
 			result[0] = new PrintFunc(this, PType.PRINT_ORDER_DETAIL, extraEnabled);
 			result[0].setRegions(this.regions);
+			result[0].setExtra(this.options.extra);
 			result[1] = new PrintFunc(this, PType.PRINT_CANCELLED_FOOD_DETAIL, cancelEnabled);
 			result[1].setRegions(this.regions);
+			result[1].setExtra(this.options.extra);
 			return result;
 		}
 	}
@@ -599,7 +639,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this.mRegions.addAll(builder.mRegions);
 		this.mDepts.addAll(builder.mDepts);
 		this.mComment = builder.comment;
-		this.extra = builder.extra;
+		this.extra = builder.options.extra;
 	}
 	
 	private PrintFunc(DetailBuilder builder, PType type, boolean enabled){
@@ -771,6 +811,14 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		this.enabled = onOff;
 	}
 
+	public SummaryOptions getSummaryOptions(){
+		return new SummaryOptions(this.extra);
+	}
+	
+	public DetailOptions getDetailOptions(){
+		return new DetailOptions(this.extra);
+	}
+	
 	@Override
 	public String toString(){
 		return "type : " + mType.getDesc() + ", repeat : " + getRepeat();
