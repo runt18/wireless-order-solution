@@ -140,7 +140,7 @@
 				<img src="images/logo.png" height="40px">
 			</div>
 			<div style="float: left;">
-				<img src="images/contact2.png" height="40px">
+				<img src="images/contact.png" height="40px">
 			</div>
 		</div>	
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">

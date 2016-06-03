@@ -56,7 +56,7 @@
 		</div>
 		<div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
 			<div >
-				<img src="images/contact2.png">
+				<img src="images/contact.png">
 			</div>
 		</div>		
 	</div>	
@@ -91,7 +91,7 @@
 				<a href="#billboardsCmp" id="btnDisplayBillboard" data-rel="popup" data-role="button" data-inline="true"  data-transition="slideup" data-icon="info" data-theme="e" style="display: none;">公告</a>
 			</div>
 			<div class="adv_logo">
-				<img src="images/contact2.png">
+				<img src="images/contact.png">
 			</div>
 		</div>	
 	</div>
