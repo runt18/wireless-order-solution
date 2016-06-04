@@ -26,7 +26,7 @@ public class DeleteMenuAction extends Action {
 			
 			String foodID = request.getParameter("foodID");
 			
-			FoodDao.delete(staff, Integer.parseInt(foodID));
+			FoodDao.deleteById(staff, Integer.parseInt(foodID));
 			
 			jobject.initTip(true, "操作成功, 已删除菜品信息.");
 			try{

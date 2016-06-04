@@ -2229,7 +2229,7 @@ function basicOperationBasicHandler(c){
 			if(foodPrices){
 				foodPrices += '&';
 			}
-			fodPrices += (food_pricePlans[i].id + ',' + Ext.getCmp('numBasicForPrice'+food_pricePlans[i].id).getValue());  
+			foodPrices += (food_pricePlans[i].id + ',' + Ext.getCmp('numBasicForPrice'+food_pricePlans[i].id).getValue());  
 		}
 	}
 	

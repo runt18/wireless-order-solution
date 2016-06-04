@@ -406,7 +406,6 @@ Ext.onReady(function(){
 				['基础扣额', 'deltaBaseMoney', 60, 'right', Ext.ux.txtFormat.gridDou],
 				['赠送扣额', 'deltaExtraMoney', 60, 'right', Ext.ux.txtFormat.gridDou],
 				['消费金额', 'payMoney', 60, 'right', Ext.ux.txtFormat.gridDou],
-				['消费金额', 'payMoney', 60, 'right', Ext.ux.txtFormat.gridDou],
 				['剩余金额', 'remainingTotalMoney', 60, 'right', Ext.ux.txtFormat.gridDou],
 				['付款方式', 'payTypeText'],
 				['变动积分', 'deltaPoint', 60, 'right'],
@@ -444,10 +443,13 @@ Ext.onReady(function(){
 				mcus_grid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+				mcus_grid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-				mcus_grid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
 				mcus_grid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+				mcus_grid.getView().getCell(store.getCount()-1, 12).innerHTML = '--';
+				mcus_grid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
+				mcus_grid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
 			}
 		});
 	}

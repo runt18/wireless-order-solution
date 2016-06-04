@@ -3714,11 +3714,10 @@ Ext.onReady(function(){
 							memberSumView.getCell(store.getCount()-1, 6).innerHTML = '--';
 							memberSumView.getCell(store.getCount()-1, 7).innerHTML = '--';
 							memberSumView.getCell(store.getCount()-1, 8).innerHTML = '--';
-							
-//							memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
-							memberSumView.getCell(store.getCount()-1, 10).innerHTML = '--';
+							memberSumView.getCell(store.getCount()-1, 9).innerHTML = '--';
 							memberSumView.getCell(store.getCount()-1, 11).innerHTML = '--';
 							memberSumView.getCell(store.getCount()-1, 12).innerHTML = '--';
+							memberSumView.getCell(store.getCount()-1, 13).innerHTML = '--';
 						}
 						
 						

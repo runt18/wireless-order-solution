@@ -76,7 +76,7 @@ public class TestFoodDao {
 			
 		}finally{
 			if(foodId != 0){
-				FoodDao.delete(mStaff, foodId);
+				FoodDao.deleteById(mStaff, foodId);
 				try{
 					FoodDao.getById(mStaff, foodId);
 					Assert.assertTrue("failed to delete the food", false);
@@ -117,7 +117,7 @@ public class TestFoodDao {
 													   .setImage(ossImageId)
 													   .addPrice(planId, 4)
 													   .setAliasId(65500).setDesc("测试描述")
-													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false).setLimit(true, 10)
+													   .setHot(true).setCommission(2.0f).setGift(true).setWeigh(false).setLimit(true, 10).setSplit(true)
 													   .addUnit(2.5f, "半只")
 													   .setPrintKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0));
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
@@ -150,9 +150,9 @@ public class TestFoodDao {
 													   .setPrice(34.2f).setDesc("测试修改描述")
 													   .addPrice(planId, 5)
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
-													   .setGift(false).setWeigh(true).setLimit(true, 5)
+													   .setGift(false).setWeigh(true).setLimit(true, 5).setSplit(false).setLimit(false, 0)
 													   .addUnit(3f, "份")
-													   //.setPrintKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(2))
+													   .setPrintKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(2))
 													   ;
 			FoodDao.update(mStaff, updateBuilder);
 			
@@ -196,7 +196,7 @@ public class TestFoodDao {
 		} finally{
 			if(foodId != 0){
 				Food original = FoodDao.getById(mStaff, foodId);
-				FoodDao.delete(mStaff, foodId);
+				FoodDao.deleteById(mStaff, foodId);
 				try{
 					FoodDao.getById(mStaff, foodId);
 					Assert.assertTrue("failed to delete the food", false);
@@ -252,6 +252,8 @@ public class TestFoodDao {
 		Assert.assertEquals("limit : " + tag, expected.isLimit(), actual.isLimit());
 		Assert.assertEquals("limit amount : " + tag, expected.getLimitAmount(), actual.getLimitAmount());
 		Assert.assertEquals("commission : " + tag, expected.getCommission(), actual.getCommission(), 0.01);
+		Assert.assertEquals("split : " + tag, expected.isSplit(), actual.isSplit());
+
 		//------- the content to associated food units --------
 		for(int i = 0; i < expected.getFoodUnits().size(); i++){
 			//Assert.assertEquals("food unit id", expected.getFoodUnits().get(0).getId(), actual.getFoodUnits().get(0).getId());

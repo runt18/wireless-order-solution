@@ -84,7 +84,7 @@ function loadInformation(){
 	
 	kitchenTree = new Ext.tree.TreePanel({
 		id : 'kitchens',
-		height : 100,
+		height : 350,
 		hidden : true,
 		border : true,
 		rootVisible : true,
@@ -107,7 +107,7 @@ function loadInformation(){
 						}
 					}); 
 					//treePanel长度过长问题
-					$('#kitchens .x-panel-body-noheader').height(80);
+					$('#kitchens .x-panel-body-noheader').height(230);
 				}
 			}
 		}),
@@ -194,7 +194,7 @@ function init(){
 		resizable : true,
 		modal : true,
 		width : 700,
-		height : 550,
+		height : 700,
 		listeners : {
 			show : function(thiz){
 				thiz.doLayout();
@@ -205,11 +205,6 @@ function init(){
 			id : 'chkIsNeedToTotalPrice',
 			checked : false,
 			boxLabel : '是否显示总价'
-		}, {
-			xtype : 'checkbox',
-			id : 'chkIsNeedToTotalAmount',
-			checked : true,
-			boxLabel : '数量是否叠加'			
 		}, {
 			xtype : 'checkbox',
 			id : 'chkIsNeedToAdd',
@@ -293,7 +288,6 @@ function init(){
 						dept : depts,
 						regions : regions,
 						printerId : sn.attributes.printerId,
-						//TODO isNeedToTotalAmount : Ext.getCmp('chkIsNeedToTotalAmount').checked
 						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
 						displayTotalPrice : Ext.getDom('chkIsNeedToTotalPrice').checked,
@@ -1179,7 +1173,6 @@ function showPanel(v){
 	//获取退菜btn
 	var cancelFoodBtn = Ext.getCmp('chkIsNeedToCancel');
 	var addFoodBtn = Ext.getCmp('chkIsNeedToAdd');
-	var totalAmount = Ext.getCmp('chkIsNeedToTotalAmount');
 	var totalPriceBtn = Ext.getCmp('chkIsNeedToTotalPrice');
 	
 	var paperDemoCmp = Ext.query("#showPrintPaper .x-panel-body")[0];
@@ -1203,7 +1196,6 @@ function showPanel(v){
 		
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
-		totalAmount.hide();
 //		cancelFoodBtn.show();
 //		cancelFoodBtn.setBoxLabel('打印退菜总单');
 //		addFoodBtn.show();
@@ -1219,8 +1211,6 @@ function showPanel(v){
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
 		addFoodBtn.show();
 		addFoodBtn.setBoxLabel('打印加菜分单');
-		totalAmount.show();
-		totalAmount.setBoxLabel('数量是否叠加');
 		
 		totalPriceBtn.hide();
 	}else if(v == 18){//客显
