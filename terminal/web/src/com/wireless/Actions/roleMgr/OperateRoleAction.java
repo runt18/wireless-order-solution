@@ -26,32 +26,33 @@ import com.wireless.pojo.staffMgr.Staff;
 public class OperateRoleAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, BusinessException{
 		
-		String pin = (String) request.getAttribute("pin");
-		String roleName = request.getParameter("roleName");
-		String modelId = request.getParameter("modelId");
-		JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String roleName = request.getParameter("roleName");
+		final String modelId = request.getParameter("modelId");
+		final JObject jobject = new JObject();
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-
-			InsertBuilder builder = new InsertBuilder(staff.getRestaurantId(), roleName);
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+				
+			final InsertBuilder builder = new InsertBuilder(staff.getRestaurantId(), roleName);
 			
 			if(modelId != null && !modelId.trim().isEmpty()){
 				Role model = RoleDao.getyById(staff, Integer.parseInt(modelId));
 				builder.getPrivileges().addAll(model.getPrivileges());
 			}
 
-			
 			RoleDao.insert(staff, builder);
 			
 			jobject.initTip(true, "添加成功");
 			
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(false,  9999, e.getMessage());
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -62,22 +63,26 @@ public class OperateRoleAction extends DispatchAction{
 	
 	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, BusinessException{
 		
-		String pin = (String) request.getAttribute("pin");
-		String roleName = request.getParameter("roleName");
-		String roleId = request.getParameter("roleId");
+		final String pin = (String) request.getAttribute("pin");
+		final String roleName = request.getParameter("roleName");
+		final String roleId = request.getParameter("roleId");
+		final String branchId = request.getParameter("branchId");
 
-		JObject jobject = new JObject();
+		final JObject jobject = new JObject();
 		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(roleId))
+			final UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(roleId))
 										.setName(roleName);
 		
 			RoleDao.update(staff, builder);
 			jobject.initTip(true, "修改成功");
 			
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
@@ -90,18 +95,23 @@ public class OperateRoleAction extends DispatchAction{
 	
 	public ActionForward updatePrivilege(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, BusinessException{
 		
-		String pin = (String) request.getAttribute("pin");
-		String roleId = request.getParameter("roleId");
-		String privileges = request.getParameter("privileges");
-		String discounts = request.getParameter("discounts");
-		String pricePlans = request.getParameter("pricePlans");
-		JObject jobject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		final String roleId = request.getParameter("roleId");
+		final String branchId = request.getParameter("branchId");
+		final String privileges = request.getParameter("privileges");
+		final String discounts = request.getParameter("discounts");
+		final String pricePlans = request.getParameter("pricePlans");
+		final JObject jobject = new JObject();
 		
 		try{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
-			Role.UpdateBuilder updateBuilder = new Role.UpdateBuilder(Integer.parseInt(roleId));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final Role.UpdateBuilder updateBuilder = new Role.UpdateBuilder(Integer.parseInt(roleId));
 			
 			if(privileges != null){
 				String[] privilegeArray = privileges.split(",");
@@ -129,10 +139,7 @@ public class OperateRoleAction extends DispatchAction{
 			RoleDao.update(staff, updateBuilder);
 			jobject.initTip(true, "修改成功");
 			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
@@ -145,12 +152,18 @@ public class OperateRoleAction extends DispatchAction{
 	
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		String roleId = request.getParameter("roleId");
-		String pin = (String) request.getAttribute("pin");
-		JObject jobject = new JObject();
+		final String roleId = request.getParameter("roleId");
+		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final JObject jobject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<Staff> list = StaffDao.getByRestaurant(staff.getRestaurantId());
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			final List<Staff> list = StaffDao.getByRestaurant(staff.getRestaurantId());
 			for (Staff s : list) {
 				if((s.getRole().getId()+"").equals(roleId)){
 					throw new BusinessException("删除失败, 此角色有员工在使用中");
@@ -159,9 +172,9 @@ public class OperateRoleAction extends DispatchAction{
 			
 			RoleDao.deleteRole(Integer.parseInt(roleId));
 			jobject.initTip(true, "删除成功");
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, JObject.TIP_TITLE_DEFAULT, e.getMessage());
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

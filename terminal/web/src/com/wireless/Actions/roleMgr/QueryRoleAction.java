@@ -21,11 +21,15 @@ public class QueryRoleAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		String pin = (String) request.getAttribute("pin");
+		String branchId = request.getParameter("branchId");
 		
 		List<Role> root = null;
 		JObject jobject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			root = RoleDao.getRoles(staff, null, " ORDER BY cate");
 		}catch(Exception e){

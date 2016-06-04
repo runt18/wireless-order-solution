@@ -126,10 +126,15 @@ public class QueryPrivilegeAction extends DispatchAction{
 	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		String pin = (String) request.getAttribute("pin");
+		String branchId = request.getParameter("branchId");
 		StringBuilder tree = new StringBuilder();
 		List<Privilege> root = null;
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			root = PrivilegeDao.getByCond(staff, null);
 			if(root.size() > 0){
@@ -524,23 +529,27 @@ public class QueryPrivilegeAction extends DispatchAction{
 	 */
 	public ActionForward roleTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		String pin = (String) request.getAttribute("pin");
-		String roleId = request.getParameter("roleId");
-		StringBuilder tree = new StringBuilder();
-		List<Privilege> root = null;
-		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
+		final String pin = (String) request.getAttribute("pin");
+		final String roleId = request.getParameter("roleId");
+		final String branchId = request.getParameter("branchId");
+		final StringBuilder tree = new StringBuilder();
+		final List<Privilege> rolePrivilege = new ArrayList<Privilege>();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			//根据id获取role
-			Role role = RoleDao.getyById(staff, Integer.parseInt(roleId));
+			final Role role = RoleDao.getyById(staff, Integer.parseInt(roleId));
 			if(role != null){
-				rolePrivilege = role.getPrivileges();
+				rolePrivilege.addAll(role.getPrivileges());
 			}
 			//获取所有权限和不是会员类型的所有折扣
-			root = PrivilegeDao.getByCond(staff, null);
+			final List<Privilege> root = PrivilegeDao.getByCond(staff, null);
 			if(root.size() > 0){
 				
-				List<CateNode> cates = new ArrayList<>();
+				final List<CateNode> cates = new ArrayList<>();
 				//前台cate
 				List<Privilege> front_ps = new ArrayList<>();
 				CateNode front = new CateNode(Privilege.Cate.FRONT_BUSINESS, front_ps);

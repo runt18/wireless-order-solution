@@ -17,24 +17,25 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
 
 public class InsertStaffAction extends Action {
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-
-		JObject jobject = new JObject();
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
+		// get the query condition
+		final String staffName = request.getParameter("staffName");
+		final String staffPwd = request.getParameter("staffPwd");
+		final String roleId = request.getParameter("roleId");
+		final String tele = request.getParameter("tele");
+		
+		final JObject jobject = new JObject();
 		try {
-			// 解决后台中文传到前台乱码
 			
-
-			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			// get the query condition
-			String staffName = request.getParameter("staffName");
-			String staffPwd = request.getParameter("staffPwd");
-			String roleId = request.getParameter("roleId");
-			String tele = request.getParameter("tele");
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
-			InsertBuilder builder = new InsertBuilder(staffName, staffPwd, new Role(Integer.parseInt(roleId))).setMobile(tele);
+			final InsertBuilder builder = new InsertBuilder(staffName, staffPwd, new Role(Integer.parseInt(roleId))).setMobile(tele);
 			
 			StaffDao.insert(staff, builder);
 			jobject.initTip(true, "添加成功");
