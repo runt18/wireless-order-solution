@@ -43,6 +43,7 @@ public class InsertMenuAction extends Action {
 		final String isLimit = request.getParameter("isLimit");
 		final String limitCount = request.getParameter("limitCount");			
 		
+		final String split = request.getParameter("split");
 		final String commission = request.getParameter("commission");
 		final String multiFoodPrices = request.getParameter("multiFoodPrices");
 		
@@ -63,6 +64,13 @@ public class InsertMenuAction extends Action {
 			if(isRecommend != null && !isRecommend.isEmpty()){
 				builder.setRecommend(Boolean.parseBoolean(isRecommend));
 			}
+			
+			//是否数量不累加
+			if(split != null && !split.isEmpty() && Boolean.parseBoolean(split)){
+				builder.setSplit(true);
+			}else{
+				builder.setSplit(false);
+			}	
 			
 			//是否停售
 			if(isSellout != null && !isSellout.isEmpty()){
