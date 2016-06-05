@@ -28,14 +28,18 @@ public class QueryMenuMgrAction extends Action {
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		
+		String branchId = request.getParameter("branchId");
 		JObject jobject = new JObject();
 		List<Food> root = null;
 		
 		try{
-			
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			
 			String kitchen = request.getParameter("kitchen");
 			String deptId = request.getParameter("deptId");

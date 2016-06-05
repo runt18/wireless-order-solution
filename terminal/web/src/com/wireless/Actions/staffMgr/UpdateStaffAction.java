@@ -19,29 +19,31 @@ import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 
 public class UpdateStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String staffId = request.getParameter("staffId");
+		final String staffName = request.getParameter("staffName");
+		final String oldPwd = request.getParameter("oldPwd");
+		final String staffPwd = request.getParameter("staffPwd");
+		
+		final String roleId = request.getParameter("roleId");
+			
+		final JObject jobject = new JObject();
 		try {
 			// get parameter
 			
-			String pin = (String)request.getAttribute("pin");
-			
-			String staffId = request.getParameter("staffId");
-			String staffName = request.getParameter("staffName");
-			String oldPwd = request.getParameter("oldPwd");
-			String staffPwd = request.getParameter("staffPwd");
-			
-			String roleId = request.getParameter("roleId");
-			
 			if(oldPwd != null && !oldPwd.trim().isEmpty()){
 				Staff staff = StaffDao.verify(Integer.parseInt(staffId));
+				if(branchId != null && !branchId.isEmpty()){
+					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+				}
 				if(!staff.getPwd().equals(oldPwd)){
 					throw new BusinessException(StaffError.VERIFY_PWD);
 				}
 			}
-			Staff.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(staffId))
-										.setStaffPwd(staffPwd);
 			
+			final Staff.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(staffId))
+										.setStaffPwd(staffPwd);
 			
 			if(roleId != null && !roleId.isEmpty()){
 				builder.setRoleId(Integer.parseInt(roleId));
@@ -55,11 +57,7 @@ public class UpdateStaffAction extends Action {
 			
 			jobject.initTip(true, "修改成功");
 			
-		}catch (BusinessException e) {
-			e.printStackTrace();
-			jobject.initTip(e);
-
-		}catch (SQLException e) {
+		}catch (BusinessException | SQLException e) {
 			e.printStackTrace();
 			jobject.initTip(e);
 
