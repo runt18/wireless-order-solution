@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class DeleteStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -22,8 +23,17 @@ public class DeleteStaffAction extends Action {
 		try {
 			// get the query condition
 			String pin = (String)request.getAttribute("pin");
+			String branchId = request.getParameter("branchId");
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			
 			int staffId = Integer.parseInt(request.getParameter("staffId"));
-			StaffDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), staffId);
+			StaffDao.deleteById(staff, staffId);
 			jobject.initTip(true, "删除成功");
 
 		}  catch (SQLException e) {

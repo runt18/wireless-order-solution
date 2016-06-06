@@ -84,7 +84,7 @@ function loadInformation(){
 	
 	kitchenTree = new Ext.tree.TreePanel({
 		id : 'kitchens',
-		height : 350,
+		height : 230,
 		hidden : true,
 		border : true,
 		rootVisible : true,
@@ -1235,7 +1235,6 @@ function showPanel(v){
 		Ext.getCmp('regions').show();
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
-		totalAmount.hide();
 		totalPriceBtn.hide();
 		
 		if(v == 127){//暂结
