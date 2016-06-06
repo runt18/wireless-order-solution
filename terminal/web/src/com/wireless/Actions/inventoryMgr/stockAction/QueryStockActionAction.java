@@ -43,6 +43,7 @@ public class QueryStockActionAction extends Action{
 		final String comment = request.getParameter("comment");
 		final String isWithOutSum = request.getParameter("isWithOutSum");
 		final String fuzzId = request.getParameter("fuzzId");
+		final String cateId = request.getParameter("cateId");
 		final JObject jObject = new JObject();
 		try{
 
@@ -112,6 +113,9 @@ public class QueryStockActionAction extends Action{
 			}
 			if(comment != null && !comment.isEmpty()){
 				extraCond.setComment(comment);
+			}
+			if(cateId != null && !cateId.isEmpty() && Integer.parseInt(cateId) > 0){
+				extraCond.setCateId(Integer.parseInt(cateId));
 			}
 			
 			List<StockAction> root = StockActionDao.getByCond(staff, extraCond.setContainsDetail(true), " ORDER BY S.status, S.ori_stock_date ");
