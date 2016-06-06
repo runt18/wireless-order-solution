@@ -53,6 +53,7 @@ public class StockActionDao {
 		private Staff staff;
 		private String comment;
 		private String fuzzId;
+		private Integer cateId;
 		
 		ExtraCond setStaff(Staff staff){
 			this.staff = staff;
@@ -61,6 +62,11 @@ public class StockActionDao {
 		
 		public ExtraCond setFuzzId(String fuzzId){
 			this.fuzzId = fuzzId;
+			return this;
+		}
+		
+		public ExtraCond setCateId(int cateId){
+			this.cateId = cateId;
 			return this;
 		}
 		
@@ -220,6 +226,16 @@ public class StockActionDao {
 			
 			if(this.type != null){
 				extraCond.append(" AND S.type = " + type.getVal());
+			}
+			
+			if(this.cateId != null){
+				extraCond.append(" AND S.id IN(" + 
+								 	" SELECT stock_action_id FROM " + Params.dbName + ".stock_action_detail SD " + 
+								 	" JOIN " + Params.dbName + ".material M ON SD.material_id = M.material_id " +
+								 	" WHERE 1 = 1 " +
+								 	" AND M.restaurant_id = " + staff.getRestaurantId() +
+								 	" AND M.cate_id = " + this.cateId + 
+								 " )");
 			}
 			
 			if(this.deptIn != 0){
@@ -1352,7 +1368,7 @@ public class StockActionDao {
 			stockAction.getDeptIn().setName(dbCon.rs.getString("dept_in_name"));
 			stockAction.getDeptOut().setId(dbCon.rs.getShort("dept_out"));
 			stockAction.getDeptOut().setName(dbCon.rs.getString("dept_out_name"));
-			stockAction.getSupplier().setSupplierid(dbCon.rs.getInt("supplier_id"));
+			stockAction.getSupplier().setId(dbCon.rs.getInt("supplier_id"));
 			stockAction.getSupplier().setName(dbCon.rs.getString("supplier_name"));
 			stockAction.setOperatorId(dbCon.rs.getInt("operator_id"));
 			stockAction.setOperator(dbCon.rs.getString("operator"));
