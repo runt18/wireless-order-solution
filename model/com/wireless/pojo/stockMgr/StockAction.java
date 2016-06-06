@@ -209,7 +209,7 @@ public class StockAction implements Jsonable{
 		}
 		
 		public InsertBuilder setSupplierId(int supplierId){
-			this.supplier.setSupplierid(supplierId);
+			this.supplier.setId(supplierId);
 			return this;
 		}
 		

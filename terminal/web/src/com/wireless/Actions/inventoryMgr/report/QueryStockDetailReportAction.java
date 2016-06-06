@@ -39,6 +39,7 @@ public class QueryStockDetailReportAction extends Action{
 		final String subType = request.getParameter("subType");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
+		final String endDate = request.getParameter("endDate");
 		final JObject jObject = new JObject();
 		try{
 
@@ -46,7 +47,11 @@ public class QueryStockDetailReportAction extends Action{
 			
 			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond().addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT);
 			
-			extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
+			if(endDate != null && !endDate.isEmpty()){
+				extraCond.setOriDate(beginDate, endDate);
+			}else{
+				extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
+			}
 			
 			if(materialId != null && !materialId.isEmpty()){
 				extraCond.setMaterial(Integer.parseInt(materialId));

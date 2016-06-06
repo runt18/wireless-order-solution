@@ -111,12 +111,12 @@ public class TestStockAction {
 		//根据不同类型获取供应商或部门
 		if(builder.getSubType() == SubType.STOCK_IN ){
 			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
-			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getId());
+			Supplier supplier = SupplierDao.getById(mStaff, builder.getSupplier().getId());
 			expected.setDeptIn(deptIn);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_OUT){
 			Department deptOut = DepartmentDao.getById(mStaff, builder.getDeptOut().getId());
-			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getId());
+			Supplier supplier = SupplierDao.getById(mStaff, builder.getSupplier().getId());
 			expected.setDeptOut(deptOut);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
@@ -274,7 +274,7 @@ public class TestStockAction {
 	@Test
 	public void testStockIn() throws BusinessException, SQLException{
 		Supplier supplier;
-		List<Supplier> suppliers = SupplierDao.getSuppliers(mStaff, null, null);
+		List<Supplier> suppliers = SupplierDao.getByCond(mStaff, null, null);
 		if(suppliers.isEmpty()){
 			throw new BusinessException(SupplierError.SUPPLIER_NOT_ADD);
 		}else{
@@ -374,7 +374,7 @@ public class TestStockAction {
 	@Test
 	public void testStockOut() throws BusinessException, SQLException{
 		Supplier supplier;
-		List<Supplier> suppliers = SupplierDao.getSuppliers(mStaff, null, null);
+		List<Supplier> suppliers = SupplierDao.getByCond(mStaff, null, null);
 		if(suppliers.isEmpty()){
 			throw new BusinessException(SupplierError.SUPPLIER_NOT_ADD);
 		}else{

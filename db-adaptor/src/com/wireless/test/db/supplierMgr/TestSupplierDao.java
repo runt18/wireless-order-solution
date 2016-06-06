@@ -39,47 +39,44 @@ public class TestSupplierDao {
 	
 	@Test
 	public void testInsert() throws Exception{
-		Supplier insupplier = new Supplier(26, "美宜佳", "12334", "内环路二号", "wang", "bedly");
+		Supplier.InsertBuilder insupplier = new Supplier.InsertBuilder();
 		
 		int supplierId = SupplierDao.insert(insupplier);
 		
-		insupplier.setSupplierid(supplierId);
 		
-		Supplier actual = SupplierDao.getSupplierById(mStaff, supplierId);
+		Supplier actual = SupplierDao.getById(mStaff, supplierId);
 		
-		compare(insupplier, actual);
+		compare(insupplier.build(), actual);
 		
 	}
 	
 	
 	@Test
 	public void testSupplierDao() throws Exception{
-		Supplier insupplier = new Supplier(mStaff.getRestaurantId(), "eozu", "12334", "内环路二号", "wang", "bedly");
+		Supplier.InsertBuilder insupplier = new Supplier.InsertBuilder();
 		final int supplierId = SupplierDao.insert(insupplier);
 		
-		insupplier.setSupplierid(supplierId);
+		Supplier actual = SupplierDao.getById(mStaff, supplierId);
 		
-		Supplier actual = SupplierDao.getSupplierById(mStaff, supplierId);
+		compare(insupplier.build(), actual);
 		
-		compare(insupplier, actual);
-		
-		insupplier = actual;
 	
-		insupplier.setName("鸣人");
-		insupplier.setTele("888888888");
-		insupplier.setAddr("番禺区星光大道");
-		insupplier.setContact("佐助");
-		insupplier.setComment("good.");
+		Supplier.UpdateBuilder updateBuilder = new Supplier.UpdateBuilder(supplierId);
+		updateBuilder.setName("鸣人");
+		updateBuilder.setTele("888888888");
+		updateBuilder.setAddr("番禺区星光大道");
+		updateBuilder.setContact("佐助");
+		updateBuilder.setComment("good.");
 		
-		SupplierDao.update(mStaff, insupplier);
-	    actual = SupplierDao.getSupplierById(mStaff, insupplier.getId());
+		SupplierDao.update(mStaff, updateBuilder);
+	    actual = SupplierDao.getById(mStaff, updateBuilder.getId());
 		
-		compare(insupplier,actual);
+		compare(updateBuilder.build(),actual);
 		
 		SupplierDao.deleteById(mStaff, supplierId);
 
 		try{
-			SupplierDao.getSupplierById(mStaff, supplierId);
+			SupplierDao.getById(mStaff, supplierId);
 		}catch(Exception e){}
 		
 	}
@@ -90,7 +87,7 @@ public class TestSupplierDao {
 		SupplierDao.deleteById(mStaff, 1);
 
 		try{
-			SupplierDao.getSupplierById(mStaff, 1);
+			SupplierDao.getById(mStaff, 1);
 		}catch(Exception e){}
 	
 	}

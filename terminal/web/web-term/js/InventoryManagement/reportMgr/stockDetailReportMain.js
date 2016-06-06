@@ -277,14 +277,15 @@ Ext.onReady(function(){
 	         new Ext.grid.RowNumberer(),
 //	         {header:'id', dataIndex:'id', hidden: true },
 	         {header:'日期', dataIndex:'date'},
-	         {header:'单号', dataIndex:'oriStockId'},
+	         {header:'库单号', dataIndex:'stockActionId', align : 'center'},
+	         {header:'原始单号', dataIndex:'oriStockId'},
 	         {header:'货品名称', dataIndex:'materialName', width:160},
 	         {header:'供应商', dataIndex:'supplier'},
 	         {header:'出库部门', dataIndex:'deptOut'},
 	         {header: '入库部门', dataIndex : 'deptIn'},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
 	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
-	         {header:'金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
+	         {header:'入库金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
 	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
 	         {header:'出库数量', dataIndex:'stockOutAmount', align : 'right', renderer : renderFormat},
 	         {header:'出库金额', dataIndex:'stockOutMoney', align : 'right', renderer : renderFormat},
@@ -299,6 +300,7 @@ Ext.onReady(function(){
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},                                                                         
 	         {name : 'date'},
+	         {name : 'stockActionId'},
 	         {name : 'oriStockId'},
 	         {name : 'supplier'},
 	         {name : 'materialName'},
@@ -679,8 +681,9 @@ Ext.onReady(function(){
 			stockDetailReportGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 			stockDetailReportGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			stockDetailReportGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-			stockDetailReportGrid.getView().getCell(store.getCount()-1, 10).innerHTML = '--';
-			stockDetailReportGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 11).innerHTML = '--';
+			stockDetailReportGrid.getView().getCell(store.getCount()-1, 15).innerHTML = '--';
 		}
 		
 	});	

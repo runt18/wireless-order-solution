@@ -5,7 +5,7 @@ import com.wireless.json.Jsonable;
 
 public class Supplier implements Jsonable{
 
-	private int supplierId;
+	private int id;
 	private int restaurantId;
 	private String name;
 	private String tele;
@@ -13,13 +13,37 @@ public class Supplier implements Jsonable{
 	private String contact;
 	private String comment;
 	
+	public Supplier(){}
+	
+	public Supplier(int supplierId){
+		this.id = supplierId;
+	}
+	
+	public Supplier(InsertBuilder builder){
+		this.restaurantId = builder.getRestaurantId();
+		this.name = builder.getName();
+		this.tele = builder.getTele();
+		this.addr = builder.getAddr();
+		this.contact = builder.getContact();
+		this.comment = builder.getComment();
+	}
+	
+	public Supplier(UpdateBuilder builder){
+		this.id = builder.getId();
+		this.restaurantId = builder.getRestaurantId();
+		this.name = builder.getName();
+		this.tele = builder.getTele();
+		this.addr = builder.getAddr();
+		this.contact = builder.getContact();
+		this.comment = builder.getComment();
+	}
 	
 	public int getId() {
-		return supplierId;
+		return id;
 	}
 
-	public void setSupplierid(int supplierid) {
-		this.supplierId = supplierid;
+	public void setId(int supplierid) {
+		this.id = supplierid;
 	}
 
 	public int getRestaurantId() {
@@ -84,23 +108,174 @@ public class Supplier implements Jsonable{
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+	
+	public static class InsertBuilder{
+		private int restaurantId;
+		private String name;
+		private String tele;
+		private String addr;
+		private String contact;
+		private String comment;
+		
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+		
+		public InsertBuilder setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public InsertBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public String getTele() {
+			return tele;
+		}
+		
+		public InsertBuilder setTele(String tele) {
+			this.tele = tele;
+			return this;
+		}
+		
+		public String getAddr() {
+			return addr;
+		}
+		
+		public InsertBuilder setAddr(String addr) {
+			this.addr = addr;
+			return this;
+		}
+		
+		public String getContact() {
+			return contact;
+		}
+		
+		public InsertBuilder setContact(String contact) {
+			this.contact = contact;
+			return this;
+		}
+		
+		public String getComment() {
+			return comment;
+		}
+		
+		public InsertBuilder setComment(String comment) {
+			this.comment = comment;
+			return this;
+		}
+		
+		public Supplier build(){
+			return new Supplier(this);
+		}
+	}
+	
+	
+	public static class UpdateBuilder{
+		private int id;
+		private int restaurantId;
+		private String name;
+		private String tele;
+		private String addr;
+		private String contact;
+		private String comment;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public int getId() {
+			return id;
+		}
+		
+		public UpdateBuilder setId(int id) {
+			this.id = id;
+			return this;
+		}
+		
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+		
+		public UpdateBuilder setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public UpdateBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+		
+		public String getTele() {
+			return tele;
+		}
+		
+		public UpdateBuilder setTele(String tele) {
+			this.tele = tele;
+			return this;
+		}
+		
+		public String getAddr() {
+			return addr;
+		}
+		
+		public UpdateBuilder setAddr(String addr) {
+			this.addr = addr;
+			return this;
+		}
+		
+		public String getContact() {
+			return contact;
+		}
+		public UpdateBuilder setContact(String contact) {
+			this.contact = contact;
+			return this;
+		}
+		
+		public String getComment() {
+			return comment;
+		}
+		
+		public UpdateBuilder setComment(String comment) {
+			this.comment = comment;
+			return this;
+		}
+		
+		public Supplier build(){
+			return new Supplier(this);
+		}
+		
+	}
+	
+	
 	@Override
 	public int hashCode(){
-		return supplierId * 31 + 17;
+		return id * 31 + 17;
 	}
 	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Supplier)){
 			return false;
 		}else{
-			return supplierId == ((Supplier)obj).supplierId && restaurantId == ((Supplier)obj).restaurantId;
+			return id == ((Supplier)obj).id && restaurantId == ((Supplier)obj).restaurantId;
 		}
 		
 	}
 	@Override
 	public String toString(){
 		return "supplier(" +
-				"supplier_id = " + supplierId +
+				"supplier_id = " + id +
 				", restaurant_id = " + restaurantId +
 				", name = " + getName() +
 				", tele = " + getTele() +
@@ -109,43 +284,11 @@ public class Supplier implements Jsonable{
 				", comment = " + getComment() + ")";
 		
 	}
-	public Supplier(){}
 	
-	public Supplier(int supplierId){
-		this.supplierId = supplierId;
-	}
-	
-	public Supplier(String name, String tele, String addr, String contact, String comment){
-		this.name = name;
-		this.tele = tele;
-		this.addr = addr;
-		this.comment = comment;
-		this.contact = contact;
-	}
-	
-	public Supplier(int restaurantId, String name, String tele, String addr, String contact, String comment){
-		this.restaurantId = restaurantId;
-		this.name = name;
-		this.tele = tele;
-		this.addr = addr;
-		this.comment = comment;
-		this.contact = contact;
-	}
-	
-	public Supplier(int supplierId, int restaurantId, String name, String tele, String addr, String contact, String comment){
-		this.supplierId = supplierId;
-		this.restaurantId = restaurantId;
-		this.name = name;
-		this.tele = tele;
-		this.addr = addr;
-		this.comment = comment;
-		this.contact = contact;
-	}
-
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putInt("supplierID", this.supplierId);
+		jm.putInt("supplierID", this.id);
 		jm.putInt("restaurantId", this.restaurantId);
 		jm.putString("name", this.name);
 		jm.putString("tele", this.tele);

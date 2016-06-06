@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/SupplierStockStatistics"
+			type="com.wireless.Actions.inventoryMgr.supplierStock.SupplierStockStatisticsAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/DownLoadQrcode" type="com.wireless.Actions.downloadQrcode.DownLoadQrcodeAction"
 			scope="request" parameter="dataSource">
 		</action>

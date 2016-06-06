@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
-import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
@@ -22,52 +21,42 @@ public class QuerySupplierAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		
-		JObject jobject = new JObject();
+		String pin = (String)request.getAttribute("pin");
+		if(request.getSession().getAttribute("pin") != null){
+			pin = (String)request.getAttribute("pin");
+		}
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
+		final String name = request.getParameter("name");
+		final String op = request.getParameter("op");
+		final String tele = request.getParameter("tele");
+		final String contact = request.getParameter("contact");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		JObject jObject = new JObject();
 		try{
-			//String pin = (String)request.getAttribute("pin");
 
-			String pin = null;
-			if(request.getSession().getAttribute("pin") != null){
-				pin = (String)request.getAttribute("pin");
-			}
-			
-			String start = request.getParameter("start");
-			String limit = request.getParameter("limit");
-			String name = request.getParameter("name");
-			String op = request.getParameter("op");
-			String tele = request.getParameter("tele");
-			String contact = request.getParameter("contact");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String extraCond = "";
+			SupplierDao.ExtraCond extraCond = new SupplierDao.ExtraCond();
 			if(start !=  null && limit != null){
 				if(op != null && op.equals("e")){
-					extraCond = " AND name LIKE '%" + (name != null ? name : " ") + 
-							"%' AND tele LIKE '%" + (tele != null ? tele : "") + 
-							"%' AND contact LIKE '%" + (contact != null ? contact : "") + "%'" +
-							"ORDER BY " +
-							"supplier_id LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit) + "";
-				}else{
-					extraCond = "ORDER BY " +
-							"supplier_id LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit) + "";
+					extraCond.setContact(contact);
+					extraCond.setName(name);
+					extraCond.setTelePhone(tele);
 				}
+				extraCond.setLimit(Integer.parseInt(start), Integer.parseInt(limit));
 										
 			}
-			int roots = SupplierDao.getSupplierCount(staff, extraCond);
+			int roots = SupplierDao.getSupplierCount(staff, extraCond, " ORDER BY supplier_id ");
 			
-			List<Supplier> root = SupplierDao.getSuppliers(staff, extraCond, null);
+			List<Supplier> root = SupplierDao.getByCond(staff, extraCond, " ORDER BY supplier_id ");
 			
-		    jobject.setTotalProperty(roots);
-		    jobject.setRoot(root);
+		    jObject.setTotalProperty(roots);
+		    jObject.setRoot(root);
 		    
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
-
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip4Exception(e);
+			jObject.initTip4Exception(e);
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

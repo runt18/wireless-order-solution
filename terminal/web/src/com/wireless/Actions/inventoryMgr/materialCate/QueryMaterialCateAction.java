@@ -45,7 +45,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 			MaterialCateDao.ExtraCond extraCond = new MaterialCateDao.ExtraCond();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(type != null && !type.isEmpty()){
+			if(type != null && !type.isEmpty() && Integer.parseInt(type) > 0){
 				extraCond.setType(MaterialCate.Type.valueOf(Integer.valueOf(type)));
 			}
 

@@ -18,6 +18,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.pojo.supplierMgr.Supplier;
 
 public class StockReportDao {
 	
@@ -27,9 +28,21 @@ public class StockReportDao {
 		private int materialId;
 		private int materialCateId;
 		private MaterialCate.Type materialCateType;
+		private int supplierId;
+		
 		
 		public ExtraCond setMaterialCateType(MaterialCate.Type type){
 			this.materialCateType = type;
+			return this;
+		}
+		
+		public ExtraCond setSupplier(Supplier supplier){
+			this.supplierId = supplier.getId();
+			return this;
+		}
+		
+		public ExtraCond setSupplier(int supplierId){
+			this.supplierId = supplierId;
 			return this;
 		}
 		
@@ -37,6 +50,7 @@ public class StockReportDao {
 			this.materialCateId = materialCateId;
 			return this;
 		}
+		
 		
 		public ExtraCond setRange(String yyyymm) throws ParseException{
 			Calendar c = Calendar.getInstance();
@@ -78,6 +92,9 @@ public class StockReportDao {
 			}
 			if(materialCateType != null){
 				extraCond.append(" AND MC.type = " + materialCateType.getValue());
+			}
+			if(supplierId != 0){
+				extraCond.append(" AND S.supplier_id = " + supplierId);
 			}
 			return extraCond.toString();
 		}
@@ -121,11 +138,13 @@ public class StockReportDao {
 			  " ,MAX(M.price) AS material_price " +
 			  //" ,MAX(IFNULL(COST.cost, M.price)) AS material_price " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount, 0)) AS stock_in " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount * D.price, 0)) AS stock_in_money " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_in = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_in_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_out = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_out_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.SPILL.getVal() + " , D.amount, 0)) AS stock_spill " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.MORE.getVal() + " , D.amount, 0)) AS stock_take_more " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount, 0)) AS stock_out " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount * D.price, 0)) AS stock_out_money " +
 			  //" ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT_TRANSFER.getVal() + " , D.amount, 0)) AS stock_out_transfer " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.DAMAGE.getVal() + " , D.amount, 0)) AS stock_damage " +
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.LESS.getVal() + " , D.amount, 0)) AS stock_take_less " +
@@ -158,6 +177,8 @@ public class StockReportDao {
 			
 			//入库采购
 			report.setStockIn(dbCon.rs.getFloat("stock_in"));
+			//入库采购金额
+			report.setStockInMoney(dbCon.rs.getFloat("stock_in_money"));
 			//入库调拨
 			report.setStockInTransfer(dbCon.rs.getFloat("stock_in_transfer"));
 			//入库报溢
@@ -166,6 +187,8 @@ public class StockReportDao {
 			report.setStockTakeMore(dbCon.rs.getFloat("stock_take_more"));
 			//出库退货
 			report.setStockOut(dbCon.rs.getFloat("stock_out"));
+			//出库退货金额
+			report.setStockOutMoney(dbCon.rs.getFloat("stock_out_money"));
 			//出库调拨
 			report.setStockOutTransfer(dbCon.rs.getFloat("stock_out_transfer"));
 			//出库报损
@@ -346,6 +369,96 @@ public class StockReportDao {
 			}
 		}
 		
+		return result;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * get StockReport by extraCond in range
+	 * @param dbCon
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 * @throws Exception
+	 */
+	public static List<StockReport> getRangeStockByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException, Exception{
+		String sql;
+		
+		sql = " SELECT D.material_id, MAX(D.name) AS material_name " + 
+			  " ,MAX(M.price) AS material_price " +
+			  //" ,MAX(IFNULL(COST.cost, M.price)) AS material_price " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount, 0)) AS stock_in " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " OR S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount * D.price, 0)) AS stock_in_money " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_in = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_in_transfer " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_out = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_out_transfer " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.SPILL.getVal() + " , D.amount, 0)) AS stock_spill " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.MORE.getVal() + " , D.amount, 0)) AS stock_take_more " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount, 0)) AS stock_out " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount * D.price, 0)) AS stock_out_money " +
+			  //" ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT_TRANSFER.getVal() + " , D.amount, 0)) AS stock_out_transfer " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.DAMAGE.getVal() + " , D.amount, 0)) AS stock_damage " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.LESS.getVal() + " , D.amount, 0)) AS stock_take_less " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount, 0)) AS stock_consumption " +
+			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount * D.price, 0)) AS stock_consume_price " +
+			  " FROM " + Params.dbName + ".stock_action_detail D " +
+			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
+			  " JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
+ 			  " JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
+			  //" LEFT JOIN " + Params.dbName + ".monthly_cost COST ON M.material_id = COST.material_id " +
+			  //" LEFT JOIN " + Params.dbName + ".monthly_balance MB ON MB.id = COST.monthly_balance_id " +
+			  " WHERE 1 = 1 " +
+			  //( monthlyBalanceId > 0 ? " AND MB.id = " + monthlyBalanceId : "") +
+//			  " AND MB.month BETWEEN '" + extraCond.range.getOpeningFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" +
+			  " AND S.restaurant_id = " + staff.getRestaurantId() +
+			  " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ")" +
+			  (extraCond != null ? extraCond.toString() : "") +
+			  " GROUP BY D.material_id ";
+		
+		final List<StockReport> result = new ArrayList<>();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			
+			Material material = new Material(dbCon.rs.getInt("material_id"));
+			material.setName(dbCon.rs.getString("material_name"));
+			
+			StockReport report = new StockReport();
+			report.setMaterial(material);
+			report.setFinalPrice(dbCon.rs.getFloat("material_price"));
+			
+			//入库采购
+			report.setStockIn(dbCon.rs.getFloat("stock_in"));
+			//入库采购金额
+			report.setStockInMoney(dbCon.rs.getFloat("stock_in_money"));
+			//入库调拨
+			report.setStockInTransfer(dbCon.rs.getFloat("stock_in_transfer"));
+			//入库报溢
+			report.setStockSpill(dbCon.rs.getFloat("stock_spill"));
+			//入库盘盈
+			report.setStockTakeMore(dbCon.rs.getFloat("stock_take_more"));
+			//出库退货
+			report.setStockOut(dbCon.rs.getFloat("stock_out"));
+			//出库退货金额
+			report.setStockOutMoney(dbCon.rs.getFloat("stock_out_money"));
+			//出库调拨
+			report.setStockOutTransfer(dbCon.rs.getFloat("stock_out_transfer"));
+			//出库报损
+			report.setStockDamage(dbCon.rs.getFloat("stock_damage"));
+			//出库盘亏
+			report.setStockTakeLess(dbCon.rs.getFloat("stock_take_less"));
+			//出库消耗
+			report.setConsumption(dbCon.rs.getFloat("stock_consumption"));
+			//销售金额
+			report.setComsumeMoney(dbCon.rs.getFloat("stock_consume_price"));
+			
+			result.add(report);
+			
+		}
+		dbCon.rs.close();
 		return result;
 	}
 	
