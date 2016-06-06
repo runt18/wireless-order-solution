@@ -29,7 +29,12 @@ public class UpdateSupplierAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Supplier supplier = new Supplier(Integer.valueOf(supplierId), staff.getRestaurantId(), name, tele, addr, contact, comment);
+			Supplier.UpdateBuilder supplier = new Supplier.UpdateBuilder(Integer.valueOf(supplierId)).setRestaurantId(staff.getRestaurantId());
+//			, staff.getRestaurantId(), name, tele, addr, contact, comment
+			
+			if(name != null){
+				supplier.setName(name);
+			}
 			
 			if(tele != null){
 				supplier.setTele(tele);

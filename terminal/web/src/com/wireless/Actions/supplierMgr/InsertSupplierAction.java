@@ -29,9 +29,9 @@ public class InsertSupplierAction extends Action {
 			String contact = request.getParameter("contact");
 			String comment = request.getParameter("comment");
 			
-			Supplier supplier = new Supplier();
+			Supplier.InsertBuilder supplier = new Supplier.InsertBuilder();
 			
-			supplier.setRestaurantid(staff.getRestaurantId());
+			supplier.setRestaurantId(staff.getRestaurantId());
 			
 			supplier.setName(supplierName);
 			
