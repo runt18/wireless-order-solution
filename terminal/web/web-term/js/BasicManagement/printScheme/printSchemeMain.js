@@ -193,7 +193,7 @@ function init(){
 		closable : false,
 		resizable : true,
 		modal : true,
-		width : 700,
+		width : 800,
 		height : 700,
 		listeners : {
 			show : function(thiz){
@@ -479,7 +479,7 @@ function init(){
 				id : 'printerType',
 				frame : true,
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -641,7 +641,7 @@ function init(){
 				frame : true,
 				id : 'weixinPrinterType',
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -715,7 +715,7 @@ function init(){
 				id : 'depts',
 				frame : true,
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -760,7 +760,7 @@ function init(){
 				id : 'regions',
 				frame : true,
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
