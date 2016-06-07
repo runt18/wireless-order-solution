@@ -2082,13 +2082,6 @@ function resetbBasicOperation(_d){
 	
 	var status = typeof(data.status) == 'undefined' ? 0 : parseInt(data.status);
 	
-	var SPLIT = 1 << 10;
-	if((status & SPLIT) != 0){
-		Ext.getDom('split_checkbox_menu').checked = false;
-	}else{
-		Ext.getDom('split_checkbox_menu').checked = true;
-	}
-	
 	foodName.setValue(data.name);
 	if(data.alias > 0){
 		document.getElementById('chbForFoodAlias').checked = true;
@@ -2109,6 +2102,7 @@ function resetbBasicOperation(_d){
 	isWeight.setValue(Ext.ux.cfs.isWeigh(status));
 	isCommission.setValue(Ext.ux.cfs.isCommission(status));
 	isLimit.setValue(Ext.ux.cfs.isLimit(status));
+	Ext.getCmp('split_checkbox_menu').setValue(!Ext.ux.cfs.isSplit(status));
 	
 	if(Ext.ux.cfs.isCommission(status)){
 		isCommission.fireEvent('check', isCommission, true);
@@ -2334,6 +2328,7 @@ function basicOperationBasicHandler(c){
 								var isHotValue = isHot.getValue();
 								var isWeightValue = isWeight.getValue();
 								var isCommissionValue = isCommission.getValue();
+								
 								//重置信息
 								resetbBasicOperation();
 								
@@ -2345,6 +2340,8 @@ function basicOperationBasicHandler(c){
 								isHot.setValue(isHotValue);
 								isWeight.setValue(isWeightValue);
 								isCommission.setValue(isCommissionValue);
+								Ext.getCmp('split_checkbox_menu').setValue(split);
+								
 								
 								if(document.getElementById('chbForFoodAlias').checked){
 									foodAliasID.setValue(parseInt(faid+1));
