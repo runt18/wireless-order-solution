@@ -31,7 +31,7 @@ function loadInformation(){
 					var c = {items : [{xtype : "checkbox", name : "dept",boxLabel : formatName(d.name) , hideLabel : true, inputValue :  d.id }]};
 					
 					Ext.getCmp('allDept').add(c);
-					if((i+1)%4 == 0){
+					if((i+1)%5 == 0){
 						Ext.getCmp('allDept').add({columnWidth : 1});
 					}
 					Ext.getCmp('allDept').doLayout();
@@ -65,7 +65,7 @@ function loadInformation(){
 					var c = {items : [{xtype : "checkbox", name : "region", boxLabel : formatName(r.name) , hideLabel : true, inputValue :  r.id }]};
 	
 					Ext.getCmp('allRegion').add(c);
-					if((i+1)%4 == 0){
+					if((i+1)%5 == 0){
 						Ext.getCmp('allRegion').add({columnWidth : 1});
 					}
 					Ext.getCmp('allRegion').doLayout();
@@ -750,7 +750,7 @@ function init(){
 					layout : 'column',
 					id : 'allDept',
 					defaults : {
-						columnWidth : .25,
+						columnWidth : .2,
 						layout : 'form',
 						labelWidth : 70
 					}
@@ -795,7 +795,7 @@ function init(){
 					layout : 'column',
 					id : 'allRegion',
 					defaults : {
-						columnWidth : .25,
+						columnWidth : .2,
 						layout : 'form',
 						labelWidth : 70
 					}
