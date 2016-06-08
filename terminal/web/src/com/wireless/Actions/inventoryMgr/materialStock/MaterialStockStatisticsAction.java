@@ -65,8 +65,40 @@ public class MaterialStockStatisticsAction extends Action{
 				}
 			}
 			
+			StockReport sum = new StockReport();
+			for(StockReport stockReport : stockReports){
+				//入库采购
+				sum.setStockIn(sum.getStockIn() + stockReport.getStockIn());
+				//入库采购金额
+				sum.setStockInMoney(sum.getStockInMoney() + stockReport.getStockInMoney());
+				//入库调拨
+				sum.setStockInTransfer(sum.getStockInTransfer() + stockReport.getStockInTransfer());
+				//入库报溢
+				sum.setStockSpill(sum.getStockSpill() + stockReport.getStockSpill());
+				//入库盘盈
+				sum.setStockTakeMore(sum.getStockTakeMore() + stockReport.getStockTakeMore());
+				//出库退货
+				sum.setStockOut(sum.getStockOut() + stockReport.getStockOut());
+				//出库退货金额
+				sum.setStockOutMoney(sum.getStockOutMoney() + stockReport.getStockOutMoney());
+				//出库调拨
+				sum.setStockOutTransfer(sum.getStockOutTransfer() + stockReport.getStockOutTransfer());
+				//出库报损
+				sum.setStockDamage(sum.getStockDamage() + stockReport.getStockDamage());
+				//出库盘亏
+				sum.setStockTakeLess(sum.getStockTakeLess() + stockReport.getStockTakeLess());
+				//出库消耗
+				sum.setConsumption(sum.getExpectConsumption() + stockReport.getExpectConsumption());
+				//销售金额
+				sum.setComsumeMoney(sum.getComsumeMoney() + stockReport.getComsumeMoney());
+			}
+			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, start, limit);
+			}
+			
+			if(stockReports.size() > 0){
+				result.add(sum);
 			}
 			
 			jObject.setRoot(result);

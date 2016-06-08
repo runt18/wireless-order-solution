@@ -276,18 +276,24 @@ Ext.onReady(function(){
 					dataIndex : 'stockIn'
 				},{
 					header : '采购金额',
-					dataIndex : 'stockInMoney'
+					dataIndex : 'stockInMoney',
+					renderer : function(data){
+						return data.toFixed(2);
+					}
 				},{
 					header : '退货数量',
 					dataIndex : 'stockOut'
 				},{
 					header : '退货金额',
-					dataIndex : 'stockOutMoney'
+					dataIndex : 'stockOutMoney',
+					renderer : function(data){
+						return data.toFixed(2);
+					}
 				},{
 					header : '合计金额',
 					dataIndex : 'totalMoney',
 					renderer : function(data, colCls, store){
-						return store.data.stockInMoney - store.data.stockOutMoney;
+						return (store.data.stockInMoney - store.data.stockOutMoney).toFixed(2);
 					}					
 				},{
 					header : '操作',
@@ -333,10 +339,10 @@ Ext.onReady(function(){
 		var materialId = selectCol.json.materialId;
 		Ext.ux.addTab('stockDetail', '进销存明细', 'InventoryManagement_Module/StockDetailReport.html', function(){
 			var store = Ext.getCmp('stock_detail_grid').getStore();
-			Ext.getCmp('materialType').setValue(cateType);
-			Ext.getCmp('materialCate').setValue(cateId == -1 ? '' : cateId);
-			Ext.getCmp('materialId_stockDetail').setValue(materialId == -1 ? '' : materialId);
-			Ext.getCmp('comboSearchSupplierForDetail').setValue(supplierId);
+//			Ext.getCmp('materialType').setValue(cateType);
+//			Ext.getCmp('materialCate').setValue(cateId == -1 ? '' : cateId);
+//			Ext.getCmp('materialId_stockDetail').setValue(materialId == -1 ? '' : materialId);
+//			Ext.getCmp('comboSearchSupplierForDetail').setValue(supplierId);
 			store.baseParams['beginDate'] = dateBegin;
 			store.baseParams['endDate'] = dateEnd;
 			store.baseParams['materialId'] = (materialId == -1 ? '' : materialId);
@@ -392,6 +398,27 @@ Ext.onReady(function(){
 		items : [stockInPanel]
 		
 	});
+	
+	//汇总
+	stockInPanel.getStore().on('load', function(store, records, options){
+		var sumRow = null;
+		if(store.getCount() > 0){
+
+			sumRow = stockInPanel.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < stockInPanel.getColumnModel().getColumnCount(); i++){
+				var sumCell = stockInPanel.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
+			}
+			
+			
+			stockInPanel.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			stockInPanel.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+		}
+		
+	});	
 	
 	dateCombo.setValue('1');
 	dateCombo.fireEvent('select', dateCombo, null, 1);

@@ -200,16 +200,25 @@ Ext.onReady(function(){
 					dataIndex : 'stockInAmount'
 				},{
 					header : '采购金额',
-					dataIndex : 'stockInMoney'
+					dataIndex : 'stockInMoney',
+					renderer : function(data){
+						return data.toFixed(2);
+					}
 				},{
 					header : '退货次数',
 					dataIndex : 'stockOutAmount'
 				},{
 					header : '退货金额',
-					dataIndex : 'stockOutMoney'
+					dataIndex : 'stockOutMoney',
+					renderer : function(data){
+						return data.toFixed(2);
+					}
 				},{
 					header : '合计金额',
-					dataIndex : 'totalMoney'
+					dataIndex : 'totalMoney',
+					renderer : function(data){
+						return data.toFixed(2);
+					}
 				},{
 					header : '操作',
 					dataIndex : 'descration',
@@ -255,31 +264,6 @@ Ext.onReady(function(){
 	
 	
 	function jumpToStockAction(){
-//		var selectCol = Ext.getCmp('supplierStockPanel_gridPanel_SupplierStock').getSelectionModel().getSelected();
-//		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_SupplierStockIn').getValue(), 'Y-m-d');
-//		var dateEnd = Ext.util.Format.date(Ext.getCmp('beginEnd_combo_SupplierStockIn').getValue(), 'Y-m-d');
-//		var supplierId = suppliserCombo.getValue();
-//		var cateType = cateTypeCombo.getValue();
-//		var cateId = cateIdCombo.getValue();
-//		var supplierId = selectCol.json.supplier.supplierID;
-//		Ext.ux.addTab('stockActionMgrMain', '出入库任务', 'InventoryManagement_Module/StockActionManagement.html', function(){
-//			Ext.getCmp('sam_comboSearchForSupplier').setValue(supplierId);
-//			Ext.getCmp('sam_comboSearchForCateType').setValue(cateType);
-//			var stockActionStore = Ext.getCmp('stockBasicGrid').getStore();
-//			stockActionStore.baseParams['isHistory'] = true;
-//			stockActionStore.baseParams['isAll'] = true;
-//			stockActionStore.baseParams['beginDate'] = dateBegin;
-//			stockActionStore.baseParams['endDate'] = dateEnd;
-//			stockActionStore.baseParams['cateId'] = cateId;
-//			Ext.getCmp('btnSearchForStockBasicMsg').handler();
-//			stockActionStore.on('load', function(){
-//				stockActionStore.baseParams['beginDate'] = '';
-//				stockActionStore.baseParams['endDate'] = '';	
-//				stockActionStore.baseParams['isHistory'] = '';
-//				stockActionStore.baseParams['isAll'] = '';
-//				stockActionStore.baseParams['cateId'] = '';
-//			});
-//		});
 		
 		var selectCol = Ext.getCmp('supplierStockPanel_gridPanel_SupplierStock').getSelectionModel().getSelected();
 		var dateBegin = Ext.util.Format.date(Ext.getCmp('beginDate_combo_SupplierStockIn').getValue(), 'Y-m-d');
@@ -336,22 +320,21 @@ Ext.onReady(function(){
 	});
 	
 	
-//	store.on('load', function(){
-//		if(store.getCount() > 0){
-//			var sumRow = stockInPanel.getView().getRow(store.getCount() - 1);
-//			sumRow.style.backgroundColor = '#EEEEEE';
-//			for(var i = 0; i < stockInPanel.getColumnModel().getColumnCount(); i++){
-//				var sumCell = stockInPanel.getView().getCell(store.getCount() - 1, i);
-//				sumCell.style.fontSize = '15px';
-//				sumCell.style.fontWeight = 'bold';
-//				sumCell.style.color = 'green';
-//			}
-//			
-//			stockInPanel.getView().getCell(store.getCount() - 1 , 1).innerHTML = '汇总';
-//			stockInPanel.getView().getCell(store.getCount() - 1, 2).innerHTML = '--';
-//			stockInPanel.getView().getCell(store.getCount() - 1, 5).innerHTML = '--';
-//		}
-//	});
+	store.on('load', function(){
+		if(store.getCount() > 0){
+			var sumRow = stockInPanel.getView().getRow(store.getCount() - 1);
+			sumRow.style.backgroundColor = '#EEEEEE';
+			for(var i = 0; i < stockInPanel.getColumnModel().getColumnCount(); i++){
+				var sumCell = stockInPanel.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
+			}
+			
+			stockInPanel.getView().getCell(store.getCount() - 1 , 1).innerHTML = '汇总';
+			stockInPanel.getView().getCell(store.getCount() - 1, 7).innerHTML = '--';
+		}
+	});
 	
 	new Ext.Panel({
 		title : '供应商采购统计',

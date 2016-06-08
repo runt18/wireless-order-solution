@@ -1,5 +1,7 @@
 package com.wireless.Actions.inventoryMgr.supplierStock;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +15,9 @@ import com.wireless.db.stockMgr.SupplierStockDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate.Type;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.stockMgr.SupplierStock;
+import com.wireless.pojo.supplierMgr.Supplier;
+import com.wireless.util.DataPaging;
 
 public class SupplierStockStatisticsAction extends Action{
 	
@@ -23,6 +28,8 @@ public class SupplierStockStatisticsAction extends Action{
 		final String cateType = request.getParameter("cateType");
 		final String cateId = request.getParameter("cateId");
 		final String pin = (String)request.getAttribute("pin");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit"); 
 		final JObject jObject = new JObject();
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -44,12 +51,39 @@ public class SupplierStockStatisticsAction extends Action{
 				extraCond.setCate(Integer.parseInt(cateId));
 			}
 			
-			jObject.setRoot(SupplierStockDao.getByCond(staff, extraCond));
+			List<SupplierStock> result = SupplierStockDao.getByCond(staff, extraCond);
+			SupplierStock sum = new SupplierStock();
+			sum.setSupplier(new Supplier());
+			
+			
+			/**
+			 * 汇总
+			 */
+			for(SupplierStock supplierStock : result){
+				sum.setStockInAmount(sum.getStockInAmount() + supplierStock.getStockInAmount());
+				sum.setStockInMoney(sum.getStockInMoney() + supplierStock.getStockInMoney());
+				sum.setStockOutAmount(sum.getStockOutAmount() + supplierStock.getStockOutAmount());
+				sum.setStockOutMoney(sum.getStockOutMoney() + supplierStock.getStockOutMoney());
+				sum.setTotalMoney(sum.getTotalMoney() + supplierStock.getTotalMoney());
+			}
+			
+			/**
+			 * 分页
+			 */
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				result = DataPaging.getPagingData(result, true, start, limit);
+			}
+			
+			if(result.size() > 0){
+				result.add(sum);
+			}
+			
+			jObject.setRoot(result);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally{
-			response.getWriter().print(jObject.toString());
+			response.getWriter().print(jObject);
 		}
 		
 		return null;
