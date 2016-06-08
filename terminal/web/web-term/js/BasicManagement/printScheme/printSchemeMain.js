@@ -31,7 +31,7 @@ function loadInformation(){
 					var c = {items : [{xtype : "checkbox", name : "dept",boxLabel : formatName(d.name) , hideLabel : true, inputValue :  d.id }]};
 					
 					Ext.getCmp('allDept').add(c);
-					if((i+1)%4 == 0){
+					if((i+1)%5 == 0){
 						Ext.getCmp('allDept').add({columnWidth : 1});
 					}
 					Ext.getCmp('allDept').doLayout();
@@ -65,7 +65,7 @@ function loadInformation(){
 					var c = {items : [{xtype : "checkbox", name : "region", boxLabel : formatName(r.name) , hideLabel : true, inputValue :  r.id }]};
 	
 					Ext.getCmp('allRegion').add(c);
-					if((i+1)%4 == 0){
+					if((i+1)%5 == 0){
 						Ext.getCmp('allRegion').add({columnWidth : 1});
 					}
 					Ext.getCmp('allRegion').doLayout();
@@ -193,7 +193,7 @@ function init(){
 		closable : false,
 		resizable : true,
 		modal : true,
-		width : 700,
+		width : 800,
 		height : 700,
 		listeners : {
 			show : function(thiz){
@@ -479,7 +479,7 @@ function init(){
 				id : 'printerType',
 				frame : true,
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -641,7 +641,7 @@ function init(){
 				frame : true,
 				id : 'weixinPrinterType',
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -715,7 +715,7 @@ function init(){
 				id : 'depts',
 				frame : true,
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -750,7 +750,7 @@ function init(){
 					layout : 'column',
 					id : 'allDept',
 					defaults : {
-						columnWidth : .25,
+						columnWidth : .2,
 						layout : 'form',
 						labelWidth : 70
 					}
@@ -760,7 +760,7 @@ function init(){
 				id : 'regions',
 				frame : true,
 				defaults : {
-					columnWidth : .25,
+					columnWidth : .2,
 					layout : 'form',
 					labelWidth : 70
 				},
@@ -795,7 +795,7 @@ function init(){
 					layout : 'column',
 					id : 'allRegion',
 					defaults : {
-						columnWidth : .25,
+						columnWidth : .2,
 						layout : 'form',
 						labelWidth : 70
 					}

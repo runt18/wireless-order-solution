@@ -99,7 +99,7 @@ function foodRelationWinShow(){
 function operateKitchenHandler(node){
 	var kitchenID = Ext.getCmp('txtKitchenID');
 	var kitchenName = Ext.getCmp('txtKitchenName');
-	var kitchenDept = Ext.getCmp('comboKitchenDept');
+	var kitchenDept = Ext.getCmp('comboKitchenDept');	
 	var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
 	initDeptComboData();
 	
@@ -2039,7 +2039,6 @@ function resetbBasicOperation(_d){
 	var isWeight = Ext.getCmp('chbForBasicWeight');
 	var isCommission = Ext.getCmp('chbForBasicCommission');
 	var isLimit = Ext.getCmp('chbForBasicLimit');
-	
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
@@ -2073,7 +2072,6 @@ function resetbBasicOperation(_d){
 		}
 	}
 	
-	
 	if(data.printKitchenId){
 		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').setValue(true);
 		Ext.getCmp('restaurant_checkbox_menuMgrMain').setValue(data.printKitchenId);
@@ -2094,7 +2092,6 @@ function resetbBasicOperation(_d){
 	}
 	foodPinyin.setValue(data.pinyin);
 	foodPrice.setValue(data.unitPrice);
-	
 	foodDesc.setValue(data.desc);
 	isSpecial.setValue(Ext.ux.cfs.isSpecial(status));
 	isRecommend.setValue(Ext.ux.cfs.isRecommend(status));
@@ -2105,6 +2102,7 @@ function resetbBasicOperation(_d){
 	isWeight.setValue(Ext.ux.cfs.isWeigh(status));
 	isCommission.setValue(Ext.ux.cfs.isCommission(status));
 	isLimit.setValue(Ext.ux.cfs.isLimit(status));
+	Ext.getCmp('split_checkbox_menu').setValue(!Ext.ux.cfs.isSplit(status));
 	
 	if(Ext.ux.cfs.isCommission(status)){
 		isCommission.fireEvent('check', isCommission, true);
@@ -2194,6 +2192,13 @@ function basicOperationBasicHandler(c){
 	var isWeight = Ext.getCmp('chbForBasicWeight');
 	var isCommission = Ext.getCmp('chbForBasicCommission');
 	var isLimit = Ext.getCmp('chbForBasicLimit');
+	var split;
+	if(Ext.getCmp('split_checkbox_menu').checked){
+		split = false;
+	}else{
+		split = true;
+	}
+	
 	
 	var commission = Ext.getCmp('numCommission');
 	var limitCount = Ext.getCmp('numLimitCount');
@@ -2295,7 +2300,9 @@ function basicOperationBasicHandler(c){
 			comboContent : comboContent,
 			foodImage : foodOperationWin.foodImage,
 			multiFoodPrices : multiFoodPrices,
-			printKitchenId : printKitchenId
+			printKitchenId : printKitchenId,
+			split : split
+			//TODO split
 		},
 		success : function(res, opt){
 			var jr = Ext.util.JSON.decode(res.responseText);
@@ -2321,6 +2328,7 @@ function basicOperationBasicHandler(c){
 								var isHotValue = isHot.getValue();
 								var isWeightValue = isWeight.getValue();
 								var isCommissionValue = isCommission.getValue();
+								
 								//重置信息
 								resetbBasicOperation();
 								
@@ -2332,6 +2340,8 @@ function basicOperationBasicHandler(c){
 								isHot.setValue(isHotValue);
 								isWeight.setValue(isWeightValue);
 								isCommission.setValue(isCommissionValue);
+								Ext.getCmp('split_checkbox_menu').setValue(split);
+								
 								
 								if(document.getElementById('chbForFoodAlias').checked){
 									foodAliasID.setValue(parseInt(faid+1));
@@ -3247,6 +3257,11 @@ function initFoodOperationWin(){
 		    		Ext.getCmp('btnNextFood').setDisabled(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasNext());
 		    	}
 		    }, '->', {
+				xtype : 'checkbox',
+				id : 'split_checkbox_menu',
+				checked : false,
+				boxLabel : '数量叠加'
+			}, {
 		    	xtype : 'button',
 		    	text : '添加',
 		    	id : 'btnAddForOW',

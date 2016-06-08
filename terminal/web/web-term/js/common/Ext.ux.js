@@ -1100,7 +1100,8 @@ Ext.ux.checkFoodStatus = {
 	isHot : function(s){ return (s & 1 << 6) != 0; },
 	isWeigh : function(s){ return (s & 1 << 7) != 0; },
 	isCommission : function(s){ return (s & 1 << 8) != 0; },
-	isLimit : function(s){ return (s & 1 << 10) != 0; }
+	isLimit : function(s){ return (s & 1 << 10) != 0; },
+	isSplit : function(s){ return (s & 1 << 11) != 0; }
 };
 Ext.ux.cfs = Ext.ux.checkFoodStatus;
 
