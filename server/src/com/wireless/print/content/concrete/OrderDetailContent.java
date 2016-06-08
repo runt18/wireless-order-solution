@@ -76,6 +76,7 @@ public class OrderDetailContent extends ConcreteContent {
 				
 			}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 				if(mOrder.isUnpaid()){
+					//mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, new String(new char[]{0x1B, 0x72, 0x49}) + makeTitle("!!!退菜分单!!!-" + tblName));
 					mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!退菜分单!!!-" + tblName));
 				}else{
 					mPrintTemplate = mPrintTemplate.replace(PVar.TITLE, makeTitle("!!!反结账退菜!!!-" + tblName));
