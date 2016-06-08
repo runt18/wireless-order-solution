@@ -1,5 +1,8 @@
 Ext.onReady(function(){
-	var hours;
+	var subTyps = {
+		STOCK_IN : {val : 1 , desc : '采购'},
+		STOCK_OUT : {val : 4 , desc : '退货'}
+	}	
 	
 	var dateBegin = new Ext.form.DateField({
 		id : 'beginDate_combo_MaterialStock',
@@ -340,10 +343,12 @@ Ext.onReady(function(){
 			store.baseParams['materialCateId'] = (cateId == -1 ? '' : cateId);
 			store.baseParams['cateType'] = cateType;
 			store.baseParams['supplier'] = supplierId;
+			store.baseParams['subTypes'] = subTyps.STOCK_IN.val + '&' + subTyps.STOCK_OUT.val;
 //			Ext.getCmp('stockDetail_btnSearch').handler();
 			Ext.getCmp('stock_detail_grid').getStore().load();
 			Ext.getCmp('stock_detail_grid').getStore().on('load', function(){
 				store.baseParams['endDate'] = '';
+				store.baseParams['subTypes'] = '';
 			});
 		});
 	}

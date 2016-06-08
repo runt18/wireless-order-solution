@@ -19,7 +19,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.util.DataPaging;
 
-public class MaterialStockStatistics extends Action{
+public class MaterialStockStatisticsAction extends Action{
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)throws Exception{
 		final String pin = (String)request.getAttribute("pin");

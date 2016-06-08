@@ -40,6 +40,7 @@ public class QueryStockDetailReportAction extends Action{
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String endDate = request.getParameter("endDate");
+		final String subTypes = request.getParameter("subTypes");
 		final JObject jObject = new JObject();
 		try{
 
@@ -67,6 +68,13 @@ public class QueryStockDetailReportAction extends Action{
 			
 			if(subType != null && !subType.isEmpty()){
 				extraCond.addSubType(StockAction.SubType.valueOf(Integer.parseInt(subType)));
+			}
+			
+			if(subTypes != null && !subTypes.isEmpty()){
+				String[] subTypeArr = subTypes.split("&");
+				for(String subT : subTypeArr){
+					extraCond.addSubType(StockAction.SubType.valueOf(Integer.valueOf(subT)));
+				}
 			}
 				
 			if(supplier != null && !supplier.isEmpty() && !supplier.equals("-1")){

@@ -8,7 +8,7 @@
 
 	<action-mappings>
 		<action path="/MaterialStockStatistics"
-			type="com.wireless.Actions.inventoryMgr.materialStock.MaterialStockStatistics" scope="request"
+			type="com.wireless.Actions.inventoryMgr.materialStock.MaterialStockStatisticsAction" scope="request"
 			parameter="dataSource">
 		</action>
 		<action path="/SupplierStockStatistics"
