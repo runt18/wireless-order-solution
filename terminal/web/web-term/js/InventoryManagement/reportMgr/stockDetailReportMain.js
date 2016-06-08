@@ -221,7 +221,7 @@ Ext.onReady(function(){
 		width : 100,
 		listWidth : 250,
 		maxheight : 300,
-		id : 'materialId',
+		id : 'materialId_stockDetail',
 		store : sDetail_materialStore,
 		valueField : 'id',
 		displayField : 'name',
@@ -441,7 +441,7 @@ Ext.onReady(function(){
 				store.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m');
 				store.baseParams['deptOut'] = Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getStore().getCount() > 0 ? Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getValue() : '-1';
 				store.baseParams['deptIn'] = Ext.getCmp('stockInDeptComb_comboBox_stockDetailPeport').getValue();
-				store.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+				store.baseParams['materialId'] = Ext.getCmp('materialId_stockDetail').getValue();
 				store.baseParams['materialCateId'] = Ext.getCmp('materialCate').getValue();
 				store.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
 				store.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
@@ -469,7 +469,7 @@ Ext.onReady(function(){
 					Ext.getCmp('sdr_beginDate').getValue().format('Y-m'),
 					Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getValue(),
 					Ext.getCmp('stockInDeptComb_comboBox_stockDetailPeport').getValue(),
-					Ext.getCmp('materialId').getValue(),
+					Ext.getCmp('materialId_stockDetail').getValue(),
 					Ext.getCmp('materialCate').getValue(),
 					Ext.getCmp('materialType').getValue(),
 					Ext.getCmp('sdr_comboSearchForStockType').getValue(),
