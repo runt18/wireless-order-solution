@@ -151,12 +151,12 @@ public class JobContentFactory {
 		}
 	}
 	
-	private void addDetail(PType printType, Staff staff, Printer printer, PrintFunc func, Order order, FoodDetailContent.DetailType detailType, final List<JobContent> jobContents, OrderFood of){
+	private JobContent createDetail(PType printType, Staff staff, Printer printer, PrintFunc func, Order order, FoodDetailContent.DetailType detailType, OrderFood of){
 		if(of.asFood().isCombo()){
 			for(ComboFood childFood : of.asFood().getChildFoods()){
 				if(func.isKitchenAll()){
 					//Add the detail content of this child order food to the job contents.
-					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+					return (new JobContent(printer, func.getRepeat(), printType,
 												   new OrderDetailContent(of, 
 														   				  childFood, 
 														   				  order, 
@@ -173,14 +173,13 @@ public class JobContentFactory {
 						}
 						if(kitchen.getId() == printKitchenId){
 							//Add the detail content of this child order food matched the kitchen to the job contents.
-							jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+							return (new JobContent(printer, func.getRepeat(), printType,
 														   new OrderDetailContent(of, 
 																   				  childFood, 
 																   				  order, 
 																   				  staff.getName(), 
 																   				  printType, 
 																   				  printer.getStyle(), detailType)));
-							break;
 						}
 					}
 				}
@@ -188,7 +187,7 @@ public class JobContentFactory {
 		}else{
 			if(func.isKitchenAll()){
 				//Add the detail content of this order food to the job contents.
-				jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+				return (new JobContent(printer, func.getRepeat(), printType,
 											   new OrderDetailContent(of, 
 													   				  order, 
 													   				  staff.getName(), 
@@ -204,18 +203,19 @@ public class JobContentFactory {
 					}
 					if(kitchen.getId() == printKitchenId){
 						//Add the detail content of this order food matched the kitchen to the job contents.
-						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+						return (new JobContent(printer, func.getRepeat(), printType,
 													   new OrderDetailContent(of, 
 															   				  order, 
 															   				  staff.getName(), 
 															   				  printType, 
 															   				  printer.getStyle(), detailType)));
-						break;
 					}
 				}
 			}
 
 		}
+		
+		return null;
 	}
 	
 	/**
@@ -238,14 +238,31 @@ public class JobContentFactory {
 				for(PrintFunc func : printer.getPrintFuncs()){
 					if(func.isTypeMatched(printType) && func.isRegionMatched(order.getRegion())){
 						for(OrderFood of : order.getOrderFoods()){
-							if(of.asFood().isSplit() && of.getCount() % Float.valueOf(of.getCount()) == 0){
-								int amount = Float.valueOf(of.getCount()).intValue();
-								for(int i = 0; i < amount; i++){
-									of.setCount(1);
-									addDetail(printType, staff, printer, func, order, detailType, jobContents, of);
+							//加菜并且设置了数量不累加时, 菜品分开打印
+							if(of.asFood().isSplit()){
+								final int amount;
+								final float count;
+								//delta不为0时表示是加菜或者退菜，为0时表示是补打
+								if(of.getDelta() != 0){
+									count = Math.abs(of.getDelta());
+									amount = Float.valueOf(count).intValue();
+								}else{
+									count = Math.abs(of.getCount());
+									amount = Float.valueOf(count).intValue();
+								}
+								//只有是小数时才分开打印
+								if(count % amount == 0){
+									OrderFood single = (OrderFood)of.clone();
+									for(int i = 0; i < amount; i++){
+										single.setCount(0);
+										single.addCount(1);
+										jobContents.add(createDetail(printType, staff, printer, func, order, detailType, single));
+									}
+								}else{
+									jobContents.add(createDetail(printType, staff, printer, func, order, detailType, of));
 								}
 							}else{
-								addDetail(printType, staff, printer, func, order, detailType, jobContents, of);
+								jobContents.add(createDetail(printType, staff, printer, func, order, detailType, of));
 							}
 						}
 					}

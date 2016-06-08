@@ -41,10 +41,12 @@ import javax.servlet.http.HttpSession;
 import javax.swing.ImageIcon;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.client.ClientProtocolException;
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.api.Template;
 import org.marker.weixin.api.Template.Keyword;
 import org.marker.weixin.api.Token;
+import org.marker.weixin.api.User;
 import org.marker.weixin.auth.AuthParam;
 import org.marker.weixin.auth.AuthorizerToken;
 import org.marker.weixin.msg.Data4Item;
@@ -632,7 +634,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		}
 	}
 	
-	private void processQrCode(Msg4Event msg) throws SQLException, BusinessException{
+	private void processQrCode(Msg4Event msg) throws SQLException, BusinessException, ClientProtocolException, IOException{
 		
 		QrCodeParam qrParam;
 		if(msg.getEvent() == Event.SUBSCRIBE){
@@ -673,20 +675,21 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			Map<Member, MemberOperation[]> result = MemberDao.chain(staff, new Member.ChainBuilder(subscriber, referrer));
 
 			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
-			String desc = ("通过$(referrer)的推荐，您已成为$(restaurant)的会员，并获得$(recommend_money)的充值赠额和$(recommend_point)的赠送积分。" +
+			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+			final Token token = Token.newInstance(authorizerToken);
+
+			String desc = ("通过好友【$(referrer)】的推荐，您已成为$(restaurant)的会员，并获得$(recommend_money)元的充值赠额和$(recommend_point)分的赠送积分。" +
 						  "\r\n" +
 					      "点击去会员中心查看详情>>>>")
-					      .replace("$(referrer)", referrer.getName())
+					      .replace("$(referrer)", User.newInstance(token, referrer.getWeixin().getSerial()).getNickName())
 					      .replace("$(restaurant)", RestaurantDao.getById(rid).getName())
-					      .replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
-					      .replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()));
+					      .replace("$(recommend_money)", Float.toString(represent.getSubscribeMoney()))
+					      .replace("$(recommend_point)", Integer.toString(represent.getSubscribePoint()));
 			session.callback(new Msg4ImageText(msg).addItem(new Data4Item("关注有礼", desc, getPicUrl(staff), createUrl(msg, WEIXIN_MEMBER))));
 			
 			//发送微信模板信息通知推荐人获得赠送充值和积分的消息
 			if(wxRestaurant.hasChargeTemplate()){
 				try{
-					final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
-					final Token token = Token.newInstance(authorizerToken);
 					
 					@SuppressWarnings("unused")
 					MemberOperation chargeMo = null, pointMo = null;
@@ -697,6 +700,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 							pointMo = mo;
 						}
 					}
+					
 					/**
 					 * {{first.DATA}}
 					 * 店面：{{keyword1.DATA}}
@@ -712,7 +716,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 							.addKeyword(new Keyword("first", 
 										("亲爱的会员【$(referrer)】, 您成功推荐【$(subscriber)】成为本店会员, 现获得$(recommend_money)元的充值赠额和$(recommend_point)分的赠送积分")
 										.replace("$(referrer)", referrer.getName())
-										.replace("$(subscriber)", subscriber.getName())
+										.replace("$(subscriber)", User.newInstance(token, subscriber.getWeixin().getSerial()).getNickName())
 										.replace("$(recommend_money)", Float.toString(represent.getRecommentMoney()))
 										.replace("$(recommend_point)", Integer.toString(represent.getRecommendPoint()))))
 							.addKeyword(new Keyword("keyword1", wxRestaurant.getNickName()))		//餐厅名称
