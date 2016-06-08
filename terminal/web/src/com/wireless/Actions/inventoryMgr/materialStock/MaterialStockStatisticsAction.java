@@ -97,7 +97,7 @@ public class MaterialStockStatisticsAction extends Action{
 				result = DataPaging.getPagingData(result, true, start, limit);
 			}
 			
-			if(stockReports.size() > 0){
+			if(result.size() > 0){
 				result.add(sum);
 			}
 			
