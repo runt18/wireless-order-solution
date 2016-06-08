@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/MaterialStockStatistics"
+			type="com.wireless.Actions.inventoryMgr.materialStock.MaterialStockStatistics" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/SupplierStockStatistics"
 			type="com.wireless.Actions.inventoryMgr.supplierStock.SupplierStockStatisticsAction" scope="request"
 			parameter="dataSource">

@@ -230,11 +230,13 @@ public class StockReport implements Jsonable{
 		jm.putString("materialName", this.getMaterial().getName());
 		jm.putFloat("primeAmount", this.getPrimeAmount());
 		jm.putFloat("stockIn", this.getStockIn());
+		jm.putFloat("stockInMoney", this.getStockInMoney());
 		jm.putFloat("stockInTransfer", this.getStockInTransfer());
 		jm.putFloat("stockTakeMore", this.getStockTakeMore());
 		jm.putFloat("stockSpill", this.getStockSpill());
 		jm.putFloat("stockInAmount", this.getStockInAmount());
 		jm.putFloat("stockOut", this.getStockOut());
+		jm.putFloat("stockOutMoney", this.getStockOutMoney());
 		jm.putFloat("stockOutTransfer", this.getStockOutTransfer());
 		jm.putFloat("stockTakeLess", this.getStockTakeLess());
 		jm.putFloat("stockDamage", this.getStockDamage());

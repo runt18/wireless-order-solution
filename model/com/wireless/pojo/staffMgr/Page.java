@@ -53,7 +53,7 @@ public class Page{
 		STOCK_REPORT("stockReport", "进销存汇总", "InventoryManagement_Module/StockReport.html", "../../images/stockReportMgr.png"),
 		STOCK_DETAIL("stockDetail", "进销存明细", "InventoryManagement_Module/StockDetailReport.html", "../../images/stockDetailReport.png"),
 		SUPPLIER_STOCK_IN_STATISTICS("supplierStockInStatistics", "供应商采购统计", "InventoryManagement_Module/SupplierStockInStatistics.html", "../../images/supplierMgr.png"),
-//		MATERIAL_STOCK_IN_STATISTICS("materialStockStatistics", "货品采购统计", "InventoryManagement_Module/MaterialStockStatistics.html", "../../images/stockActionMgr.png"),
+		MATERIAL_STOCK_IN_STATISTICS("materialStockStatistics", "货品采购统计", "InventoryManagement_Module/MaterialStockStatistics.html", "../../images/stockActionMgr.png"),
 		STOCK_DISTRIBUTION("stockDistribution", "库存分布", "InventoryManagement_Module/StockDistributionReport.html", "../../images/stockDistributionReport.png"),
 		DELTA_REPORT("deltaReport", "消耗差异表", "InventoryManagement_Module/DeltaReport.html", "../../images/deltaReport.png"),
 		SALE_OF_MATERIAL("saleOfMaterial", "销售对账表", "InventoryManagement_Module/SaleOfMaterials.html", "../../images/history.png"),

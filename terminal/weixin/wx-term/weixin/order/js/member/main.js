@@ -152,13 +152,13 @@ function getLevelChartInfo(x,point){
 	var pointFormat;
 	if(document.body.clientWidth > 330){
 		pointFormat = '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
-			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>'
+			+ (temp.discount && temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>'
 			+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
 			+ (temp.exchangeRate > 1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权，消费1元积'+temp.exchangeRate+'分':'') + '</font>' 			
 			;
 	}else{
 		pointFormat = '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
-			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
+			+ (temp.discount && temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
 			+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，</font> <br/><font style="font-size: 13px;color:maroon">充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
 			+ (temp.exchangeRate > 1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权，</font> <br/><font style="font-size: 13px;color:maroon">消费1元积'+temp.exchangeRate+'分':'') + '</font>' 
 			;
