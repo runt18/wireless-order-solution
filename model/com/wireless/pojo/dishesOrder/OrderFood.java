@@ -22,7 +22,7 @@ import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 
-public class OrderFood implements Parcelable, Jsonable {
+public class OrderFood implements Parcelable, Jsonable, Cloneable {
 	
 	public final static byte OF_PARCELABLE_4_COMMIT = 0;
 	public final static byte OF_PARCELABLE_4_QUERY = 1;
@@ -812,6 +812,15 @@ public class OrderFood implements Parcelable, Jsonable {
 		}
 		return result;
 	}
+	
+	@Override
+    public Object clone() {   
+        try {   
+            return super.clone();   
+        } catch (CloneNotSupportedException e) {   
+            return null;   
+        }   
+    } 
 	
 	/**
 	 * Return the order food string.
