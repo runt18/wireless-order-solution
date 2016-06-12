@@ -193,8 +193,8 @@ function init(){
 		closable : false,
 		resizable : true,
 		modal : true,
-		width : 800,
-		height : 700,
+		width : 900,
+		height : 670,
 		listeners : {
 			show : function(thiz){
 				thiz.doLayout();
@@ -447,7 +447,7 @@ function init(){
 				defaults : {
 					columnWidth : .5,
 					layout : 'form',
-					labelWidth : 60
+					labelWidth : 90
 				},
 				items : [{
 					columnWidth : 0.6,
@@ -841,7 +841,7 @@ function init(){
 			region : 'east',
 			layout : 'border',
 			height : 550,
-			width : 300,
+			width : 400,
 			items : [{
 				id : 'showPrintPaper',
 				border : false,
@@ -861,7 +861,7 @@ function init(){
 					xtype : 'textfield',
 					style : 'margin-top:5px;',
 					id : 'printComment',
-					width : 280,
+					width : 400,
 					hideLabel : true
 				}]
 			}]
