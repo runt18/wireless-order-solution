@@ -238,6 +238,7 @@ public class JobContentFactory {
 				for(PrintFunc func : printer.getPrintFuncs()){
 					if(func.isTypeMatched(printType) && func.isRegionMatched(order.getRegion())){
 						for(OrderFood of : order.getOrderFoods()){
+							JobContent content = null;
 							//加菜并且设置了数量不累加时, 菜品分开打印
 							if(of.asFood().isSplit()){
 								final int amount;
@@ -256,13 +257,16 @@ public class JobContentFactory {
 									for(int i = 0; i < amount; i++){
 										single.setCount(0);
 										single.addCount(1);
-										jobContents.add(createDetail(printType, staff, printer, func, order, detailType, single));
+										content = createDetail(printType, staff, printer, func, order, detailType, single);
 									}
 								}else{
-									jobContents.add(createDetail(printType, staff, printer, func, order, detailType, of));
+									content = createDetail(printType, staff, printer, func, order, detailType, of);
 								}
 							}else{
-								jobContents.add(createDetail(printType, staff, printer, func, order, detailType, of));
+								content = createDetail(printType, staff, printer, func, order, detailType, of);
+							}
+							if(content != null){
+								jobContents.add(content);
 							}
 						}
 					}
