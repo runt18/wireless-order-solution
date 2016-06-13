@@ -151,12 +151,13 @@ public class JobContentFactory {
 		}
 	}
 	
-	private JobContent createDetail(PType printType, Staff staff, Printer printer, PrintFunc func, Order order, FoodDetailContent.DetailType detailType, OrderFood of){
+	private List<JobContent> createDetail(PType printType, Staff staff, Printer printer, PrintFunc func, Order order, FoodDetailContent.DetailType detailType, OrderFood of){
+		final List<JobContent> details = new ArrayList<>();
 		if(of.asFood().isCombo()){
 			for(ComboFood childFood : of.asFood().getChildFoods()){
 				if(func.isKitchenAll()){
 					//Add the detail content of this child order food to the job contents.
-					return (new JobContent(printer, func.getRepeat(), printType,
+					details.add(new JobContent(printer, func.getRepeat(), printType,
 												   new OrderDetailContent(of, 
 														   				  childFood, 
 														   				  order, 
@@ -173,7 +174,7 @@ public class JobContentFactory {
 						}
 						if(kitchen.getId() == printKitchenId){
 							//Add the detail content of this child order food matched the kitchen to the job contents.
-							return (new JobContent(printer, func.getRepeat(), printType,
+							details.add(new JobContent(printer, func.getRepeat(), printType,
 														   new OrderDetailContent(of, 
 																   				  childFood, 
 																   				  order, 
@@ -187,7 +188,7 @@ public class JobContentFactory {
 		}else{
 			if(func.isKitchenAll()){
 				//Add the detail content of this order food to the job contents.
-				return (new JobContent(printer, func.getRepeat(), printType,
+				details.add(new JobContent(printer, func.getRepeat(), printType,
 											   new OrderDetailContent(of, 
 													   				  order, 
 													   				  staff.getName(), 
@@ -203,7 +204,7 @@ public class JobContentFactory {
 					}
 					if(kitchen.getId() == printKitchenId){
 						//Add the detail content of this order food matched the kitchen to the job contents.
-						return (new JobContent(printer, func.getRepeat(), printType,
+						details.add(new JobContent(printer, func.getRepeat(), printType,
 													   new OrderDetailContent(of, 
 															   				  order, 
 															   				  staff.getName(), 
@@ -215,7 +216,7 @@ public class JobContentFactory {
 
 		}
 		
-		return null;
+		return details;
 	}
 	
 	/**
@@ -239,7 +240,7 @@ public class JobContentFactory {
 					if(func.isTypeMatched(printType) && func.isRegionMatched(order.getRegion())){
 						for(OrderFood of : order.getOrderFoods()){
 							//加菜并且设置了数量不累加时, 菜品分开打印
-							if(of.asFood().isSplit()){
+							if(of.asFood().isSplit() && !of.asFood().isCombo()){
 								final int amount;
 								final float count;
 								//delta不为0时表示是加菜或者退菜，为0时表示是补打
@@ -256,14 +257,15 @@ public class JobContentFactory {
 									for(int i = 0; i < amount; i++){
 										single.setCount(0);
 										single.addCount(1);
-										jobContents.add(createDetail(printType, staff, printer, func, order, detailType, single));
+										jobContents.addAll(createDetail(printType, staff, printer, func, order, detailType, single));
 									}
 								}else{
-									jobContents.add(createDetail(printType, staff, printer, func, order, detailType, of));
+									jobContents.addAll(createDetail(printType, staff, printer, func, order, detailType, of));
 								}
 							}else{
-								jobContents.add(createDetail(printType, staff, printer, func, order, detailType, of));
+								jobContents.addAll(createDetail(printType, staff, printer, func, order, detailType, of));
 							}
+
 						}
 					}
 				}
