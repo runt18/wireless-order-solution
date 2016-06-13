@@ -213,7 +213,6 @@ Ext.onReady(function(){
 							url : '../../OperateStockAction.do',
 							params : {
 								'dataSource' : stockTaskNavWin.otype.toLowerCase(),
-								
 								id : id.getValue(),
 								deptIn : deptIn.getValue(),
 								supplier : supplier.getValue(),
@@ -263,10 +262,12 @@ Ext.onReady(function(){
 				var diaplayTitle = '';
 				
 				//Ext.getDom('labActualPrice').style.display="block";
-				
 				//置出库仓和入库仓可选状态
 				Ext.getCmp('comboDeptOutForStockActionBasic').setValue(null);
 				Ext.getCmp('comboDeptInForStockActionBasic').setValue(null);
+				Ext.getCmp('txtCommentForStockActionBasic').setValue('');
+				Ext.getCmp('comboSupplierForStockActionBasic').setValue('');
+				Ext.getCmp('comboSupplierForStockActionBasic').setDisabled(false);
 				Ext.getCmp('comboDeptOutForStockActionBasic').setDisabled(false);
 				Ext.getCmp('comboDeptInForStockActionBasic').setDisabled(false);
 				if(stockType == 1){
@@ -1226,7 +1227,7 @@ Ext.onReady(function(){
 				width : 80,
 				value : -1,
 				store : new Ext.data.SimpleStore({
-					data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 冲红']],
+					data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 反审核']],
 					fields : ['value', 'text']
 				}),
 				valueField : 'value',

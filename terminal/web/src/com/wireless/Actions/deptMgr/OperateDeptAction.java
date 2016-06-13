@@ -41,6 +41,7 @@ public class OperateDeptAction extends DispatchAction{
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String inventory = request.getParameter("inventory");
+		final String type = request.getParameter("type");
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -52,7 +53,11 @@ public class OperateDeptAction extends DispatchAction{
 			if(inventory != null && !inventory.isEmpty()){
 				root = DepartmentDao.getDepartments4Inventory(staff);
 			}else{
-				root = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+				if(type != null && !type.isEmpty()){
+					root = DepartmentDao.getByType(staff, Department.Type.valueOf(Integer.parseInt(type)));
+				}else{
+					root = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+				}
 			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){

@@ -68,7 +68,7 @@ public class CostAnalyzeReportDao {
 			departExtraCond.setId(extraCond.deptId);
 			departments = DepartmentDao.getByCond(staff, departExtraCond, orderClause);
 		}else{
-			departments = DepartmentDao.getDepartments4Inventory(staff);
+			departments = DepartmentDao.getByType(staff, Department.Type.NORMAL);
 		}
 
 		for(Department department : departments){

@@ -16,7 +16,7 @@ Ext.ux.printContain = function(type, cols, data, param){
 			stockActionData : {val : 1 ,desc : '出入库单表格'}
 		}
 		
-		//head start
+		//colHead start
 		var html = '<table id="stockActionDetailPanel" border="2" class="tb_base" style="width : 98%;font-size:26px;" >' + 	
 				   '<tr>';
 		var dataIndexArr = [];
@@ -27,7 +27,7 @@ Ext.ux.printContain = function(type, cols, data, param){
 		
 		html += '</tr>';
 		
-		//data start
+		//colData start
 		if(data && data.length > 0){
 				data.forEach(function(el, index){
 				var temp = '<tr>';
@@ -51,10 +51,10 @@ Ext.ux.printContain = function(type, cols, data, param){
 		html += '</table>';
 		
 		
-		//head start
+		//actionHead start
 		if(type == dataType.stockActionData.val){
 			var stockActionData = {};
-			stockActionData.title = param.data.typeText + '--' + param.data.cateTypeText + param.data.subTypeText + '(' + param.data.id + ')';
+			stockActionData.title = param.data.typeText + '--' + param.data.cateTypeText + param.data.subTypeText + '(' + param.data.id + ') (' + param.data.statusText + ')' ;
 			stockActionData.deptOut = '出货仓：' + (param.data.deptOut.name ? param.data.deptOut.name : '----');
 			stockActionData.deptIn = '收货仓：' + (param.data.deptIn.name ? param.data.deptIn.name : '----');
 			stockActionData.oriStockDate = '货单日期：' + param.data.oriStockDateFormat;
@@ -327,7 +327,7 @@ Ext.ux.importShowerWin = function(params){
 		width : 80,
 		value : -1,
 		store : new Ext.data.SimpleStore({
-			data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 冲红']],
+			data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 反审核']],
 			fields : ['value', 'text']
 		}),
 		valueField : 'value',

@@ -13,7 +13,7 @@ Ext.onReady(function(){
        {header: '其他出库额', dataIndex: 'stockDamageMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '盘亏金额', dataIndex: 'stockTakeLessMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '期末金额', dataIndex: 'endMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
-       {header: '成本金额', dataIndex: 'costMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '成本金额', dataIndex: 'costMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou, tooltip : '成本金额 = 期初金额 + 采购金额 + 领料金额 - 退货金额 - 退料金额 - 期末金额'},
        {header: '销售金额', dataIndex: 'salesMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '毛利额', dataIndex: 'profit', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '毛利率', dataIndex: 'profitRate', align : 'right', renderer : Ext.ux.txtFormat.gridDou}
@@ -58,6 +58,79 @@ Ext.onReady(function(){
             plugins: 'monthPickerPlugin',  
             format: 'Y-m'
             //editable: false
+		},{
+			xtype : 'tbtext', text : '类别:'
+		},{
+			xtype : 'combo',
+			forceSelection : true,
+			id : 'searchType_comBox_costAnalys',
+			width : 80,
+			maxheight : 300,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name'],
+				data : [[1, '部门'],[2, '仓库']],
+				autoLoad : true
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			triggerAction : 'all',
+			mode : 'local',
+			listeners : {
+				render : function(thiz){
+					Ext.getCmp('searchType_comBox_costAnalys').setValue(1);
+					Ext.getCmp('searchType_comBox_costAnalys').fireEvent('select');
+				},
+				select : function(thiz){
+					var store = Ext.getCmp('deptComb_comboBox_costAnalys').getStore();
+					if(Ext.getCmp('searchType_comBox_costAnalys').getValue() == 1){
+						var thiz = Ext.getCmp('deptComb_comboBox_costAnalys');
+						var data = [[-1,'全部']];
+						Ext.Ajax.request({
+							url : '../../OperateDept.do',
+							params: { 
+						    	dataSource : 'getByCond'
+						    }, 
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									data.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+								thiz.fireEvent('select');
+							},
+							fialure : function(res, opt){
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							}
+						});
+					}else{
+						var thiz = Ext.getCmp('deptComb_comboBox_costAnalys');
+//						var data = [[-1,'全部']];
+						var data = [];
+						Ext.Ajax.request({
+							url : '../../OperateDept.do',
+							params: { 
+						    	dataSource : 'getByCond',
+						    	type : 2
+						    }, 
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									data.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								thiz.store.loadData(data);
+								thiz.setValue(jr.root[0]['id']);
+								thiz.fireEvent('select');
+							},
+							fialure : function(res, opt){
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							}
+						});
+					}
+				}
+			}
 		}, {
 			xtype : 'tbtext', text : '部门:'
 		}, {
@@ -81,8 +154,7 @@ Ext.onReady(function(){
 					Ext.Ajax.request({
 						url : '../../OperateDept.do',
 						params: { 
-					    	dataSource : 'getByCond',
-					    	inventory : true
+					    	dataSource : 'getByCond'
 					    }, 
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
