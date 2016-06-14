@@ -1,70 +1,13 @@
-function cdd_deltaPointRenderer(v, md, r, ri, ci, store){
-	var deltaPoint = parseInt(r.get('deltaPoint'));
-	if(v == 2 || v == 3 || v == 4 || v == 7 || v == 8){
-		if(deltaPoint < 0){
-			return "<font color='red' size='4'>"+ deltaPoint + "</font>";
-		}else{
-			return "<font color='green' size='4'>"+ deltaPoint + "</font>";
-		}
+
+function payMoneyChange(a, b, c, d){
+	if(c.json.payMoney){
+		return c.json.payMoney;
 	}else{
-		return '--';
+		return 0;
 	}
+}
 	
-}
-function cdd_remainingPointRenderer(v, md, r, ri, ci, store){
-	if(v == 2 || v == 3 || v == 4 || v == 7 || v == 8){
-		return parseInt(r.get('remainingPoint'));
-	}else{
-		return '--';
-	}
-}
-function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
-	var deltaTotalMoney = parseInt(r.get('deltaTotalMoney'));
-	if(v == 1 || v == 2 || v == 5 || v == 6 || v == 7 || v == 8){
-		
-		if(v == 2 || v == 7 || v == 8){
-			return '--';
-		}else{
-			if(deltaTotalMoney < 0){
-				return "<font color='red' size='4'>"+ Ext.ux.txtFormat.gridDou(deltaTotalMoney) + "</font>";
-			}else{
-				return "<font color='green' size='4'>"+ Ext.ux.txtFormat.gridDou(deltaTotalMoney) + "</font>";
-			}
-		}
-	}else{
-		return '--';
-	}
-	
-}
-function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 6 || v == 7 || v == 8){
-		if((v == 2 || v == 7 || v == 8) && r.get('member')['memberType']['attributeValue'] == 1){
-			return '--';
-		}else{
-			return Ext.ux.txtFormat.gridDou(r.get('remainingTotalMoney'));			
-		}
-	}else{
-		return '--';
-	}
-}
-function cdd_payMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 6){
-		return Ext.ux.txtFormat.gridDou(r.get('chargeMoney'));
-	}else if(v == 2 || v == 5 || v == 7 || v == 8){
-		return Ext.ux.txtFormat.gridDou(r.get('payMoney'));
-	}else{
-		return '--';
-	}
-}
-function cdd_payTypeRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 6){
-		return r.get('chargeTypeText');
-	}else if(v == 2 || v == 5 || v == 7 || v == 8){
-		return r.get('payTypeText');
-	}else{
-		return '--';
-	}
-}
+
 var cdd_mo_grid, cdd_panelMemberOperationContent;
 var cdd_search_comboOperateType, cdd_search_memberType, cdd_search_memerbMobile,cdd_search_onDuty, cdd_search_offDuty;
 Ext.onReady(function(){
@@ -92,11 +35,6 @@ Ext.onReady(function(){
 		allowBlank : false,
 		listeners : {
 			select : function(){
-				cdd_mo_grid.getColumnModel().setRenderer(4, cdd_deltaPointRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(5, cdd_remainingPointRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(6, cdd_payMoneyRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(7, cdd_deltaTotalMoneyRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(8, cdd_remainingTotalMoneyRenderer);
 				
 				cdd_searchMemberOperation();
 			}
@@ -323,12 +261,13 @@ Ext.onReady(function(){
 			['操作类型', 'operateTypeText', 60],
 			['会员名称', 'member.name', 60],
 			['所属门店', 'branchName', 60],
-			['变动积分', 'operateTypeValue', 60, 'right', 'cdd_deltaPointRenderer'],
-			['剩余积分', 'operateTypeValue', 60, 'right', 'cdd_remainingPointRenderer'],
-			['收款金额', 'operateTypeValue', 60, 'right', 'cdd_payMoneyRenderer'],
-			['变动金额', 'operateTypeValue', 60, 'right', 'cdd_deltaTotalMoneyRenderer'],
-			['剩余金额', 'operateTypeValue', 60, 'right', 'cdd_remainingTotalMoneyRenderer'],
-			['收款方式', 'operateTypeValue', 60, 'center', 'cdd_payTypeRenderer'],
+			['变动积分', 'deltaPoint', 60, 'right', ''],
+			['剩余积分', 'remainingPoint', 60, 'right', ''],
+			['收款金额', 'payMoney', 60, 'right', 'payMoneyChange'],
+			['基础变动金额', 'deltaBaseMoney', 60, 'right'],
+			['赠送变动金额', 'deltaExtraMoney', 60, 'right'],
+			['剩余金额', 'remainingTotalMoney', 60, 'right', ''],
+			['收款方式', 'payType', 60, 'center', ''],
 			['操作时间', 'operateDateFormat'],
 			['操作人', 'staffName', 60]
 		],
@@ -344,32 +283,7 @@ Ext.onReady(function(){
 		cdd_search_dateCombo.setValue(1);
 		cdd_search_dateCombo.fireEvent('select', cdd_search_dateCombo, null, 1);
 	});
-	cdd_mo_grid.getStore().on('beforeload', function(){
-		if(cdd_search_comboOperateType.getValue() == 1){
-			cdd_mo_grid.getColumnModel().setRenderer(4, function(){
-				return '--';
-			});
-			cdd_mo_grid.getColumnModel().setRenderer(5, function(){
-				return '--';
-			});
-		}
-		if(cdd_search_comboOperateType.getValue() == 3){
-			cdd_mo_grid.getColumnModel().setRenderer(6, function(){
-				return '--';
-			});
-			cdd_mo_grid.getColumnModel().setRenderer(7, function(){
-				return '--';
-			});
-			cdd_mo_grid.getColumnModel().setRenderer(8, function(){
-				return '--';
-			});
-		}
-
-	});
 	cdd_mo_grid.getStore().on('load', function(thiz){
-		if(thiz.getCount() > 0 && cdd_search_memerbMobile.getValue() != ''){
-			Ext.getCmp('mr_queryMemberOperationWin').setTitle('会员操作明细 --> ' + thiz.getAt(0).get('member').name);
-		}
 	});
 	cdd_panelMemberOperationContent = new Ext.Panel({
 		renderTo : 'divMemberOperationContent',
