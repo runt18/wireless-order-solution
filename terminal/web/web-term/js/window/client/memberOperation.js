@@ -202,7 +202,6 @@ Ext.onReady(function(){
 							thiz.setValue(null);
 						}
 						
-						thiz.fireEvent('select');
 					}
 				});
 			},
