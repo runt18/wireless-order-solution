@@ -7,6 +7,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 
 public class MemberOperation implements Jsonable {
 
@@ -250,6 +251,10 @@ public class MemberOperation implements Jsonable {
 			jm.putInt("chargeTypeValue", this.chargeType.getValue());
 			jm.putFloat("chargeMoney", this.chargeMoney);
 			jm.putFloat("takeMoney", this.takeMoney);
+			jm.putFloat("deltaCharge", this.deltaExtraMoney);
+			if(this.deltaBaseMoney > 0){
+				jm.putFloat("chargeRatio", NumericUtil.roundFloat(this.deltaExtraMoney / this.deltaBaseMoney));
+			}
 		}
 
 		jm.putInt("branchId", this.branchId);
