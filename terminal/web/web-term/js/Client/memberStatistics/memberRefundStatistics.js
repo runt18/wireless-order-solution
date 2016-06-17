@@ -355,12 +355,12 @@ Ext.onReady(function(){
 						offDuty = Ext.util.Format.date(mrs_search_offDuty.getValue(), 'Y-m-d 23:59:59');
 						
 						var memberType = mrs_search_memberType.getRawValue() != '' ? mrs_search_memberType.getValue() : '';
-						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}&isRefund=true&branchId={9}';
+						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}&branchId={9}';
 						url = String.format(
 								url, 
 								'ExportHistoryStatisticsToExecl.do', 
 								memberType > 0 ? memberType : '', 
-								'rechargeDetail',
+								'refundDetail',
 								onDuty,
 								offDuty,
 								mrs_search_memberName.getValue(),

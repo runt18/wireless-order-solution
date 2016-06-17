@@ -53,6 +53,13 @@ public class QueryMemberOperationAction extends Action{
 		final String offDuty = request.getParameter("offDuty");
 		final String total = request.getParameter("total");
 		final String pointChanged = request.getParameter("pointChanged");
+		//充值实收和充额差异
+		final String minDeltaCharge = request.getParameter("minDeltaCharge");
+		final String maxDeltaCharge = request.getParameter("maxDeltaCharge");
+		//充值比例
+		final String minChargeRate = request.getParameter("minChargeRate");
+		final String maxChargeRate = request.getParameter("maxChargeRate");
+		
 		try{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -102,6 +109,22 @@ public class QueryMemberOperationAction extends Action{
 				for (Member member : members) {
 					extraCond.addMember(member);
 				}
+			}
+			
+			if(minDeltaCharge != null && !minDeltaCharge.isEmpty()){
+				extraCond.setMinDeltaCharge(Float.parseFloat(minDeltaCharge));
+			}
+			
+			if(maxDeltaCharge != null && !maxDeltaCharge.isEmpty()){
+				extraCond.setMaxDeltaCharge(Float.parseFloat(maxDeltaCharge));
+			}
+			
+			if(minChargeRate != null && !minChargeRate.isEmpty()){
+				extraCond.setMinChargeRate(Float.parseFloat(minChargeRate));
+			}
+			
+			if(maxChargeRate != null && !maxChargeRate.isEmpty()){
+				extraCond.setMaxChargeRage(Float.parseFloat(maxChargeRate));
 			}
 			
 			//如果没选择小分类,则选择所有的小分类
