@@ -253,7 +253,7 @@ public class MemberOperation implements Jsonable {
 			jm.putFloat("takeMoney", this.takeMoney);
 			jm.putFloat("deltaCharge", this.deltaExtraMoney);
 			if(this.deltaBaseMoney > 0){
-				jm.putFloat("chargeRatio", NumericUtil.roundFloat(this.deltaExtraMoney / this.deltaBaseMoney));
+				jm.putFloat("chargeRatio", NumericUtil.roundFloat(this.getDeltaTotalMoney() / this.deltaBaseMoney));
 			}
 		}
 
