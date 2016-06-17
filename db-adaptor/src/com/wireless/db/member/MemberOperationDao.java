@@ -77,6 +77,15 @@ public class MemberOperationDao {
 		private int restaurantId;
 		private Float minChargeAmount;
 		private Float maxChargeAmount;
+		
+		//充值实收和充额差异
+		private Float minDeltaCharge;
+		private Float maxDeltaCharge;
+		
+		//充值比例
+		private Float minChargeRate;
+		private Float maxChargeRate;
+		
 		private String comment;
 		
 		public ExtraCond(DateType dateType){
@@ -85,6 +94,26 @@ public class MemberOperationDao {
 		
 		public ExtraCond setComment(String comment){
 			this.comment = comment;
+			return this;
+		}
+		
+		public ExtraCond setMinChargeRate(Float min){
+			this.minChargeRate = min;
+			return this;
+		}
+		
+		public ExtraCond setMaxChargeRage(Float max){
+			this.maxChargeRate = max;
+			return this;
+		}
+		
+		public ExtraCond setMinDeltaCharge(Float min){
+			this.minDeltaCharge = min;
+			return this;
+		}
+		
+		public ExtraCond setMaxDeltaCharge(Float max){
+			this.maxDeltaCharge = max;
 			return this;
 		}
 		
@@ -270,12 +299,31 @@ public class MemberOperationDao {
 				extraCond.append(" AND MO.branch_id = " + branchId);
 			}
 			if(minChargeAmount != null && maxChargeAmount != null){
-				extraCond.append(" AND delta_extra_money BETWEEN " + minChargeAmount + " AND " + maxChargeAmount);
+				extraCond.append(" AND delta_extra_money + delta_base_money BETWEEN " + minChargeAmount + " AND " + maxChargeAmount);
 			}else if(minChargeAmount != null && maxChargeAmount == null){
-				extraCond.append(" AND delta_extra_money > " + minChargeAmount);
+				extraCond.append(" AND delta_extra_money + delta_base_money > " + minChargeAmount);
 			}else if(minChargeAmount == null && maxChargeAmount != null){
-				extraCond.append(" AND delta_extra_money < " + maxChargeAmount);
+				extraCond.append(" AND delta_extra_money + delta_base_money < " + maxChargeAmount);
 			}
+			
+			//充值实收和充额差异
+			if(minDeltaCharge != null && maxDeltaCharge != null){
+				extraCond.append(" AND delta_extra_money BETWEEN " + minDeltaCharge + " AND " + maxDeltaCharge);
+			}else if(minDeltaCharge != null && maxDeltaCharge == null){
+				extraCond.append(" AND delta_extra_money > " + minDeltaCharge);
+			}else if(minDeltaCharge == null && maxDeltaCharge != null){
+				extraCond.append(" AND delta_extra_money < " + maxDeltaCharge);
+			}
+			
+			//充值比例
+			if(minChargeRate != null && maxChargeRate != null){
+				extraCond.append(" AND (delta_extra_money + delta_base_money) / delta_base_money BETWEEN " + minChargeRate + " AND " + maxChargeRate);
+			}else if(minChargeRate != null && maxChargeRate == null){
+				extraCond.append(" AND (delta_extra_money + delta_base_money) / delta_base_money > " + minChargeRate);
+			}else if(minChargeRate == null && maxChargeRate != null){
+				extraCond.append(" AND (delta_extra_money + delta_base_money) / delta_base_money < " + maxChargeRate);
+			}
+			
 			if(comment != null){
 				extraCond.append(" AND MO.comment LIKE '%" + comment + "%'");
 			}
