@@ -873,7 +873,7 @@ $(function(){
 				var issuedPopup = null;
 				issuedPopup = issued.newInstance({
 					title : '发送优惠券',
-					memberName : orderMsg.member.name, 
+					member : orderMsg.member, 
 					issueMode : issued.IssueMode.ORDER,
 					orderId : orderMsg.id,
 					issueTo : orderMsg.memberId

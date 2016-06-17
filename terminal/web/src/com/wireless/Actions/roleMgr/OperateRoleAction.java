@@ -121,7 +121,7 @@ public class OperateRoleAction extends DispatchAction{
 					}
 				}
 			}
-			
+			 
 			if(discounts != null && !discounts.trim().isEmpty()){
 				String[] discountArray = discounts.split(",");
 				for (String distId : discountArray) {

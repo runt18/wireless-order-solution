@@ -141,6 +141,7 @@ public class OperatePromotionAction extends DispatchAction{
 		final String image = request.getParameter("image");		
 		final String issueRule = request.getParameter("issueRule");
 		final String issueSingleMoney = request.getParameter("issueSingleMoney");
+		final String point = request.getParameter("point");
 		final String useRule = request.getParameter("useRule");
 		final String useSingleMoney = request.getParameter("useSingleMoney");
 		
@@ -201,6 +202,9 @@ public class OperatePromotionAction extends DispatchAction{
 				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.WX_SCAN.getVal()){
 					//扫码发券
 					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4WxScan());
+				}else if(Integer.parseInt(issueRule) == PromotionTrigger.IssueRule.POINT_EXCHANGE.getVal()){
+					//积分兑换
+					promotionUpdateBuilder.setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Point(Integer.parseInt(point)));
 				}
 			}
 			
@@ -240,6 +244,7 @@ public class OperatePromotionAction extends DispatchAction{
 		final String issueTriggers = request.getParameter("issueTriggers");
 		final String useTriggers = request.getParameter("useTriggers");
 		final String orderId = request.getParameter("orderId");
+		final String memberId = request.getParameter("memberId");
 		
 		final JObject jobject = new JObject();
 		
@@ -265,6 +270,8 @@ public class OperatePromotionAction extends DispatchAction{
 					PromotionTrigger.IssueRule issueRule = PromotionTrigger.IssueRule.valueOf(Integer.parseInt(issueTrigger));
 					if(issueRule.isSingleExceed()){
 						extraCond.addIssueRule(issueRule, Integer.valueOf(orderId));
+					}else if(issueRule.isPointExchange()){
+						extraCond.addIssueRule(issueRule, Integer.parseInt(memberId));
 					}else{
 						extraCond.addIssueRule(issueRule);
 					}

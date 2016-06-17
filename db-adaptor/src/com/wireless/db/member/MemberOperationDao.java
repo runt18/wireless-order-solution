@@ -78,6 +78,7 @@ public class MemberOperationDao {
 		private Float minChargeAmount;
 		private Float maxChargeAmount;
 		private String comment;
+		private boolean pointChanged;
 		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType);
@@ -211,6 +212,11 @@ public class MemberOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setPointChange(boolean onOff){
+			this.pointChanged = onOff;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
@@ -265,6 +271,9 @@ public class MemberOperationDao {
 			}
 			if(containsCoupon){
 				extraCond.append(" AND MO.coupon_id > 0 AND MO.operate_type = " + OperationType.CONSUME.getValue());
+			}
+			if(pointChanged){
+				extraCond.append(" AND MO.delta_point <> 0");
 			}
 			if(branchId != 0){
 				extraCond.append(" AND MO.branch_id = " + branchId);

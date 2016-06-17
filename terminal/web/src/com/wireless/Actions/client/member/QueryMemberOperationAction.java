@@ -52,6 +52,7 @@ public class QueryMemberOperationAction extends Action{
 		final String onDuty = request.getParameter("onDuty");
 		final String offDuty = request.getParameter("offDuty");
 		final String total = request.getParameter("total");
+		final String pointChanged = request.getParameter("pointChanged");
 		try{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -73,6 +74,10 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}else{
 				extraCond = new MemberOperationDao.ExtraCond(dateType);
+			}
+			
+			if(pointChanged != null && !pointChanged.isEmpty()){
+				extraCond.setPointChange(Boolean.parseBoolean(pointChanged));
 			}
 
 			if(memberType != null && !memberType.trim().isEmpty()){

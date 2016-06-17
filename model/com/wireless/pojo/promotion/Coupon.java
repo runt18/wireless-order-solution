@@ -40,6 +40,14 @@ public class Coupon implements Jsonable{
 			return new UseBuilder(memberId, CouponOperation.Operate.ORDER_USE, orderId);
 		}
 		
+		public static UseBuilder newInstance4Point(int memberId){
+			return new UseBuilder(memberId, CouponOperation.Operate.POINT_EXCHANGE_USE, 0);
+		}
+		
+		public static UseBuilder newInstance4Point(Member member){
+			return new UseBuilder(member.getId(), CouponOperation.Operate.POINT_EXCHANGE_USE, 0);
+		}
+		
 		private UseBuilder(int memberId, CouponOperation.Operate operation, int associateId){
 			this.memberId = memberId;
 			this.operation = operation;
@@ -124,6 +132,10 @@ public class Coupon implements Jsonable{
 
 		public static IssueBuilder newInstance4WxScan(){
 			return new IssueBuilder(CouponOperation.Operate.WX_SCAN_ISSUE, 0);
+		}
+		
+		public static IssueBuilder newInstance4PointExchange(){
+			return new IssueBuilder(CouponOperation.Operate.POINT_EXCHANGE_ISSUE, 0);
 		}
 		
 		private IssueBuilder(CouponOperation.Operate operate, int associateId){

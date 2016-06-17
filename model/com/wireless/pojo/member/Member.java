@@ -3,6 +3,7 @@ package com.wireless.pojo.member;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
@@ -15,6 +16,7 @@ import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
 
@@ -349,6 +351,72 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		public Member build(){
 			return new Member(this);
 		}
+	}
+	
+	public static class PointExchangeBuilder{
+		private final int memberId;
+		private final List<Map.Entry<Integer, Integer>> coupons = new ArrayList<>();
+		private String comment;
+		private boolean isIssueAndUse;
+		
+		public PointExchangeBuilder(int memberId){
+			this.memberId = memberId;
+		} 
+		
+		public PointExchangeBuilder addPromotion(final Promotion promotion, final int amount){
+			return addPromotion(promotion.getId(), amount);
+		}
+		
+		public PointExchangeBuilder addPromotion(final int promotionId, final int amount){
+			coupons.add(new Map.Entry<Integer, Integer>() {
+				
+				@Override
+				public Integer getKey() {
+					return promotionId;
+				}
+
+				@Override
+				public Integer getValue() {
+					return amount;
+				}
+
+				@Override
+				public Integer setValue(Integer value) {
+					return null;
+				}
+			});
+			return this;
+		}
+		
+		public List<Map.Entry<Integer, Integer>> getPromotions(){
+			return Collections.unmodifiableList(coupons);
+		}
+		
+		public PointExchangeBuilder setComment(String comment){
+			this.comment = comment;
+			return this;
+		}
+		
+		public PointExchangeBuilder setIssueAndUse(boolean onOff){
+			this.isIssueAndUse = onOff;
+			return this;
+		}
+		
+		public int getMemberId(){
+			return this.memberId;
+		}
+		
+		public String getComment(){
+			if(this.comment == null){
+				return "";
+			}
+			return this.comment;
+		}
+		
+		public boolean isIssueAndUse(){
+			return this.isIssueAndUse;
+		}
+		
 	}
 	
 	public static class BindBuilder{

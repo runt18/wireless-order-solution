@@ -76,10 +76,6 @@ public class OperateCouponAction extends DispatchAction{
 				extraCond.setStaff(Integer.parseInt(staffId));
 			}
 			
-			if(branchId != null && !branchId.isEmpty()){
-				extraCond.setBranch(Integer.parseInt(branchId));
-			}
-			
 			if(begin != null && !begin.isEmpty() && end != null && !end.isEmpty()){
 				if(isDuty != null && !isDuty.isEmpty() && Boolean.parseBoolean(isDuty)){
 					DutyRange range = DutyRangeDao.exec(staff, begin, end);
@@ -251,6 +247,52 @@ public class OperateCouponAction extends DispatchAction{
 			response.getWriter().print(jObject.toString(Coupon.COUPON_JSONABLE_SIMPLE));
 		}
 		return null;
+	}
+	
+	public ActionForward getOperateType(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		JObject jObject = new JObject();
+		
+		final List<Jsonable> operations = new ArrayList<>();
+		
+		for(final CouponOperation.Operate operate : CouponOperation.Operate.values()){
+			operations.add(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					// TODO Auto-generated method stub
+					JsonMap jm = new JsonMap();
+					jm.putInt("value", operate.getVal());
+					jm.putString("name", operate.toString());
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
+		}
+		
+		jObject.setRoot(new Jsonable(){
+			@Override
+			public JsonMap toJsonMap(int flag) {
+				JsonMap jm = new JsonMap();
+				jm.putJsonableList("operateType", operations, 0);
+				return jm;
+			}
+
+			@Override
+			public void fromJsonMap(JsonMap jm, int flag) {
+			}
+			
+		});
+		
+		response.getWriter().print(jObject.toString());
+		
+		return null;
+		
 	}
 	
 	/**

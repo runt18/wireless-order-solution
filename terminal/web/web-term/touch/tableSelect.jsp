@@ -160,7 +160,7 @@
 			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
-			<li class="popupButtonList" onclick="ts.member.openMemberPointConsumeWin()"><a >积分消费</a></li>
+			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分消费</a></li>
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="patchWxCard_a_tableSelect"><a>补发电子卡</a></li>
@@ -245,56 +245,6 @@
         </ul>
 	</div>		
 	
-	
-	<!-- 积分消费 -->
-	<div id="memberPointConsume" class="ui-overlay-shadow ui-corner-all" style="width:340px;z-index: 1102;position: absolute; top: 30%; left: 50%; margin: -100px 0px 0px -150px;background-color: white;display: none;" align="center">	
-	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-	        	会员积分消费
-	    </div> 
-	    <table>
-	    	<tr>
-		    	<td>
-		    		<input placeholder="手机号/卡号/微信卡号" style="font-size:20px;font-weight: bold;" id="txtMember4PointConsume">
-		    	</td>
-		    	<td width="30px">
-		    		<a data-role="button" id="btnReadMember4PointConsume" class="numberInputStyle" data-theme="b" onclick="ts.member.readMemberByCondtion4PointConsume()">读取会员</a>
-		    	</td>
-		    </tr>
-	    	<tr>
-	    		<td class="readMemberTd">会员名称:</td>
-	    		<td class="readMemberTdValue"><label id="numMemberNameForConsumePoint">----</label></td>
-	    	</tr>
-	    	<tr>
-	    		<td class="readMemberTd">会员类别:</td>
-	    		<td class="readMemberTdValue"><label id="numMemberTypeForConsumePoint">----</label></td>   		   		
-	    	</tr> 
-	    	<tr id="tr_memberFirstTimeCharge">
-	    		<td class="readMemberTd">当前积分:</td>
-	    		<td class="readMemberTdValue"><label id="numMemberPointForConsumePoint">----</label></td>   
-	    	</tr>	  
-	    	<tr id="tr_memberFirstTimeChargePrint">
-	    		<td class="readMemberTd">
-	    		消费积分:</td>
-	    		<td class="readMemberTdValue"><input id="numConsumePointForConsumePoint" onkeypress="intOnly()"></td>   
-	    	</tr>	    	  
-	    </table>
-	    
-		<div data-role="footer" data-theme="b" class="ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.memberPointConsumeAction()">确定</a>
-				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ts.member.closeMemberPointConsumeWin()">取消</a>		 
-			 </div>
-	    </div>	
-	</div>		
-
-	<div data-role="popup" id="pointConsume_searchMemberType" data-theme="d" class="payment_searchMemberType">
-		<ul id="pointConsume_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-			<li data-role="divider" data-theme="e" style="line-height: 30px;">选择号码来源:</li>
-			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(1)"><a >手机卡</a></li>
-			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(3)"><a >会员实体卡</a></li>
-			<li  class="popupButtonList" onclick="ts.member.readMemberByCondtion4PointConsume(2)"><a >微信卡</a></li>
-		</ul>
-	</div>		
 </div>			
 
 <!-- end 餐台选择  -->

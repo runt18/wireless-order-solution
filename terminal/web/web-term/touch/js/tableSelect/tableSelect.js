@@ -663,6 +663,56 @@ $(function(){
 			dailyHandler(CommitTypeEnum.Person);
 		});
 		
+		
+		//积分兑换
+		$('#pointConsume_li_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				seajs.use(['readMember', 'issueCoupon'], function(readPopup, issuePopup){
+					var fastIssuePopup = null;
+					fastIssuePopup = readPopup.newInstance({
+						confirm : function(member){
+							if(member){
+								fastIssuePopup.close(function(){
+									var issueCouponPopup = issuePopup.newInstance({
+										title : '积分兑换',
+										member : member,
+										issueMode : issuePopup.IssueMode.POINT,
+										issueTo : member.id,
+										isPoint : true,
+										confirm : function(self, promotions, point){
+											$.ajax({
+												url : '../OperateMember.do',
+												type : 'post',
+												dataType : 'json',
+												data : {
+													dataSource : 'consumePoint',
+													memberId : member.id,
+													comment : self.find('[id="pointExchange_input_issue"]').val(),
+													promotions : promotions.join(";"),
+													isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
+												},
+												success : function(jr){
+													issueCouponPopup.close();
+													Util.msg.tip(jr.msg);
+												}
+											})
+										
+										}
+									});
+									issueCouponPopup.open();
+								}, 200);
+							}else{
+								Util.msg.tip('请注入会员!');
+							}
+						}
+					});
+					fastIssuePopup.open();
+					
+				});
+			}, 100);
+		});
+		
 		//快速发券
 		$('#fastIssue_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
@@ -675,7 +725,7 @@ $(function(){
 								fastIssuePopup.close(function(){
 									var issueCouponPopup = issuePopup.newInstance({
 										title : '快速发放优惠券',
-										memberName : member.name,
+										member : member,
 										issueMode : issuePopup.IssueMode.FAST,
 										issueTo : member.id
 									});
@@ -1678,14 +1728,6 @@ window.onload = function(){
 	//渲染会员读取窗口
 	$('#lookupOrderDetail').trigger('create').trigger('refresh');
     
-	//积分消费读卡
-    $('#txtMember4PointConsume').on('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	ts.member.readMemberByCondtion4PointConsume();
-        }
-    });	    
-    
     //会员消费详情
     $('#consumeDetail_memberName').on('keypress',function(event){
         if(event.keyCode == "13")    
@@ -1737,153 +1779,3 @@ ts.renderToCreateOrder = function(tableNo, customNum, comment){
 };
 
 
-/**
- * 打开 & 关闭会员积分消费
- */
-ts.member.openMemberPointConsumeWin = function(){
-	$('#frontPageMemberOperation').popup('close');
-	
-	setTimeout(function(){
-		$('#memberPointConsume').show();
-		$('#shadowForPopup').show();
-		
-		$('#txtMember4PointConsume').focus();		
-	}, 250);
-};
-
-ts.member.closeMemberPointConsumeWin = function(){
-	
-	$('#memberPointConsume').hide();
-	$('#shadowForPopup').hide();
-	
-	ts.member.loadMemberInfo4PointConsume();
-	
-	$('#txtMember4PointConsume').val('');
-};
-
-
-/**
- * 积分消费读取会员
- */
-ts.member.readMemberByCondtion4PointConsume = function(stype){
-	var memberInfo = $('#txtMember4PointConsume');
-	
-	if(!memberInfo.val()){
-		Util.msg.alert({msg:'请填写会员相关信息', topTip:true});
-		memberInfo.focus();
-		return;
-	}
-	
-	if(stype){
-		$('#pointConsume_searchMemberType').popup('close');
-	}else{
-		stype = '';
-	}
-	Util.LM.show();
-	$.ajax({
-		url : "../QueryMember.do",
-		type : 'post',
-		data : {
-			dataSource:'normal',
-			sType: stype,
-			forDetail : true,
-			memberCardOrMobileOrName:memberInfo.val()
-		},
-//		async : false,
-		dataType : 'json',
-		success : function(jr, status, xhr){
-			Util.LM.hide();
-			if(jr.success){
-				if(jr.root.length == 1){
-					Util.msg.alert({msg:'会员信息读取成功.', topTip:true});
-					ts.member.pointConsumeMember = jr.root[0];
-					ts.member.loadMemberInfo4PointConsume(jr.root[0]);
-				}else if(jr.root.length > 1){
-					$('#pointConsume_searchMemberType').popup('open');
-					$('#pointConsume_searchMemberType').css({top:$('#btnReadMember4PointConsume').position().top - 270, left:$('#btnReadMember4PointConsume').position().left-300});
-				}else{
-					Util.msg.alert({msg:'该会员信息不存在, 请重新输入条件后重试.', renderTo : 'tableSelectMgr', fn : function(){
-						memberInfo.focus();
-					}});
-				}
-			}else{
-				Util.msg.alert({
-					msg : jr.msg,
-					renderTo : 'tableSelectMgr'
-				});
-			}
-		},
-		error : function(request, status, err){
-		}
-	}); 		
-};
-
-
-/**
- * 积分消费加载会员信息
- */
-ts.member.loadMemberInfo4PointConsume = function(member){
-	member = member == null || typeof member == 'undefined' ? {} : member;
-	var memberType = member.memberType ? member.memberType : {};
-	
-	$('#numConsumePointForConsumePoint').val('');
-	
-	$('#numMemberPointForConsumePoint').text(member.point?member.point:'----');
-	$('#numMemberNameForConsumePoint').text(member.name?member.name:'----');
-	$('#numMemberTypeForConsumePoint').text(memberType.name?memberType.name:'----');
-	
-	if(!jQuery.isEmptyObject(member)){
-		$('#numConsumePointForConsumePoint').focus();		
-	}
-};
-
-/**
- * 积分消费操作
- */
-ts.member.memberPointConsumeAction = function(){
-	if(!ts.member.pointConsumeMember){
-		Util.msg.alert({msg : '请先输入手机号码或会员卡号读取会员信息.', topTip:true});
-		return;
-	}
-	
-	var point = $('#numConsumePointForConsumePoint');
-	if(!point.val()){
-		Util.msg.alert({msg : '请输入要消费的积分.', topTip:true});
-		point.focus();
-		return;
-	}else if(point.val() > ts.member.pointConsumeMember.point){
-		Util.msg.alert({msg:'请输入小于当前积分的消费积分的数值.', renderTo:'tableSelectMgr', fn:function(){
-			point.focus();
-		}});
-		return;
-	}
-	
-	$.post('../OperateMember.do', {
-		dataSource : 'consumePoint',
-		memberId : ts.member.pointConsumeMember.id,
-		orientedPrinter : getcookie(document.domain + '_printers'),
-		point : point.val()		
-	}, function(jr){
-		if(jr.success){
-			Util.msg.alert({
-				title : '消费成功',
-				msg : '<font size=4>原有积分: ' + ts.member.pointConsumeMember['point'] + '</font>'
-					+'<br><font size=4 color="red">消费积分: ' + point.val()	 + '</font>'
-					+'<br><font size=4 color="green">当前积分: ' + (ts.member.pointConsumeMember['point'] - point.val()) + '</font>',
-				renderTo : 'tableSelectMgr'
-			});
-			
-/*			Util.msg.alert({
-				msg : '会员积分消费成功',
-				topTip : true
-			});*/
-			
-			ts.member.closeMemberPointConsumeWin();
-		}else{
-			Util.msg.alert({
-				msg : jr.msg,
-				renderTo : 'tableSelectMgr'
-			});
-		}		
-	});
-};

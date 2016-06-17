@@ -3016,6 +3016,305 @@ public class HistoryStatisticsAction extends DispatchAction{
 	}
 	
 	/**
+	 * 积分明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public ActionForward pointConsume(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		response.setContentType("application/vnd.ms-excel;");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		final String dataSource = request.getParameter("dataSource");
+		
+		final String memberType = request.getParameter("memberType");
+		
+		final String fuzzy = request.getParameter("fuzzy");
+		
+		final String payType = request.getParameter("payType");
+		//现金,刷卡,签单
+		final String chargeType = request.getParameter("chargeType");
+		//消费类型,充值类型,积分,金额调整
+		final String operateType = request.getParameter("operateType");
+		//充值,取款,积分消费,反结账...
+		final String detailOperate = request.getParameter("detailOperate");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		final String pointChanged = request.getParameter("pointChanged");
+		
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		final DateType dateType;
+		if(dataSource.equalsIgnoreCase("today")){
+			dateType = DateType.TODAY;
+		}else{
+			dateType = DateType.HISTORY;
+		}
+		
+		final MemberOperationDao.ExtraCond extraCond;
+
+		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+			if(OperationCate.valueOf(Integer.valueOf(operateType)) == OperationCate.CONSUME_TYPE){
+				extraCond = new MemberOperationDao.ExtraCond4Consume(dateType);
+			}else{
+				extraCond = new MemberOperationDao.ExtraCond(dateType);
+			}
+		}else{
+			extraCond = new MemberOperationDao.ExtraCond(dateType);
+		}
+		
+		if(pointChanged != null && !pointChanged.isEmpty()){
+			extraCond.setPointChange(Boolean.parseBoolean(pointChanged));
+		}
+
+		if(memberType != null && !memberType.trim().isEmpty()){
+			extraCond.setMemberType(Integer.parseInt(memberType));
+		}
+		
+		if(payType != null && !payType.isEmpty() && !payType.equals("-1")){
+			extraCond.setPayType(Integer.parseInt(payType));
+		}
+		
+		if(chargeType != null && !chargeType.isEmpty() && !chargeType.equals("-1")){
+			extraCond.setChargeType(Integer.parseInt(chargeType));
+		}
+		
+		if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
+			extraCond.setBranch(Integer.parseInt(branchId));
+		}
+		
+		if(fuzzy != null && !fuzzy.trim().isEmpty()){
+			List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
+			extraCond.addMember(-1);
+			for (Member member : members) {
+				extraCond.addMember(member);
+			}
+		}
+		
+		//如果没选择小分类,则选择所有的小分类
+		if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
+			extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
+		}else{
+			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+				for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
+					extraCond.addOperationType(type);
+				}
+			}
+		}
+		
+		if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+			extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
+		}
+			
+		
+		List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, null);
+		
+		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
+		if(list != null && !list.isEmpty()){
+			sum.setChargeType(list.get(0).getChargeType());
+			sum.setComment(list.get(0).getComment());
+			sum.setOperationType(list.get(0).getOperationType());
+			sum.setPayType(list.get(0).getPayType());
+			sum.setOperateSeq(list.get(0).getOperateSeq());
+			sum.setStaffName(list.get(0).getStaffName());
+			for(MemberOperation temp : list){
+				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setId(temp.getMemberId()), null);
+				
+				if(members.isEmpty()){
+					MemberType delteMT = new MemberType(0);
+					delteMT.setName("已删除会员");
+					temp.getMember().setMemberType(delteMT);
+				}else{
+					temp.setMember(members.get(0));
+				}
+				
+				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
+				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
+				sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());
+				sum.setPayMoney(temp.getPayMoney() + sum.getPayMoney());
+				sum.setDeltaPoint(temp.getDeltaPoint() + sum.getDeltaPoint());
+			}
+		}
+		
+		String title;
+		if(Integer.parseInt(branchId) > 0){
+			title = "积分兑换明细表(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")";
+		}else{
+			title = "积分兑换明细表(全部门店)";
+		}
+		
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("积分兑换明细.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3800);
+		sheet.setColumnWidth(1, 3000);
+		sheet.setColumnWidth(2, 3300);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 3000);
+		sheet.setColumnWidth(8, 3000);
+		sheet.setColumnWidth(9, 9000);
+		
+		//冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		String date;
+		if(dataSource.equals("today")){
+			date = "当日";
+		}else{
+			date = onDuty + "  至  " + offDuty;
+		}
+		cell.setCellValue("统计时间: " + date );
+//				cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("共 " + list.size() + " 条兑换记录"	);
+//				cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+		
+		//列头
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("操作日期");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员手机");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("会员卡号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("积分余额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("积分使用");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("门店名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);
+		
+		for (MemberOperation mo : list) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(DateUtil.format(mo.getOperateDate()));
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getMemberName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getMemberMobile());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getMemberCard());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getRemainingPoint());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getDeltaPoint());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getOperationType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getStaffName());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getBranchName());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(mo.getComment());
+			cell.setCellStyle(strStyle);
+			
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+
+		
+		
+		return null;
+	}
+	
+	
+	/**
 	 * 消费明细
 	 * @param mapping
 	 * @param form
@@ -3043,7 +3342,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String payType = request.getParameter("payType");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
 		
 		
 		DateType dy;

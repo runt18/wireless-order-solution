@@ -18,11 +18,28 @@
 	    
 	    </div>
 	    
-		<div data-role="footer" data-theme="b" class="ui-footer ui-bar-b ui-corner-bottom" style="height: 47px;">
-			 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth" style="width:100%;">
-			 	 <a id="couponIssueConfirm_a_issue" data-role="button" data-inline="true" class="tablePopbottomBtn" style="width:50%;">确定</a>
-				 <a id="couponIssueCancel_a_issue" data-role="button" data-inline="true" class="tablePopbottomBtn" style="width:48%;">取消</a>		 
-			 </div>
+	    
+	    <table id="pointExchange_table_issue" style="display:none;">
+	    	<tr>
+	    		<td><div style="font-weight:bold;">备注 : </div></td>
+	    		<td><input id="pointExchange_input_issue" data-type="num" style="width:80%;font-size:16px;font-weight: bold;"></td>
+	    		<td>
+	    			<div>
+						<label>
+					        <input type="checkbox" id="pointExchange_check_issue" data-theme="e"><label>发送并使用优惠券</label>
+					    </label>
+				    </div>	    	
+				</td>
+	    	</tr>
+	    </table>
+	    
+		<div data-role="footer" data-theme="b" class="ui-footer ui-bar-b ui-corner-bottom"	>
+			<div class="bottomGeneralBar">
+			</div>	
+			<div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth" style="width:100%;">
+			 	<a id="couponIssueConfirm_a_issue" data-role="button" data-inline="true" class="tablePopbottomBtn" style="width:50%;">确定</a>
+				<a id="couponIssueCancel_a_issue" data-role="button" data-inline="true" class="tablePopbottomBtn" style="width:48%;">取消</a>		 
+			</div>
 	    </div>
 	    
 	 </div>	

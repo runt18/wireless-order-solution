@@ -223,6 +223,7 @@ public class Page{
 		MEMBER_COND("memberCond", "会员分析", "Client_Module/memberCond.html", "../../images/history.png"),
 		COUPON_STATISTICS("couponStatistics", "优惠券统计 ", "History_Module/CouponStatistics.html", "../../images/giftStatistics.png"),
 		COUPON_EFFECT("couponEffect", "优惠活动效果分析", "Client_Module/couponEffectStatistics.html", "../../images/memberMgr.png"),
+		POINT_CONSUME("pointConsumeStaitstics", "积分兑换统计", "Client_Module/pointConsumeStatistics.html", "../../images/memberMgr.png"),
 		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png"),
 		REPRESENT_STATISTICS("representStatistics", "代言统计", "History_Module/RepresentStatistics.html", "../../images/memberMgr.png"),
 		WXCOMMISSION_STATISTICS("wxCommissionStatistics", "佣金统计", "History_Module/WxCommissionStatistics.html", "../../images/memberMgr.png"),

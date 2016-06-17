@@ -462,13 +462,35 @@ public class OperateMemberAction extends DispatchAction{
 		
 		final String pin = (String)request.getAttribute("pin");
 		final String memberId = request.getParameter("memberId");
-		final String point = request.getParameter("point");
+		final String comment = request.getParameter("comment");
+		final String isIssueAndUse = request.getParameter("isIssueAndUse");
+		final String promotions = request.getParameter("promotions");
 		
 		final JObject jObject = new JObject();
 		try{
-			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			MemberDao.pointConsume(staff, Integer.valueOf(memberId), Integer.valueOf(point));
+			final Member.PointExchangeBuilder pointExchangeBuilder = new Member.PointExchangeBuilder(Integer.parseInt(memberId));
+			//设置发放的优惠券
+			if(promotions != null && !promotions.isEmpty()){
+				for(String eachPromotion : promotions.split(";")){
+					int promotionId = Integer.parseInt(eachPromotion.split(",")[0]);
+					int amount = Integer.parseInt(eachPromotion.split(",")[1]);
+					pointExchangeBuilder.addPromotion(promotionId, amount);
+				}
+			}		
+			
+			if(comment != null && !comment.isEmpty()){
+				pointExchangeBuilder.setComment(comment);
+			}
+			
+			
+			if(isIssueAndUse != null && Boolean.valueOf(isIssueAndUse)){
+				pointExchangeBuilder.setIssueAndUse(true);
+			}else{
+				pointExchangeBuilder.setIssueAndUse(false);
+			}
+			
+			MemberDao.pointConsume(staff, pointExchangeBuilder);
 			jObject.initTip(true, "操作成功, 会员积分消费成功.");
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();

@@ -8,12 +8,14 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.member.MemberDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
@@ -532,8 +534,15 @@ public class PromotionDao {
 				for(Promotion promotion : promotions){
 					if(issueRule.rule == promotion.getIssueTrigger().getIssueRule()){
 						if(issueRule.rule.isSingleExceed()){
+							//单次消费满足
 							Order order = OrderDao.getById(dbCon, staff, ((Integer)issueRule.extra).intValue(), DateType.TODAY);
 							if(order.calcTotalPrice() > promotion.getIssueTrigger().getExtra()){
+								result.add(promotion);
+							}
+						}else if(issueRule.rule.isPointExchange()){
+							//积分兑换
+							Member member = MemberDao.getById(dbCon, staff, (Integer)issueRule.extra);
+							if(member.getPoint() >= promotion.getIssueTrigger().getExtra()){
 								result.add(promotion);
 							}
 						}else{

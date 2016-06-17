@@ -39,6 +39,11 @@ public class PromotionTrigger implements Jsonable {
 			return new InsertBuilder(Type.ISSUE, IssueRule.WX_SCAN, 0);
 		}
 		
+		//积分兑换
+		public static InsertBuilder newIssue4Point(int point){
+			return new InsertBuilder(Type.ISSUE, IssueRule.POINT_EXCHANGE, point);
+		}
+		
 		//免费发券
 		public static InsertBuilder newIssue4Free(){
 			return new InsertBuilder(Type.ISSUE, IssueRule.FREE, 0);
@@ -127,7 +132,8 @@ public class PromotionTrigger implements Jsonable {
 		FREE(1, "免费发券"),
 		SINGLE_EXCEED(2, "单次消费满"),
 		WX_SUBSCRIBE(3, "微信关注"),
-		WX_SCAN(4, "扫码发券")
+		WX_SCAN(4, "扫码发券"),
+		POINT_EXCHANGE(5, "积分兑换")
 		;
 		private final int val;
 		private final String desc;
@@ -160,6 +166,10 @@ public class PromotionTrigger implements Jsonable {
 
 		public boolean isWxScan(){
 			return this == WX_SCAN;
+		}
+		
+		public boolean isPointExchange(){
+			return this == POINT_EXCHANGE;
 		}
 		
 		@Override
@@ -195,6 +205,10 @@ public class PromotionTrigger implements Jsonable {
 		
 		public boolean isSingleExceed(){
 			return this == SINGLE_EXCEED;
+		}
+		
+		public boolean isFree(){
+			return this == FREE;
 		}
 		
 		@Override

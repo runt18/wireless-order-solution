@@ -83,8 +83,10 @@ public class CouponOperation implements Jsonable{
 		BATCH_ISSUE(OperateType.ISSUE, 3, "批量发券"),
 		WX_SUBSCRIBE_ISSUE(OperateType.ISSUE, 4, "微信关注发券"),
 		WX_SCAN_ISSUE(OperateType.ISSUE, 5, "微信扫码发券"),
+		POINT_EXCHANGE_ISSUE(OperateType.ISSUE, 6, "积分兑换发券"),
 		FAST_USE(OperateType.USE, 20, "手动用券"),
 		ORDER_USE(OperateType.USE, 21, "账单用券"),
+		POINT_EXCHANGE_USE(OperateType.USE, 22, "积分兑换用券")
 		;
 		Operate(OperateType type, int val, String desc){
 			this.type = type;

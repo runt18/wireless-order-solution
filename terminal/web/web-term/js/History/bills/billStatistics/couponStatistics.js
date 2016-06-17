@@ -33,7 +33,7 @@ Ext.onReady(function(){
 		xtype : 'combo',
 		id : 'couponType_combo_couponStatistics',
 		forceSelection : true,
-		width : 80,
+		width : 100,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text']
 		}),
@@ -45,9 +45,26 @@ Ext.onReady(function(){
 		selectOnFocus : true,
 		listeners : {
 			render : function(thiz){
-				thiz.store.loadData([['', '全部'], ['issue', '发券'], ['1', '快速发券'], ['2', '账单发券'], ['3', '批量发券'], 
-				                     ['use', '用券'], ['20', '手动用券'], ['21', '账单用券'], ['22', '微信关注用券']]);
-				thiz.setValue('');
+				$.ajax({
+					url : '../../OperateCoupon.do',
+					type :'post',
+					dataType : 'json',
+					data : {
+						dataSource : 'getOperateType'
+					},
+					success : function(jr){
+						var data = [['', '全部']];
+						if(jr.success){
+							for(var i = 0; i < jr.root[0].operateType.length; i++){
+								data.push([jr.root[0].operateType[i]['value'], jr.root[0].operateType[i]['name']]);
+							}
+						}
+						thiz.store.loadData(data);
+						thiz.setValue('');
+					}
+				
+				})
+						
 			},
 			select : function(){
 				Ext.getCmp('coupon_btnSearch').handler();

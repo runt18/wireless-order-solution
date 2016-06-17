@@ -73,7 +73,8 @@ Ext.onReady(function(){
 						FREE : {val : 1, desc : "免费发券"},
 						SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
 						WX_SUBSCRIBE : {val : 3, desc : "微信关注"},
-						WX_SCAN : {val : 4, desc : '扫码发券'} 
+						WX_SCAN : {val : 4, desc : '扫码发券'},
+						POINT_EXCHANGE : {val : 5, desc : '积分兑换'}
 					}
 								
 					var useRules = {
@@ -86,20 +87,29 @@ Ext.onReady(function(){
 					if(jr.root[0].issueTrigger.issueRule){
 						if(jr.root[0].issueTrigger.issueRule == issueRules.FREE.val){
 							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
+							Ext.getCmp('pointExchange_numberfield_active').setValue('');
 							Ext.getCmp('issueFree_active').setValue(true);
 							Ext.getCmp('issueFree_active').fireEvent('focus');
 						}else if(jr.root[0].issueTrigger.issueRule == issueRules.SINGLE_EXCEED.val){
 							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue(jr.root[0].issueTrigger.extra);
+							Ext.getCmp('pointExchange_numberfield_active').setValue('');
 							Ext.getCmp('issueSingle_active').setValue(true);
 							Ext.getCmp('issueSingle_active').fireEvent('focus');
 						}else if(jr.root[0].issueTrigger.issueRule == issueRules.WX_SUBSCRIBE.val){
 							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
+							Ext.getCmp('pointExchange_numberfield_active').setValue('');
 							Ext.getCmp('issueWx_active').setValue(true);
 							Ext.getCmp('issueWx_active').fireEvent('focus');
 						}else if(jr.root[0].issueTrigger.issueRule == issueRules.WX_SCAN.val){
 							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
+							Ext.getCmp('pointExchange_numberfield_active').setValue('');
 							Ext.getCmp('wxScan_active').setValue(true);
 							Ext.getCmp('wxScan_active').fireEvent('focus');
+						}else if(jr.root[0].issueTrigger.issueRule == issueRules.POINT_EXCHANGE.val){
+							Ext.getCmp('pointExchange_numberfield_active').setValue(jr.root[0].issueTrigger.extra);
+							Ext.getCmp('IssueSingleMoney_numberfield_active').setValue('');
+							Ext.getCmp('point_exchange').setValue(true);
+							Ext.getCmp('point_exchange').fireEvent('focus');
 						}
 					}
 					
@@ -913,7 +923,8 @@ Ext.onReady(function(){
 									FREE : {val : 1, desc : "免费发券"},
 									SINGLE_EXCEED : {val : 2, desc : "单次消费满"},
 									WX_SUBSCRIBE : {val : 3, desc : "微信关注"},
-									WX_SCAN_ISSUE_COUPON : {val : 4, desc : '扫码发券'}
+									WX_SCAN_ISSUE_COUPON : {val : 4, desc : '扫码发券'},
+									POINT_EXCHANGE : {val : 5, desc : '积分兑换'}
 								}
 								
 								var useRules = {
@@ -942,6 +953,8 @@ Ext.onReady(function(){
 									issueRuleValue = 3;
 								}else if(Ext.getCmp('wxScan_active').getValue()){
 									issueRuleValue = 4;
+								}else if(Ext.getCmp('point_exchange').getValue()){
+									issueRuleValue = 5;
 								}
 								
 								if(Ext.getCmp('useRule_active').getValue()){
@@ -953,6 +966,7 @@ Ext.onReady(function(){
 								//设定发券规则
 								var issueRule = null;
 								var issueSingeMoney = null;
+								var point = null;
 								if(issueRuleValue == 1){
 									issueRule = issueRules.FREE.val;
 								}else if (issueRuleValue == 2){
@@ -968,6 +982,15 @@ Ext.onReady(function(){
 									issueRule = issueRules.WX_SUBSCRIBE.val;
 								}else if(issueRuleValue == 4){
 									issueRule = issueRules.WX_SCAN_ISSUE_COUPON.val;
+								}else if(issueRuleValue == 5){
+									issueRule = issueRules.POINT_EXCHANGE.val;
+									
+									if(Ext.getCmp('pointExchange_numberfield_active').getValue() == ''){
+										Ext.example.msg('提示', '操作失败, 发券满足金额不能为空或者只能填写数字');
+										return;
+									}else{
+										point = Ext.getCmp('pointExchange_numberfield_active').getValue();
+									}
 								}
 								
 								//设定用券规则
@@ -993,7 +1016,8 @@ Ext.onReady(function(){
 										issueRule : issueRule,
 										issueSingleMoney : issueRule == issueRules.SINGLE_EXCEED.val ? issueSingeMoney : null,
 										useRule : useRule,
-										useSingleMoney : useRule == issueRules.SINGLE_EXCEED.val ? useSingleMoney : null
+										useSingleMoney : useRule == issueRules.SINGLE_EXCEED.val ? useSingleMoney : null,
+										point : point
 									},
 									success : function(res, opt){
 										var jr = Ext.decode(res.responseText);
@@ -1033,6 +1057,7 @@ Ext.onReady(function(){
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
+											Ext.getCmp('pointExchange_fieldset_activeMgr').hide();
 										}
 									}
 								},{
@@ -1047,7 +1072,7 @@ Ext.onReady(function(){
 										focus : function(e, check){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').show();
 											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
-											
+											Ext.getCmp('pointExchange_fieldset_activeMgr').hide();
 										}
 									}
 								},{
@@ -1062,7 +1087,7 @@ Ext.onReady(function(){
 										focus : function(e){
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
-											
+											Ext.getCmp('pointExchange_fieldset_activeMgr').hide();
 										}
 									}
 								}, {
@@ -1075,6 +1100,22 @@ Ext.onReady(function(){
 										},
 										focus : function(e){
 											Ext.getCmp('createQrCode_fieldset_activeMgr').show();
+											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
+											Ext.getCmp('pointExchange_fieldset_activeMgr').hide();
+										}
+									}
+								}, {
+									boxLabel : '积分兑换',
+									name : 'sendCouponRule',
+									id : 'point_exchange',
+									inputValue : 5,
+									listeners : {
+										check : function(e){
+										},
+										focus : function(e){
+											//TODO
+											Ext.getCmp('pointExchange_fieldset_activeMgr').show();
+											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
 										}
 									}
@@ -1090,7 +1131,7 @@ Ext.onReady(function(){
 										id : 'IssueSingleMoney_numberfield_active',
 										fieldLabel : '发送满足金额',
 										allowBlank : false,
-										blankText : '类型名称不能为空.',
+										blankText : '发送满足金额不能为空.',
 										value : ""
 									}]
 								}, {
@@ -1107,6 +1148,20 @@ Ext.onReady(function(){
 										handler : function(){
 											initQrcode();
 										}
+									}]
+								}, {
+									title : '积分兑换',
+									id : 'pointExchange_fieldset_activeMgr',
+									xtype : 'fieldset',
+									layout : 'form',
+									hidden : true,
+									items : [{
+										xtype : 'numberfield',
+										id : 'pointExchange_numberfield_active',
+										fieldLabel : '积分',
+										allowBlank : false,
+										blankText : '积分不能为空.',
+										value : ""
 									}]
 								}, {
 								xtype : 'radiogroup',

@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -15,6 +16,7 @@ import com.wireless.db.Params;
 import com.wireless.db.member.represent.RepresentChainDao;
 import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
@@ -41,6 +43,8 @@ import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.member.represent.RepresentChain;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Privilege;
@@ -2167,34 +2171,96 @@ public class MemberDao {
 	 * 			the id to member to perform point consumption
 	 * @param pointConsume
 	 * 			the amount of point consumption
-	 * @return the member operation to this point consumption 
+	 * @return the list to member operation to this point consumption 
 	 * @throws BusinessException
 	 * 			throws if point to consume exceeds the remaining
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation pointConsume(DBCon dbCon, Staff staff, int memberId, int pointConsume) throws BusinessException, SQLException{
+	public static List<MemberOperation> pointConsume(DBCon dbCon, Staff staff, Member.PointExchangeBuilder pointBuilder) throws BusinessException, SQLException{
 		
-		if(pointConsume < 0){
-			throw new IllegalArgumentException("The amount of point to consume(amount = " + pointConsume + ") must be more than zero");
+		final List<Map.Entry<Promotion, Integer>> promotions = new ArrayList<>();
+		float pointsExchange = 0;
+		for(final Map.Entry<Integer, Integer> entry : pointBuilder.getPromotions()){
+			final Promotion promotion = PromotionDao.getById(dbCon, staff, entry.getKey());
+			if(!promotion.getIssueTrigger().getIssueRule().isPointExchange()){
+				throw new BusinessException(("对不起, 【$(promotion)】的优惠券不能积分兑换").replace("$(promotion)", promotion.getCouponType().getName()));
+			}
+			pointsExchange += promotion.getIssueTrigger().getExtra() * entry.getValue();
+			
+			promotions.add(new Map.Entry<Promotion, Integer>() {
+
+				@Override
+				public Promotion getKey() {
+					return promotion;
+				}
+
+				@Override
+				public Integer getValue() {
+					return entry.getValue();
+				}
+
+				@Override
+				public Integer setValue(Integer value) {
+					return null;
+				}
+			});	
 		}
 		
-		Member member = getById(dbCon, staff, memberId);
+		final Member member = getById(dbCon, staff, pointBuilder.getMemberId());
 		
-		//Perform the point consumption and get the related member operation.
-		MemberOperation mo = member.pointConsume(pointConsume);
-				
-		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, staff, mo);
+		if(member.getPoint() < pointsExchange){
+			throw new BusinessException("会员所剩积分不足,兑换失败");
+		}
 		
-		//Update the point.
-		String sql = " UPDATE " + Params.dbName + ".member SET" +
-				     " used_point = " + member.getUsedPoint() + "," +
-					 " point = " + member.getPoint() + 
-					 " WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
+		final List<MemberOperation> result = new ArrayList<>();
+		for(Entry<Promotion, Integer> entry : promotions){
+			
+			//Perform the point consumption and get the related member operation.
+			MemberOperation mo = member.pointConsume(entry.getKey().getIssueTrigger().getExtra() * entry.getValue());
+			
+			StringBuilder allComment = new StringBuilder();
+			allComment.append(("兑换【$(promotion)】优惠券【$(amount)】张,").replace("$(promotion)", entry.getKey().getTitle()).replace("$(amount)", String.valueOf(entry.getValue())));
+			
+			mo.setComment(allComment + pointBuilder.getComment());
+			
+			final Coupon.IssueBuilder issueBuilder = Coupon.IssueBuilder.newInstance4PointExchange();
+			issueBuilder.addPromotion(entry.getKey().getId());
+			issueBuilder.addMember(pointBuilder.getMemberId());
+			
+			//发送优惠券
+			int[] issuedCoupons = CouponDao.issue(dbCon, staff, issueBuilder);
+			
+			//使用优惠券
+			if(pointBuilder.isIssueAndUse()){
+				for(int couponId : issuedCoupons){
+					final Coupon coupon = CouponDao.getById(dbCon, staff, couponId);
+					
+					if(coupon.getPromotion().getUseTrigger().getUseRule().isFree()){
+						final Coupon.UseBuilder useBuilder = Coupon.UseBuilder.newInstance4Point(member.getId());
+						useBuilder.addCoupon(coupon);
+						CouponDao.use(dbCon, staff, useBuilder);
+					}else{
+						throw new BusinessException(("对不起, 【$(promotion)】的优惠券不符合使用条件").replace("$(promotion)", coupon.getPromotion().getCouponType().getName()));
+					}
+				}
+			}
+			
+			//Insert the member operation to this point consumption.
+			mo.setId(MemberOperationDao.insert(dbCon, staff, mo));
 		
-		return mo;
+			//Update the point.
+			String sql = " UPDATE " + Params.dbName + ".member SET" +
+					     " used_point = " + member.getUsedPoint() + "," +
+						 " point = " + member.getPoint() + 
+						 " WHERE member_id = " + pointBuilder.getMemberId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			result.add(mo);
+		}
+		
+		return result;
+		
 	}
 	
 	/**
@@ -2211,14 +2277,14 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation pointConsume(Staff staff, int memberId, int pointConsume) throws BusinessException, SQLException{
+	public static List<MemberOperation> pointConsume(Staff staff, Member.PointExchangeBuilder pointBuilder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.pointConsume(dbCon, staff, memberId, pointConsume);
+			List<MemberOperation> result = MemberDao.pointConsume(dbCon, staff, pointBuilder);
 			dbCon.conn.commit();
-			return mo;
+			return result;
 			
 		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
