@@ -693,8 +693,13 @@ $(function(){
 													isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
 												},
 												success : function(jr){
-													issueCouponPopup.close();
-													Util.msg.tip(jr.msg);
+													if(jr.success){
+														issueCouponPopup.close(function(){
+															Util.msg.tip(jr.msg);
+														});
+													}else{
+														Util.msg.tip(jr.msg);
+													}
 												}
 											})
 										

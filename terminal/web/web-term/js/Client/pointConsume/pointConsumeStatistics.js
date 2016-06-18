@@ -157,8 +157,6 @@ Ext.onReady(function(){
 				return;
 			}
 			
-			businessHour =  Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'pointConsume_'}).data;
-			
 			var store = pointConsumePanel.getStore();
 			store.baseParams['pointChanged'] = 'true';
 			store.baseParams['dataSource'] = 'history';
@@ -166,8 +164,6 @@ Ext.onReady(function(){
 			store.baseParams['offDuty'] = Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59');
 			store.baseParams['fuzzy'] = Ext.getCmp('pointMember_textfield_point').getValue();
 			store.baseParams['branchId'] = branch_combo_point.getValue();
-			store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
-			store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';
 			store.baseParams['detailOperate'] = operateType_combo_point.getValue();
 			store.baseParams['isPaging'] = 'true';
 			store.load({
@@ -183,7 +179,7 @@ Ext.onReady(function(){
 		text : '导出',
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
-			var url = '../../{0}?dataSource={1}&pointChanged={2}&onDuty={3}&offDuty={4}&fuzzy={5}&branchId={6}&opening={7}&ending={8}&detailOperate={9}';
+			var url = '../../{0}?dataSource={1}&pointChanged={2}&onDuty={3}&offDuty={4}&fuzzy={5}&branchId={6}&detailOperate={7}';
 		
 			url = String.format(
 				url,
@@ -194,8 +190,6 @@ Ext.onReady(function(){
 				Ext.util.Format.date(endDate.getValue(), 'Y-m-d 23:59:59'),
 				Ext.getCmp('pointMember_textfield_point').getValue(),
 				branch_combo_point.getValue(),
-				businessHour.opening != '00:00' ? businessHour.opening : '',
-				businessHour.ending != '00:00' ? businessHour.ending : '',
 				operateType_combo_point.getValue()
 			);
 			
@@ -208,7 +202,7 @@ Ext.onReady(function(){
 		beginDate : beginDate,
 		endDate : endDate,
 		dateCombo : dataCombo,
-		tbarType : 1,
+		tbarType : 2,
 		statistic : 'pointConsume_',
 		callback : function businessHourSelect(){
 			hours  = null;
@@ -218,11 +212,12 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
 		{header : '操作日期', dataIndex : 'operateDateFormat', width : 30},
+		{header : '账单号', dataIndex : 'orderId', width : 30},
 		{header : '会员名称', dataIndex : 'member.name',width : 20},
 		{header : '会员手机', dataIndex : 'member.mobile', width : 20},
 		{header : '会员卡号', dataIndex : 'member.memberCard', width : 20},
 		{header : '积分余额', dataIndex : 'remainingPoint',width : 20},
-		{header : '积分使用', dataIndex : 'deltaPoint',width : 20},
+		{header : '变动积分', dataIndex : 'deltaPoint',width : 20},
 		{header : '操作类型', dataIndex : 'operateTypeText',width : 20},
 		{header : '操作人', dataIndex : 'staffName',width : 20},
 		{header : '门店名称', dataIndex : 'branchName',width : 20},
@@ -236,6 +231,7 @@ Ext.onReady(function(){
 		proxy : new Ext.data.HttpProxy({url : '../../QueryMemberOperation.do'}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root', idProperty : ''}, [
 			 {name : 'operateDateFormat'},
+			 {name : 'orderId'},
              {name : 'member.name'},
              {name : 'member.mobile'},
              {name : 'member.memberCard'},
