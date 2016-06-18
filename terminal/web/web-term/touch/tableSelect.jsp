@@ -160,7 +160,7 @@
 			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
-			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分消费</a></li>
+			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分兑换</a></li>
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="patchWxCard_a_tableSelect"><a>补发电子卡</a></li>
