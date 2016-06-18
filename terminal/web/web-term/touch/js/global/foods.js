@@ -368,10 +368,10 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	};
 	
 	_instance.removeTaste = function(taste){
-		var thiz = this.normalTasteContent;
-		this.normalTasteContent.forEach(function(eachTaste, index){
+		var thiz = this;
+		thiz.normalTasteContent.forEach(function(eachTaste, index){
 			if(eachTaste.id === taste.id){
-				thiz.splice(index, 1);
+				thiz.normalTasteContent.splice(index, 1);
 			}
 		});
 	};
@@ -459,7 +459,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 		if((typeof name == 'undefined' || name == null || name.length == 0 ) && (typeof price == 'undefined' || price == '' || price == 0)){
 			delete thiz.tmpTaste;
 		}else{
-			this.tmpTaste = {
+			thiz.tmpTaste = {
 				name : name ? name : '',
 				price : price ? price : 0 
 			};
@@ -516,7 +516,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	
 	//判断口味组是否相同
 	_instance.equals = function(tasteGroup){
-		return isNormalMatch(tasteGroupm, this) && isTmpMatch(tasteGroup, thiz);
+		return isNormalMatch(tasteGroupm, this) && isTmpMatch(tasteGroup, this);
 	};
 	
 	
