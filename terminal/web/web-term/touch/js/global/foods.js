@@ -351,8 +351,9 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	
 	_instance.addTaste = function(taste){
 		//是否有相同的taste
+		var thiz = this;
 		var duplicated = false;
-		this.normalTasteContent.forEach(function(eachTaste, index){
+		thiz.normalTasteContent.forEach(function(eachTaste, index){
 			if(eachTaste.id === taste.id){
 				duplicated = true;
 			}
@@ -361,25 +362,26 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 		if(duplicated){
 			return false;
 		}else{
-			this.normalTasteContent.push(new WirelessOrder.Taste(taste));
+			thiz.normalTasteContent.push(new WirelessOrder.Taste(taste));
 			return true;
 		}
 	};
 	
 	_instance.removeTaste = function(taste){
-		var thiz = this.normalTasteContent;
-		this.normalTasteContent.forEach(function(eachTaste, index){
+		var thiz = this;
+		thiz.normalTasteContent.forEach(function(eachTaste, index){
 			if(eachTaste.id === taste.id){
-				thiz.splice(index, 1);
+				thiz.normalTasteContent.splice(index, 1);
 			}
 		});
 	};
 	
 	//保存口味组
 	_instance.setTastes = function(tastes){
-		this.normalTasteContent = [];
+		var thiz = this;
+		thiz.normalTasteContent = [];
 		tastes.forEach(function(eachTaste, index){
-			this.addTaste(eachTaste);
+			thiz.addTaste(eachTaste);
 		});
 	};
 	
@@ -392,15 +394,15 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	_instance.getPrice = function(){
 		//获取到口味组的价格	
 		var tastePrice = 0;
-		
-		if(this.hasNormalTaste()){
-			this.normalTasteContent.forEach(function(eachTaste, index){
+		var thiz = this;
+		if(thiz.hasNormalTaste()){
+			thiz.normalTasteContent.forEach(function(eachTaste, index){
 				tastePrice += eachTaste.isCalcByPrice() ? eachTaste.price : (attchedFood.unitPrice * eachTaste.rate);
 			});
 		}
 		
-		if(this.hasTmpTaste()){
-			tastePrice += getTmpTastePrice(this);
+		if(thiz.hasTmpTaste()){
+			tastePrice += getTmpTastePrice(thiz);
 		}
 		
 		return tastePrice;
@@ -410,20 +412,20 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	_instance.getPref = function(){
 		// 获取到拼接后的口味名称  xx, xx
 		
-		
-		if(this.normalTasteContent.length > 0){
+		var thiz = this;
+		if(thiz.normalTasteContent.length > 0){
 			var normalTasteName = '';
-			this.normalTasteContent.forEach(function(eachTaste, index){
+			thiz.normalTasteContent.forEach(function(eachTaste, index){
 				if(normalTasteName == ''){
 					normalTasteName += eachTaste.name;
 				}else{
 					normalTasteName += ',' + eachTaste.name;
 				}
 			});
-			return normalTasteName + (this.hasTmpTaste() ? "," + getTmpTastePref(this) : '');
+			return normalTasteName + (thiz.hasTmpTaste() ? "," + getTmpTastePref(thiz) : '');
 		}else{
-			if(this.hasTmpTaste()){
-				return getTmpTastePref(this);
+			if(thiz.hasTmpTaste()){
+				return getTmpTastePref(thiz);
 			}else{
 				return '';
 			}
@@ -453,10 +455,11 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	
 	//设置临时口味
 	_instance.setTmpTaste = function(name, price){
+		var thiz = this;
 		if((typeof name == 'undefined' || name == null || name.length == 0 ) && (typeof price == 'undefined' || price == '' || price == 0)){
-			delete this.tmpTaste;
+			delete thiz.tmpTaste;
 		}else{
-			this.tmpTaste = {
+			thiz.tmpTaste = {
 				name : name ? name : '',
 				price : price ? price : 0 
 			};
@@ -513,7 +516,7 @@ WirelessOrder.TasteGroup = function(tasteGroup, attchedFood){
 	
 	//判断口味组是否相同
 	_instance.equals = function(tasteGroup){
-		return isNormalMatch(tasteGroupm, this) && isTmpMatch(tasteGroup, thiz);
+		return isNormalMatch(tasteGroupm, this) && isTmpMatch(tasteGroup, this);
 	};
 	
 	
