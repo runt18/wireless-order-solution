@@ -188,10 +188,7 @@ $(function(){
 	//结账
 	function submit(c){
 		if(of.newFood.isEmpty()){
-			Util.msg.alert({
-				topTip : true,
-				msg : '请选择菜品后再继续操作.'
-			});
+			Util.msg.tip('请选择菜品后再继续操作.');
 			return;
 		}
 		
@@ -240,10 +237,7 @@ $(function(){
 					closePopTastePopup();
 					closePinyin();
 					closeHandWriting();
-					Util.msg.alert({
-						msg : data.msg,
-						topTip : true
-					});
+					Util.msg.tip(data.msg);
 					
 					if(c.postSubmit){
 						c.postSubmit();
