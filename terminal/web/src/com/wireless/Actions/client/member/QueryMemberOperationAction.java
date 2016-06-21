@@ -60,6 +60,15 @@ public class QueryMemberOperationAction extends Action{
 		final String minChargeRate = request.getParameter("minChargeRate");
 		final String maxChargeRate = request.getParameter("maxChargeRate");
 		
+		//basemoney
+		final String minDeltaBaseMoney = request.getParameter("minDeltaBase");
+		final String maxDeltaBaseMoney = request.getParameter("maxDeltaBase");
+		
+		//totaoMoney
+		final String minDeltaTotalMoney = request.getParameter("minDeltaTotal");
+		final String maxDeltaToTalMoney = request.getParameter("maxDeltaTotal");
+		
+		
 		try{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -127,6 +136,21 @@ public class QueryMemberOperationAction extends Action{
 				extraCond.setMaxChargeRage(Float.parseFloat(maxChargeRate));
 			}
 			
+			if(minDeltaBaseMoney != null && !minDeltaBaseMoney.isEmpty()){
+				extraCond.setMinDeltaBaseMoney(Float.parseFloat(minDeltaBaseMoney));
+			}
+			
+			if(maxDeltaBaseMoney != null && !maxDeltaBaseMoney.isEmpty()){
+				extraCond.setMaxDeltaBaseMoney(Float.parseFloat(maxDeltaBaseMoney));
+			}
+			
+			if(minDeltaTotalMoney != null && !minDeltaTotalMoney.isEmpty()){
+				extraCond.setMinDeltaTotalMoney(Float.parseFloat(minDeltaTotalMoney));
+			}
+
+			if(maxDeltaToTalMoney != null && !maxDeltaToTalMoney.isEmpty()){
+				extraCond.setMaxDeltaTotalMoney(Float.parseFloat(maxDeltaToTalMoney));
+			}
 			//如果没选择小分类,则选择所有的小分类
 			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
 				extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));

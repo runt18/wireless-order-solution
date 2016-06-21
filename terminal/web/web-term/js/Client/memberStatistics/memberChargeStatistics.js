@@ -392,6 +392,130 @@ Ext.onReady(function(){
 				width : 100,
 				xtype : 'numberfield',
 				id : 'maxChargeRatio_numberField_memberCharge'
+			}, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;实收金额:'
+			}, {
+				columnWidth : 0.2,
+				id : 'deltaBase_combo_memberCharge',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				value : 0,
+				width : 80,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [[1, '大于'], [2, '小于'], [3, '介于'], [0, '无设定']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				listeners : {
+					render : function(thiz){
+						thiz.fireEvent('select', thiz, null ,0);
+					},
+					select : function(combo, record, index){
+						Ext.getCmp('minDeltaBase_numberField_memberCharge').setValue('');
+						Ext.getCmp('maxDeltaBase_numberField_memberCharge').setValue('');
+						if(combo.value == 1){//大于
+							Ext.getCmp('minDeltaBase_numberField_memberCharge').show();
+							Ext.getCmp('maxDeltaBase_numberField_memberCharge').hide();
+							Ext.getCmp('deltaBaseAnd_tbtext_memberCharge').hide();
+						}else if(combo.value == 2){//小于
+							Ext.getCmp('minDeltaBase_numberField_memberCharge').hide();
+							Ext.getCmp('maxDeltaBase_numberField_memberCharge').show();
+							Ext.getCmp('deltaBaseAnd_tbtext_memberCharge').hide();
+						}else if(combo.value == 3){//介于
+							Ext.getCmp('minDeltaBase_numberField_memberCharge').show();
+							Ext.getCmp('maxDeltaBase_numberField_memberCharge').show();
+							Ext.getCmp('deltaBaseAnd_tbtext_memberCharge').show();
+						}else if(combo.value == 0){//无设定
+							Ext.getCmp('minDeltaBase_numberField_memberCharge').hide();
+							Ext.getCmp('maxDeltaBase_numberField_memberCharge').hide();
+							Ext.getCmp('deltaBaseAnd_tbtext_memberCharge').hide();
+						}
+					}
+				}
+			}, {
+				xtype : 'tbtext',
+				text : " "
+			}, {
+				width : 100,
+				xtype : 'numberfield',
+				id : 'minDeltaBase_numberField_memberCharge'
+			},{
+				id : 'deltaBaseAnd_tbtext_memberCharge',
+				xtype : 'tbtext',
+				text : '至'
+			}, {
+				width : 100,
+				xtype : 'numberfield',
+				id : 'maxDeltaBase_numberField_memberCharge'
+			}, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;账户充额:'
+			}, {
+				columnWidth : 0.2,
+				id : 'deltaTotal_combo_memberCharge',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				value : 0,
+				width : 80,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [[1, '大于'], [2, '小于'], [3, '介于'], [0, '无设定']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				listeners : {
+					render : function(thiz){
+						thiz.fireEvent('select', thiz, null ,0);
+					},
+					select : function(combo, record, index){
+						Ext.getCmp('minDeltaTotal_numberField_memberCharge').setValue('');
+						Ext.getCmp('maxDeltaTotal_numberField_memberCharge').setValue('');
+						if(combo.value == 1){//大于
+							Ext.getCmp('minDeltaTotal_numberField_memberCharge').show();
+							Ext.getCmp('maxDeltaTotal_numberField_memberCharge').hide();
+							Ext.getCmp('deltaTotalAnd_tbtext_memberCharge').hide();
+						}else if(combo.value == 2){//小于
+							Ext.getCmp('minDeltaTotal_numberField_memberCharge').hide();
+							Ext.getCmp('maxDeltaTotal_numberField_memberCharge').show();
+							Ext.getCmp('deltaTotalAnd_tbtext_memberCharge').hide();
+						}else if(combo.value == 3){//介于
+							Ext.getCmp('minDeltaTotal_numberField_memberCharge').show();
+							Ext.getCmp('maxDeltaTotal_numberField_memberCharge').show();
+							Ext.getCmp('deltaTotalAnd_tbtext_memberCharge').show();
+						}else if(combo.value == 0){//无设定
+							Ext.getCmp('minDeltaTotal_numberField_memberCharge').hide();
+							Ext.getCmp('maxDeltaTotal_numberField_memberCharge').hide();
+							Ext.getCmp('deltaTotalAnd_tbtext_memberCharge').hide();
+						}
+					}
+				}
+			}, {
+				xtype : 'tbtext',
+				text : " "
+			}, {
+				width : 100,
+				xtype : 'numberfield',
+				id : 'minDeltaTotal_numberField_memberCharge'
+			},{
+				id : 'deltaTotalAnd_tbtext_memberCharge',
+				xtype : 'tbtext',
+				text : '至'
+			}, {
+				width : 100,
+				xtype : 'numberfield',
+				id : 'maxDeltaTotal_numberField_memberCharge'
 			}]
 		});
 		
@@ -487,7 +611,7 @@ Ext.onReady(function(){
 						
 						var memberType = mcs_search_memberType.getRawValue() != '' ? mcs_search_memberType.getValue() : '';
 						var url = '../../{0}?memberType={1}&dataSource={2}&onDuty={3}&offDuty={4}&fuzzy={5}&dataSources={6}&detailOperate={7}&payType={8}&branchId={9}&minDeltaCharge={10}&maxDeltaCharge={11}'
-						+ '&minChargeRate={12}&maxChargeRate={13}';
+						+ '&minChargeRate={12}&maxChargeRate={13}&minDeltaBase={14}&maxDeltaBase={15}&minDeltaTotal={16}&maxDeltaTotal={17}';
 						url = String.format(
 								url, 
 								'ExportHistoryStatisticsToExecl.do', 
@@ -503,7 +627,11 @@ Ext.onReady(function(){
 								Ext.getCmp('minDeltaCharge_numberField_memberCharge').getValue() != null ? Ext.getCmp('minDeltaCharge_numberField_memberCharge').getValue() : '',
 								Ext.getCmp('maxdeltaCharge_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxdeltaCharge_numberField_memberCharge').getValue() : '',
 								Ext.getCmp('minChargeRatio_numberField_memberCharge').getValue() != null ? Ext.getCmp('minChargeRatio_numberField_memberCharge').getValue() : '',
-								Ext.getCmp('maxChargeRatio_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxChargeRatio_numberField_memberCharge').getValue() : ''
+								Ext.getCmp('maxChargeRatio_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxChargeRatio_numberField_memberCharge').getValue() : '',
+								Ext.getCmp('minDeltaBase_numberField_memberCharge').getValue() != null ? Ext.getCmp('minDeltaBase_numberField_memberCharge').getValue() : '',
+								Ext.getCmp('maxDeltaBase_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxDeltaBase_numberField_memberCharge').getValue() : '',
+								Ext.getCmp('minDeltaTotal_numberField_memberCharge').getValue() != null ? Ext.getCmp('minDeltaTotal_numberField_memberCharge').getValue() : '',
+								Ext.getCmp('maxDeltaTotal_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxDeltaTotal_numberField_memberCharge').getValue() : ''
 							);
 						window.location = url;
 					}
@@ -591,6 +719,10 @@ Ext.onReady(function(){
 		gs.baseParams['maxDeltaCharge'] = Ext.getCmp('maxdeltaCharge_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxdeltaCharge_numberField_memberCharge').getValue() : '';
 		gs.baseParams['minChargeRate'] = Ext.getCmp('minChargeRatio_numberField_memberCharge').getValue() != null ? Ext.getCmp('minChargeRatio_numberField_memberCharge').getValue() : '';
 		gs.baseParams['maxChargeRate'] = Ext.getCmp('maxChargeRatio_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxChargeRatio_numberField_memberCharge').getValue() : '';
+		gs.baseParams['minDeltaBase'] = Ext.getCmp('minDeltaBase_numberField_memberCharge').getValue() != null ? Ext.getCmp('minDeltaBase_numberField_memberCharge').getValue() : '';
+		gs.baseParams['maxDeltaBase'] = Ext.getCmp('maxDeltaBase_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxDeltaBase_numberField_memberCharge').getValue() : '';
+		gs.baseParams['minDeltaTotal'] = Ext.getCmp('minDeltaTotal_numberField_memberCharge').getValue() != null ? Ext.getCmp('minDeltaTotal_numberField_memberCharge').getValue() : '';
+		gs.baseParams['maxDeltaTotal'] = Ext.getCmp('maxDeltaTotal_numberField_memberCharge').getValue() != null ? Ext.getCmp('maxDeltaTotal_numberField_memberCharge').getValue() : '';
 		
 		gs.load({
 			params : {

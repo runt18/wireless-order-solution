@@ -86,6 +86,15 @@ public class MemberOperationDao {
 		private Float minChargeRate;
 		private Float maxChargeRate;
 		
+		//deltaBaseMoney
+		private Float minDeltaBaseMoney;
+		private Float maxDeltaBaseMoney;
+		
+		//deltaTotalMoney
+		private Float minDeltaTotalMoney;
+		private Float maxDeltaTotalMoney;
+		
+		
 		private String comment;
 		private boolean pointChanged;
 		
@@ -95,6 +104,26 @@ public class MemberOperationDao {
 		
 		public ExtraCond setComment(String comment){
 			this.comment = comment;
+			return this;
+		}
+		
+		public ExtraCond setMinDeltaBaseMoney(Float min){
+			this.minDeltaBaseMoney = min;
+			return this;
+		}
+		
+		public ExtraCond setMaxDeltaBaseMoney(Float max){
+			this.maxDeltaBaseMoney = max;
+			return this;
+		}
+		
+		public ExtraCond setMinDeltaTotalMoney(Float min){
+			this.minDeltaTotalMoney = min;
+			return this;
+		}
+		
+		public ExtraCond setMaxDeltaTotalMoney(Float max){
+			this.maxDeltaTotalMoney = max;
 			return this;
 		}
 		
@@ -332,6 +361,25 @@ public class MemberOperationDao {
 			}else if(minChargeRate == null && maxChargeRate != null){
 				extraCond.append(" AND (delta_extra_money + delta_base_money) / delta_base_money < " + maxChargeRate);
 			}
+			
+			//deltaBaseMoney
+			if(minDeltaBaseMoney != null && maxDeltaBaseMoney != null){
+				extraCond.append(" AND delta_base_money BETWEEN " + minDeltaBaseMoney + " AND " + maxDeltaBaseMoney);
+			}else if(minDeltaBaseMoney != null && maxDeltaBaseMoney == null){
+				extraCond.append(" AND delta_base_money > " + minDeltaBaseMoney);
+			}else if(minDeltaBaseMoney == null && maxDeltaBaseMoney != null){
+				extraCond.append(" AND delta_base_money < " + maxDeltaBaseMoney);
+			} 
+			
+			//deltaTotalMoney
+			if(minDeltaTotalMoney != null && maxDeltaTotalMoney != null){
+				extraCond.append(" AND (delta_base_money + delta_extra_money) BETWEEN " + minDeltaTotalMoney + " AND " + maxDeltaTotalMoney);
+			}else if(minDeltaTotalMoney != null && maxDeltaTotalMoney == null){
+				extraCond.append(" AND (delta_base_money + delta_extra_money) > " + minDeltaTotalMoney);
+			}else if(minDeltaTotalMoney == null && maxDeltaTotalMoney != null){
+				extraCond.append(" AND (delta_base_money + delta_extra_money) < " + maxDeltaTotalMoney);
+			}
+			
 			
 			if(comment != null){
 				extraCond.append(" AND MO.comment LIKE '%" + comment + "%'");
