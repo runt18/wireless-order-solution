@@ -15,6 +15,7 @@ public class WxRestaurant implements Jsonable{
 		private String qrCodeUrl;
 		private String nickName;
 		private String headImgUrl;
+		private int wxCardImgId;
 		private String refreshToken;
 		private String qrCode;
 		private QrCodeStatus qrCodeStatus;
@@ -26,6 +27,19 @@ public class WxRestaurant implements Jsonable{
 		private String orderNotifyTemplate;
 		private PayType defaultOrderType;
 		private PrefectMember prefectMemberStatus;
+		
+		public boolean isWxCardImgIdChange(){
+			return this.wxCardImgId != 0;
+		}
+		
+		public UpdateBuilder setWxCardImgId(int wxCardImgUrl){
+			this.wxCardImgId = wxCardImgUrl;
+			return this;
+		}
+		
+		public int getWxCardImgId(){
+			return this.wxCardImgId;
+		}
 		
 		public UpdateBuilder setChargeTemplate(String template){
 			this.chargeTemplate = template;
@@ -357,6 +371,7 @@ public class WxRestaurant implements Jsonable{
 	private String couponDrawTemplate;
 	private String couponTimeoutTemplate;
 	private String orderNotifyTemplate;
+	private OssImage wxCardImg;
 	private String chargeTemplate;
 	private PayType defaultOrderType = PayType.CONFIRM_BY_STAFF;
 	private PrefectMember prefectMemberStatus = PrefectMember.SHOW_PREFECMEMBER;
@@ -380,12 +395,23 @@ public class WxRestaurant implements Jsonable{
 		this.orderNotifyTemplate = builder.orderNotifyTemplate;
 		this.defaultOrderType = builder.defaultOrderType;
 		this.prefectMemberStatus = builder.prefectMemberStatus;
+		if(builder.wxCardImgId != 0){
+			this.wxCardImg = new OssImage(builder.wxCardImgId);
+		}
 	}
 	
 	public WxRestaurant(int restaurantId){
 		this.restaurantId = restaurantId;
 	}
 	
+	public OssImage getWxCardImg() {
+		return wxCardImg;
+	}
+
+	public void setWxCardImg(OssImage wxCardImg) {
+		this.wxCardImg = wxCardImg;
+	}
+
 	public String getWeixinSerial() {
 		if(weixinSerial == null){
 			return "";
@@ -657,6 +683,7 @@ public class WxRestaurant implements Jsonable{
 		jm.putInt("defaultOrderType", getDefaultOrderType().val);
 		jm.putString("defaultOrderTypeText", getDefaultOrderType().desc);
 		jm.putInt("prefectMemberStatus", getPrefectMemberStatus().val);
+		jm.putJsonable("wxCardImg", this.wxCardImg, 0);
 		jm.putString("prefectMemberStatusText", getPrefectMemberStatus().desc);
 		return jm;
 	}

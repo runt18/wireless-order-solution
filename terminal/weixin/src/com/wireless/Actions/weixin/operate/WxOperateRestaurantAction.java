@@ -137,7 +137,8 @@ public class WxOperateRestaurantAction extends DispatchAction {
 						throw new BusinessException(WxRestaurantError.WEIXIN_SESSION_TIMEOUT);
 					}
 				}else{
-					staff = StaffDao.getAdminByRestaurant(Integer.parseInt(fid));
+					final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+					staff = StaffDao.getAdminByRestaurant(rid);
 				}
 			}
 			
