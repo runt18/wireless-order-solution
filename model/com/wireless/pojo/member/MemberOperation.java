@@ -49,7 +49,7 @@ public class MemberOperation implements Jsonable {
 
 		CHARGE(OperationCate.CHARGE_TYPE, 1, "充值", "CZ"),
 		CONSUME(OperationCate.CONSUME_TYPE, 2, "消费", "XF"), 
-		POINT_CONSUME(OperationCate.POINT_ADJUST_TYPE, 3, "积分消费", "JFXF"), 
+		POINT_CONSUME(OperationCate.POINT_ADJUST_TYPE, 3, "积分兑换", "JFXF"), 
 		POINT_ADJUST(OperationCate.POINT_ADJUST_TYPE, 4, "积分调整", "JFTZ"),
 		BALANCE_ADJUST(OperationCate.BALANCE_ADJUST_TYPE, 5, "金额调整", "CZTZ"), 
 		REFUND(OperationCate.CHARGE_TYPE, 6, "取款", "QK"),
