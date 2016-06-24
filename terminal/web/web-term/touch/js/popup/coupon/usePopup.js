@@ -59,27 +59,28 @@ define(function(require, exports, module){
 						var progressCouponTwo = "";
 						var progressCouponThree = "";
 						for(var i = 0; i < availCoupons.length; i++){
-						
-							var eachProgressCoupon = '<tr align="center">'
-												 + '<td style="width:250px">'
-												 + '<label style="height:50px"><input $(input_checked) type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].couponType.name + '<font style="float:right" color="red">$(word)</font>' +'</label>'
-												 + '</td>'
-												 + '</tr>';
-							
-							if(availCoupons[i].statusText == '已使用'){
-								eachProgressCoupon = eachProgressCoupon.replace('$(word)', '已使用').replace('$(input_checked)', 'checked');
-							}else{
-								eachProgressCoupon = eachProgressCoupon.replace('$(word)', ' ');
-							}
-							
-							
-							
-							if(i % 3 == 0){
-								progressCouponOne += eachProgressCoupon;
-							}else if(i % 3 == 1){
-								progressCouponTwo += eachProgressCoupon;
-							}else{
-								progressCouponThree += eachProgressCoupon;
+							if(availCoupons[i].promotion.isUseTimeMatched){
+								var eachProgressCoupon = '<tr align="center">'
+													 + '<td style="width:250px">'
+													 + '<label style="height:50px"><input $(input_checked) type="checkbox" class="useCouponClass" data-theme="e" coupon_id="' + availCoupons[i].couponId + '">' + availCoupons[i].couponType.name + '<font style="float:right" color="red">$(word)</font>' +'</label>'
+													 + '</td>'
+													 + '</tr>';
+								
+								if(availCoupons[i].statusText == '已使用'){
+									eachProgressCoupon = eachProgressCoupon.replace('$(word)', '已使用').replace('$(input_checked)', 'checked');
+								}else{
+									eachProgressCoupon = eachProgressCoupon.replace('$(word)', ' ');
+								}
+								
+								
+								
+								if(i % 3 == 0){
+									progressCouponOne += eachProgressCoupon;
+								}else if(i % 3 == 1){
+									progressCouponTwo += eachProgressCoupon;
+								}else{
+									progressCouponThree += eachProgressCoupon;
+								}
 							}
 						}
 						

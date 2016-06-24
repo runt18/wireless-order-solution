@@ -20,6 +20,7 @@ import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.promotion.PromotionTrigger;
+import com.wireless.pojo.promotion.PromotionUseTime.InsertBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
@@ -228,7 +229,13 @@ public class PromotionDao {
 		if(builder.hasUseTrigger()){
 			PromotionTriggerDao.insert(dbCon, staff, builder.getUseTriggerBuilder().setPromotion(promotionId));
 		}
-
+		
+		//Insert the use promotion time
+		for(InsertBuilder promotionUseTime : builder.getUseTimeBuilder()){
+			PromotionUseTimeDao.insert(dbCon, staff, promotionUseTime.setPromotionId(promotionId));
+		}
+		
+		
 		if(!promotion.getBody().isEmpty()){
 			
 			//Update the associated oss image to this promotion's body.
@@ -334,6 +341,18 @@ public class PromotionDao {
 			PromotionTriggerDao.deleteByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setPromotion(promotion).setType(PromotionTrigger.Type.USE));
 			if(builder.getUseTriggerBuilder() != null){
 				PromotionTriggerDao.insert(dbCon, staff, builder.getUseTriggerBuilder().setPromotion(promotion));
+			}
+		}
+		
+		//update the use promotion time 
+		if(builder.isUseTimeChange()){
+			//delete 
+			PromotionUseTimeDao.delById(dbCon, staff, promotion.getId());
+			
+			if(builder.getUseTimeBuilder() != null){
+				for(InsertBuilder promotionUseTime : builder.getUseTimeBuilder()){
+					PromotionUseTimeDao.insert(dbCon, staff, promotionUseTime.setPromotionId(promotion));
+				}
 			}
 		}
 		
@@ -524,7 +543,13 @@ public class PromotionDao {
 				promotion.setUseTrigger(triggers.get(0));
 			}
 		}
-		
+
+		//GET the use promtion time
+		for(Promotion promotion : result){
+			promotion.setUseTimes(PromotionUseTimeDao.getByCond(dbCon, staff, new PromotionUseTimeDao.ExtraCond().setPromotionId(promotion))); 
+		}
+
+
 		if(!extraCond.issueRules.isEmpty() || !extraCond.useRules.isEmpty()){
 			final List<Promotion> promotions = new ArrayList<>(result);
 			result.clear();
@@ -632,10 +657,10 @@ public class PromotionDao {
 		String sql;
 		sql = " DELETE FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotionId;
 		dbCon.stmt.executeUpdate(sql);
-
+		//Delete the use promotion time 
+		PromotionUseTimeDao.delById(dbCon, staff, promotionId);
 		//Delete the associated triggers.
 		PromotionTriggerDao.deleteByCond(dbCon, staff, new PromotionTriggerDao.ExtraCond().setPromotion(promotionId));
-
 		//Delete the promotion.
 		sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){

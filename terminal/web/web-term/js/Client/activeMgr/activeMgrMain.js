@@ -81,7 +81,60 @@ Ext.onReady(function(){
 						FREE : {val : 1, desc : "免费发券"},
 						SINGLE_EXCEED : {val : 2, desc : "单次消费满"}
 					}
-		
+
+					Ext.getCmp('week_combo_activeMgr').setValue('2');
+					Ext.getCmp('start_combo_activeMgr').setValue('1');
+					Ext.getCmp('end_combo_activeMgr').setValue('1');
+																	
+					var items=Ext.getCmp('foodMultiPrice_column_weixin').items.items;
+					if(items.length > 0){
+						for(var i = items.length; i > -1 ; i--){
+							Ext.getCmp('foodMultiPrice_column_weixin').remove(items[i]);
+						}
+						Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+					}
+					
+					for(var i = 0; i < jr.root[0].useTime.length; i++){
+						
+						var subTitleId = 'subTitle' + i;
+
+						Ext.getCmp('foodMultiPrice_column_weixin').add({
+							cls : 'multiClass'+i,
+					 		columnWidth : 1	 		
+					 	});		
+						
+						Ext.getCmp('foodMultiPrice_column_weixin').add({
+							cls : 'multiClass'+i,
+							columnWidth: 0.6,
+							items :[{
+								xtype : 'label',
+								id : subTitleId,
+								text : ''
+							}]
+						});	
+						
+						//TODO
+						Ext.getCmp('foodMultiPrice_column_weixin').add({
+							cls : 'multiClass'+ i,
+					 		columnWidth : .3,
+					 		items : [{
+						    	xtype : 'button',
+						    	text : '删除',
+						    	multiIndex : i,
+						    	iconCls : 'btn_delete',
+						    	handler : function(e){
+						    		deleteMultiPriceHandler(e, i, jr.root[0].useTime);
+						    	}
+					 		}] 		 		
+					 	});	
+					 	
+					 	Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+
+						
+						html = "<font size='4px'>" + jr.root[0].useTime[i].weekName + "   " + jr.root[0].useTime[i].start + "  到     " + jr.root[0].useTime[i].end + "</font>";
+						$('#subTitle' + i).html(html);
+					}
+					
 					
 					//加载优惠券设置信息
 					if(jr.root[0].issueTrigger.issueRule){
@@ -870,7 +923,6 @@ Ext.onReady(function(){
 	}
 	
 	
-	
 	// 活动框体
 	var promotionPreviewPanel = null;
 	(function(){
@@ -907,7 +959,7 @@ Ext.onReady(function(){
 				}),new Ext.Panel({
 					id : 'promotionGeneral',
 					region : 'center',
-					height : 350,
+					height : 250,
 					layout : 'border',
 					items : [new Ext.Panel({
 						title : '参与会员信息',
@@ -1039,7 +1091,7 @@ Ext.onReady(function(){
 							layout : 'form',
 							id : 'couponConfigRules_panel_activeMgrMain',
 							autoScroll : true,
-							height : (parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,''))) - 250,
+							height : (parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,''))) - 400,
 							frame : true,
 								items : [{
 								xtype : 'radiogroup',
@@ -1113,7 +1165,6 @@ Ext.onReady(function(){
 										check : function(e){
 										},
 										focus : function(e){
-											//TODO
 											Ext.getCmp('pointExchange_fieldset_activeMgr').show();
 											Ext.getCmp('createQrCode_fieldset_activeMgr').hide();
 											Ext.getCmp('sendCouponByOrder_fieldset_activeMgr').hide();
@@ -1212,86 +1263,401 @@ Ext.onReady(function(){
 										blankText : '用券满足金额不能为空',
 										value : ""
 									}]
-								},{
-									xtype : 'panel',
-									hidden : false,
-									items : [{
-										xtype : 'container',
-										hidden : false,
-										items : [{
-											xtype : 'checkbox',
-											boxLabel : '全选'
-										}, {
-								xtype : 'container',
-								layout : 'column',
-								hidden : false,
-								id : 'weeklyConfig_container_activeMgrMain',
-								items : [{
-									xtype : 'checkbox',
-									boxLabel : '星期一',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainMon',
-									isStopSearch : true
-								}), {
-									xtype : 'checkbox',
-									boxLabel : '星期二',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainTues',
-									isStopSearch : true
-								}),{
-									xtype : 'checkbox',
-									boxLabel : '星期三',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainWed',
-									isStopSearch : true
-								}),{
-									xtype : 'checkbox',
-									boxLabel : '星期四',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainThur',
-									isStopSearch : true
-								}), {
-									xtype : 'checkbox',
-									boxLabel : '星期五',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainFri',
-									isStopSearch : true
-								}), {
-									xtype : 'checkbox',
-									boxLabel : '星期六',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainSat',
-									isStopSearch : true
-								}),{
-									xtype : 'checkbox',
-									boxLabel : '星期日',
-									columnWidth : 0.6
-								}, new Ext.ux.initTimeBar({
-									tbarType : 3,
-									statistic : 'activeMgrMainSun',
-									isStopSearch : true
-								})]
-							}]
-									}]
 								}]
 						}]
 					})]
+				}), new Ext.Panel({
+					title : '优惠券限制使用时段',
+					region : 'south',
+					height : 300,
+					frame : true,
+					items : [{
+						xtype : 'panel',
+						layout : 'column',
+						autoScroll : true,
+						height : 300,
+						frame : true, 
+						items : [
+							{
+								columnWidth : 1,
+								style :'margin-bottom:10px;',
+								border : false		
+							},{
+								columnWidth : 1,
+								xtype : 'label',
+								html : '<font color="red">请选择要设置的时段,开始时间不能比结束时间要大,一天只能设置一个时段,设置完请按保存,如需继续设置,请继续上述操作</font>'
+							},{
+								columnWidth : 1,
+								style :'margin-bottom:10px;',
+								border : false		
+							}, {
+								columnWidth : 0.2,
+								id : 'week_combo_activeMgr',
+								xtype : 'combo',
+								readOnly : false,
+								forceSelection : true,
+								width : 30,
+								store : new Ext.data.SimpleStore({
+									fields : ['value', 'text']
+								}),
+								valueField : 'value',
+								displayField : 'text',
+								typeAhead : true,
+								mode : 'local',
+								triggerAction : 'all',
+								selectOnFocus : true,
+								listeners : {
+									render : function(thiz){
+										thiz.store.loadData([["2","星期一"], ["3", "星期二"], ["4", "星期三"], ["5", "星期四"], ["6", "星期五"], ["7", "星期六"], ["1", "星期日"]]);
+										thiz.setValue("2");
+										thiz.fireEvent('select');
+									},
+									select : function(){
+										Ext.getCmp('start_combo_activeMgr').setValue('0');
+										Ext.getCmp('end_combo_activeMgr').setValue('0');
+//										
+//										Ext.getCmp('useTime_label_activeMgr').html = "<font>sddsd</font>";
+//										Ext.getCmp('useTime_label_activeMgr').html = "<font>sddsd123</font>";
+										
+									}
+								}
+							}, {
+								columnWidth : 0.2,
+								id : 'start_combo_activeMgr',
+								xtype : 'combo',
+								readOnly : false,
+								forceSelection : true,
+								width : 20,
+								store : new Ext.data.SimpleStore({
+									fields : ['value', 'text']
+								}),
+								valueField : 'value',
+								displayField : 'text',
+								typeAhead : true,
+								mode : 'local',
+								triggerAction : 'all',
+								selectOnFocus : true,
+								listeners : {
+									render : function(thiz){
+											var data = [['1', '1:00' ], ['2', '2:00' ], ['3', '3:00' ], ['4', '4:00' ], ['5', '5:00'], ['6', '6:00'], ['7', '7:00'], ['8', '8:00'], ['9', '9:00'], ['10', '10:00'], ['11', '11:00'], ['12', '12:00'], 
+													['13', '13:00'], ['14', '14:00'], ['15', '15:00'], ['16', '16:00'], ['17', '17:00'], ['18', '18:00'], ['19', '19:00'], ['20', '20:00'], ['21', '21:00'], ['22', '22:00'], ['23', '23:00'], ['24', '24:00']];
+										thiz.store.loadData(data);
+										thiz.setValue('1');
+									},
+									select : function(){
+										
+									}
+								}
+							},{
+								xtype : 'label',
+								text : '~'
+							}, {
+								columnWidth : 0.2,
+								id : 'end_combo_activeMgr',
+								xtype : 'combo',
+								readOnly : false,
+								forceSelection : true,
+								width : 20,
+								store : new Ext.data.SimpleStore({
+									fields : ['value', 'text']
+								}),
+								valueField : 'value',
+								displayField : 'text',
+								typeAhead : true,
+								mode : 'local',
+								triggerAction : 'all',
+								selectOnFocus : true,
+								listeners : {
+									render : function(thiz){
+										var data = [['1', '1:00' ], ['2', '2:00' ], ['3', '3:00' ], ['4', '4:00' ], ['5', '5:00'], ['6', '6:00'], ['7', '7:00'], ['8', '8:00'], ['9', '9:00'], ['10', '10:00'], ['11', '11:00'], ['12', '12:00'], 
+													['13', '13:00'], ['14', '14:00'], ['15', '15:00'], ['16', '16:00'], ['17', '17:00'], ['18', '18:00'], ['19', '19:00'], ['20', '20:00'], ['21', '21:00'], ['22', '22:00'], ['23', '23:00'], ['24', '24:00']];
+										thiz.store.loadData(data);
+										thiz.setValue('1');
+									},
+									select : function(){
+										
+									}
+								}
+							},{
+								xtype : 'button',
+	        			    	text : '添加',
+	        			    	style:'margin-left:2px;',
+	        			    	iconCls : 'btn_add',
+								handler : function(e){
+									//选中的优惠券
+									var node = Ext.ux.getSelNode(promotionTree);
+									if (!node || node.attributes.id == -1) {
+										Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+										return;
+									}
+									
+									//优惠活动Id
+									var promotionId = node.attributes.id;
+									
+									var promotionUseTime = null;
+									$.ajax({
+										url : '../../OperatePromotion.do',
+										data : {
+											dataSource : 'getByCond',
+											promotionId : promotionId
+										},
+										type : 'post',
+										dataType : 'json',
+										success : function(jr){
+											if(jr.success){
+												promotionUseTime = jr.root[0].useTime;
+												
+												var promotionTimes = [];
+												if(promotionUseTime.length > 0){
+													for(var i = 0; i < promotionUseTime.length; i++){
+														var useTimes = [];
+														useTimes.push(promotionUseTime[i].week);
+														useTimes.push(promotionUseTime[i].start);
+														useTimes.push(promotionUseTime[i].end);
+														promotionTimes.push(useTimes.join(','));
+													}
+												}
+												
+												
+												var times = [];
+												
+												if(Ext.getCmp('week_combo_activeMgr').getValue()){
+													times.push(Ext.getCmp('week_combo_activeMgr').getValue());
+												}
+												
+												if(Ext.getCmp('start_combo_activeMgr').getValue()){
+													times.push(Ext.getCmp('start_combo_activeMgr').getValue()+":00");
+												}
+
+												if(Ext.getCmp('end_combo_activeMgr').getValue()){
+													times.push(Ext.getCmp('end_combo_activeMgr').getValue()+":00");
+												}
+												
+												promotionTimes.push(times);
+												
+												$.ajax({
+													url : '../../OperatePromotion.do',
+													type : 'post',
+													dataType : 'json',
+													data : {
+														dataSource : 'update',
+														id : promotionId,
+														useTimes : promotionTimes.join('@')
+													},
+													success : function(jr){
+														if(jr.success){
+															$.ajax({
+																url : '../../OperatePromotion.do',
+																data : {
+																	dataSource : 'getByCond',
+																	promotionId : promotionId
+																},
+																type : 'post',
+																dataType : 'json',
+																success : function(jr){
+																	Ext.getCmp('week_combo_activeMgr').setValue('');
+																	Ext.getCmp('start_combo_activeMgr').setValue('');
+																	Ext.getCmp('end_combo_activeMgr').setValue('');
+																	
+																	var html = "";
+																	
+																	var items=Ext.getCmp('foodMultiPrice_column_weixin').items.items;
+																	if(items.length > 0){
+																		for(var i = items.length; i > -1 ; i--){
+																			Ext.getCmp('foodMultiPrice_column_weixin').remove(items[i]);
+																		}
+																		Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+																	}
+																	
+																	for(var i = 0; i < jr.root[0].useTime.length; i++){
+																		
+																		var subTitleId = 'subTitle' + i;
+		
+																		Ext.getCmp('foodMultiPrice_column_weixin').add({
+																			cls : 'multiClass'+i,
+																	 		columnWidth : 1	 		
+																	 	});		
+																		
+																		Ext.getCmp('foodMultiPrice_column_weixin').add({
+																			cls : 'multiClass'+i,
+																			columnWidth: 0.6,
+																			items :[{
+																				xtype : 'label',
+																				id : subTitleId,
+																				text : ''
+																			}]
+																		});	
+																		
+																		Ext.getCmp('foodMultiPrice_column_weixin').add({
+																			cls : 'multiClass'+ i,
+																	 		columnWidth : .3,
+																	 		items : [{
+																		    	xtype : 'button',
+																		    	text : '删除',
+																		    	multiIndex : i,
+																		    	iconCls : 'btn_delete',
+																		    	handler : function(e){
+																		    		deleteMultiPriceHandler(e, i, jr.root[0].useTime);
+																		    	}
+																	 		}] 		 		
+																	 	});	
+																	 	
+																	 	Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+		
+																		
+																		html = "<font size='4px'>" + jr.root[0].useTime[i].weekName + "   " + jr.root[0].useTime[i].start + "  到     " + jr.root[0].useTime[i].end + "</font>";
+																		$('#subTitle' + i).html(html);
+																	}
+																	
+																	
+																}
+															});
+														}
+														Ext.example.msg("提示", jr.msg);
+													}
+												});
+											}
+										}
+									});
+								}
+							},{
+								columnWidth : 1,
+								style :'margin-bottom:10px;',
+								border : false		
+							},{
+								columnWidth : 1,
+								border : false		
+							}, {
+								columnWidth: 1,
+								id : 'foodMultiPrice_column_weixin',
+								layout : 'column',
+								width : 400,
+								frame : false,
+								defaults : {
+									layout : 'form'
+								},
+								items : []
+							}
+						]}
+					]
 				})]		
 			})]
 		})
 	})();
+	
+	function deleteMultiPriceHandler(e, i, promotionUseTime){
+		var cmps = $('.multiClass'+Ext.getCmp(e.id).multiIndex);
+		
+		promotionUseTime.splice(Ext.getCmp(e.id).multiIndex, 1);
+		
+		for (var i = 0; i < cmps.length; i++) {
+			Ext.getCmp('foodMultiPrice_column_weixin').remove(cmps[i].getAttribute("id"));
+		}
+		
+		Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+		
+		//选中的优惠券
+		var node = Ext.ux.getSelNode(promotionTree);
+		if (!node || node.attributes.id == -1) {
+			Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+			return;
+		}
+		
+		//优惠活动Id
+		var promotionId = node.attributes.id;
+									
+		//TODO
+		var promotionTimes = [];
+		if(promotionUseTime.length > 0){
+			for(var i = 0; i < promotionUseTime.length; i++){
+				var useTimes = [];
+				useTimes.push(promotionUseTime[i].week);
+				useTimes.push(promotionUseTime[i].start);
+				useTimes.push(promotionUseTime[i].end);
+				promotionTimes.push(useTimes.join(','));
+			}
+		}
+		
+		$.ajax({
+			url : '../../OperatePromotion.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				dataSource : 'update',
+				id : promotionId,
+				useTimes : promotionTimes.join('@')
+			},
+			success : function(jr){
+				if(jr.success){
+					$.ajax({
+						url : '../../OperatePromotion.do',
+						data : {
+							dataSource : 'getByCond',
+							promotionId : promotionId
+						},
+						type : 'post',
+						dataType : 'json',
+						success : function(jr){
+							var html = "";
+							
+							var items=Ext.getCmp('foodMultiPrice_column_weixin').items.items;
+							if(items.length > 0){
+								for(var i = items.length; i > -1 ; i--){
+									Ext.getCmp('foodMultiPrice_column_weixin').remove(items[i]);
+								}
+								Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+							}
+							
+							for(var i = 0; i < jr.root[0].useTime.length; i++){
+								
+								var subTitleId = 'subTitle' + i;
+
+								Ext.getCmp('foodMultiPrice_column_weixin').add({
+									cls : 'multiClass'+i,
+							 		columnWidth : 1	 		
+							 	});		
+								
+								Ext.getCmp('foodMultiPrice_column_weixin').add({
+									cls : 'multiClass'+i,
+									columnWidth: 0.6,
+									items :[{
+										xtype : 'label',
+										id : subTitleId,
+										text : ''
+									}]
+								});	
+								
+								Ext.getCmp('foodMultiPrice_column_weixin').add({
+									cls : 'multiClass'+ i,
+							 		columnWidth : .3,
+							 		items : [{
+								    	xtype : 'button',
+								    	text : '删除',
+								    	multiIndex : i,
+								    	iconCls : 'btn_delete',
+								    	handler : function(e){
+								    		deleteMultiPriceHandler(e, i, jr.root[0].useTime);
+								    	}
+							 		}] 		 		
+							 	});	
+							 	
+							 	Ext.getCmp('foodMultiPrice_column_weixin').doLayout();
+
+								
+								html = "<font size='4px'>" + jr.root[0].useTime[i].weekName + "   " + jr.root[0].useTime[i].start + "  到     " + jr.root[0].useTime[i].end + "</font>";
+								$('#subTitle' + i).html(html);
+							}
+							
+							
+						}
+					});
+				}
+				Ext.example.msg("提示", jr.msg);
+			}
+		});
+		
+		
+	}
 	
 	
 	//活动树
@@ -1350,6 +1716,7 @@ Ext.onReady(function(){
 		    			return;
 		    		}
 					loadPromotion(e.attributes.id);
+					
 				}
 			}
 		});

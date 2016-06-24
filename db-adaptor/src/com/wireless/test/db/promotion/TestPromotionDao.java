@@ -20,6 +20,7 @@ import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.promotion.PromotionDao;
+import com.wireless.db.promotion.PromotionUseTimeDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -32,6 +33,7 @@ import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.PromotionTrigger;
+import com.wireless.pojo.promotion.PromotionUseTime;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
@@ -136,7 +138,10 @@ public class TestPromotionDao {
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
 																	  .newInstance("测试优惠活动", body, typeInsertBuilder, "hello jingjing<br>")
 																	  .setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Free())
-																	  .setUseTrigger(PromotionTrigger.InsertBuilder.newUse4SingleExceed(100));
+																	  .setUseTrigger(PromotionTrigger.InsertBuilder.newUse4SingleExceed(100))
+																	  .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Monday, "12:15:00", "16:45:00"))
+																	  .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Friday, "14:15:00", "22:45:00"))
+																	  .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Thursday, "12:15:00", "23:45:00"));
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -175,6 +180,8 @@ public class TestPromotionDao {
 																									 .setCouponTypeBuilder(typeUpdateBuilder)
 																									 .setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4SingleExceed(100))
 																									 .setUseTrigger(null)
+																									 .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Wednesday, "13:15:00", "21:45:00"))
+																									 .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Monday, "14:15:00", "22:45:00"))
 																									 ;
 			expectedPromotion = promotionUpdateBuilder.build();
 			expectedPromotion.setCouponType(typeUpdateBuilder.build());
@@ -275,7 +282,8 @@ public class TestPromotionDao {
 //							Assert.assertTrue("failed to delete the promotion image from aliyun oss storage", false);
 //						}
 //					}catch(OSSException ignored){}
-					
+
+					Assert.assertTrue("failed to delete the promotion useTime", PromotionUseTimeDao.getByCond(mStaff, new PromotionUseTimeDao.ExtraCond().setPromotionId(promotionId)).isEmpty());
 					//Check to see whether or not the associated coupon is deleted.
 					Assert.assertTrue("failed to delete the associated coupon", CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setPromotion(promotionId), null).isEmpty());
 					//Check to see whether or not the associated coupon type is deleted.
@@ -347,6 +355,17 @@ public class TestPromotionDao {
 		Assert.assertEquals("use trigger issue rule", expected.getUseTrigger().getIssueRule(), actual.getUseTrigger().getIssueRule());
 		Assert.assertEquals("use trigger use rule", expected.getUseTrigger().getUseRule(), actual.getUseTrigger().getUseRule());
 		Assert.assertEquals("use trigger extra", expected.getUseTrigger().getExtra(), actual.getUseTrigger().getExtra());
+		
+		//the useTime
+		//Assert.assertEquals("primmotionUseTime id", expected.getUseTime().)
+		for(int i = 0; i < actual.getUseTime().size(); i++){
+			Assert.assertEquals("promotion id to useTime", expected.getId(), actual.getUseTime().get(i).getPromotionId());
+			Assert.assertEquals("promotion useTime week", expected.getUseTime().get(i).getWeek(), actual.getUseTime().get(i).getWeek());
+			Assert.assertEquals("promotion useTime start", expected.getUseTime().get(i).getStart(), actual.getUseTime().get(i).getStart());
+			Assert.assertEquals("promotion useTime end", expected.getUseTime().get(i).getEnd(), actual.getUseTime().get(i).getEnd());
+		}
+		
+		
 	}
 	
 	private void compare(Staff staff, Coupon.IssueBuilder issueBuilder, Promotion expectedPromotion, Member expectedMember, Coupon actual) throws SQLException{
