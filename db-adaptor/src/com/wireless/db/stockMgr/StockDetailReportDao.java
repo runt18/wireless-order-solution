@@ -45,7 +45,7 @@ public class StockDetailReportDao {
 	 */
 	public static List<StockDetailReport> getByCond(DBCon dbCon, Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException, BusinessException{
 		final List<StockDetailReport> result = new ArrayList<>();
-		List<StockActionDetail> details = StockActionDetailDao.getByCond(dbCon, staff, extraCond, " ORDER BY S.ori_stock_date, S.birth_date ASC ");
+		List<StockActionDetail> details = StockActionDetailDao.getByCond(dbCon, staff, extraCond, " ORDER BY D.id ASC ");
 		for(StockActionDetail stockDetail : details){
 			StockDetailReport detailReport = new StockDetailReport();
 			detailReport.setStockActonDetail(stockDetail);
