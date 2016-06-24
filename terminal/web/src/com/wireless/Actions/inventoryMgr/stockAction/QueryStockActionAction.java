@@ -44,6 +44,7 @@ public class QueryStockActionAction extends Action{
 		final String isWithOutSum = request.getParameter("isWithOutSum");
 		final String fuzzId = request.getParameter("fuzzId");
 		final String cateId = request.getParameter("cateId");
+		final String containsDetails = request.getParameter("containsDetails");
 		final JObject jObject = new JObject();
 		try{
 
@@ -117,8 +118,11 @@ public class QueryStockActionAction extends Action{
 			if(cateId != null && !cateId.isEmpty() && Integer.parseInt(cateId) > 0){
 				extraCond.setCateId(Integer.parseInt(cateId));
 			}
+			if(containsDetails != null && !containsDetails.isEmpty() && Boolean.parseBoolean(containsDetails)){
+				extraCond.setContainsDetail(true);
+			}
 			
-			List<StockAction> root = StockActionDao.getByCond(staff, extraCond.setContainsDetail(true), " ORDER BY S.status, S.ori_stock_date ");
+			List<StockAction> root = StockActionDao.getByCond(staff, extraCond, " ORDER BY S.status, S.ori_stock_date ");
 			
 			//设置是否可反审核
 			//最近盘点或月结时间
