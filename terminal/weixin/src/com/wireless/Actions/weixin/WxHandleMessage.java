@@ -538,7 +538,14 @@ public class WxHandleMessage extends HandleMessageAdapter {
 							title.append("，可用积分" + NumericUtil.float2String2(member.getTotalPoint()) + "分");
 						}
 						
-						final String qrCodeUrl = "http://qr.liantu.com/api.php?text=" + member.getWeixin().getCard() + "&w=70";
+						/**
+						 * w为尺寸
+						 */
+						final String qrCodeUrl = "http://qr.liantu.com/api.php?&w=80"
+																			+ "&fg=000000"
+																			+ "&gc=000000"
+																			+ "&bg=ffffff" 
+																			+ "&text=" + member.getWeixin().getCard();
 
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item(title.toString(), "1、店员扫描我的二维码完成会员注入\r\n2、点击查看您的更多信息>>>", qrCodeUrl, createUrl(msg, WEIXIN_MEMBER))));
 						

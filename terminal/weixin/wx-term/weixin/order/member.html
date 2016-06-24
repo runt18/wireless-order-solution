@@ -27,9 +27,9 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 <div id="WXCmp_div_member">
 
 	<div id="divMemberCard" class="main-box">
-	<div data-type="r">
+	<div data-type="r" style="display:none;">
 		<!-- <div id="divRestaurantName" data-type="top">--</div> -->
-		<div id="divWXMemberCard" data-type="bottom">微信卡号:1000000</div>
+		<div data-type="bottom">微信卡号:1000000</div>
 	</div>
 	
 	<div data-type="R">
@@ -42,16 +42,23 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 	
 	<ul class="m-b-list">
 		<li class="box-horizontal none-line">
-			<div style="width: 45%">会员名: <span id="name_span_member">--</span></div>
-			<div id="phone_div_member" style="text-align: right;width: 55%">手机号: <span id="mobile_span_member">--</span></div>
-			<div id="bind_div_member" style="text-align: right;width: 55%">完善会员资料&nbsp;&gt;</div>
+			<span style="display:block;width:100%;">
+				<span style="display:block;width:100%;line-height: 30px;height:24px;">
+					<span style="width: 80%;display:inline-block;">会员卡号: <span id="divWXMemberCard" style="color:#26a9d0;">94512654</span></span>
+				</span>
+				<span style="display:block;width:100%;line-height: 30px;height:24px;">
+					<span style="width: 45%;display:inline-block;">会员名: <span id="name_span_member">--</span></span>
+					<span id="phone_div_member" style="width: 50%;display:inline-block;">手机号: <span id="mobile_span_member">--</span></span>
+					<span id="bind_div_member" style="width: 45%;display:inline-block;">完善会员资料&nbsp;&gt;</span>
+				</span>
+			</span>
 			<li id="birthday_li_member">
-			<div style="margin-top:-29px;">
-				<font style="font-size: 11px;font-weight: bold;">
-				会员生日 <span id="memberBirthday_span_member" style="color:#26a9d0;">--.--</span>
-				</font>
-			</div>
-		</li>
+				<div style="margin-top:-16px;">
+					<font style="font-size: 11px;font-weight: bold;">
+						会员生日 ：<span id="memberBirthday_span_member" style="color:#26a9d0;">--.--</span>
+					</font>
+				</div>
+			</li>
 		</li>
 		<li>
 			<div id="bindMember_div_member" style="display: none;width: 100%;">

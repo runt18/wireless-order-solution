@@ -164,6 +164,7 @@ public class WxRestaurantDao {
 			  (builder.isOrderNotifyTemplateChanged() ? " ,order_notify_template = '" + wr.getOrderNotifyTemplate() + "'" : "") +
 			  (builder.isDefaultOrderTypeChanged() ? " ,default_order_type = " + wr.getDefaultOrderType().getValue() : "") + 
 			  (builder.isPrefectMemberStatusChanged() ? " , prefect_member_status = " + wr.getPrefectMemberStatus().getValue() : "") +
+			  (builder.isWxCardImgIdChange() ? " ,weixin_card_img = '" + wr.getWxCardImg().getId() + "'": "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
@@ -291,6 +292,7 @@ public class WxRestaurantDao {
 			wr.setRefreshToken(dbCon.rs.getString("refresh_token"));
 			wr.setNickName(dbCon.rs.getString("nick_name"));
 			String info = dbCon.rs.getString("weixin_info");
+			wr.setWxCardImg(new OssImage(dbCon.rs.getInt("weixin_card_img")));
 			if(info != null && !info.isEmpty()){
 				wr.setWeixinInfo(new StringHtml(info, StringHtml.ConvertTo.TO_HTML).toString());
 			}
@@ -310,9 +312,23 @@ public class WxRestaurantDao {
 
 				wr.setPrefectMemberStatus(WxRestaurant.PrefectMember.valueOf(dbCon.rs.getInt("prefect_member_status")));
 			}
+			if(dbCon.rs.getInt("weixin_card_img") != 0){
+				wr.setWxCardImg(new OssImage(dbCon.rs.getInt("weixin_card_img")));
+			}
 			result.add(wr);
 		}
 		dbCon.rs.close();
+		
+		for(WxRestaurant wxRestaurant : result){
+			if(wxRestaurant.getWxCardImg() != null){
+				try {
+					wxRestaurant.setWxCardImg(OssImageDao.getById(dbCon, staff, wxRestaurant.getWxCardImg().getId()));
+				} catch (BusinessException e) {
+					e.printStackTrace();
+					wxRestaurant.setWxCardImg(null);
+				}
+			}
+		}
 		
 		return result;
 	}

@@ -1212,17 +1212,19 @@ Ext.onReady(function(){
 										blankText : '用券满足金额不能为空',
 										value : ""
 									}]
-								}, {
-								xtype : 'container',
-								hidden : true,
-								items : [{
-									xtype : 'checkbox',
-									boxLabel : '全选'
-								}]
-								}, {
+								},{
+									xtype : 'panel',
+									hidden : false,
+									items : [{
+										xtype : 'container',
+										hidden : false,
+										items : [{
+											xtype : 'checkbox',
+											boxLabel : '全选'
+										}, {
 								xtype : 'container',
 								layout : 'column',
-								hidden : true,
+								hidden : false,
 								id : 'weeklyConfig_container_activeMgrMain',
 								items : [{
 									xtype : 'checkbox',
@@ -1282,6 +1284,8 @@ Ext.onReady(function(){
 									isStopSearch : true
 								})]
 							}]
+									}]
+								}]
 						}]
 					})]
 				})]		

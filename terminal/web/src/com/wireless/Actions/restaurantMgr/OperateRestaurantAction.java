@@ -641,6 +641,83 @@ public class OperateRestaurantAction extends DispatchAction {
 		}
 		return null;
 	}	
+
+	
+	/**
+	 * 修改微信会员卡上面的logo
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateWxCard(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String wxCardImgUrl = request.getParameter("wxCardImgUrl");
+		final String pin = (String)request.getAttribute("pin");
+		final JObject jObject = new JObject();
+		try {
+			Staff staff = StaffDao.verify(Integer.valueOf(pin));
+			if(wxCardImgUrl != null && !wxCardImgUrl.isEmpty()){
+				 WxRestaurantDao.update(staff, new WxRestaurant.UpdateBuilder().setWxCardImgId(Integer.parseInt(wxCardImgUrl)));
+			}
+			
+			jObject.initTip(true, "保存成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * 获取微信卡
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getWxCard(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final JObject jObject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.valueOf(pin));
+		try {
+			OssImage image = WxRestaurantDao.getByCond(staff, null, "").get(0).getWxCardImg();
+			final String wxCardUrl;
+			if(image.getId() != 0){
+				wxCardUrl = image.getObjectUrl();
+			}else{
+				wxCardUrl = this.getServlet().getInitParameter("imageBrowseDefaultFile");
+			}
+			
+			jObject.setExtra(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("wxCardUrl", wxCardUrl);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
+			jObject.setSuccess(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally{
+			response.getWriter().print(jObject.toString());
+		}
+		
+		return null;
+	}
 	
 	
 }

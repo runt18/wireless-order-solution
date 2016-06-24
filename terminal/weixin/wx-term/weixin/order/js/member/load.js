@@ -93,7 +93,30 @@ $(function(){
 					error : function(data, errotType, eeor){
 						Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
 					}
-				});					
+				});				
+				
+				$.ajax({
+					url : '../../WxOperateRestaurant.do',
+					data : {
+						dataSource : 'getByCond',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid,
+						sessionId : Util.mp.params.sessionId
+					},
+					type : 'post',
+					dataType : 'json',
+					success : function(data, status, req){
+						if(data.success){
+							$('#divMemberCard').css({
+								'background': 'url("' + data.root[0].wxCardImg.image + '")',
+								'background-size' : '100% 100%'
+							});
+						}
+					},
+					error : function(req, status, err){
+					
+					}
+				});
 				
 				$('#divMemberCard').css('display', 'block');
 				$('#divMemberContent').css('display', 'block');

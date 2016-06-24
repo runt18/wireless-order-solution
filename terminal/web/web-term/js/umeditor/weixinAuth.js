@@ -104,6 +104,7 @@ $(function (){
 			}
 	    },
 	    onStepChanged: function (event, currentIndex, priorIndex) {
+	    	Ext.getCmp('weixinCardImage').render('btnOperateMenu');
 	    	//0开始
 	    	if(currentIndex == 1){//餐厅logo
 	    		//加载微信logo uploader
@@ -180,8 +181,9 @@ $(function (){
 	    
 	    //初始化第二步微信Logo界面
 	    initWeixinLogoCmp();
+	    setWeixinCardImage();
 	    //初始化第四步欢迎活动界面
-	    initWeixinActiveCmp();		
+	    initWeixinActiveCmp();	
 	}, 100);
 
 
@@ -201,7 +203,7 @@ $(function (){
 	
 });
 
-
+//TODO
 function initWeixinLogoCmp(){
 //Ext.onReady(function() {
 	var uploadMask = new Ext.LoadMask(document.body, {
@@ -353,6 +355,173 @@ function initWeixinLogoCmp(){
 	});	
 }
 //})
+
+function setWeixinCardImage(){
+	
+		var imgFile2,btnUpload2,imageBox,btnClose2,formPanel,weixinCardImage;
+		
+		imageBox = new Ext.BoxComponent({
+			xtype : 'box',
+	 	    columnWidth : 1,
+	 	    height : 300,
+	 	    id : 'imageBox_box_weixinAuth',
+	 	    autoEl : {
+	 	    	tag : 'img',
+	 	    	title : '图片预览.'
+	 	    }
+		});
+		
+		imgFile2 = Ext.ux.plugins.createImageFile({
+			id : 'imageFile2_imageFile_weixinAuth',
+			img : imageBox,
+			width : 468,
+			height : 300,
+			imgSize : 100,
+			uploadCallback : function(){
+				btnUpload2.handler();
+			}
+		});
+		var weixin_uploadMask = new Ext.LoadMask(document.body, {
+			msg : '正在上传图片...'
+		});
+		btnUpload2 = new Ext.Button({
+			hidden : true,
+	        text : '上传图片',
+	        listeners : {
+	        	render : function(thiz){
+	        		thiz.getEl().setWidth(100, true);
+	        	}
+	        },
+	        handler : function(e){
+	        	var check = true, img = '';
+	        	if(Ext.isIE){
+	        		Ext.getDom(imgFile.getId()).select();
+	        		img = document.selection.createRange().text;
+	        	}else{
+	 	        	img = Ext.getDom(imgFile2.getId()).value;
+	        	}
+	        	if(typeof(img) != 'undefined' && img.length > 0){
+		 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+		 	        check = false;
+		 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+		 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+		 	        		check = true;
+			 	           	break;
+			 	        }
+		 	        }
+		 	        if(!check){
+			 	       	Ext.example.msg('提示', '图片类型不正确.');
+			 	        return;
+	 	        	}
+	        	}else{
+	        		Ext.example.msg('提示', '未选择图片.');
+	 	        	return;
+	        	}
+	        	
+	        	weixin_uploadMask.show();
+	        	
+	        	Ext.Ajax.request({
+	        		url : '../../OperateImage.do?dataSource=upload&ossType=13',
+	 	   			isUpload : true,
+	 	   			form : formPanel.getForm().getEl(),
+	 	   			success : function(response, options){
+	 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+	 	   				if(!jr.success){
+ 	   						Ext.ux.showMsg({code: 0,msg : jr.msg});
+ 	   						weixin_uploadMask.hide();
+ 	   						return;
+ 	   					}
+ 	   					
+						Ext.Ajax.request({
+							url : '../../OperateRestaurant.do',
+							params : {
+								dataSource : 'updateWxCard',
+								wxCardImgUrl : jr.root[0].imageId
+							},
+							success : function(res, opt){
+								weixin_uploadMask.hide();
+								var jr = Ext.decode(res.responseText);
+								Ext.example.msg('提示', jr.msg);
+							},
+							fialure : function(res, opt){
+								weixin_uploadMask.hide();
+								Ext.ux.showMsg(res.responseText);
+							}
+						});	 	   				
+	 	   				
+	 	   			},
+	 	   			failure : function(response, options){
+	 	   				weixin_uploadMask.hide();
+	 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+	 	   			}
+	        	});
+	        }
+		});
+		
+		var btnClose2 = new Ext.Button({
+			hidden : true,
+	        text : '关闭',
+	        listeners : {
+	        	render : function(thiz){
+	        		thiz.getEl().setWidth(100, true);
+	        	}
+	        },
+	        handler : function(e){
+//	        	weixinLogoWin.hide();
+	        }
+		});
+		
+		formPanel = new Ext.form.FormPanel({
+			columnWidth : 1,
+			labelWidth : 60,
+			fileUpload : true,
+			items : [imgFile2],
+			listeners : {
+		    		render : function(e){
+		    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+	 	  		}
+	    	},
+	    	buttonAlign : 'center',
+	    	buttons : [btnUpload2, btnClose2]
+		});
+		
+		
+		var weixinCardImage;
+		weixinCardImage = new Ext.Panel({
+			title : '&nbsp;',
+			region : 'center',
+			layout : 'column',
+			id : 'weixinCardImage',
+			width : 500,
+			frame : true,
+			items : [imageBox, {
+				columnWidth: 1, 
+				height: 20,
+				html : '<sapn style="font-size:13px;color:green;">提示: 单张图片大小不能超过100KB.</span>'
+			}, formPanel],
+			listeners : {
+				render : function(){
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getWxCard'
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.other && jr.other.wxCardUrl){
+								imgFile2.setImg(jr.other.wxCardUrl);
+							}
+						},
+						fialure : function(res, opt){
+							wx.lm.hide();
+							Ext.ux.showMsg(res.responseText);
+						}
+					});
+				}
+			}
+		});	
+//		weixinCardImage.render('btnOperateMenu');
+}
 
 /**
  * 初始化欢迎活动
