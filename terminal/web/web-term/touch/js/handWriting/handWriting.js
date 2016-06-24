@@ -169,18 +169,40 @@ function HandWritingPanel(param){
 	 	return top;  
 	}  
 
+	var _sendDataTimeout = null;
+	
 	function senddata() {
-		var lg = "zh-cn";//选择语言
-		$.post("http://118.244.232.180/json/hd_json.php?key=c4ca4238a0b923820dcc509a6f75849b", {
-					bh : lg + bihua.join("")
-				}, function(data) {
-					if(param.result){
-						//Remove the duplicated result.
-						param.result(data.split(" ").filter(function(item, pos, self){
-							return self.indexOf(item) == pos && item.trim().length != 0 && item != "\"" ;
-						}));
-					}
-				});
+		
+		//删除请求笔画识别的定时器
+		if(_sendDataTimeout){
+			clearTimeout(_sendDataTimeout);
+		}
+		
+		//延时500ms请求笔画识别
+		_sendDataTimeout = setTimeout(function(){
+			var lg = "zh-cn";//选择语言
+			$.post("http://118.244.232.180/json/hd_json.php?key=c4ca4238a0b923820dcc509a6f75849b", {
+						bh : lg + bihua.join("")
+					}, function(data) {
+						if(param.result){
+							//Remove the duplicated result.
+							param.result(data.split(" ").filter(function(item, pos, self){
+								return self.indexOf(item) == pos && item.trim().length != 0 && item != "\"" ;
+							}));
+						}
+					});
+		}, 500);
+//		var lg = "zh-cn";//选择语言
+//		$.post("http://118.244.232.180/json/hd_json.php?key=c4ca4238a0b923820dcc509a6f75849b", {
+//					bh : lg + bihua.join("")
+//				}, function(data) {
+//					if(param.result){
+//						//Remove the duplicated result.
+//						param.result(data.split(" ").filter(function(item, pos, self){
+//							return self.indexOf(item) == pos && item.trim().length != 0 && item != "\"" ;
+//						}));
+//					}
+//				});
 	}
 	
 	//public methods
