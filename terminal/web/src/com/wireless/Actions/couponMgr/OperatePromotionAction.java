@@ -22,6 +22,7 @@ import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
 import com.wireless.pojo.promotion.PromotionTrigger;
+import com.wireless.pojo.promotion.PromotionUseTime;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
@@ -144,6 +145,8 @@ public class OperatePromotionAction extends DispatchAction{
 		final String point = request.getParameter("point");
 		final String useRule = request.getParameter("useRule");
 		final String useSingleMoney = request.getParameter("useSingleMoney");
+		final String useTimes = request.getParameter("useTimes");
+		
 		
 		//String orientedId = request.getParameter("oriented");
 		
@@ -217,6 +220,13 @@ public class OperatePromotionAction extends DispatchAction{
 				} 
 			}
 			
+			//限定使用时间
+			if(useTimes != null && !useTimes.isEmpty()){
+				for(String useTime : useTimes.split("@")){
+					promotionUpdateBuilder.addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.valueOf(Integer.parseInt(useTime.split(",")[0])), useTime.split(",")[1], useTime.split(",")[2]));
+				}
+			}
+				
 			PromotionDao.update(staff, promotionUpdateBuilder);
 			
 			jobject.initTip(true, "活动修改成功");

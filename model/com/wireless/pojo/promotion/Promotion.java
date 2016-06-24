@@ -1,12 +1,17 @@
 package com.wireless.pojo.promotion;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.oss.OssImage;
+import com.wireless.pojo.promotion.PromotionUseTime.InsertBuilder;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class Promotion implements Jsonable{
 
@@ -19,6 +24,7 @@ public class Promotion implements Jsonable{
 		private final CouponType.InsertBuilder typeBuilder;
 		private PromotionTrigger.InsertBuilder issueTriggerBuilder;
 		private PromotionTrigger.InsertBuilder useTriggerBuilder;
+		private final List<PromotionUseTime.InsertBuilder> useTimeBuilders = new ArrayList<PromotionUseTime.InsertBuilder>();
 		
 		private CreateBuilder(String title, String body, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
@@ -40,6 +46,15 @@ public class Promotion implements Jsonable{
 			return this;
 		}
 		
+		public CreateBuilder addUseTime(PromotionUseTime.InsertBuilder builder){
+			if(builder != null){
+				if(this.useTimeBuilders.indexOf(builder) == 0){
+					this.useTimeBuilders.add(builder);
+				}
+			}
+			return this;
+		}
+		
 		public CreateBuilder setUseTrigger(PromotionTrigger.InsertBuilder builder){
 			if(builder != null && !builder.build().getType().isUse()){
 				throw new IllegalArgumentException("设置的必须是用券规则");
@@ -47,6 +62,7 @@ public class Promotion implements Jsonable{
 			this.useTriggerBuilder = builder;
 			return this;
 		}
+		
 		
 		public CouponType.InsertBuilder getTypeBuilder(){
 			return this.typeBuilder;
@@ -58,6 +74,10 @@ public class Promotion implements Jsonable{
 		
 		public boolean hasUseTrigger(){
 			return this.useTriggerBuilder != null;
+		}
+		
+		public List<InsertBuilder> getUseTimeBuilder(){
+			return this.useTimeBuilders;
 		}
 		
 		public PromotionTrigger.InsertBuilder getIssueTriggerBuilder(){
@@ -84,6 +104,7 @@ public class Promotion implements Jsonable{
 		private CouponType.UpdateBuilder typeBuilder;
 		private PromotionTrigger.InsertBuilder issueTriggerBuilder = TRIGGER_UPDATE_FLAG;
 		private PromotionTrigger.InsertBuilder useTriggerBuilder = TRIGGER_UPDATE_FLAG;
+		private final List<PromotionUseTime.InsertBuilder> useTimeBuilders = new ArrayList<PromotionUseTime.InsertBuilder>();
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -95,6 +116,24 @@ public class Promotion implements Jsonable{
 			}
 			this.issueTriggerBuilder = builder;
 			return this;
+		}
+		
+		public UpdateBuilder addUseTime(PromotionUseTime.InsertBuilder builder){
+			if(builder != null){
+				if(this.useTimeBuilders.indexOf(builder) >= 0){
+					throw new IllegalArgumentException("您已经重复添加同一天的时段");
+				}
+				this.useTimeBuilders.add(builder);
+			}
+			return this;
+		}
+		
+		public boolean isUseTimeChange(){
+			return this.useTimeBuilders != null;
+		}
+		
+		public List<InsertBuilder> getUseTimeBuilder(){
+			return this.useTimeBuilders;
 		}
 
 		public boolean isIssueTriggerChanged(){
@@ -371,7 +410,7 @@ public class Promotion implements Jsonable{
 	private Type type = Type.NORMAL;
 	private PromotionTrigger issueTrigger = ISSUE_TRIGGER_4_FREE;
 	private PromotionTrigger useTrigger = USE_TRIGGER_4_FREE;
-	
+	private final List<PromotionUseTime> useTimes = SortedList.newInstance();
 	private OssImage image;
 	
 	
@@ -388,6 +427,10 @@ public class Promotion implements Jsonable{
 		}
 		if(builder.useTriggerBuilder != null){
 			this.useTrigger = builder.useTriggerBuilder.build();
+		}
+		
+		for(PromotionUseTime.InsertBuilder insertBuilder : builder.useTimeBuilders){
+			this.useTimes.add(insertBuilder.build());
 		}
 	}
 	
@@ -408,6 +451,9 @@ public class Promotion implements Jsonable{
 		}
 		if(builder.isIssueTriggerChanged() && builder.issueTriggerBuilder != null){
 			this.issueTrigger = builder.issueTriggerBuilder.build();
+		}
+		for(PromotionUseTime.InsertBuilder insertBuilder : builder.useTimeBuilders){
+			this.useTimes.add(insertBuilder.build());
 		}
 	}
 	
@@ -546,6 +592,23 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
+	public List<PromotionUseTime> getUseTime(){
+		return this.useTimes;
+	}
+
+	public void setUseTimes(List<PromotionUseTime> promotionUseTimes){
+		if(promotionUseTimes != null){
+			this.useTimes.clear();
+			this.useTimes.addAll(promotionUseTimes);
+		}
+	}
+	
+	public void addUseTime(PromotionUseTime promotionUseTime){
+		if(promotionUseTime != null){
+			this.useTimes.add(promotionUseTime);
+		}
+	}
+	
 	public PromotionTrigger getUseTrigger(){
 		return this.useTrigger;
 	}
@@ -558,6 +621,29 @@ public class Promotion implements Jsonable{
 	
 	public PromotionTrigger getIssueTrigger(){
 		return this.issueTrigger;
+	} 
+	
+	public boolean isMatchUseTime(){
+		Calendar ca = Calendar.getInstance();
+		if(this.useTimes.isEmpty()){
+			return true;
+		}else{
+			boolean isMatched = false;
+			for(PromotionUseTime promotionUseTime : this.useTimes){
+				if(promotionUseTime.getWeek().getVal() == (ca.get(Calendar.DAY_OF_WEEK))){
+					final int time = ca.get(Calendar.HOUR_OF_DAY);
+					int start = Integer.parseInt(DateUtil.format(promotionUseTime.getStart(), DateUtil.Pattern.HOUR).substring(0, 2));
+					int end = Integer.parseInt(DateUtil.format(promotionUseTime.getEnd(), DateUtil.Pattern.HOUR).substring(0, 2));
+					
+					if(time >= start && time <= end){
+						isMatched = true;
+						break;
+					}
+				}
+			}
+			return isMatched;
+		}
+	
 	}
 	
 	@Override
@@ -596,6 +682,8 @@ public class Promotion implements Jsonable{
 		jm.putJsonable("coupon", this.couponType, 0);
 		jm.putJsonable("issueTrigger", this.issueTrigger, 0);
 		jm.putJsonable("useTrigger", this.useTrigger, 0);
+		jm.putJsonableList("useTime", this.useTimes, 0);
+		jm.putBoolean("isUseTimeMatched", isMatchUseTime());
 		return jm;
 	}
 

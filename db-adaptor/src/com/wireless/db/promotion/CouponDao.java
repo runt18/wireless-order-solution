@@ -344,6 +344,10 @@ public class CouponDao {
 				throw new BusinessException("【已过期】的优惠券不可使用", PromotionError.COUPON_USE_NOT_ALLOW);
 			}
 			
+			if(!coupon.getPromotion().isMatchUseTime()){
+				throw new BusinessException("【不在使用时段】的优惠券不可使用", PromotionError.COUPON_USE_NOT_ALLOW);
+			}
+			
 			String sql;
 			sql = " UPDATE " + Params.dbName + ".coupon " +
 				  " SET coupon_id = " + couponId +
