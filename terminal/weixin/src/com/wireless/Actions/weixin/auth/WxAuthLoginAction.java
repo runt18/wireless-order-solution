@@ -15,8 +15,7 @@ public class WxAuthLoginAction extends Action{
 		String path = "https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=$(app_id)&pre_auth_code=$(pre_auth_code)&redirect_uri=$(redirect_uri)";
 		path = path.replace("$(app_id)", AuthParam.APP_ID);
 		path = path.replace("$(pre_auth_code)", AuthParam.PRE_AUTH_CODE.getCode());
-//		path = path.replace("$(redirect_uri)", "http://" + request.getLocalAddr() + "/wx-term/WxAuth.do?rid=" + request.getParameter("rid"));
-		path = path.replace("$(redirect_uri)", "http://" + request.getLocalAddr() + "/wx-term/weixin/order/authResponse.html?rid=" + request.getParameter("rid"));
+		path = path.replace("$(redirect_uri)", "http://" + getServlet().getInitParameter("wxServer") + "/wx-term/weixin/order/authResponse.html?rid=" + request.getParameter("rid"));
 		response.getWriter().write(path);
 		return null;
 	}
