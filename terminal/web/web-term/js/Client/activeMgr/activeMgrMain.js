@@ -82,9 +82,9 @@ Ext.onReady(function(){
 						SINGLE_EXCEED : {val : 2, desc : "单次消费满"}
 					}
 
-					Ext.getCmp('week_combo_activeMgr').setValue('2');
-					Ext.getCmp('start_combo_activeMgr').setValue('1');
-					Ext.getCmp('end_combo_activeMgr').setValue('1');
+					Ext.getCmp('week_combo_activeMgr').setValue('');
+					Ext.getCmp('start_combo_activeMgr').setValue('');
+					Ext.getCmp('end_combo_activeMgr').setValue('');
 																	
 					var items=Ext.getCmp('foodMultiPrice_column_weixin').items.items;
 					if(items.length > 0){
@@ -962,7 +962,7 @@ Ext.onReady(function(){
 					height : 250,
 					layout : 'border',
 					items : [new Ext.Panel({
-						title : '参与会员信息',
+						title : '发券与用券限制条件',
 						frame : true,
 						id : '',
 						region : 'center',
@@ -1313,8 +1313,8 @@ Ext.onReady(function(){
 										thiz.fireEvent('select');
 									},
 									select : function(){
-										Ext.getCmp('start_combo_activeMgr').setValue('0');
-										Ext.getCmp('end_combo_activeMgr').setValue('0');
+										Ext.getCmp('start_combo_activeMgr').setValue('1');
+										Ext.getCmp('end_combo_activeMgr').setValue('1');
 //										
 //										Ext.getCmp('useTime_label_activeMgr').html = "<font>sddsd</font>";
 //										Ext.getCmp('useTime_label_activeMgr').html = "<font>sddsd123</font>";
