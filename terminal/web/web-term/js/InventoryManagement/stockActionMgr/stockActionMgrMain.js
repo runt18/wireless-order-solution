@@ -692,52 +692,70 @@ Ext.onReady(function(){
 			Ext.example.msg('提示', '操作失败, 请选中一条记录后再操作.');
 			return;
 		}
-		stockTaskNavWin.center();
-		stockTaskNavWin.show();
-		Ext.getCmp('btnPrintStockAction').show();
-		Ext.getCmp('importStockActionForm').hide();
-
-		if(data['statusValue'] == 1 || c.reAudit){
-			stockTaskNavWin.otype = Ext.ux.otype['update'];
-			if(c.reAudit){
-				stockTaskNavWin.otype = "reaudit";
-			}
-			stockTaskNavWin.setTitle('修改库存单信息');
-			operateStockActionBasic({
-				otype : Ext.ux.otype['set'],
-				data : data
-			});
-			Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
-			//货品添加可用
-			Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
-			if(data['subTypeValue'] == 1 || data['subTypeValue'] == 4){
-				Ext.getDom('txtActualPrice').disabled = false;
-			}
+		
+		$.ajax({
+			url : '../../QueryStockAction.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				id : data.id,
+				containsDetails : true
+			},
+			success : function(res, status, req){
+				if(res.success){
+					data = res.root[0];
+					stockTaskNavWin.center();
+					stockTaskNavWin.show();
+					Ext.getCmp('btnPrintStockAction').show();
+					Ext.getCmp('importStockActionForm').hide();
 			
-			if(data['subTypeValue'] == 9){
-				Ext.getCmp('btnNextForStockNav').setDisabled(true);
-				Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
-				Ext.getCmp('btnAuditStockAction').hide();
-			}else{
-				Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
-				Ext.getCmp('btnAuditStockAction').hide();
+					if(data['statusValue'] == 1 || c.reAudit){
+						stockTaskNavWin.otype = Ext.ux.otype['update'];
+						if(c.reAudit){
+							stockTaskNavWin.otype = "reaudit";
+						}
+						stockTaskNavWin.setTitle('修改库存单信息');
+						operateStockActionBasic({
+							otype : Ext.ux.otype['set'],
+							data : data
+						});
+						Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
+						//货品添加可用
+						Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
+						if(data['subTypeValue'] == 1 || data['subTypeValue'] == 4){
+							Ext.getDom('txtActualPrice').disabled = false;
+						}
+						
+						if(data['subTypeValue'] == 9){
+							Ext.getCmp('btnNextForStockNav').setDisabled(true);
+							Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
+							Ext.getCmp('btnAuditStockAction').hide();
+						}else{
+							Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
+							Ext.getCmp('btnAuditStockAction').hide();
+						}
+					}else{
+						stockTaskNavWin.otype = Ext.ux.otype['select'];
+						stockTaskNavWin.setTitle('查看库存单信息');
+						operateStockActionBasic({
+							otype : Ext.ux.otype['set'],
+							data : data
+						});
+						Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
+						Ext.getCmp('btnNextForStockNav').setDisabled(true);
+						Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
+						//货品添加禁用
+						Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(true);
+						Ext.getDom('txtActualPrice').disabled = true;
+						Ext.getCmp('btnAuditStockAction').hide();
+						Ext.getCmp('datetOriStockDateForStockActionBasic').clearInvalid();
+					}
+				}
+			},
+			error : function(){
+			
 			}
-		}else{
-			stockTaskNavWin.otype = Ext.ux.otype['select'];
-			stockTaskNavWin.setTitle('查看库存单信息');
-			operateStockActionBasic({
-				otype : Ext.ux.otype['set'],
-				data : data
-			});
-			Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
-			Ext.getCmp('btnNextForStockNav').setDisabled(true);
-			Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
-			//货品添加禁用
-			Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(true);
-			Ext.getDom('txtActualPrice').disabled = true;
-			Ext.getCmp('btnAuditStockAction').hide();
-			Ext.getCmp('datetOriStockDateForStockActionBasic').clearInvalid();
-		}
+		});
 	}
 	/**
 	 * 删除库存单信息
