@@ -608,6 +608,7 @@ Ext.onReady(function(){
 	
 	
 	var pagingBar = new Ext.PagingToolbar({
+		id : 'pagingToolbar_stockDistribution',
 		pageSize : limitCount,
 		store : ds,
 		displayInfo : true,
