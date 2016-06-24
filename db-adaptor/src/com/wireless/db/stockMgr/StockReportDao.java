@@ -408,8 +408,8 @@ public class StockReportDao {
 			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount * D.price, 0)) AS stock_consume_price " +
 			  " FROM " + Params.dbName + ".stock_action_detail D " +
 			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
-			  " JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
- 			  " JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
+			  " LEFT JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
+ 			  " LEFT JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
 			  //" LEFT JOIN " + Params.dbName + ".monthly_cost COST ON M.material_id = COST.material_id " +
 			  //" LEFT JOIN " + Params.dbName + ".monthly_balance MB ON MB.id = COST.monthly_balance_id " +
 			  " WHERE 1 = 1 " +

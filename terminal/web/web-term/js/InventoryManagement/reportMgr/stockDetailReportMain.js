@@ -1,4 +1,5 @@
 Ext.onReady(function(){
+	var limitCount = 20;
 	var stockForm = new Ext.form.FormPanel({  
 		height : 200,
 	    region : 'north',
@@ -606,7 +607,6 @@ Ext.onReady(function(){
 	});	
 	
 	
-	var limitCount = 20;
 	var pagingBar = new Ext.PagingToolbar({
 		pageSize : limitCount,
 		store : ds,

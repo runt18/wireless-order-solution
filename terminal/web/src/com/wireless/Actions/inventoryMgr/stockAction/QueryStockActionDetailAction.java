@@ -17,6 +17,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockActionDetail;
+import com.wireless.util.DataPaging;
 
 public class QueryStockActionDetailAction extends Action{
 	@Override
@@ -24,6 +25,8 @@ public class QueryStockActionDetailAction extends Action{
 		
 		final String pin = (String)request.getAttribute("pin");
 		final String id = request.getParameter("id");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
 		
 		final JObject jObject = new JObject();
 		try{
@@ -37,6 +40,8 @@ public class QueryStockActionDetailAction extends Action{
 			List<StockActionDetail> root = StockActionDetailDao.getByCond(staff, new StockActionDetailDao.ExtraCond().setStockAction(Integer.parseInt(id)), null);
 
 			jObject.setTotalProperty(root.size());
+			
+			DataPaging.getPagingData(root, true, start, limit);
 			jObject.setRoot(root);
 			
 		}catch(BusinessException  | SQLException e){
