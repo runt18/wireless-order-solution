@@ -19,6 +19,7 @@ import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.supplierMgr.Supplier;
+import com.wireless.pojo.util.DateUtil;
 
 public class StockReportDao {
 	
@@ -269,13 +270,17 @@ public class StockReportDao {
 		
 			  
 		for(StockReport report : result){
+			Calendar c = Calendar.getInstance();
+			c.setTimeInMillis(DateUtil.parseDate(extraCond.range.getOpeningFormat()));
+			c.add(Calendar.MONTH, -1);
+			String maxDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH) + " 23:59:59";
 			
 			/**
 			 * 获取最后一张已审核 或 反审核的物品库单 
 			 */
 			List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																					.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-																					.setOriDate(null, extraCond.range.getOpeningFormat())
+																					.setOriDate(null, maxDate)
 																					.setMaterial(report.getMaterial())
 																					.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
 			if(!primeDetail.isEmpty()){
