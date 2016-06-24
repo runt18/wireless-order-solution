@@ -129,6 +129,9 @@ public class QueryMaterialDeptAction extends Action{
 					
 				});
 			}
+
+			jObject.setTotalProperty(result.size());
+			
 			result = DataPaging.getPagingData(result, true, start, limit);
 			
 			//增加最后一条汇总
@@ -153,7 +156,6 @@ public class QueryMaterialDeptAction extends Action{
 			});
 			
 			jObject.setRoot(result);
-			jObject.setTotalProperty(result.size());
 			
 			
 		}catch(BusinessException | SQLException e){
