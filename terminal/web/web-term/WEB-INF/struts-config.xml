@@ -12,14 +12,15 @@
 			parameter="dataSource">
 		</action>
 		<action path="/MaterialStockStatistics"
-			type="com.wireless.Actions.inventoryMgr.materialStock.MaterialStockStatisticsAction" scope="request"
-			parameter="dataSource">
+			type="com.wireless.Actions.inventoryMgr.materialStock.MaterialStockStatisticsAction"
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/SupplierStockStatistics"
-			type="com.wireless.Actions.inventoryMgr.supplierStock.SupplierStockStatisticsAction" scope="request"
-			parameter="dataSource">
+			type="com.wireless.Actions.inventoryMgr.supplierStock.SupplierStockStatisticsAction"
+			scope="request" parameter="dataSource">
 		</action>
-		<action path="/DownLoadQrcode" type="com.wireless.Actions.downloadQrcode.DownLoadQrcodeAction"
+		<action path="/DownLoadQrcode"
+			type="com.wireless.Actions.downloadQrcode.DownLoadQrcodeAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperateKeyword" type="com.wireless.Actions.weixin.OperateKeywordAction"
@@ -28,16 +29,20 @@
 		<action path="/OperateReply" type="com.wireless.Actions.weixin.OperateReplyAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/QueryWxCommisison" type="com.wireless.Actions.represent.QueryWxCommisisonAction"
+		<action path="/QueryWxCommisison"
+			type="com.wireless.Actions.represent.QueryWxCommisisonAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/OperateCouponEffect"
+			type="com.wireless.Actions.couponEffect.OperateCouponEffectAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/OperateCouponEffect" type="com.wireless.Actions.couponEffect.OperateCouponEffectAction"
-			scope="request" parameter="dataSource">
+		<action path="/OperateRepresent"
+			type="com.wireless.Actions.represent.OperateRepresentAction" scope="request"
+			parameter="dataSource">
 		</action>
-		<action path="/OperateRepresent" type="com.wireless.Actions.represent.OperateRepresentAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/OperateRepresentChain" type="com.wireless.Actions.represent.OperateRepresentChainAction"
+		<action path="/OperateRepresentChain"
+			type="com.wireless.Actions.represent.OperateRepresentChainAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/BeeCloud" type="com.wireless.Actions.beeCloud.BeeCloudAction"
@@ -552,9 +557,6 @@
 		</action>
 		<action path="/OperatePricePlan"
 			type="com.wireless.Actions.menuMgr.basic.OperatePricePlanAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/WXQueryDaZhongInfo" type="com.wireless.Actions.init.QueryDazhongDataAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperatePayType"

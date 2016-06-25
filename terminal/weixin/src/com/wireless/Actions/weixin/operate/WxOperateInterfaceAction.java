@@ -172,7 +172,7 @@ public class WxOperateInterfaceAction extends DispatchAction{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
-			String path = "http://" + request.getLocalAddr() + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&rid=" + rid +"&time=" + new Date().getTime();
+			String path = "http://" + getServlet().getInitParameter("wxServer") + "/wx-term/weixin/order/generalReport.html?m=" + token.getOpenid() + "&rid=" + rid +"&time=" + new Date().getTime();
 			response.getWriter().print(path);
 		}
 		return null;

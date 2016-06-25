@@ -230,6 +230,8 @@ public class OperateCouponAction extends DispatchAction{
 				Coupon item = iter.next();
 				if(item.isExpired()){
 					iter.remove();
+				}else{
+					item.setPromotion(PromotionDao.getById(staff, item.getPromotion().getId()));
 				}
 			}
 			

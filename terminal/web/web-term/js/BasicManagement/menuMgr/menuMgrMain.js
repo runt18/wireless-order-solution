@@ -1,4 +1,4 @@
-﻿var currPageIndex = 0, currRowIndex = -1, conditionType = '',
+﻿	var currPageIndex = 0, currRowIndex = -1, conditionType = '',
 	//多价格数量
 	multiFoodPriceCount = 0,
 	
