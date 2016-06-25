@@ -189,8 +189,9 @@ Ext.ux.importShowerWin = function(params){
 			panelStore.baseParams['supplier'] = supplier;
 			panelStore.baseParams['fuzzId'] = oriStockId;
 			panelStore.baseParams['comment'] = comment;
+			panelStore.baseParams['isPaging'] = true;
 			
-			panelStore.load();
+			panelStore.load({params : {start : 0, limit : 12}});
 		}
 	});
 	
@@ -542,7 +543,7 @@ Ext.ux.importShowerWin = function(params){
 	
 	var pagingbar
 	pagingbar = new Ext.PagingToolbar({
-		pageSize : 8,
+		pageSize : 12,
 		store : store,
 		displayInfo : true,
 		displayMsg : '显示第{0} 条到{1} 条记录，共{2}条',
@@ -696,7 +697,7 @@ Ext.ux.importShowerWin = function(params){
     		}
 		});
 	});
-	importStockActionGridPanel.store.load();
+	searchBtn.handler();
 }
 
 
