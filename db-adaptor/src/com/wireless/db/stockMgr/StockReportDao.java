@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -20,6 +21,7 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class StockReportDao {
 	
@@ -187,13 +189,29 @@ public class StockReportDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		//需要追加统计本月之前初数量不为0，但是本月没有做过出入库任务的商品和原料
-		while(dbCon.rs.next()){
-			boolean isExist = false;
-			for(StockReport eachReport : result){
-				if(eachReport.getMaterial().getId() == dbCon.rs.getInt("material_id")){
-					isExist = true;
-					break;
+		SortedList<StockReport> sortedResult = SortedList.newInstance(result, new Comparator<StockReport>() {
+			@Override
+			public int compare(StockReport o1, StockReport o2) {
+				if(o1.getMaterial().getId() > o2.getMaterial().getId()){
+					return 1;
+				}else if(o1.getMaterial().getId() < o2.getMaterial().getId()){
+					return -1;
+				}else{
+					return 0;
 				}
+			}
+			
+		});
+		
+		StockReport report2Compare = new StockReport();
+		report2Compare.setMaterial(new Material(0));
+		while(dbCon.rs.next()){
+			final boolean isExist;
+			report2Compare.getMaterial().setId(dbCon.rs.getInt("material_id"));
+			if(sortedResult.find(report2Compare) != null){
+				isExist = true;
+			}else{
+				isExist = false;
 			}
 			
 			if(!isExist){
