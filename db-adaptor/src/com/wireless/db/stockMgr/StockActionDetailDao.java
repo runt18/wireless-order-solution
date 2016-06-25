@@ -3,6 +3,7 @@ package com.wireless.db.stockMgr;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -35,10 +36,20 @@ public class StockActionDetailDao {
 		private Staff staff;
 		private String minOriDate;							//原始库单时间
 		private String maxOriDate;
+		private boolean isOnlyAmount;
 		
-		ExtraCond setStaff(Staff staff){
+		private ExtraCond setStaff(Staff staff){
 			this.staff = staff;
 			return this;
+		}
+		
+		public ExtraCond setIsOnlyAmount(boolean onOff){
+			this.isOnlyAmount = onOff;
+			return this;
+		}
+		
+		public boolean isOnlyAmount(){
+			return this.isOnlyAmount;
 		}
 		
 		public ExtraCond setOriDate(String min, String max){
@@ -314,29 +325,42 @@ public class StockActionDetailDao {
 	 */
 	public static List<StockActionDetail> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
-		sql = " SELECT D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount, D.dept_in_remaining, D.dept_out_remaining, D.remaining " +
+		sql = " SELECT " +
+			  (extraCond.isOnlyAmount ? " COUNT(*) " :
+			  " D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount, D.dept_in_remaining, D.dept_out_remaining, D.remaining ") +
 			  " FROM " + Params.dbName + ".stock_action_detail D " +
 			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
 			  " WHERE 1 = 1 " +
 			  " AND S.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond == null ? "" : extraCond.setStaff(staff).toString()) +
 			  (orderClause == null ? "" : orderClause);
-		final List<StockActionDetail> result = new ArrayList<StockActionDetail>();
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			StockActionDetail detail = new StockActionDetail();
-			detail.setId(dbCon.rs.getInt("id"));
-			detail.setStockActionId(dbCon.rs.getInt("stock_action_id"));
-			detail.setMaterialId(dbCon.rs.getInt("material_id"));
-			detail.setName(dbCon.rs.getString("name"));
-			detail.setPrice(dbCon.rs.getFloat("price"));
-			detail.setAmount(dbCon.rs.getFloat("amount"));
-			detail.setDeptInRemaining(dbCon.rs.getFloat("dept_in_remaining"));
-			detail.setDeptOutRemaining(dbCon.rs.getFloat("dept_out_remaining"));
-			detail.setRemaining(dbCon.rs.getFloat("remaining"));
-			
-			result.add(detail);
+		
+		List<StockActionDetail> result = new ArrayList<StockActionDetail>();
+		
+		if(extraCond.isOnlyAmount){
+			if(dbCon.rs.next()){
+				result = Collections.nCopies(dbCon.rs.getInt(1), null);
+			}else{
+				result = Collections.emptyList();
+			}
+		}else{
+			while(dbCon.rs.next()){
+				StockActionDetail detail = new StockActionDetail();
+				detail.setId(dbCon.rs.getInt("id"));
+				detail.setStockActionId(dbCon.rs.getInt("stock_action_id"));
+				detail.setMaterialId(dbCon.rs.getInt("material_id"));
+				detail.setName(dbCon.rs.getString("name"));
+				detail.setPrice(dbCon.rs.getFloat("price"));
+				detail.setAmount(dbCon.rs.getFloat("amount"));
+				detail.setDeptInRemaining(dbCon.rs.getFloat("dept_in_remaining"));
+				detail.setDeptOutRemaining(dbCon.rs.getFloat("dept_out_remaining"));
+				detail.setRemaining(dbCon.rs.getFloat("remaining"));
+				result.add(detail);
+			}
 		}
+		
 		dbCon.rs.close();
 		return result;
 	}

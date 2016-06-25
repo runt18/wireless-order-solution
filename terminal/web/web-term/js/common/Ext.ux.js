@@ -648,37 +648,52 @@ Ext.ux.importShowerWin = function(params){
 		$('[data-type=importStockAction_A_ux]').click(function(){
 			selectCol = importStockActionGridPanel.getSelectionModel().getSelected();
     		if(selectCol){
-				var details = selectCol.json.stockDetails;		    		
+				var details = selectCol.json.stockDetails;	
+				if(details.length == 0){
+					$.ajax({
+						url : '../../QueryStockAction.do',
+						type : 'post',
+						dataType : 'json',
+						data : {
+							id : selectCol.json.id,
+							containsDetails : true
+						},
+						success : function(data, status, req){
+							details = data.root[0].stockDetails;
+							if(param.store){
+								param.store.removeAll();		    			
+				    			if(details && details.length > 0){
+				    				details.forEach(function(el, index){
+				    					param.store.add(new StockDetailRecord({
+					    					material : el,
+					    					id : el.stockActionId,
+					    					'material.id' : el.materialId,
+					    					'material.cateName' : '',
+					    					'material.name' : el.materialName,
+					    					amount : el.amount,
+					    					price : el.price
+					    				}));
+				    				});
+				    			}else{
+				    				Ext.example.msg('错误提示', '该单剧没有材料存在');
+				    				return;
+				    			}
+				    			importShowerWin.hide();
+				    			$('#' + importShowerWin.id).remove();
+				    			Ext.example.msg('成功提示', '导入成功');
+				    			
+				    		}else{
+				    			Ext.example.msg('错误提示', '没有指定导入的表格');
+				    		}
+						},
+						error : function(req, status, err){
+							Ext.example.msg('错误提示', '单据读取失败');
+						}
+					});
+				}
     		}else{
     			Ext.example.msg('错误提示', '请选择单据');
-    			return;
     		}
-    		if(param.store){
-				param.store.removeAll();		    			
-    			if(details && details.length > 0){
-    				details.forEach(function(el, index){
-    					param.store.add(new StockDetailRecord({
-	    					material : el,
-	    					id : el.stockActionId,
-	    					'material.id' : el.materialId,
-	    					'material.cateName' : '',
-	    					'material.name' : el.materialName,
-	    					amount : el.amount,
-	    					price : el.price
-	    				}));
-    				});
-    			}else{
-    				Ext.example.msg('错误提示', '该单剧没有材料存在');
-    				return;
-    			}
-    			importShowerWin.hide();
-    			$('#' + importShowerWin.id).remove();
-    			Ext.example.msg('成功提示', '导入成功');
-    			
-    		}else{
-    			Ext.example.msg('错误提示', '没有指定导入的表格');
-    		}
-			
 		});
 	});
 	importStockActionGridPanel.store.load();
