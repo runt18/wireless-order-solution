@@ -134,9 +134,11 @@ public class QueryStockActionAction extends Action{
 					}
 				}
 			}
+			
+			jObject.setTotalProperty(root.size());
+			List<StockAction> result = DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit);
 
 			if(!root.isEmpty() && isWithOutSum == null){
-				jObject.setTotalProperty(root.size());
 				float price = 0, actualPrice = 0;
 				for (StockAction stockAction : root) {
 					price += stockAction.getPrice();
@@ -152,10 +154,9 @@ public class QueryStockActionAction extends Action{
 				totalStockAction.setActualPrice(actualPrice);
 				totalStockAction.setPrice(price);
 				
-				root = DataPaging.getPagingData(root, Boolean.parseBoolean(isPaging), start, limit);
-				root.add(totalStockAction);
+				result.add(totalStockAction);
 			}
-			jObject.setRoot(root);
+			jObject.setRoot(result);
 			
 		}catch(BusinessException | SQLException e){
 			jObject.initTip(e);

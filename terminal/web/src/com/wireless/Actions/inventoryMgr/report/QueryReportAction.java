@@ -21,7 +21,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.util.DataPaging;
 
 public class QueryReportAction extends Action {
 
@@ -69,6 +68,11 @@ public class QueryReportAction extends Action {
 				extraCond.setMaterialCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)));
 			}
 			
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				extraCond.setStart(Integer.parseInt(start));
+				extraCond.setLimit(Integer.parseInt(limit));
+			}
+			
 			List<StockReport> result = StockReportDao.getByCond(staff, extraCond);
 
 			StockReport summary = new StockReport();
@@ -79,63 +83,10 @@ public class QueryReportAction extends Action {
 				summary.setPrimeMoney(summary.getPrimeMoney() + report.getPrimeMoney());
 			}
 			
-			jObject.setTotalProperty(result.size());
-			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
-			}
-			
+			jObject.setTotalProperty(StockReportDao.getByCond(staff, extraCond.setIsOnlyAmount(true)).size());
 			result.add(summary);
 			
 			jObject.setRoot(result);
-			
-//			List<StockReport> stockReports = null ;
-//			List<StockReport> stockReportPage = new ArrayList<StockReport>() ;
-//			int roots = 0;
-//			String extra = "";
-//			extra += " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ") ";
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//			if(beginDate == null || cateType == null){
-//					
-//				Calendar c = Calendar.getInstance();
-//				c.setTime(new Date());
-//				c.add(Calendar.MONTH, -1);
-//				stockReports = StockReportDao.getStockCollectByTime(staff, sdf.format(c.getTime()), sdf.format(new Date()), extra, null);
-//				
-//			}else{
-//				endDate = beginDate + "-31";
-//				beginDate += "-01";
-//				
-//				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
-//					extra += " AND M.material_id = " + materialId;
-//				}
-//				
-//				if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-//					extra += " AND (S.dept_in = " + deptId +" OR S.dept_out = " + deptId + ")";
-//					stockReports = StockReportDao.getStockCollectByDept(staff, beginDate, endDate, extra, null, Integer.parseInt(deptId));
-//				}else{
-//					stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
-//				}
-//			}
-//
-//			if(stockReports == null || stockReports.isEmpty()){
-//				roots = 0;
-//			}else{
-//				roots = stockReports.size();
-//				int plus = Integer.parseInt(start)+Integer.parseInt(limit);
-//				if(plus > roots){
-//					plus = roots;
-//				}
-//				stockReportPage = stockReports.subList(Integer.parseInt(start), plus);
-//				float tatalMoney = 0;
-//				for (StockReport stockReport : stockReports) {
-//					tatalMoney += stockReport.getFinalMoney();
-//				}
-//				StockReport totalStockReport = new StockReport();
-//				totalStockReport.setFinalMoney(tatalMoney);
-//				stockReportPage.add(totalStockReport);
-//			}
-//			jObject.setTotalProperty(roots);
-//			jObject.setRoot(stockReportPage);
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
