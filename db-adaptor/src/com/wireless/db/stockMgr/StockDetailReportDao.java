@@ -177,7 +177,7 @@ public class StockDetailReportDao {
 			result.add(detailReport);
 		}
 		
-		if(!extraCond.isOnlyAmount() && !extraCond.isSum()){
+		if(!extraCond.isOnlyAmount()){
 			for(StockDetailReport detailReport : result){
 				detailReport.setStockAction(StockActionDao.getById(dbCon, staff, detailReport.getStockActionDetail().getStockActionId()));
 			}		
