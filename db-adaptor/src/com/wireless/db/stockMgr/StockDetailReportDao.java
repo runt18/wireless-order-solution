@@ -208,9 +208,9 @@ public class StockDetailReportDao {
 		String sql = " SELECT " + 
 					 " 0 " +
 					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.amount, 0)) AS stock_in_amount " +
-					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.price, 0), 2)) AS stock_in_price " +
+					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.price * SD.amount, 0), 2)) AS stock_in_price " +
 					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.amount, 0)) AS stock_out_amount " +
-					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.price, 0), 2)) AS stock_out_price " +
+					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.price * SD.amount, 0), 2)) AS stock_out_price " +
 					 " FROM " + Params.dbName + ".stock_action_detail SD" + 
 					 " JOIN " + Params.dbName + ".stock_action S ON SD.stock_action_id = S.id " +
 					 " WHERE 1 = 1 " + 
