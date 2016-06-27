@@ -203,29 +203,43 @@ public class StockReportDao {
 			
 		});
 		
+		List<StockReport> report2NewMember = new ArrayList<>();
 		StockReport report2Compare = new StockReport();
 		report2Compare.setMaterial(new Material(0));
 		while(dbCon.rs.next()){
-			final boolean isExist;
+//			final boolean isExist;
 			report2Compare.getMaterial().setId(dbCon.rs.getInt("material_id"));
-			if(sortedResult.find(report2Compare) != null){
-				isExist = true;
-			}else{
-				isExist = false;
-			}
 			
-			if(!isExist){
-				try {
-					Material material = MaterialDao.getById(staff, dbCon.rs.getInt("material_id"));
-					StockReport report = new StockReport();
-					report.setMaterial(material);
-					report.setFinalPrice(material.getPrice());
-					
-					result.add(report);
-				} catch (BusinessException e) {
-					e.printStackTrace();
-				}
+			if(sortedResult.find(report2Compare) == null){
+				report2NewMember.add(report2Compare);
 			}
+//			if(sortedResult.find(report2Compare) != null){
+//				isExist = true;
+//			}else{
+//				isExist = false;
+//			}
+//			
+//			if(!isExist){
+//				try {
+//					Material material = MaterialDao.getById(staff, dbCon.rs.getInt("material_id"));
+//					StockReport report = new StockReport();
+//					report.setMaterial(material);
+//					report.setFinalPrice(material.getPrice());
+//					
+//					result.add(report);
+//				} catch (BusinessException e) {
+//					e.printStackTrace();
+//				}
+//			}
+		}
+		
+		for(StockReport stockReport : report2NewMember){
+			Material material = MaterialDao.getById(dbCon, staff, stockReport.getMaterial().getId());
+			StockReport report = new StockReport();
+			report.setMaterial(material);
+			report.setFinalPrice(material.getPrice());
+			
+			result.add(report);
 		}
 		
 		
