@@ -27,8 +27,8 @@ Rem copy the www files
 IF EXIST www GOTO www_exist
 IF NOT EXIST www GOTO www_not_exist
 :www_exist
-	@echo copying the index.php...
-	@xcopy /s/y www\index.php dist\www\ > nul
+	@echo copying the index.html...
+	@xcopy /s/y www\index.html dist\www\ > nul
 	
 	@echo copying the favicon...
 	@xcopy /s/y www\images\favicon.ico dist\www\ > nul
