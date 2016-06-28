@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
+import com.wireless.db.stockMgr.StockActionDetailDao.ExtraCond;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -20,7 +21,6 @@ import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockDetailReport;
-import com.wireless.util.DataPaging;
 
 public class QueryStockDetailReportAction extends Action{
 	
@@ -89,33 +89,28 @@ public class QueryStockDetailReportAction extends Action{
 				extraCond.setDeptOut(Integer.parseInt(deptOut));
 			}
 			
-			List<StockDetailReport> result = StockDetailReportDao.getByCond(staff, extraCond);
-			jObject.setTotalProperty(result.size());
+			List<StockDetailReport> result = StockDetailReportDao.getByCond(staff, extraCond, ((start != null && limit != null) ? (" LIMIT " + start +", " + limit) : ""));
+			jObject.setTotalProperty(StockDetailReportDao.getByCond(staff, extraCond.setIsOnlyAmount(true), null).size());
 
-			StockDetailReport summary = new StockDetailReport();
-			float totalStockInAmount = 0, totalStockInMoney = 0, totalStockOutAmount = 0, totalStockOutMoney = 0;
-			for (StockDetailReport s : result) {
-				if(s.getStockAction().getType() == StockAction.Type.STOCK_IN){
-					totalStockInAmount += s.getStockActionDetail().getAmount();
-					totalStockInMoney += s.getStockActionDetail().getAmount() * s.getStockActionDetail().getPrice();
-				}
-				if(s.getStockAction().getType() == StockAction.Type.STOCK_OUT){
-					totalStockOutAmount += s.getStockActionDetail().getAmount();
-					totalStockOutMoney += s.getStockActionDetail().getAmount() * s.getStockActionDetail().getPrice();
-				}
-			}
-			summary.setSummary(true);
-			summary.setTotalStockInAmount(totalStockInAmount);
-			summary.setTotalStockInMoney(totalStockInMoney);
-			summary.setTotalStockOutAmount(totalStockOutAmount);
-			summary.setTotalStockOutMoney(totalStockOutMoney);
+//			StockDetailReport summary = new StockDetailReport();
+//			float totalStockInAmount = 0, totalStockInMoney = 0, totalStockOutAmount = 0, totalStockOutMoney = 0;
+//			for (StockDetailReport s : result) {
+//				if(s.getStockAction().getType() == StockAction.Type.STOCK_IN){
+//					totalStockInAmount += s.getStockActionDetail().getAmount();
+//					totalStockInMoney += s.getStockActionDetail().getAmount() * s.getStockActionDetail().getPrice();
+//				}
+//				if(s.getStockAction().getType() == StockAction.Type.STOCK_OUT){
+//					totalStockOutAmount += s.getStockActionDetail().getAmount();
+//					totalStockOutMoney += s.getStockActionDetail().getAmount() * s.getStockActionDetail().getPrice();
+//				}
+//			}
+//			summary.setSummary(true);
+//			summary.setTotalStockInAmount(totalStockInAmount);
+//			summary.setTotalStockInMoney(totalStockInMoney);
+//			summary.setTotalStockOutAmount(totalStockOutAmount);
+//			summary.setTotalStockOutMoney(totalStockOutMoney);
 
-			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
-			}
-			
-			result.add(summary);
-			
+			result.add(StockDetailReportDao.getSumByCond(staff, extraCond));
 			jObject.setRoot(result);
 			
 		}catch(BusinessException | SQLException e){

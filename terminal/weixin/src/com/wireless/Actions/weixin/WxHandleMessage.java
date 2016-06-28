@@ -234,12 +234,13 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		}
 	}
 	
-	public WxHandleMessage(HttpServletRequest request, WxSession session){
+	public WxHandleMessage(String serverName, HttpServletRequest request, WxSession session){
 		super(session);
 		
 		this.request = request;
 
-		this.serverName = request.getLocalAddr();
+		//this.serverName = request.getLocalAddr();
+		this.serverName = serverName;
 		
 		final String root = "http://" + this.serverName + "/wx-term";
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";

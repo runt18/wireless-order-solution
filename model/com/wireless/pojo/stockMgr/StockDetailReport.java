@@ -40,8 +40,9 @@ public class StockDetailReport implements Jsonable {
 		return this.stockAction;
 	}
 	
-	public void setSummary(boolean onOff){
+	public StockDetailReport setSummary(boolean onOff){
 		this.isSummary = onOff;
+		return this;
 	}
 	
 	public void setTotalStockInAmount(float totalStockInAmount) {

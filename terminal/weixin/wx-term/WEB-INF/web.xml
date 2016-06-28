@@ -62,6 +62,10 @@
 			<param-value>55555</param-value>
 		</init-param>
 		<init-param>
+			<param-name>wxServer</param-name>
+			<param-value>wx.e-tones.net</param-value>
+		</init-param>
+		<init-param>
 			<param-name>imageBrowseDefaultFile</param-name>
 			<param-value>http://food-image-test.oss.aliyuncs.com/nophoto.jpg</param-value>
 		</init-param>

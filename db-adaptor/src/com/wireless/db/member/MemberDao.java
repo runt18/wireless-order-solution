@@ -2225,7 +2225,7 @@ public class MemberDao {
 			mo.setComment(allComment + pointBuilder.getComment());
 			
 			final Coupon.IssueBuilder issueBuilder = Coupon.IssueBuilder.newInstance4PointExchange();
-			issueBuilder.addPromotion(entry.getKey().getId());
+			issueBuilder.addPromotion(entry.getKey().getId(), entry.getValue());
 			issueBuilder.addMember(pointBuilder.getMemberId());
 			
 			//发送优惠券

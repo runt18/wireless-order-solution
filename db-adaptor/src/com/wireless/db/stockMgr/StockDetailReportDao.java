@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.staffMgr.Staff;
@@ -14,49 +15,6 @@ import com.wireless.pojo.stockMgr.StockDetailReport;
 import com.wireless.pojo.stockMgr.StockInGeneral;
 
 public class StockDetailReportDao {
-
-	
-	/**
-	 * Get the the stock detail report.
-	 * @param staff
-	 * @param extraCond
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static List<StockDetailReport> getByCond(Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getByCond(dbCon, staff, extraCond);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the the stock detail report.
-	 * @param dbCon
-	 * @param staff
-	 * @param extraCond
-	 * @return
-	 * @throws SQLException
-	 * @throws BusinessException
-	 */
-	public static List<StockDetailReport> getByCond(DBCon dbCon, Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException, BusinessException{
-		final List<StockDetailReport> result = new ArrayList<>();
-		List<StockActionDetail> details = StockActionDetailDao.getByCond(dbCon, staff, extraCond, " ORDER BY D.id ASC ");
-		for(StockActionDetail stockDetail : details){
-			StockDetailReport detailReport = new StockDetailReport();
-			detailReport.setStockActonDetail(stockDetail);
-			result.add(detailReport);
-		}
-		
-		for(StockDetailReport detailReport : result){
-			detailReport.setStockAction(StockActionDao.getById(dbCon, staff, detailReport.getStockActionDetail().getStockActionId()));
-		}		
-		return result;
-	}
 	public static class ExtraCond{
 		
 		private DutyRange range;
@@ -71,73 +29,73 @@ public class StockDetailReportDao {
 		public DutyRange getRange() {
 			return range;
 		}
-
-
+		
+		
 		public void setRange(DutyRange range) {
 			this.range = range;
 		}
-
-
+		
+		
 		public int getOperateStaff() {
 			return operateStaff;
 		}
-
-
+		
+		
 		public void setOperateStaff(int operateStaff) {
 			this.operateStaff = operateStaff;
 		}
-
-
+		
+		
 		public String getName() {
 			return name;
 		}
-
-
+		
+		
 		public void setName(String name) {
 			this.name = name;
 		}
-
-
+		
+		
 		public int getDeptId() {
 			return deptId;
 		}
-
-
+		
+		
 		public void setDeptId(int deptId) {
 			this.deptId = deptId;
 		}
-
-
+		
+		
 		public int getCateType() {
 			return cateType;
 		}
-
-
+		
+		
 		public void setCateType(int cateType) {
 			this.cateType = cateType;
 		}
-
-
+		
+		
 		public int getCateId() {
 			return cateId;
 		}
-
-
+		
+		
 		public void setCateId(int cateId) {
 			this.cateId = cateId;
 		}
-
-
+		
+		
 		public int getSuppler() {
 			return suppler;
 		}
-
-
+		
+		
 		public void setSuppler(int suppler) {
 			this.suppler = suppler;
 		}
-
-
+		
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -166,6 +124,110 @@ public class StockDetailReportDao {
 			return extraCond.toString();
 		}
 	}	
+
+	
+	/**
+	 * Get the the stock detail report.
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static List<StockDetailReport> getByCond(Staff staff, StockActionDetailDao.ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the the stock detail report.
+	 * @param dbCon
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static List<StockDetailReport> getByCond(DBCon dbCon, Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException, BusinessException{
+		return getByCond(dbCon, staff, extraCond, null);
+	}
+	
+	
+	/**
+	 * Get the the stock detail report.
+	 * @param dbCon
+	 * @param staff
+	 * @param extraCond
+	 * @param orderClause
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static List<StockDetailReport> getByCond(DBCon dbCon, Staff staff, StockActionDetailDao.ExtraCond extraCond,String orderClause) throws SQLException, BusinessException{
+		final List<StockDetailReport> result = new ArrayList<>();
+		List<StockActionDetail> details = StockActionDetailDao.getByCond(dbCon, staff, extraCond, (orderClause != null ? " ORDER BY D.id ASC " + orderClause : ""));
+		for(StockActionDetail stockDetail : details){
+			StockDetailReport detailReport = new StockDetailReport();
+			detailReport.setStockActonDetail(stockDetail);
+			result.add(detailReport);
+		}
+		
+		if(!extraCond.isOnlyAmount()){
+			for(StockDetailReport detailReport : result){
+				detailReport.setStockAction(StockActionDao.getById(dbCon, staff, detailReport.getStockActionDetail().getStockActionId()));
+			}		
+		}
+		
+		return result;
+	}
+	
+	public static StockDetailReport getSumByCond(Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try {
+			dbCon.connect();
+			return getSumByCond(dbCon, staff, extraCond);
+		} finally {
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 */
+	public static StockDetailReport getSumByCond(DBCon dbCon,Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException{
+		String sql = " SELECT " + 
+					 " 0 " +
+					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.amount, 0)) AS stock_in_amount " +
+					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.price * SD.amount, 0), 2)) AS stock_in_price " +
+					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.amount, 0)) AS stock_out_amount " +
+					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.price * SD.amount, 0), 2)) AS stock_out_price " +
+					 " FROM " + Params.dbName + ".stock_action_detail SD" + 
+					 " JOIN " + Params.dbName + ".stock_action S ON SD.stock_action_id = S.id " +
+					 " WHERE 1 = 1 " + 
+					 " AND S.restaurant_id = " + staff.getRestaurantId() +
+					 (extraCond != null ? extraCond.toString() : "");
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		StockDetailReport stockDetailReport = new StockDetailReport();
+		while(dbCon.rs.next()){
+			stockDetailReport.setSummary(true);
+			stockDetailReport.setTotalStockInAmount(dbCon.rs.getInt("stock_in_amount"));
+			stockDetailReport.setTotalStockInMoney(dbCon.rs.getFloat("stock_in_price"));
+			stockDetailReport.setTotalStockOutAmount(dbCon.rs.getInt("stock_out_amount"));
+			stockDetailReport.setTotalStockOutMoney(dbCon.rs.getFloat("stock_out_price"));
+		}
+		return stockDetailReport;
+	}
 	
 	/**
 	 * Get the stock_in general information by extra.

@@ -91,7 +91,7 @@ public class EntryAction extends Action{
 		final OutputStream os = response.getOutputStream();
 		final WxSession session = WxSession.newInstance();
 		try{
-			session.addOnHandleMessageListener(new WxHandleMessage(request, session));
+			session.addOnHandleMessageListener(new WxHandleMessage(getServlet().getInitParameter("wxServer"), request, session));
 			session.process(is, os);
 		}finally{
 			session.close();

@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -20,6 +21,7 @@ import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class StockReportDao {
 	
@@ -30,7 +32,28 @@ public class StockReportDao {
 		private int materialCateId;
 		private MaterialCate.Type materialCateType;
 		private int supplierId;
+		private boolean isOnlyAmount;
+		private Integer start;
+		private Integer limit;
 		
+		public ExtraCond setStart(int start){
+			this.start = start;
+			return this;
+		}
+		
+		public ExtraCond setLimit(int limit){
+			this.limit = limit;
+			return this;
+		}
+		
+		public ExtraCond setIsOnlyAmount(boolean onOff){
+			this.isOnlyAmount = onOff;
+			return this;
+		}
+		
+		public boolean isOnlyAmount(){
+			return this.isOnlyAmount;
+		}
 		
 		public ExtraCond setMaterialCateType(MaterialCate.Type type){
 			this.materialCateType = type;
@@ -133,85 +156,6 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 */
 	public static List<StockReport> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException, Exception{
-//		String sql;
-		
-//		sql = " SELECT D.material_id, MAX(D.name) AS material_name " + 
-//			  " ,MAX(M.price) AS material_price " +
-//			  //" ,MAX(IFNULL(COST.cost, M.price)) AS material_price " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " ,D.amount, 0)) AS stock_in " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN.getVal() + " ,D.amount * D.price, 0)) AS stock_in_money " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.INIT.getVal() + " ,D.amount, 0)) AS stock_init " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_in = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_in_transfer " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_IN_TRANSFER.getVal() + (extraCond.deptId != -1 ? " AND S.dept_out = " + extraCond.deptId : "") + " , D.amount, 0)) AS stock_out_transfer " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.SPILL.getVal() + " , D.amount, 0)) AS stock_spill " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.MORE.getVal() + " , D.amount, 0)) AS stock_take_more " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount, 0)) AS stock_out " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT.getVal() + " , D.amount * D.price, 0)) AS stock_out_money " +
-//			  //" ,SUM(IF(S.sub_type = " + StockAction.SubType.STOCK_OUT_TRANSFER.getVal() + " , D.amount, 0)) AS stock_out_transfer " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.DAMAGE.getVal() + " , D.amount, 0)) AS stock_damage " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.LESS.getVal() + " , D.amount, 0)) AS stock_take_less " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount, 0)) AS stock_consumption " +
-//			  " ,SUM(IF(S.sub_type = " + StockAction.SubType.CONSUMPTION.getVal() + " , D.amount * D.price, 0)) AS stock_consume_price " +
-//			  " FROM " + Params.dbName + ".stock_action_detail D " +
-//			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
-//			  " JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
-// 			  " JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id " +
-//			  //" LEFT JOIN " + Params.dbName + ".monthly_cost COST ON M.material_id = COST.material_id " +
-//			  //" LEFT JOIN " + Params.dbName + ".monthly_balance MB ON MB.id = COST.monthly_balance_id " +
-//			  " WHERE 1 = 1 " +
-//			  //( monthlyBalanceId > 0 ? " AND MB.id = " + monthlyBalanceId : "") +
-////			  " AND MB.month BETWEEN '" + extraCond.range.getOpeningFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" +
-//			  " AND S.restaurant_id = " + staff.getRestaurantId() +
-//			  " AND S.status IN (" + StockAction.Status.AUDIT.getVal() + "," + StockAction.Status.RE_AUDIT.getVal() + ")" +
-//			  (extraCond != null ? extraCond.toString() : "") +
-//			  " GROUP BY D.material_id ";
-//		
-//		final List<StockReport> result = new ArrayList<>();
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		while(dbCon.rs.next()){
-//			
-//			Material material = new Material(dbCon.rs.getInt("material_id"));
-//			material.setName(dbCon.rs.getString("material_name"));
-//			
-//			StockReport report = new StockReport();
-//			report.setMaterial(material);
-//			report.setFinalPrice(dbCon.rs.getFloat("material_price"));
-//			
-//			//期初建账数量
-//			report.setPrimeAmount(dbCon.rs.getFloat("stock_init"));
-//			report.setPrimeMoney(report.getPrimeAmount() * report.getFinalPrice());
-//			report.setFinalAmount(report.getPrimeAmount());
-//			report.setFinalMoney(report.getPrimeMoney());
-//			
-//			//入库采购
-//			report.setStockIn(dbCon.rs.getFloat("stock_in"));
-//			//入库采购金额
-//			report.setStockInMoney(dbCon.rs.getFloat("stock_in_money"));
-//			//入库调拨
-//			report.setStockInTransfer(dbCon.rs.getFloat("stock_in_transfer"));
-//			//入库报溢
-//			report.setStockSpill(dbCon.rs.getFloat("stock_spill"));
-//			//入库盘盈
-//			report.setStockTakeMore(dbCon.rs.getFloat("stock_take_more"));
-//			//出库退货
-//			report.setStockOut(dbCon.rs.getFloat("stock_out"));
-//			//出库退货金额
-//			report.setStockOutMoney(dbCon.rs.getFloat("stock_out_money"));
-//			//出库调拨
-//			report.setStockOutTransfer(dbCon.rs.getFloat("stock_out_transfer"));
-//			//出库报损
-//			report.setStockDamage(dbCon.rs.getFloat("stock_damage"));
-//			//出库盘亏
-//			report.setStockTakeLess(dbCon.rs.getFloat("stock_take_less"));
-//			//出库消耗
-//			report.setConsumption(dbCon.rs.getFloat("stock_consumption"));
-//			//销售金额
-//			report.setComsumeMoney(dbCon.rs.getFloat("stock_consume_price"));
-//			
-//			result.add(report);
-//			
-//		}
-//		dbCon.rs.close();
 		
 		
 //		//获取本月之前期末数量不为0的商品和原料
@@ -220,7 +164,7 @@ public class StockReportDao {
 //																								.setOriStockDate(null, extraCond.range.getOpeningFormat()), 
 //																								" GROUP BY D.material_id HAVING(D.dept_in_remaining) > 0 ");
 		
-		final List<StockReport> result = getRangeStockByCond(dbCon, staff, extraCond);
+		List<StockReport> result = getRangeStockByCond(dbCon, staff, extraCond);
 		
 		String sql;
 		//获取本月之前期末数量不为0的商品和原料
@@ -245,135 +189,175 @@ public class StockReportDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		//需要追加统计本月之前初数量不为0，但是本月没有做过出入库任务的商品和原料
-		while(dbCon.rs.next()){
-			boolean isExist = false;
-			for(StockReport eachReport : result){
-				if(eachReport.getMaterial().getId() == dbCon.rs.getInt("material_id")){
-					isExist = true;
-					break;
+		SortedList<StockReport> sortedResult = SortedList.newInstance(result, new Comparator<StockReport>() {
+			@Override
+			public int compare(StockReport o1, StockReport o2) {
+				if(o1.getMaterial().getId() > o2.getMaterial().getId()){
+					return 1;
+				}else if(o1.getMaterial().getId() < o2.getMaterial().getId()){
+					return -1;
+				}else{
+					return 0;
 				}
 			}
 			
-			if(!isExist){
-				try {
-					Material material = MaterialDao.getById(staff, dbCon.rs.getInt("material_id"));
-					StockReport report = new StockReport();
-					report.setMaterial(material);
-					report.setFinalPrice(material.getPrice());
-					
-					result.add(report);
-				} catch (BusinessException e) {
-					e.printStackTrace();
-				}
+		});
+		
+		List<StockReport> report2NewMember = new ArrayList<>();
+		StockReport report2Compare = new StockReport();
+		report2Compare.setMaterial(new Material(0));
+		while(dbCon.rs.next()){
+//			final boolean isExist;
+			report2Compare.getMaterial().setId(dbCon.rs.getInt("material_id"));
+			
+			if(sortedResult.find(report2Compare) == null){
+				report2NewMember.add(report2Compare);
 			}
+//			if(sortedResult.find(report2Compare) != null){
+//				isExist = true;
+//			}else{
+//				isExist = false;
+//			}
+//			
+//			if(!isExist){
+//				try {
+//					Material material = MaterialDao.getById(staff, dbCon.rs.getInt("material_id"));
+//					StockReport report = new StockReport();
+//					report.setMaterial(material);
+//					report.setFinalPrice(material.getPrice());
+//					
+//					result.add(report);
+//				} catch (BusinessException e) {
+//					e.printStackTrace();
+//				}
+//			}
 		}
 		
-			  
-		for(StockReport report : result){
-			Calendar c = Calendar.getInstance();
-			c.setTimeInMillis(DateUtil.parseDate(extraCond.range.getOpeningFormat()));
-			c.add(Calendar.MONTH, -1);
-			String maxDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH) + " 23:59:59";
+		for(StockReport stockReport : report2NewMember){
+			Material material = MaterialDao.getById(dbCon, staff, stockReport.getMaterial().getId());
+			StockReport report = new StockReport();
+			report.setMaterial(material);
+			report.setFinalPrice(material.getPrice());
 			
+			result.add(report);
+		}
+		
+		
+		if(!extraCond.isOnlyAmount){
 			/**
-			 * 获取最后一张已审核 或 反审核的物品库单 
+			 * 分页
 			 */
-			List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
-																					.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-																					.setOriDate(null, maxDate)
-																					.setMaterial(report.getMaterial())
-																					.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
-			if(!primeDetail.isEmpty()){
-				float primeAmount = 0;
-				if(extraCond.deptId == -1){
-					primeAmount = primeDetail.get(0).getRemaining();
-				}else{
-					StockAction primeStock = StockActionDao.getById(dbCon, staff, primeDetail.get(0).getStockActionId());
-					if(primeStock.getDeptIn().getId() == extraCond.deptId){
-						primeAmount = primeDetail.get(0).getDeptInRemaining();
-					}else if(primeStock.getDeptOut().getId() == extraCond.deptId){
-						primeAmount = primeDetail.get(0).getDeptOutRemaining();
-					}
-				}
-				//期初数量
-				report.setPrimeAmount(primeAmount);
-				
-				
-				//TODO
-//				List<MonthlyBalance> monthlyBalance = MonthlyBalanceDao.getMonthlyBalance(staff, new MonthlyBalanceDao.ExtraCond().setRange(extraCond.range.getOpeningFormat()), " ORDER BY month DESC");
-//				
-//				if(monthlyBalance.size() > 0){
-////					monthlyBalance.get(0);
-//				}
-				
-				//期初金额
-				report.setPrimeMoney(primeAmount * report.getFinalPrice());
+			if(extraCond.start != null && extraCond.limit != null){
+				int end = extraCond.start + extraCond.limit;
+				end = result.size() >= end ? end : result.size();
+				result = result.subList(extraCond.start, end);
 			}
 			
-			
-			/**
-			 * 获取搜索时间内  最后一张库单来判定期末数
-			 */
-			List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
+			for(StockReport report : result){
+				Calendar c = Calendar.getInstance();
+				c.setTimeInMillis(DateUtil.parseDate(extraCond.range.getOpeningFormat()));
+				c.add(Calendar.MONTH, -1);
+				String maxDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.getActualMaximum(Calendar.DAY_OF_MONTH) + " 23:59:59";
+				
+				/**
+				 * 获取最后一张已审核 或 反审核的物品库单 
+				 */
+				List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																						.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
-																						.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
+																						.setOriDate(null, maxDate)
 																						.setMaterial(report.getMaterial())
 																						.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
-			
-			if(!finalDetail.isEmpty()){
-				float finalAmount = 0;
-				if(extraCond.deptId == -1){
-					finalAmount = finalDetail.get(0).getRemaining();
-				}else{
-					StockAction finalStock = StockActionDao.getById(dbCon, staff, finalDetail.get(0).getStockActionId());
-					if(finalStock.getDeptIn().getId() == extraCond.deptId){
-						finalAmount = finalDetail.get(0).getDeptInRemaining();
-					}else if(finalStock.getDeptOut().getId() == extraCond.deptId){
-						finalAmount = finalDetail.get(0).getDeptOutRemaining();
+				if(!primeDetail.isEmpty()){
+					float primeAmount = 0;
+					if(extraCond.deptId == -1){
+						primeAmount = primeDetail.get(0).getRemaining();
+					}else{
+						StockAction primeStock = StockActionDao.getById(dbCon, staff, primeDetail.get(0).getStockActionId());
+						if(primeStock.getDeptIn().getId() == extraCond.deptId){
+							primeAmount = primeDetail.get(0).getDeptInRemaining();
+						}else if(primeStock.getDeptOut().getId() == extraCond.deptId){
+							primeAmount = primeDetail.get(0).getDeptOutRemaining();
+						}
 					}
-				}
-				//期末数量
-				report.setFinalAmount(finalAmount);
-				//期末金额
-				report.setFinalMoney(finalAmount * report.getFinalPrice());
-
-				
-				/**
-				 * 判断是否有月结
-				 */
-				sql = " SELECT id FROM " + Params.dbName + ".monthly_balance " + 
-						" WHERE 1 = 1 " +
-						" AND month BETWEEN '" + extraCond.range.getOpeningFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" + 
-						" ORDER BY id DESC LIMIT 1";
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				int monthlyBalanceId = 0;
-				if(dbCon.rs.next()){
-					monthlyBalanceId = dbCon.rs.getInt("id");
-				}
-				dbCon.rs.close();
-				
-				
-				/**
-				 * 如果有月结  就用月结记录的成本计算期初期末金额
-				 */
-				if(monthlyBalanceId > 0){
-					sql = " SELECT M.month, M.restaurant_id, C.material_id, C.cost FROM " + Params.dbName + ".monthly_balance M " + 
-							" JOIN " + Params.dbName + ".monthly_cost C ON M.id = C.monthly_balance_id " + 
-							" WHERE 1 = 1 " + 
-							" AND M.id = " + monthlyBalanceId + 
-							" AND C.material_id = " + report.getMaterial().getId();
+					//期初数量
+					report.setPrimeAmount(primeAmount);
 					
+					
+					//TODO
+	//				List<MonthlyBalance> monthlyBalance = MonthlyBalanceDao.getMonthlyBalance(staff, new MonthlyBalanceDao.ExtraCond().setRange(extraCond.range.getOpeningFormat()), " ORDER BY month DESC");
+	//				
+	//				if(monthlyBalance.size() > 0){
+	////					monthlyBalance.get(0);
+	//				}
+					
+					//期初金额
+					report.setPrimeMoney(primeAmount * report.getFinalPrice());
+				}
+				
+				
+				/**
+				 * 获取搜索时间内  最后一张库单来判定期末数
+				 */
+				List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
+																							.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
+																							.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
+																							.setMaterial(report.getMaterial())
+																							.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
+				
+				if(!finalDetail.isEmpty()){
+					float finalAmount = 0;
+					if(extraCond.deptId == -1){
+						finalAmount = finalDetail.get(0).getRemaining();
+					}else{
+						StockAction finalStock = StockActionDao.getById(dbCon, staff, finalDetail.get(0).getStockActionId());
+						if(finalStock.getDeptIn().getId() == extraCond.deptId){
+							finalAmount = finalDetail.get(0).getDeptInRemaining();
+						}else if(finalStock.getDeptOut().getId() == extraCond.deptId){
+							finalAmount = finalDetail.get(0).getDeptOutRemaining();
+						}
+					}
+					//期末数量
+					report.setFinalAmount(finalAmount);
+					//期末金额
+					report.setFinalMoney(finalAmount * report.getFinalPrice());
+	
+					
+					/**
+					 * 判断是否有月结
+					 */
+					sql = " SELECT id FROM " + Params.dbName + ".monthly_balance " + 
+							" WHERE 1 = 1 " +
+							" AND month BETWEEN '" + extraCond.range.getOpeningFormat() + "' AND '" + extraCond.range.getEndingFormat() + "'" + 
+							" ORDER BY id DESC LIMIT 1";
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					int monthlyBalanceId = 0;
 					if(dbCon.rs.next()){
-						float cost = dbCon.rs.getFloat("cost");
-						report.setFinalPrice(cost);
-						report.setPrimeMoney(report.getPrimeAmount() * cost);
-						report.setFinalMoney(report.getFinalAmount() * cost);
+						monthlyBalanceId = dbCon.rs.getInt("id");
+					}
+					dbCon.rs.close();
+					
+					
+					/**
+					 * 如果有月结  就用月结记录的成本计算期初期末金额
+					 */
+					if(monthlyBalanceId > 0){
+						sql = " SELECT M.month, M.restaurant_id, C.material_id, C.cost FROM " + Params.dbName + ".monthly_balance M " + 
+								" JOIN " + Params.dbName + ".monthly_cost C ON M.id = C.monthly_balance_id " + 
+								" WHERE 1 = 1 " + 
+								" AND M.id = " + monthlyBalanceId + 
+								" AND C.material_id = " + report.getMaterial().getId();
+						
+						dbCon.rs = dbCon.stmt.executeQuery(sql);
+						if(dbCon.rs.next()){
+							float cost = dbCon.rs.getFloat("cost");
+							report.setFinalPrice(cost);
+							report.setPrimeMoney(report.getPrimeAmount() * cost);
+							report.setFinalMoney(report.getFinalAmount() * cost);
+						}
 					}
 				}
 			}
 		}
-		
 		return result;
 	}
 	
@@ -425,8 +409,10 @@ public class StockReportDao {
 			  (extraCond != null ? extraCond.toString() : "") +
 			  " GROUP BY D.material_id ";
 		
-		final List<StockReport> result = new ArrayList<>();
+		List<StockReport> result = new ArrayList<>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		
 		while(dbCon.rs.next()){
 			
 			Material material = new Material(dbCon.rs.getInt("material_id"));
@@ -435,12 +421,6 @@ public class StockReportDao {
 			StockReport report = new StockReport();
 			report.setMaterial(material);
 			report.setFinalPrice(dbCon.rs.getFloat("material_price"));
-			
-			//期初建账数量
-//			report.setPrimeAmount(dbCon.rs.getFloat("stock_init"));
-//			report.setPrimeMoney(report.getPrimeAmount() * report.getFinalPrice());
-//			report.setFinalAmount(report.getPrimeAmount());
-//			report.setFinalMoney(report.getPrimeMoney());
 			
 			//入库采购
 			report.setStockIn(dbCon.rs.getFloat("stock_in"));
@@ -468,7 +448,7 @@ public class StockReportDao {
 			report.setComsumeMoney(dbCon.rs.getFloat("stock_consume_price"));
 			
 			result.add(report);
-			
+				
 		}
 		dbCon.rs.close();
 		return result;

@@ -19,7 +19,7 @@ public class VerifyLoginAction extends Action {
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
-		
+
 		final JObject jObject = new JObject();
 		try{        
 			final String pin = (String) request.getSession().getAttribute("pin");
