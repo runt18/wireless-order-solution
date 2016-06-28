@@ -791,7 +791,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setDeptOut(Integer.parseInt(deptOut));
 		}
 		
-		List<StockDetailReport> stockDetailReports = StockDetailReportDao.getByCond(staff, extraCond);
+		List<StockDetailReport> stockDetailReports = StockDetailReportDao.getByCond(staff, extraCond, null);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("进销存明细");
