@@ -63,7 +63,7 @@ Ext.onReady(function(){
 					//显示优惠券内容
 					if(jr.root[0].coupon){
 						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="100"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
-																	+ '<div style="float:left;vertical-align: middle;line-height: 25px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');							
+																	+ '<div style="float:left;vertical-align: middle;line-height: 25px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >开始时间 : ' + jr.root[0].coupon.beginExpired + '</span><br><span>结束时间 : '+ jr.root[0].coupon.endExpired +'</span></div>');							
 					}else{
 						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="100"  src="../../images/noCouponNow.png" /></div>');
 					}												
@@ -218,7 +218,8 @@ Ext.onReady(function(){
 		}
 		var couponName = Ext.getCmp('guide_2nd_couponName');
 		var price = Ext.getCmp('guide_2nd_couponPrice');
-		var expiredDate= Ext.getCmp('guide_2nd_couponExpired');
+		var beginExpired = Ext.getCmp('beginDate_date_couponExpired');
+		var endExpired = Ext.getCmp('endDate_date_couponExpired');
 	
 		var params = {};
 		if(createActiveWin.otype == 'insert'){
@@ -234,7 +235,19 @@ Ext.onReady(function(){
 		}
 		params.couponName = couponName.getValue();
 		params.price = price.getValue();
-		params.expiredDate = expiredDate.getValue().format('Y-m-d');
+		
+		if(Ext.getCmp('beginExpired_radio_active').getValue()){
+			params.beginExpired = beginExpired.getValue().format('Y-m-d');
+		}else{
+			params.beginExpired = '';
+		}
+		
+		if(Ext.getCmp('endExpired_radio_active').getValue()){
+			params.endExpired = endExpired.getValue().format('Y-m-d');
+		}else{
+			params.endExpired = '';
+		}
+		
 		params.title = title.getValue();
 		
 		params.body = Ext.getCmp('guide_2nd_promotionEditor').getValue();	
@@ -599,18 +612,84 @@ Ext.onReady(function(){
 		                            fieldLabel : '&nbsp;&nbsp;&nbsp;面额',
 		                            allowBlank : false
 		                        }]
-		                    }, {
+		                    },{
+								xtype : 'checkboxgroup',
+								style : 'paddingLeft : 25px;',
+								columns : 3,
+								items : [{
+									boxLabel : '开始时间',
+									inputValue : 2,
+									id : 'beginExpired_radio_active',
+									name : 'time',
+									listeners : {
+										check : function(e){
+											if(Ext.getCmp('beginExpired_radio_active').checked){
+												Ext.getCmp('beginDate_date_couponExpired').enable();
+											}else{
+												Ext.getCmp('beginDate_date_couponExpired').disable();
+											}
+										},
+										focus : function(e){
+											if(Ext.getCmp('beginExpired_radio_active').checked){
+												Ext.getCmp('beginDate_date_couponExpired').enable();
+											}else{
+												Ext.getCmp('beginDate_date_couponExpired').disable();
+											}
+										}
+									}
+								}]
+							}, {
 		                        items : [{
-		                            id : 'guide_2nd_couponExpired',
+		                            id : 'beginDate_date_couponExpired',
 		                            xtype : 'datefield',
 		                            width : 130,
-		                            fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
+		                            fieldLabel : '&nbsp;&nbsp;&nbsp;开始时间',
 		                            format : 'Y-m-d',
 		                            readOnly : false,
-		                            allowBlank : false,
 		                            minValue : new Date(),
 		                            value : new Date(),
-		                            blankText : '日期不能为空.',
+		                            listeners : {
+		                                invalid : function(thiz){
+		                                    thiz.clearInvalid();
+		                                }
+		                            }
+		                        }]
+		                    },{
+								xtype : 'checkboxgroup',
+								style : 'paddingLeft : 25px;',
+								columns : 3,
+								items : [{
+									boxLabel : '结束时间',
+									inputValue : 2,
+									id : 'endExpired_radio_active',
+									name : 'time',
+									listeners : {
+										check : function(e){
+											if(Ext.getCmp('endExpired_radio_active').checked){
+												Ext.getCmp('endDate_date_couponExpired').enable();
+											}else{
+												Ext.getCmp('endDate_date_couponExpired').disable();
+											}
+										},
+										focus : function(e){
+											if(Ext.getCmp('beginExpired_radio_active').checked){
+												Ext.getCmp('beginDate_date_couponExpired').enable();
+											}else{
+												Ext.getCmp('beginDate_date_couponExpired').disable();
+											}
+										}
+									}
+								}]
+		                    }, {
+		                        items : [{
+		                            id : 'endDate_date_couponExpired',
+		                            xtype : 'datefield',
+		                            width : 130,
+		                            fieldLabel : '&nbsp;&nbsp;&nbsp;结束时间',
+		                            format : 'Y-m-d',
+		                            readOnly : false,
+		                            minValue : new Date(),
+		                            value : new Date(),
 		                            listeners : {
 		                                invalid : function(thiz){
 		                                    thiz.clearInvalid();
@@ -759,9 +838,17 @@ Ext.onReady(function(){
 						Ext.getCmp('guide_2nd_title').setValue();
 						Ext.getCmp('guide_2nd_couponName').setValue();
 						Ext.getCmp('guide_2nd_couponPrice').setValue();
-						Ext.getCmp('guide_2nd_couponExpired').setValue(new Date());
+						Ext.getCmp('beginDate_date_couponExpired').setValue(new Date());
+						Ext.getCmp('endDate_date_couponExpired').setValue(new Date());
 						Ext.getCmp('guide_2nd_promotionEditor').setValue();
-						Ext.getCmp('guide_2nd_couponExpired').clearInvalid();
+						Ext.getCmp('beginDate_date_couponExpired').clearInvalid();
+						Ext.getCmp('endDate_date_couponExpired').clearInvalid();
+						
+						
+						Ext.getCmp('beginExpired_radio_active').setValue(true); 
+						
+						Ext.getCmp('endExpired_radio_active').setValue(true); 
+						
 						
 						Ext.getDom('radioDefaultCoupon').checked = true; 
 						Ext.getCmp('radioDefaultCoupon').fireEvent('check', Ext.getCmp('radioDefaultCoupon'), true);
@@ -771,13 +858,33 @@ Ext.onReady(function(){
 						 
 						createActiveWin.image = '';
 						
+						//TODO
 					}else if(thiz.otype == 'update'){
 						this.setTitle('修改优惠活动');
 						
 						Ext.getCmp('guide_2nd_title').setValue(thiz.promotion.title);
 						Ext.getCmp('guide_2nd_couponName').setValue(thiz.promotion.coupon.name);
 						Ext.getCmp('guide_2nd_couponPrice').setValue(thiz.promotion.coupon.price);
-						Ext.getCmp('guide_2nd_couponExpired').setValue(thiz.promotion.coupon.expiredFormat);
+						
+						if(thiz.promotion.coupon.beginExpired != ''){
+							Ext.getCmp('beginDate_date_couponExpired').setValue(thiz.promotion.coupon.beginExpired);
+							Ext.getCmp('beginExpired_radio_active').setValue(true); 
+							
+						}else{
+							Ext.getCmp('beginExpired_radio_active').setValue(false); 
+						}
+						
+						
+						if(thiz.promotion.coupon.endExpired != ''){
+							Ext.getCmp('endDate_date_couponExpired').setValue(thiz.promotion.coupon.endExpired);
+							Ext.getCmp('endExpired_radio_active').setValue(true); 
+						}else{
+							Ext.getCmp('endExpired_radio_active').setValue(false); 
+						}
+						
+						Ext.getCmp('beginExpired_radio_active').fireEvent('focus');
+						Ext.getCmp('endDate_date_couponExpired').fireEvent('focus');
+						
 						Ext.getCmp('guide_2nd_promotionEditor').setValue(thiz.promotion.body);
 						
 						Ext.getDom('radioSelfCoupon').checked = true; 
@@ -1566,7 +1673,6 @@ Ext.onReady(function(){
 		//优惠活动Id
 		var promotionId = node.attributes.id;
 									
-		//TODO
 		var promotionTimes = [];
 		if(promotionUseTime.length > 0){
 			for(var i = 0; i < promotionUseTime.length; i++){
@@ -2126,7 +2232,7 @@ Ext.onReady(function(){
 //						}]
 //					}, {
 //						items : [{
-//							id : 'guide_2nd_couponExpired',
+//							id : 'endDate_date_couponExpired',
 //							xtype : 'datefield',
 //							width : 130,
 //							fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
@@ -2198,7 +2304,8 @@ Ext.onReady(function(){
 		}
 	});
 	
-	$('#guide_2nd_couponExpired').parent().width($('#guide_2nd_couponExpired').width() + $('#guide_2nd_couponExpired').next().width()+20);
+	$('#beginDate_date_couponExpired').parent().width($('#beginDate_date_couponExpired').width() + $('#beginDate_date_couponExpired').next().width()+20);
+	$('#endDate_date_couponExpired').parent().width($('#endDate_date_couponExpired').width() + $('#endDate_date_couponExpired').next().width()+20);
 	
 	$('#active_dateSearchDateBegin').parent().width($('#active_dateSearchDateBegin').width() + $('#active_dateSearchDateBegin').next().width()+20);
 	$('#active_dateSearchDateEnd').parent().width($('#active_dateSearchDateEnd').width() + $('#active_dateSearchDateEnd').next().width()+20);
@@ -2209,5 +2316,5 @@ Ext.onReady(function(){
  	$('#secondStepEastBody').children().first().children().first().css('overflow-y', 'visible');
  	$('#threeStepEastBody').children().first().children().first().css('overflow-y', 'visible');
  	$('#promotionPreviewBody').children().first().children().first().css('overflow-y', 'visible');
-// 	Ext.getCmp('couponConfigRules_panel_activeMgrMain').setHeight((parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,'')) - Ext.getCmp('promotionCouponPreview').getHeight()) - 50);
+// 	Ext.getCmp('couponConfigRules_panel_activeMgrMain').setHeight((parseInt(Ext.getDom('divActive').parentElement.style.height.replace(/px/g,'')) - Ext.getCmp('').getHeight()) - 50);
 });

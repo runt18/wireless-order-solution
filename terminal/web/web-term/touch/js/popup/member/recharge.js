@@ -28,9 +28,18 @@ define(function(require, exports, module){
 					});
 				});
 				
+				//防止连点下单
+				var isProcessing = false;
 				//充值按钮
 				self.find('[id=toRecharge_a_recharge]').click(function(){
-					meberRechargeCheck(self);
+					
+					if(!isProcessing){
+						isProcessing = true;
+						setTimeout(function(){
+							isProcessing = false;
+						},2000);
+						meberRechargeCheck(self);
+					}
 				});
 				
 				//取消按钮
