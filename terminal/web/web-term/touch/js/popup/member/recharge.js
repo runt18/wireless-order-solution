@@ -35,9 +35,6 @@ define(function(require, exports, module){
 					
 					if(!isProcessing){
 						isProcessing = true;
-						setTimeout(function(){
-							isProcessing = false;
-						},2000);
 						meberRechargeCheck(self);
 					}
 				});
@@ -224,7 +221,8 @@ define(function(require, exports, module){
 					Util.msg.tip(response.msg);
 				}else{
 					Util.msg.tip(response.msg);
-				}		
+				}	
+				isProcessing = false;
 			});
 		}
 		

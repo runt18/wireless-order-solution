@@ -485,10 +485,6 @@
 			type="com.wireless.Actions.couponMgr.QueryCouponTypeAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/OperateCouponType"
-			type="com.wireless.Actions.couponMgr.OperateCouponTypeAction" scope="request"
-			parameter="dataSource">
-		</action>
 		<action path="/OperateCoupon"
 			type="com.wireless.Actions.couponMgr.OperateCouponAction" scope="request"
 			parameter="dataSource">
