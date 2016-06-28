@@ -46,7 +46,8 @@ public class OperatePromotionAction extends DispatchAction{
 		
 		final String couponName = request.getParameter("couponName");
 		final String price = request.getParameter("price");
-		final String expiredDate = request.getParameter("expiredDate");
+		final String beginExpired = request.getParameter("beginExpired");
+		final String endExpired = request.getParameter("endExpired");
 		final String image = request.getParameter("image");
 		final String issueRule = request.getParameter("issueRule");
 		final String issueSingleMoney = request.getParameter("singleMoney");
@@ -57,7 +58,9 @@ public class OperatePromotionAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		try{
 			
-			final CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
+			final CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price))
+																	.setExpired(beginExpired, endExpired)
+																	.setComment("活动优惠劵");
 			if(image != null && !image.isEmpty()){
 				typeInsertBuilder.setImage(Integer.parseInt(image));
 			}
@@ -138,7 +141,8 @@ public class OperatePromotionAction extends DispatchAction{
 		final String couponTypeId = request.getParameter("cId");
 		final String couponName = request.getParameter("couponName");
 		final String price = request.getParameter("price");
-		final String expiredDate = request.getParameter("expiredDate");
+		final String beginExpired = request.getParameter("beginExpired");
+		final String endExpired = request.getParameter("endExpired");
 		final String image = request.getParameter("image");		
 		final String issueRule = request.getParameter("issueRule");
 		final String issueSingleMoney = request.getParameter("issueSingleMoney");
@@ -163,8 +167,9 @@ public class OperatePromotionAction extends DispatchAction{
 				if(price != null && !price.isEmpty()){
 					typeUpdateBuilder.setPrice(Integer.parseInt(price));
 				}
-				if(expiredDate != null && !expiredDate.isEmpty()){
-					typeUpdateBuilder.setExpired(expiredDate);
+				
+				if(beginExpired != null && !beginExpired.isEmpty() || endExpired != null && !endExpired.isEmpty()){
+					typeUpdateBuilder.setExpired(beginExpired, endExpired);
 				}
 				if(image != null && !image.isEmpty()){
 					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));

@@ -444,7 +444,7 @@ public class Coupon implements Jsonable{
 	
 	public long getExpired(){
 		if(this.couponType != null){
-			return this.couponType.getExpired();
+			return this.couponType.getEndExpired();
 		}else{
 			return 0;
 		}
