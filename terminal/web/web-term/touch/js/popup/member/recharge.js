@@ -28,9 +28,15 @@ define(function(require, exports, module){
 					});
 				});
 				
+				//防止连点下单
+				var isProcessing = false;
 				//充值按钮
 				self.find('[id=toRecharge_a_recharge]').click(function(){
-					meberRechargeCheck(self);
+					
+					if(!isProcessing){
+						isProcessing = true;
+						meberRechargeCheck(self);
+					}
 				});
 				
 				//取消按钮
@@ -215,7 +221,8 @@ define(function(require, exports, module){
 					Util.msg.tip(response.msg);
 				}else{
 					Util.msg.tip(response.msg);
-				}		
+				}	
+				isProcessing = false;
 			});
 		}
 		

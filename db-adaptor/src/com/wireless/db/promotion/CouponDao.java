@@ -37,7 +37,7 @@ public class CouponDao {
 		private int memberId;
 		private int couponTypeId;
 		private List<Integer> promotions = new ArrayList<>();
-		private Boolean expired;
+		private boolean expired;
 		private CouponOperation.Operate operation;
 		private int associateId;
 		private DutyRange range;
@@ -136,13 +136,6 @@ public class CouponDao {
 			}
 			if(promotionCond.length() != 0){
 				extraCond.append(" AND C.promotion_id IN ( " + promotionCond + " ) ");
-			}
-			if(expired != null){
-				if(expired){
-					extraCond.append(" AND CT.expired < NOW()");
-				}else{
-					extraCond.append(" AND CT.expired > NOW()");
-				}
 			}
 			if(this.operation != null || this.associateId != 0 || this.range != null){
 				String sql;
@@ -594,7 +587,7 @@ public class CouponDao {
 			  (extraCond.isOnlyAmount ? 
 			  " COUNT(*) " : 
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.status, " +
-			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
+			  " C.coupon_type_id, CT.name, CT.price, CT.begin_expired, CT.end_expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title, P.rule, P.start_date, P.finish_date ") +
 			  " FROM " + Params.dbName + ".coupon C " +
@@ -627,7 +620,13 @@ public class CouponDao {
 				ct.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				ct.setPrice(dbCon.rs.getFloat("price"));
 				ct.setName(dbCon.rs.getString("name"));
-				ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
+				if(dbCon.rs.getTimestamp("begin_Expired") != null){
+					ct.setBeginExpired(dbCon.rs.getTimestamp("begin_Expired").getTime());
+				}
+				
+				if(dbCon.rs.getTimestamp("end_expired") !=null){
+					ct.setEndExpired(dbCon.rs.getTimestamp("end_expired").getTime());
+				}
 				if(dbCon.rs.getInt("oss_image_id") != 0){
 					ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
 				}
@@ -655,7 +654,10 @@ public class CouponDao {
 				promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
 				coupon.setPromotion(promotion);
 				
-				result.add(coupon);
+				if(!(extraCond.expired && ct.isExpired())){
+					result.add(coupon);
+				}
+				
 			}
 		}
 

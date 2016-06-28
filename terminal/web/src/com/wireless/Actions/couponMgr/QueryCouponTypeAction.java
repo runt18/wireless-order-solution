@@ -37,7 +37,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 				tree.append(",leaf:true");
 				tree.append(",couponTypeId:" + list.get(i).getId());
 				tree.append(",price:" + list.get(i).getPrice());
-				tree.append(",date:'" + DateUtil.formatToDate(list.get(i).getExpired()) + "'");
+				tree.append(",date:'" + DateUtil.formatToDate(list.get(i).getEndExpired()) + "'");
 				tree.append(",desc:'" + list.get(i).getComment() + "'");
 				tree.append(",image:'" + list.get(i).getImage()+ "'");
 				if(list.get(i).isExpired()){
@@ -79,7 +79,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 					tree.append(",leaf:true");
 					tree.append(",couponTypeId:" + list.get(i).getId());
 					tree.append(",price:" + list.get(i).getPrice());
-					tree.append(",date:'" + DateUtil.formatToDate(list.get(i).getExpired()) + "'");
+					tree.append(",date:'" + DateUtil.formatToDate(list.get(i).getEndExpired()) + "'");
 					tree.append(",desc:'" + list.get(i).getComment() + "'");
 					tree.append(",image:'" + list.get(i).getImage()+ "'");
 					tree.append("}");

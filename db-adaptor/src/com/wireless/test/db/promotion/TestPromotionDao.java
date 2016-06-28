@@ -76,7 +76,8 @@ public class TestPromotionDao {
 		
 		int promotionId = 0;
 		try{
-			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance("测试优惠活动", "测试优惠活动", new CouponType.InsertBuilder("测试优惠券类型", 30, "2020-2-1")
+			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder.newInstance("测试优惠活动", "测试优惠活动", new CouponType.InsertBuilder("测试优惠券类型", 30)
+																	  .setExpired("2019-2-15", "2021-8-6")
 							   										  .setComment("测试备注"), "hello jingjing<br>")
 					  												   ;
 			promotionId = PromotionDao.create(groupStaff, promotionCreateBuilder);
@@ -128,9 +129,10 @@ public class TestPromotionDao {
 			promotionImg1 = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 			promotionImg2 = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
-			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30, "2020-2-1")
+			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30)
 																	   .setComment("测试备注")
-																	   .setImage(ossImageId);
+																	   .setImage(ossImageId)
+																	   .setExpired("2016-4-5", "2018-3-8");
 			
 			String htmlTxt = "<br>数量份金沙路<div align=\"center\" style=\"width:100%;\"><img src='$(pic_1)' style=\"max-width:95%;\"></div>谁加路费金沙路费<br><br><div align=\"center\" style=\"width:100%;\"></div><br>";
 			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
@@ -171,7 +173,8 @@ public class TestPromotionDao {
 			CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改测试优惠券类型")
 																	   .setComment("修改测试备注")
 																	   .setImage(ossImageId)
-																	   .setPrice(50);
+																	   .setPrice(50)
+																	   .setExpired("2017-4-5", "2019-3-8");
 			body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg2).getObjectUrl());
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange("2016-2-1", "2020-3-1")

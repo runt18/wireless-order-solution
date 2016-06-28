@@ -66,11 +66,12 @@ public class CouponTypeDao {
 		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".coupon_type " +
-			  " (`restaurant_id`, `name`, `price`, `expired`, `oss_image_id`, `comment`) VALUES(" +
+			  " (`restaurant_id`, `name`, `price`, `begin_expired`, `end_expired`, `oss_image_id`, `comment`) VALUES(" +
 			  staff.getRestaurantId() + "," +
 			  "'" + type.getName() + "'," +
 			  type.getPrice() + "," +
-			  "'" + DateUtil.format(type.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
+			  "'" + DateUtil.format(type.getBeginExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
+			  "'" + DateUtil.format(type.getEndExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
 			  (type.hasImage() ? type.getImage().getId() : "NULL") + "," +
 			  "'" + type.getComment() + "'" +
 			  ")";
@@ -188,7 +189,8 @@ public class CouponTypeDao {
 			  " coupon_type_id = " + type.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + type.getName() + "'" : "") +
 			  (builder.isPriceChanged() ? " ,price = " + type.getPrice() : "") +
-			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(type.getExpired()) + "'" : "") +
+			  (builder.isBeginExpiredChanged() ? " ,begin_expired = '" + DateUtil.format(type.getBeginExpired()) + "'" : "") +
+			  (builder.isEndExpiredChanged() ? " ,end_expired = '" + DateUtil.format(type.getEndExpired()) + "'" : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + type.getComment() + "'" : "") +
 			  " WHERE coupon_type_id = " + type.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -338,7 +340,7 @@ public class CouponTypeDao {
 	private static List<CouponType> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " coupon_type_id, restaurant_id, name, price, expired, comment, oss_image_id " +
+			  " coupon_type_id, restaurant_id, name, price, begin_expired, end_expired, comment, oss_image_id " +
 			  " FROM " + Params.dbName + ".coupon_type " +
 			  " WHERE restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
 			  (extraCond != null ? extraCond : " ") +
@@ -351,7 +353,12 @@ public class CouponTypeDao {
 			type.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			type.setName(dbCon.rs.getString("name"));
 			type.setPrice(dbCon.rs.getFloat("price"));
-			type.setExpired(dbCon.rs.getTimestamp("expired").getTime());
+			if(dbCon.rs.getTimestamp("begin_expired") != null){
+				type.setBeginExpired(dbCon.rs.getTimestamp("begin_expired").getTime());
+			}
+			if(dbCon.rs.getTimestamp("end_Expired") != null){
+				type.setEndExpired(dbCon.rs.getTimestamp("end_Expired").getTime());
+			}
 			type.setComment(dbCon.rs.getString("comment"));
 			if(dbCon.rs.getInt("oss_image_id") != 0){
 				type.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
