@@ -48,6 +48,7 @@ public class OperatePromotionAction extends DispatchAction{
 		final String price = request.getParameter("price");
 		final String beginExpired = request.getParameter("beginExpired");
 		final String endExpired = request.getParameter("endExpired");
+		final String limitAmount = request.getParameter("limitAmount");
 		final String image = request.getParameter("image");
 		final String issueRule = request.getParameter("issueRule");
 		final String issueSingleMoney = request.getParameter("singleMoney");
@@ -59,6 +60,7 @@ public class OperatePromotionAction extends DispatchAction{
 		try{
 			
 			final CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price))
+																	.setLimitAmount(Integer.parseInt(limitAmount))
 																	.setExpired(beginExpired, endExpired)
 																	.setComment("活动优惠劵");
 			if(image != null && !image.isEmpty()){
@@ -142,6 +144,7 @@ public class OperatePromotionAction extends DispatchAction{
 		final String couponName = request.getParameter("couponName");
 		final String price = request.getParameter("price");
 		final String beginExpired = request.getParameter("beginExpired");
+		final String limitAmount = request.getParameter("limitAmount");
 		final String endExpired = request.getParameter("endExpired");
 		final String image = request.getParameter("image");		
 		final String issueRule = request.getParameter("issueRule");
@@ -171,6 +174,11 @@ public class OperatePromotionAction extends DispatchAction{
 				if(beginExpired != null && !beginExpired.isEmpty() || endExpired != null && !endExpired.isEmpty()){
 					typeUpdateBuilder.setExpired(beginExpired, endExpired);
 				}
+				
+				if(limitAmount != null && !limitAmount.isEmpty()){
+					typeUpdateBuilder.setLimitAmount(Integer.parseInt(limitAmount));
+				}
+				
 				if(image != null && !image.isEmpty()){
 					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
 				}

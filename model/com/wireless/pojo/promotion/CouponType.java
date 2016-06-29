@@ -13,6 +13,7 @@ public class CouponType implements Jsonable{
 		private long endExpired;
 		private long beginExpired;
 		private String comment;
+		private int limitAmount;
 		
 		private OssImage ossImage;
 		
@@ -21,13 +22,20 @@ public class CouponType implements Jsonable{
 			this.price = price;
 		}
 		
+		public InsertBuilder setLimitAmount(int limit){
+			this.limitAmount = limit;
+			return this;
+		}
+		
 		public InsertBuilder setExpired(long beginExpired, long endExpired){
-			if(beginExpired > endExpired){
-				throw new IllegalArgumentException("开始时间不能大于结束时间");
+			if(beginExpired != 0 && endExpired != 0){
+				if(beginExpired > endExpired){
+					throw new IllegalArgumentException("开始时间不能大于结束时间");
+				}
 			}
-			this.beginExpired = beginExpired;
-			this.endExpired = endExpired;
 			
+			this.beginExpired = beginExpired > 0 ? beginExpired : 0;
+			this.endExpired = endExpired > 0 ? endExpired : 0;
 			return this;
 		}
 		
@@ -67,9 +75,23 @@ public class CouponType implements Jsonable{
 		private String comment;
 		private float price = -1;
 		private OssImage ossImage;
+		private int limitAmount = -1;
+		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
 			this.name = name;
+		}
+		
+		public boolean isLimitAmountChanged(){
+			return this.limitAmount >= 0;
+		}
+		
+		public UpdateBuilder setLimitAmount(int limit){
+			if(limit < 0){
+				throw new IllegalArgumentException("张数限制不能小于0");
+			}
+			this.limitAmount = limit;
+			return this;
 		}
 		
 		public boolean isNameChanged(){
@@ -77,7 +99,7 @@ public class CouponType implements Jsonable{
 		}
 		
 		public UpdateBuilder setExpired(long beginExpired, long endExpired){
-			if(beginExpired > 0 && endExpired > 0){
+			if(beginExpired != 0 && endExpired != 0){
 				if(beginExpired > endExpired){
 					throw new IllegalArgumentException("开始时间不能大于结束时间");
 				}
@@ -145,6 +167,7 @@ public class CouponType implements Jsonable{
 	private long endExpired;
 	private String comment;
 	private OssImage image;
+	private int limitAmout;
 	
 	private CouponType(UpdateBuilder builder){
 		setId(builder.id);
@@ -154,6 +177,7 @@ public class CouponType implements Jsonable{
 		setComment(builder.comment);
 		setPrice(builder.price);
 		setImage(builder.ossImage);
+		setLimitAmount(builder.limitAmount);
 	}
 	
 	private CouponType(InsertBuilder builder){
@@ -163,6 +187,7 @@ public class CouponType implements Jsonable{
 		setEndExpired(builder.endExpired);
 		setComment(builder.comment);
 		setImage(builder.ossImage);
+		setLimitAmount(builder.limitAmount);
 	}
 	
 	public CouponType(int id){
@@ -179,6 +204,7 @@ public class CouponType implements Jsonable{
 			setEndExpired(src.getEndExpired());
 			setComment(src.getComment());
 			setImage(src.getImage());
+			setLimitAmount(src.limitAmout);
 		}
 	}
 	
@@ -217,6 +243,18 @@ public class CouponType implements Jsonable{
 		this.price = price;
 	}
 	
+	public boolean hasLimit(){
+		return this.limitAmout > 0;
+	}
+	
+	public int getLimitAmount(){
+		return limitAmout;
+	}
+	
+	public void setLimitAmount(int limit){
+		this.limitAmout = limit;
+	}
+	
 	public long getBeginExpired(){
 		return beginExpired;
 	}
@@ -231,6 +269,14 @@ public class CouponType implements Jsonable{
 	
 	public void setEndExpired(long endExpired){
 		this.endExpired = endExpired > 0 ? endExpired : 0;
+	}
+	
+	public boolean hasEndExpire(){
+		return this.endExpired != 0;
+	}
+	
+	public boolean hasBeginExpire(){
+		return this.beginExpired != 0;
 	}
 	
 	public boolean isExpired(){
@@ -305,6 +351,7 @@ public class CouponType implements Jsonable{
 				jm.putJsonable("ossImage", this.image, 0);
 			}
 		}
+		jm.putInt("limitAmount", this.limitAmout);
 		return jm;
 	}
 
