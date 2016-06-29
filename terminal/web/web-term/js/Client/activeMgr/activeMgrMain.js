@@ -248,6 +248,12 @@ Ext.onReady(function(){
 			params.endExpired = '';
 		}
 		
+		if(Ext.getCmp('limitAmount_checkbox_active').getValue()){
+			params.limitAmount = Ext.getCmp('limitAmount_text_active').getValue();
+		}else{
+			params.limitAmount = 0;
+		}
+		
 		params.title = title.getValue();
 		
 		params.body = Ext.getCmp('guide_2nd_promotionEditor').getValue();	
@@ -672,10 +678,10 @@ Ext.onReady(function(){
 											}
 										},
 										focus : function(e){
-											if(Ext.getCmp('beginExpired_radio_active').checked){
-												Ext.getCmp('beginDate_date_couponExpired').enable();
+											if(Ext.getCmp('endExpired_radio_active').checked){
+												Ext.getCmp('endDate_date_couponExpired').enable();
 											}else{
-												Ext.getCmp('beginDate_date_couponExpired').disable();
+												Ext.getCmp('endDate_date_couponExpired').disable();
 											}
 										}
 									}
@@ -806,7 +812,7 @@ Ext.onReady(function(){
 		            items : [{
 		                id : 'guide_2nd_title',
 		                xtype : 'textfield',
-		                width : 200,
+		                width : 300,
 		                fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
 		                style : 'overflow: hidden;',
 		                allowBlank : false,
@@ -816,6 +822,36 @@ Ext.onReady(function(){
 		                    }
 		                }
 		            }]
+		        }, {
+		            columnWidth : .1,
+		            items : [{
+		            	xtype: "checkbox",
+		            	id : 'limitAmount_checkbox_active',
+		            	listeners : {
+							check : function(e){
+								if(Ext.getCmp('limitAmount_checkbox_active').checked){
+									Ext.getCmp('limitAmount_text_active').enable();
+								}else{
+									Ext.getCmp('limitAmount_text_active').disable();
+								}
+							},
+							focus : function(e){
+								if(Ext.getCmp('limitAmount_checkbox_active').checked){
+									Ext.getCmp('limitAmount_text_active').enable();
+								}else{
+									Ext.getCmp('limitAmount_text_active').disable();
+								}
+							}
+						}
+		            }]
+		        }, {
+		        	columnWidth : .2,
+		        	items : [{
+		                id : 'limitAmount_text_active',
+		                xtype : 'textfield',
+		                width : 100,
+		                fieldLabel : '张数限制'
+		        	}]
 		        }]
 		    }]
 		});
@@ -844,7 +880,7 @@ Ext.onReady(function(){
 						Ext.getCmp('beginDate_date_couponExpired').clearInvalid();
 						Ext.getCmp('endDate_date_couponExpired').clearInvalid();
 						
-						
+						Ext.getCmp('limitAmount_checkbox_active').setValue(false);
 						Ext.getCmp('beginExpired_radio_active').setValue(true); 
 						
 						Ext.getCmp('endExpired_radio_active').setValue(true); 
@@ -882,8 +918,16 @@ Ext.onReady(function(){
 							Ext.getCmp('endExpired_radio_active').setValue(false); 
 						}
 						
+						if(thiz.promotion.coupon.limitAmount > 0){
+							Ext.getCmp('limitAmount_checkbox_active').setValue(true);
+							Ext.getCmp('limitAmount_text_active').setValue(thiz.promotion.coupon.limitAmount);
+						}else{
+							Ext.getCmp('limitAmount_checkbox_active').setValue(false);
+						}
+						
 						Ext.getCmp('beginExpired_radio_active').fireEvent('focus');
-						Ext.getCmp('endDate_date_couponExpired').fireEvent('focus');
+						Ext.getCmp('endExpired_radio_active').fireEvent('focus');
+						Ext.getCmp('limitAmount_checkbox_active').fireEvent('focus');
 						
 						Ext.getCmp('guide_2nd_promotionEditor').setValue(thiz.promotion.body);
 						

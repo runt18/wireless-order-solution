@@ -70,16 +70,31 @@ public class WxNotifyMemberAction extends DispatchAction{
 			 * {{remark.DATA}}
 			 */
 			Coupon coupon = CouponDao.getById(staff, co.getCouponId());
-			String serverName;
-			if(request.getServerName().equals("e-tones.net")){
-				serverName = "wx.e-tones.net";
+			final String serverName;
+			if(getServlet().getInitParameter("wxServer") != null){
+				serverName = getServlet().getInitParameter("wxServer");
 			}else{
-				serverName = request.getServerName(); 
+				serverName = "wx.e-tones.net"; 
 			}
+			
 			final String url = "http://" + serverName + "/wx-term/weixin/order/sales.html?pid=" + coupon.getPromotion().getId() + 
 							   "&fid=" + wxMember.getSerial() + 
 							   "&r=" + wxRestaurant.getWeixinSerial() +
 							   "&time=1450689776892";
+			
+			final StringBuilder expired = new StringBuilder();
+			if(coupon.getCouponType().hasBeginExpire() && coupon.getCouponType().hasEndExpire()){
+				expired.append(DateUtil.format(coupon.getCouponType().getBeginExpired(), DateUtil.Pattern.DATE))
+					   .append(" 至 ")
+					   .append(DateUtil.format(coupon.getCouponType().getEndExpired(), DateUtil.Pattern.DATE));
+				
+			}else if(!coupon.getCouponType().hasBeginExpire() && coupon.getCouponType().hasEndExpire()){
+				expired.append(DateUtil.format(coupon.getCouponType().getEndExpired(), DateUtil.Pattern.DATE));
+				
+			}else if(coupon.getCouponType().hasBeginExpire() && !coupon.getCouponType().hasEndExpire()){
+				expired.append("从" + DateUtil.format(coupon.getCouponType().getEndExpired(), DateUtil.Pattern.DATE) + "开始");
+			}
+			
 			//System.out.println(
 			Template.send(token, new Template.Builder()
 					.setToUser(wxMember.getSerial())
@@ -87,7 +102,7 @@ public class WxNotifyMemberAction extends DispatchAction{
 					.addKeyword(new Keyword("first", ("亲爱的会员，您已成功领取【$(coupon_name)】优惠券").replace("$(coupon_name)", coupon.getName())))
 					.addKeyword(new Keyword("keyword1", co.getMemberName()))		//领取人
 					.addKeyword(new Keyword("keyword2", coupon.getName()))	       //商品名称
-					.addKeyword(new Keyword("keyword3", DateUtil.format(coupon.getExpired(), DateUtil.Pattern.DATE)))	//有效期至
+					.addKeyword(new Keyword("keyword3", expired.toString()))	//有效期至
 					.addKeyword(new Keyword("keyword4", "----"))				//订单编号
 					.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
 					.setUrl(url)

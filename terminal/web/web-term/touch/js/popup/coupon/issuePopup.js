@@ -19,7 +19,7 @@ define(function(require, exports, module){
 		
 		
 		this.open = function(afterOpen){
-			$.post('../OperatePromotion.do',  {
+			$.post('../OperatePromotion.do', {
 					dataSource : 'getByCond', 
 					status : 'progress', 
 					issueTriggers : param.issueMode.triggers, 
@@ -34,12 +34,23 @@ define(function(require, exports, module){
 								pageInit : function(self){
 									var progressCoupon = "";
 									for(var i = 0; i < response.root.length; i++){
-										var eachProgressCoupon = '<tr class="promotionClass_tr_issue" data-value="'+ response.root[i].issueTrigger.extra +'"> '
-															 + '<td style="width:250px">'
-															 + '<label style="height:50px"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '</label>'
-															 + '</td>'
-															 + '<td style="width:35px"><input data-value="'+ response.root[i].issueTrigger.extra +'" id="amount_input_issue_' + response.root[i].id + '" class="amountClass_input_issue" style="font-size:20px;font-weight: bold;width:35px;" maxlength="3" ></td>'
-															 + '</tr>';
+										var eachProgressCoupon = '';
+										if(param.isPoint){
+											eachProgressCoupon = '<tr class="promotionClass_tr_issue" data-value="'+ response.root[i].issueTrigger.extra +'"> '
+																 + '<td style="width:250px">'
+																 + '<label style="height:50px"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '(' + response.root[i].issueTrigger.extra + '积分 )</label>'
+																 + '</td>'
+																 + '<td style="width:35px"><input data-value="'+ response.root[i].issueTrigger.extra +'" id="amount_input_issue_' + response.root[i].id + '" class="amountClass_input_issue" style="font-size:20px;font-weight: bold;width:35px;" maxlength="3" ></td>'
+																 + '</tr>';
+										}else{
+											eachProgressCoupon = '<tr class="promotionClass_tr_issue" data-value="'+ response.root[i].issueTrigger.extra +'"> '
+																 + '<td style="width:250px">'
+																 + '<label style="height:50px"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '</label>'
+																 + '</td>'
+																 + '<td style="width:35px"><input data-value="'+ response.root[i].issueTrigger.extra +'" id="amount_input_issue_' + response.root[i].id + '" class="amountClass_input_issue" style="font-size:20px;font-weight: bold;width:35px;" maxlength="3" ></td>'
+																 + '</tr>';
+										}
+										
 											
 										progressCoupon += eachProgressCoupon;
 									}

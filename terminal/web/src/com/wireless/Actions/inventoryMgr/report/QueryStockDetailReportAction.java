@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
-import com.wireless.db.stockMgr.StockActionDetailDao.ExtraCond;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;

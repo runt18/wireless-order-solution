@@ -33,7 +33,6 @@ import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.PromotionTrigger;
-import com.wireless.pojo.promotion.PromotionUseTime;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
@@ -132,7 +131,8 @@ public class TestPromotionDao {
 			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30)
 																	   .setComment("测试备注")
 																	   .setImage(ossImageId)
-																	   .setExpired("2016-4-5", "2018-3-8");
+																	   .setExpired("2016-4-5", "2018-3-8")
+																	   .setLimitAmount(1);
 			
 			String htmlTxt = "<br>数量份金沙路<div align=\"center\" style=\"width:100%;\"><img src='$(pic_1)' style=\"max-width:95%;\"></div>谁加路费金沙路费<br><br><div align=\"center\" style=\"width:100%;\"></div><br>";
 			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
@@ -141,9 +141,6 @@ public class TestPromotionDao {
 																	  .newInstance("测试优惠活动", body, typeInsertBuilder, "hello jingjing<br>")
 																	  .setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4Free())
 																	  .setUseTrigger(PromotionTrigger.InsertBuilder.newUse4SingleExceed(100))
-																	  .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Monday, "12:15:00", "16:45:00"))
-																	  .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Friday, "14:15:00", "22:45:00"))
-																	  .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Thursday, "12:15:00", "23:45:00"));
 																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -174,7 +171,8 @@ public class TestPromotionDao {
 																	   .setComment("修改测试备注")
 																	   .setImage(ossImageId)
 																	   .setPrice(50)
-																	   .setExpired("2017-4-5", "2019-3-8");
+																	   .setExpired("2016-4-5", "2019-3-8")
+																	   .setLimitAmount(2);
 			body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg2).getObjectUrl());
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange("2016-2-1", "2020-3-1")
@@ -183,8 +181,6 @@ public class TestPromotionDao {
 																									 .setCouponTypeBuilder(typeUpdateBuilder)
 																									 .setIssueTrigger(PromotionTrigger.InsertBuilder.newIssue4SingleExceed(100))
 																									 .setUseTrigger(null)
-																									 .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Wednesday, "13:15:00", "21:45:00"))
-																									 .addUseTime(PromotionUseTime.InsertBuilder.newInstance(PromotionUseTime.Week.Monday, "14:15:00", "22:45:00"))
 																									 ;
 			expectedPromotion = promotionUpdateBuilder.build();
 			expectedPromotion.setCouponType(typeUpdateBuilder.build());
@@ -210,6 +206,10 @@ public class TestPromotionDao {
 			
 			//Issue the coupon to m1, m2, m3
 			Coupon.IssueBuilder issueBuilder = Coupon.IssueBuilder.newInstance4Fast().addPromotion(actualPromotion).addMember(m1).addMember(m2).addMember(m3);
+			CouponDao.issue(mStaff, issueBuilder);
+			CouponDao.issue(mStaff, issueBuilder);
+			CouponDao.issue(mStaff, issueBuilder);
+			CouponDao.issue(mStaff, issueBuilder);
 			CouponDao.issue(mStaff, issueBuilder);
 			//Compare the coupon related to this promotion.
 			Coupon coupon1 = CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0);
