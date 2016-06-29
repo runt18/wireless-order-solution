@@ -378,7 +378,7 @@ $(function(){
 						if(data.root.length > 0){
 							var templet = '<div class="box" promotion-id="{promotionId}">' +
 											'<div class="box_in"><img src="{couponImg}"></div>' +
-											'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>到期 : {expiredTime}</span><br><span>来自 : {promotionName}</span>' +
+											'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>结束时间 : {beginExpired}</span><br><span>结束时间 : {endExpired}</span><br><span>来自 : {promotionName}</span>' +
 			  							  '</div>';
 							var html = [];
 						
@@ -388,7 +388,8 @@ $(function(){
 									couponImg : coupon.couponType.ossImage ? coupon.couponType.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
 									name : coupon.couponType.name,
 									cPrice : coupon.couponType.price,
-									expiredTime : coupon.couponType.expiredFormat,
+									beginExpired : coupon.couponType.beginExpired != '' ? coupon.couponType.beginExpired : '无',
+									endExpired : coupon.couponType.endExpired != '' ? coupon.couponType.endExpired : '无',
 									promotionName : coupon.promotion.title,
 									promotionId : coupon.promotion.id
 								}));

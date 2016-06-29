@@ -189,6 +189,7 @@ $(function(){
 			//显示结账发券和用券按钮
 			$('#issueCoupon_a_orderFood').show();
 			$('#useCoupon_a_orderFood').show();
+			$('#point_a_payment').show();
 			
 			$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
 				if(result.success){
@@ -239,6 +240,7 @@ $(function(){
 			//隐藏结账发券和用券按钮
 			$('#issueCoupon_a_orderFood').hide();
 			$('#useCoupon_a_orderFood').hide();
+			$('#point_a_payment').hide();
 		}
 		
 		//查看微信订单详情
@@ -884,52 +886,39 @@ $(function(){
 		
 		//打开积分兑换
 		$('#point_a_payment').click(function(){
-			seajs.use(['readMember', 'issueCoupon'], function(readPopup, issuePopup){
-				var fastIssuePopup = null;
-				fastIssuePopup = readPopup.newInstance({
-					confirm : function(member){
-						if(member){
-							fastIssuePopup.close(function(){
-								var issueCouponPopup = issuePopup.newInstance({
-									title : '积分兑换',
-									member : member,
-									issueMode : issuePopup.IssueMode.POINT,
-									issueTo : member.id,
-									isPoint : true,
-									confirm : function(self, promotions, point){
-										$.ajax({
-											url : '../OperateMember.do',
-											type : 'post',
-											dataType : 'json',
-											data : {
-												dataSource : 'consumePoint',
-												memberId : member.id,
-												comment : self.find('[id="pointExchange_input_issue"]').val(),
-												promotions : promotions.join(";"),
-												isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
-											},
-											success : function(jr){
-												if(jr.success){
-													issueCouponPopup.close(function(){
-														Util.msg.tip(jr.msg);
-													});
-												}else{
-													Util.msg.tip(jr.msg);
-												}
-											}
-										})
-									
-									}
-								});
-								issueCouponPopup.open();
-							}, 200);
-						}else{
-							Util.msg.tip('请注入会员!');
-						}
+			seajs.use(['issueCoupon'], function(issuePopup){
+				var issueCouponPopup = issuePopup.newInstance({
+					title : '积分兑换',
+					member : orderMsg.member,
+					issueMode : issuePopup.IssueMode.POINT,
+					issueTo : orderMsg.member.id,
+					isPoint : true,
+					confirm : function(self, promotions, point){
+						$.ajax({
+							url : '../OperateMember.do',
+							type : 'post',
+							dataType : 'json',
+							data : {
+								dataSource : 'consumePoint',
+								memberId : orderMsg.member.id,
+								comment : self.find('[id="pointExchange_input_issue"]').val(),
+								promotions : promotions.join(";"),
+								isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
+							},
+							success : function(jr){
+								if(jr.success){
+									issueCouponPopup.close(function(){
+										Util.msg.tip(jr.msg);
+									});
+								}else{
+									Util.msg.tip(jr.msg);
+								}
+							}
+						})
+					
 					}
 				});
-				fastIssuePopup.open();
-				
+				issueCouponPopup.open();				
 			});
 		});
 		

@@ -35,17 +35,36 @@ define(function(require, exports, module){
 									var progressCoupon = "";
 									for(var i = 0; i < response.root.length; i++){
 										var eachProgressCoupon = '';
+										var begin = '';
+										if(response.root[i].coupon.beginExpired != ''){
+											begin = '开始时间 : ' + response.root[i].coupon.beginExpired;
+										}
+										
+										var end = '';
+										if(response.root[i].coupon.endExpired != ''){
+											end = "结束时间 : " + response.root[i].coupon.endExpired;
+										}
+										
+										var time = '';
+										if(begin != '' && end != ''){
+											time = begin + "," + end;
+										}else{
+											time = begin + end;
+										}
+										
 										if(param.isPoint){
 											eachProgressCoupon = '<tr class="promotionClass_tr_issue" data-value="'+ response.root[i].issueTrigger.extra +'"> '
 																 + '<td style="width:250px">'
-																 + '<label style="height:50px"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '(' + response.root[i].issueTrigger.extra + '积分 )</label>'
+																 + '<label style="height:50px;width:350px;"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '(需' + response.root[i].issueTrigger.extra + '积分 )'
+																 + '<br><font color="red" size="2" >'+ time +'</font></label>'
 																 + '</td>'
 																 + '<td style="width:35px"><input data-value="'+ response.root[i].issueTrigger.extra +'" id="amount_input_issue_' + response.root[i].id + '" class="amountClass_input_issue" style="font-size:20px;font-weight: bold;width:35px;" maxlength="3" ></td>'
 																 + '</tr>';
 										}else{
 											eachProgressCoupon = '<tr class="promotionClass_tr_issue" data-value="'+ response.root[i].issueTrigger.extra +'"> '
 																 + '<td style="width:250px">'
-																 + '<label style="height:50px"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name + '</label>'
+																 + '<label style="height:50px;width:350px;"><input data-value="'+ response.root[i].issueTrigger.extra +'" type="checkbox" data-theme="e" class="promotionClass_checkInput_issue" promotion-id="' + response.root[i].id + '">' + response.root[i].coupon.name 
+																+ '<br><font color="red" size="2" >'+ time +'</font></label>'
 																 + '</td>'
 																 + '<td style="width:35px"><input data-value="'+ response.root[i].issueTrigger.extra +'" id="amount_input_issue_' + response.root[i].id + '" class="amountClass_input_issue" style="font-size:20px;font-weight: bold;width:35px;" maxlength="3" ></td>'
 																 + '</tr>';
