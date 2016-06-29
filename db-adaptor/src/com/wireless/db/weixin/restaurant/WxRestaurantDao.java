@@ -241,8 +241,9 @@ public class WxRestaurantDao {
 	 * @return the weixin restaurant result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<WxRestaurant> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<WxRestaurant> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -265,8 +266,9 @@ public class WxRestaurantDao {
 	 * @return the weixin restaurant result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static List<WxRestaurant> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
+	public static List<WxRestaurant> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		String sql;
 		sql = " SELECT * FROM " + Params.dbName + ".weixin_restaurant" +
 			  " WHERE 1 = 1 " +
@@ -292,7 +294,6 @@ public class WxRestaurantDao {
 			wr.setRefreshToken(dbCon.rs.getString("refresh_token"));
 			wr.setNickName(dbCon.rs.getString("nick_name"));
 			String info = dbCon.rs.getString("weixin_info");
-			wr.setWxCardImg(new OssImage(dbCon.rs.getInt("weixin_card_img")));
 			if(info != null && !info.isEmpty()){
 				wr.setWeixinInfo(new StringHtml(info, StringHtml.ConvertTo.TO_HTML).toString());
 			}
@@ -321,12 +322,12 @@ public class WxRestaurantDao {
 		
 		for(WxRestaurant wxRestaurant : result){
 			if(wxRestaurant.getWxCardImg() != null){
-				try {
-					wxRestaurant.setWxCardImg(OssImageDao.getById(dbCon, staff, wxRestaurant.getWxCardImg().getId()));
-				} catch (BusinessException e) {
-					e.printStackTrace();
-					wxRestaurant.setWxCardImg(null);
-				}
+//				try {
+				wxRestaurant.setWxCardImg(OssImageDao.getById(dbCon, staff, wxRestaurant.getWxCardImg().getId()));
+//				} catch (BusinessException e) {
+//					e.printStackTrace();
+//					wxRestaurant.setWxCardImg(null);
+//				}
 			}
 		}
 		

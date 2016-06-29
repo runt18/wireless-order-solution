@@ -510,6 +510,9 @@ function setWeixinCardImage(){
 							var jr = Ext.decode(res.responseText);
 							if(jr.other && jr.other.wxCardUrl){
 								imgFile2.setImg(jr.other.wxCardUrl);
+							}else{
+								
+								imgFile2.setImg('../../images/member_vip.jpg');
 							}
 						},
 						fialure : function(res, opt){

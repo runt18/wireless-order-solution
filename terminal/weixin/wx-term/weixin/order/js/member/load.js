@@ -111,6 +111,11 @@ $(function(){
 								'background': 'url("' + data.root[0].wxCardImg.image + '")',
 								'background-size' : '100% 100%'
 							});
+						}else{
+							$('#divMemberCard').css({
+								'background': 'url("../images/member_vip.jpg")',
+								'background-size' : '100% 100%'
+							});
 						}
 					},
 					error : function(req, status, err){
