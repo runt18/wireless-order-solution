@@ -271,6 +271,14 @@ public class CouponType implements Jsonable{
 		this.endExpired = endExpired > 0 ? endExpired : 0;
 	}
 	
+	public boolean hasEndExpire(){
+		return this.endExpired != 0;
+	}
+	
+	public boolean hasBeginExpire(){
+		return this.beginExpired != 0;
+	}
+	
 	public boolean isExpired(){
 		if(beginExpired != 0 && endExpired != 0){
 			return System.currentTimeMillis() > endExpired || beginExpired > System.currentTimeMillis();
