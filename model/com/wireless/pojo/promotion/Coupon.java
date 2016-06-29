@@ -442,15 +442,6 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
-	public long getExpired(){
-		if(this.couponType != null){
-			return this.couponType.getEndExpired();
-		}else{
-			return 0;
-		}
-	}
-	
-	
 	@Override
 	public int hashCode(){
 		return id * 31 + 17;
