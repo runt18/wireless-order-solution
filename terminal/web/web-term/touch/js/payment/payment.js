@@ -886,6 +886,7 @@ $(function(){
 		
 		//打开积分兑换
 		$('#point_a_payment').click(function(){
+			Util.LM.show();
 			seajs.use(['issueCoupon'], function(issuePopup){
 				var issueCouponPopup = issuePopup.newInstance({
 					title : '积分兑换',
@@ -918,7 +919,9 @@ $(function(){
 					
 					}
 				});
-				issueCouponPopup.open();				
+				issueCouponPopup.open(function(){
+					Util.LM.hide();
+				});				
 			});
 		});
 		
