@@ -66,11 +66,11 @@ Ext.onReady(function(){
 						var end = jr.root[0].coupon.endExpired != '' ? jr.root[0].coupon.endExpired : '无设置';
 						var limitAmount = jr.root[0].coupon.limitAmount != 0 ? jr.root[0].coupon.limitAmount : '无设置';
 						
-						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="100"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
+						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 30px 10px 10px 20px;float:left;"><img height="100"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
 																	+ '<div style="float:left;vertical-align: middle;line-height: 25px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >开始时间 : ' + begin + '</span><br><span>结束时间 : '+ end +'</span>' +
 																	 '<br><span>限制数量 : ' + limitAmount + '</span></div>');							
 					}else{
-						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="100"  src="../../images/noCouponNow.png" /></div>');
+						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 30px 10px 10px 10px;"><img height="100"  src="../../images/noCouponNow.png" /></div>');
 					}												
 						
 					
@@ -849,12 +849,11 @@ Ext.onReady(function(){
 		        }, {
 		        	columnWidth : .2,
 	        		style : {
-						'margin-left' : '-30px'
+						'margin-left' : '-20px'
 					},
 		        	items : [{
 		                id : 'limitAmount_text_active',
 		                xtype : 'textfield',
-	                  
 		                width : 100,
 		                fieldLabel : '限制数量'
 		        	}]
@@ -1112,7 +1111,7 @@ Ext.onReady(function(){
 					id : 'promotionCouponPreview',
 					region : 'north',
 					height : 200,
-					html : '<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png" /></div>'
+					html : '<div style="text-align:center; margin: 30px 10px 10px 10px;"><img height="160"  src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png" /></div>'
 				}),new Ext.Panel({
 					id : 'promotionGeneral',
 					region : 'center',
