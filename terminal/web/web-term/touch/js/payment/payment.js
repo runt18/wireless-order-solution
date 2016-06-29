@@ -891,7 +891,7 @@ $(function(){
 					title : '积分兑换',
 					member : orderMsg.member,
 					issueMode : issuePopup.IssueMode.POINT,
-					issueTo : orderMsg.member.id,
+					issueTo : orderMsg.memberId,
 					isPoint : true,
 					confirm : function(self, promotions, point){
 						$.ajax({
