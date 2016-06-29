@@ -882,6 +882,57 @@ $(function(){
 			})
 		});
 		
+		//打开积分兑换
+		$('#point_a_payment').click(function(){
+			seajs.use(['readMember', 'issueCoupon'], function(readPopup, issuePopup){
+				var fastIssuePopup = null;
+				fastIssuePopup = readPopup.newInstance({
+					confirm : function(member){
+						if(member){
+							fastIssuePopup.close(function(){
+								var issueCouponPopup = issuePopup.newInstance({
+									title : '积分兑换',
+									member : member,
+									issueMode : issuePopup.IssueMode.POINT,
+									issueTo : member.id,
+									isPoint : true,
+									confirm : function(self, promotions, point){
+										$.ajax({
+											url : '../OperateMember.do',
+											type : 'post',
+											dataType : 'json',
+											data : {
+												dataSource : 'consumePoint',
+												memberId : member.id,
+												comment : self.find('[id="pointExchange_input_issue"]').val(),
+												promotions : promotions.join(";"),
+												isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
+											},
+											success : function(jr){
+												if(jr.success){
+													issueCouponPopup.close(function(){
+														Util.msg.tip(jr.msg);
+													});
+												}else{
+													Util.msg.tip(jr.msg);
+												}
+											}
+										})
+									
+									}
+								});
+								issueCouponPopup.open();
+							}, 200);
+						}else{
+							Util.msg.tip('请注入会员!');
+						}
+					}
+				});
+				fastIssuePopup.open();
+				
+			});
+		});
+		
 		//打开用券
 		$('#useCoupon_a_orderFood').click(function(){
 			seajs.use('useCoupon', function(usedCoupon){
@@ -949,41 +1000,6 @@ $(function(){
 				//打开会员读取Popup
 				memberReadPopup.open();
 			});
-//			var memberReadPopup = null;
-//			memberReadPopup = new MemberReadPopup({
-//				confirm : function(member, discount, pricePlan){
-//					Util.LM.show();
-//					
-//					$.post('../OperateDiscount.do', {
-//						dataSource : 'setDiscount',
-//						orderId : orderMsg.id,
-//						memberId : member.id,
-//						discountId : discount.id,
-//						pricePlan : pricePlan.id
-//						
-//					}, function(data){
-//						Util.LM.hide();
-//						if(data.success){
-//							
-//							//刷新账单
-//							refreshOrderData();
-//							
-//							Util.msg.alert({topTip : true, msg : '会员注入成功'});	
-//							
-//							//关闭会员读取Popup
-//							memberReadPopup.close();
-//							
-//						}else{
-//							Util.msg.alert({
-//								msg : '使用会员失败</br>' + data.msg, 
-//								topTip : true
-//							});					
-//						}
-//					}, 'json');		
-//				}
-//			});
-//			//打开会员读取Popup
-//			memberReadPopup.open();
 		});
 		
 		//读取会员&会员余额

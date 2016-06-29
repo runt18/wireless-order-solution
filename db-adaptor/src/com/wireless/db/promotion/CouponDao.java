@@ -25,6 +25,7 @@ import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
+import com.wireless.pojo.promotion.CouponOperation.OperateType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.StringHtml;
 
@@ -200,6 +201,7 @@ public class CouponDao {
 				continue;
 			}
 
+			//单次满
 			if(promotion.getIssueTrigger().getIssueRule().isSingleExceed()){
 				if(amount > 1){
 					throw new BusinessException(("满足【$(promotion)】活动的优惠券只能发放1张").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
@@ -211,6 +213,16 @@ public class CouponDao {
 				if(!issuedCoupons.isEmpty()){
 					throw new BusinessException(("本张账单只能发放1张【$(promotion)】活动的优惠券").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
 				}
+			}
+			
+			if(promotion.getCouponType().hasLimit()){
+				List<CouponOperation> issueds = CouponOperationDao.getByCond(dbCon, staff, new CouponOperationDao.ExtraCond()
+																													   .setCouponType(promotion.getCouponType())
+																													   .addOperation(OperateType.ISSUE));
+				if(issueds.size() > promotion.getCouponType().getLimitAmount()){
+					throw new BusinessException(("发送的张数超过了【$(promotion)】活动的优惠券的张数限制").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
+				}
+				
 			}
 			
 			for(int memberId : builder.getMembers()){
@@ -587,7 +599,7 @@ public class CouponDao {
 			  (extraCond.isOnlyAmount ? 
 			  " COUNT(*) " : 
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.status, " +
-			  " C.coupon_type_id, CT.name, CT.price, CT.begin_expired, CT.end_expired, CT.oss_image_id, " +
+			  " C.coupon_type_id, CT.name, CT.price, CT.begin_expired, CT.end_expired, CT.limit_amount, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title, P.rule, P.start_date, P.finish_date ") +
 			  " FROM " + Params.dbName + ".coupon C " +
@@ -630,6 +642,8 @@ public class CouponDao {
 				if(dbCon.rs.getInt("oss_image_id") != 0){
 					ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
 				}
+				ct.setLimitAmount(dbCon.rs.getInt("limit_amount"));
+				
 				coupon.setCouponType(ct);
 				
 				Member m = new Member(dbCon.rs.getInt("member_id"));
