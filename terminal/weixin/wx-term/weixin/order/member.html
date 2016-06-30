@@ -33,101 +33,101 @@ var member = {}, currentMemberLevelData={}, memberLevelData=[];
 	</div>
 	
 	<div data-type="R">
-	<div id="divMemberTypeName" data-type="bottom">未激活</div>
 	</div>
 	
 	</div>
 	
 	<div id="divMemberContent" class="main-box">
 	
-	<ul class="m-b-list">
-		<li class="box-horizontal none-line">
-			<span style="display:block;width:100%;">
-				<span style="display:block;width:100%;line-height: 30px;height:24px;">
-					<span style="width: 80%;display:inline-block;">会员卡号: <span id="divWXMemberCard" style="color:#26a9d0;">94512654</span></span>
-				</span>
-				<span style="display:block;width:100%;line-height: 30px;height:24px;">
-					<span style="width: 45%;display:inline-block;">会员名: <span id="name_span_member">--</span></span>
-					<span id="phone_div_member" style="width: 50%;display:inline-block;">手机号: <span id="mobile_span_member">--</span></span>
-					<span id="bind_div_member" style="width: 45%;display:inline-block;">完善会员资料&nbsp;&gt;</span>
-				</span>
-			</span>
-			<li id="birthday_li_member">
-				<div style="margin-top:-16px;">
-					<font style="font-size: 11px;font-weight: bold;">
-						会员生日 ：<span id="memberBirthday_span_member" style="color:#26a9d0;">--.--</span>
-					</font>
+		<ul class="m-b-list">
+			<li class="box-horizontal none-line" style="height:20px;line-height:20px;margin-top:10px;">
+				<div stype="width:60%;">
+					会员卡号: <span id="divWXMemberCard" style="color:#26a9d0;">94512654</span>
+				</div>
+				<div style="width:40%;"><span id="bind_div_member" style="display:inline-block;">完善会员资料&nbsp;&gt;</span></div>
+			</li>
+			<li class="box-horizontal none-line" style="height:20px;line-height:20px;margin-top:10px;">
+				<div style="width:50%">
+					会员姓名 : <span id="name_span_member">--</span>
+				</div>
+				<div style="width:50%;">
+					手机号: <span id="mobile_span_member">--</span>
 				</div>
 			</li>
-		</li>
-		<li>
-			<div id="bindMember_div_member" style="display: none;width: 100%;">
-				<ul class="m-b-list">
-					<li class="none-line" style="line-height: 50px;padding-top: 10px;">
-						手机号码: <input id="mobile_input_member" class="txtVerifyMobile"  type="tel" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" maxlength="11"/>
-					</li>
-					<li class="none-line" style="line-height: 50px;">
-						会员姓名: <input id="name_input_member" class="txtVerifyMobile"/>
-					</li>
-					<li class="none-line" style="line-height: 50px;">
-							会员生日: <input id="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:60px;">&nbsp;月
-						&nbsp;<input id="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:60px;">&nbsp;日
-					</li>
-					<li class="box-horizontal none-line" style="line-height: 50px;font-size:18px;">
-						性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div data-type="personSex" data-value="0" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">
-							<ul class="m-b-list">先生</ul>
-						</div>
-						<div data-type="personSex" data-value="1" class="region_css_book" style="width:31%;" href="#">
-							<ul class="m-b-list">女士</ul>
-						</div>
-					</li>
-					<li class="none-line" style="line-height: 50px;">	
-						年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select id="memberAge_select_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width:180px;">
-								<option value="5">00后</option>
-								<option value="4">90后</option>
-								<option value="3">80后</option>
-								<option value ="2">70后</option>
-								<option value ="1">60后</option>  
-								<option value ="6">50后</option>
-							</select>			
-					</li>
-					<li class="none-line">
-						<div style="height: 55px;width: 100%;text-align: center;" >
-							<a id="bind_a_member" class="a_demo_two" style="font-size: 20px;font-weight: bold;">确认绑定</a>	
-						</div>	
-					</li>
-					<li>
-						<span style="font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
-						<div id="privilege_div_member" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
-							<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
-							<ul id="privilege_ul_member" class="ulMemberPrivilegeDetail"></ul>
-						</div>
-					</li>					
-				</ul>
-			</div>
-		</li>	
-	</ul>
+			<li id="birthday_li_member">
+				<div style="margin-top:-8px;">
+					会员生日 ：<span id="memberBirthday_span_member" style="color:#26a9d0;">--.--</span>
+				</div>
+			</li>
+		
+			<li>
+				<div id="bindMember_div_member" style="display: none;width: 100%;">
+					<ul class="m-b-list">
+						<li class="none-line" style="line-height: 50px;padding-top: 10px;">
+							手机号码: <input id="mobile_input_member" class="txtVerifyMobile"  type="tel" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" maxlength="11"/>
+						</li>
+						<li class="none-line" style="line-height: 50px;">
+							会员姓名: <input id="name_input_member" class="txtVerifyMobile"/>
+						</li>
+						<li class="none-line" style="line-height: 50px;">
+								会员生日: <input id="birthdayMonth_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:60px;">&nbsp;月
+							&nbsp;<input id="birthdayDay_input_member"  type="tel" class="txtVerifyMobile" style="font-size:20px;width:60px;">&nbsp;日
+						</li>
+						<li class="box-horizontal none-line" style="line-height: 50px;font-size:18px;">
+							性别:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div data-type="personSex" data-value="0" class="region_css_book selectedRegion_css_book" style="width:31%;" href="#">
+								<ul class="m-b-list">先生</ul>
+							</div>
+							<div data-type="personSex" data-value="1" class="region_css_book" style="width:31%;" href="#">
+								<ul class="m-b-list">女士</ul>
+							</div>
+						</li>
+						<li class="none-line" style="line-height: 50px;">	
+							年龄段: &nbsp;&nbsp;&nbsp;&nbsp;<select id="memberAge_select_member" style="font-size: 20px;padding: 3px 5px 3px 5px;width:180px;">
+									<option value="5">00后</option>
+									<option value="4">90后</option>
+									<option value="3">80后</option>
+									<option value ="2">70后</option>
+									<option value ="1">60后</option>  
+									<option value ="6">50后</option>
+								</select>			
+						</li>
+						<li class="none-line">
+							<div style="height: 55px;width: 100%;text-align: center;" >
+								<a id="bind_a_member" class="a_demo_two" style="font-size: 20px;font-weight: bold;">确认绑定</a>	
+							</div>	
+						</li>
+						<li>
+							<span style="font-size: 18px;">注: 可到前台激活或绑定原会员卡</span>
+							<div id="privilege_div_member" style="width: 100%;border: 1px dashed darkgray;margin-bottom: 2px;">
+								<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
+								<ul id="privilege_ul_member" class="ulMemberPrivilegeDetail"></ul>
+							</div>
+						</li>					
+					</ul>
+				</div>
+			</li>	
+		</ul>
 	</div>
 	
 	<div id="divMemberBalanceAndPiont" class="main-box">
-	<ul class="m-b-list">
-		<li class="box-horizontal none-line" style="height:20px;line-height:20px;margin-top:10px;">
-			<div style="width:50%">
-				<div>
-				基本余额: <span id="spanMemberBaseBalance" style="color:#26a9d0;">--.--</span>元
+		<ul class="m-b-list">
+			<li class="box-horizontal none-line" style="height:20px;line-height:20px;margin-top:10px;">
+				<div style="width:50%">
+					<div>
+					基本余额: <span id="spanMemberBaseBalance" style="color:#26a9d0;">--.--</span>元
+					</div>
 				</div>
-			</div>
-			<div style="width:50%;text-align: right;">积&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
-		</li>
-		<li style="line-height:20px;height:20px;border:none;margin-top:4px;">
-			<div>
-				赠送余额: <span id="spanMemberExtraBalance" style="color:#26a9d0;">--.--</span>元
-			</div>
-		</li>
-		<li id="spanMemberExtraBalanceDesc_li_member" style="line-height:20px;">
-			<span id="spanMemberExtraBalanceDesc" style="width:100%;display:inline-block;color:#26a9d0;font-size:13px;font-weight:bold;">--.--</span>
-		</li>
-	</ul>
+				<div style="width:50%;text-align: right;">积&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+			</li>
+			<li style="line-height:20px;height:20px;border:none;margin-top:4px;">
+				<div>
+					赠送余额: <span id="spanMemberExtraBalance" style="color:#26a9d0;">--.--</span>元
+				</div>
+			</li>
+			<li id="spanMemberExtraBalanceDesc_li_member" style="line-height:20px;">
+				<span id="spanMemberExtraBalanceDesc" style="width:100%;display:inline-block;color:#26a9d0;font-size:13px;font-weight:bold;">--.--</span>
+			</li>
+		</ul>
 	</div>
 	
 	<div id="divMemberRecommendHistory" class="main-box">

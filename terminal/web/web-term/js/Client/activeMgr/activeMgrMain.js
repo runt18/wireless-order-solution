@@ -62,10 +62,15 @@ Ext.onReady(function(){
 					Ext.getCmp('promotionUrl').setText('http://wx.e-tones.net/wx-term/weixin/order/sales.html?pid=' + promotionId);
 					//显示优惠券内容
 					if(jr.root[0].coupon){
-						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="100"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
-																	+ '<div style="float:left;vertical-align: middle;line-height: 25px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >开始时间 : ' + jr.root[0].coupon.beginExpired + '</span><br><span>结束时间 : '+ jr.root[0].coupon.endExpired +'</span></div>');							
+						var begin = jr.root[0].coupon.beginExpired != '' ? jr.root[0].coupon.beginExpired : '无设置';
+						var end = jr.root[0].coupon.endExpired != '' ? jr.root[0].coupon.endExpired : '无设置';
+						var limitAmount = jr.root[0].coupon.limitAmount != 0 ? jr.root[0].coupon.limitAmount : '无设置';
+						
+						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 30px 10px 10px 20px;float:left;"><img height="100"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
+																	+ '<div style="float:left;vertical-align: middle;line-height: 25px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >开始时间 : ' + begin + '</span><br><span>结束时间 : '+ end +'</span>' +
+																	 '<br><span>限制数量 : ' + limitAmount + '</span></div>');							
 					}else{
-						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="100"  src="../../images/noCouponNow.png" /></div>');
+						Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 30px 10px 10px 10px;"><img height="100"  src="../../images/noCouponNow.png" /></div>');
 					}												
 						
 					
@@ -196,7 +201,7 @@ Ext.onReady(function(){
 		couponPicBox = new Ext.BoxComponent({
 			id : 'promotionPic',
 			xtype : 'box',
-	 	    columnWidth : 0.4,
+	 	    columnWidth : 0.6,
 	 	    height : 100,
 	 	    width : 100,
 	 	    style : 'marginRight:5px;',
@@ -596,7 +601,6 @@ Ext.onReady(function(){
 		                    xtype : 'panel',
 		                    layout : 'column',
 		                    width : 220,
-		                    style : 'paddingTop:20px;',
 		                    defaults : {
 		                        layout : 'form',
 		                        labelWidth : 80
@@ -620,7 +624,6 @@ Ext.onReady(function(){
 		                        }]
 		                    },{
 								xtype : 'checkboxgroup',
-								style : 'paddingLeft : 25px;',
 								columns : 3,
 								items : [{
 									boxLabel : '开始时间',
@@ -662,7 +665,6 @@ Ext.onReady(function(){
 		                        }]
 		                    },{
 								xtype : 'checkboxgroup',
-								style : 'paddingLeft : 25px;',
 								columns : 3,
 								items : [{
 									boxLabel : '结束时间',
@@ -718,7 +720,7 @@ Ext.onReady(function(){
 		                    items : [couponPicBox, form,{
 		                        items : [{
 		                            xtype : 'label',
-		                            style : 'width : 130px;',
+		                            style : 'width : 140px;',
 		                            html : '<sapn style="font-size:13px;color:green;font-weight:bold">图片大小不能超过100K</span>'
 		                        }]
 		                    },btnUpload],
@@ -736,7 +738,7 @@ Ext.onReady(function(){
 		                items : [promotionEditor],
 		                style : {
 							'margin-left' : '100px',
-							'margin-top' : '40px'
+							'margin-top' : '20px'
 						},
 		                buttonAlign : 'center',
 		                buttons : [new Ext.Button({
@@ -797,10 +799,10 @@ Ext.onReady(function(){
 		            layout : 'form',
 		            labelWidth : 70,
 		            labelAlign : 'right',
-		            columnWidth : .33
+		            columnWidth : .25
 		        },
 		        items : [{
-		            labelWidth : 180,
+		            labelWidth : 160,
 		            items : [{
 		                id : 'guide_2nd_occupy',
 		                xtype : 'label',
@@ -846,11 +848,14 @@ Ext.onReady(function(){
 		            }]
 		        }, {
 		        	columnWidth : .2,
+	        		style : {
+						'margin-left' : '-20px'
+					},
 		        	items : [{
 		                id : 'limitAmount_text_active',
 		                xtype : 'textfield',
 		                width : 100,
-		                fieldLabel : '张数限制'
+		                fieldLabel : '限制数量'
 		        	}]
 		        }]
 		    }]
@@ -1106,7 +1111,7 @@ Ext.onReady(function(){
 					id : 'promotionCouponPreview',
 					region : 'north',
 					height : 200,
-					html : '<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png" /></div>'
+					html : '<div style="text-align:center; margin: 30px 10px 10px 10px;"><img height="160"  src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png" /></div>'
 				}),new Ext.Panel({
 					id : 'promotionGeneral',
 					region : 'center',
