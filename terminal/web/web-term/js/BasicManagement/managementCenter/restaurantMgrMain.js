@@ -1088,7 +1088,10 @@ Ext.onReady(function(){
 			name : 'branches'
 		},{
 			name : 'typeText'
-		}])
+		}]),
+		baseParams : {
+			dataSource : 'getByCond'
+		}
 	});
 	
 	var cm = new Ext.grid.ColumnModel([
@@ -1234,6 +1237,6 @@ Ext.onReady(function(){
     });
     
     initModulesData();
-    ds.baseParams['dataSource'] = 'getByCond';
-    ds.load();
+//    ds.baseParams['dataSource'] = 'getByCond';
+//    ds.load();
 });
