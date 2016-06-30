@@ -31,7 +31,7 @@ define(function(require, exports, module){
 				//防止连点下单
 				var isProcessing = false;
 				//充值按钮
-				self.find('[id=toRecharge_a_recharge]').click(function(){
+				self.find('[id="toRecharge_a_recharge"]').click(function(){
 					
 					if(!isProcessing){
 						isProcessing = true;
