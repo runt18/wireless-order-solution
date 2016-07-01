@@ -135,7 +135,7 @@ Ext.onReady(function(){
 									//var gp = Ext.getCmp('tm_numGiftPoint');
 									var tempMT = rechargeOperateData.memberType;
 									
-									pmm.setValue(Math.round(rm * tempMT.chargeRate));
+									pmm.setValue(Math.round(rm));
 									//gm.setValue(parseInt(rm * Math.abs((tempMT.chargeRate - 1))));
 									//gp.setValue(Math.round(rm * tempMT.exchangeRate));
 								}

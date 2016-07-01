@@ -66,7 +66,9 @@
 			'printBind' : './js/popup/print/print',
 			'feastPay' : './js/popup/feastPay/feastPay',
 			'handlerTable' : './js/popup/handlerTable/handlerTable',
-			'askTable' : './js/popup/table/ask'
+			'askTable' : './js/popup/table/ask',
+			'takeMoney' : './js/popup/member/takeMoney',
+			'ajustPoint' : './js/popup/member/ajustPointPopup'
 		}
 	});
 </script>
@@ -158,7 +160,9 @@
 	<div data-role="popup" id="frontPageMemberOperation" data-theme="d" class="payment_searchMemberType">
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
 			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
-			<li class="popupButtonList" id="addMember_a_tableSelect"><a >添加会员</a></li>
+			<li class="popupButtonList" id="addMember_a_tableSelect"><a>添加会员</a></li>
+			<li class="popupButtonList" id="ajustPoint_a_tableSelect"><a>积分调整</a></li>
+			<li class="popupButtonList" id="takeMoney_a_tableSelect"><a>会员取款</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分兑换</a></li>
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
