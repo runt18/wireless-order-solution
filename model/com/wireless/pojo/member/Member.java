@@ -499,6 +499,32 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 	}
 	
+	public static class UpgradeBuilder{
+		private final int memberId;
+		private String wxServer;
+		
+		public UpgradeBuilder(int memberId){
+			this.memberId = memberId;
+		}
+		
+		public UpgradeBuilder(Member member){
+			this.memberId = member.getId();
+		}
+		
+		public UpgradeBuilder setWxServer(String wxServer){
+			this.wxServer = wxServer;
+			return this;
+		}
+		
+		public String getWxServer(){
+			return this.wxServer;
+		}
+		
+		public int getMemberId(){
+			return this.memberId;
+		}
+	}
+	
 	private int id;
 	private int restaurantId;
 	private String restaurantName;      //操作门店

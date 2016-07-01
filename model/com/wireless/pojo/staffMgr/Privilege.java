@@ -82,6 +82,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		MEMBER_REMOVE(3003, Cate.MEMBER, 3, "会员删除"),
 		MEMBER_CHARGE(3004, Cate.MEMBER, 4, "会员充值"),
 		MEMBER_REFUND(3005, Cate.MEMBER, 5, "会员取款"),
+		MEMBER_POINT(3006, Cate.MEMBER, 6, "积分调整"),
 		SYSTEM(6000, Cate.SYSTEM, 1, "系统"),
 		WEIXIN(7000, Cate.WEIXIN, 1, "微信"),
 		SMS(8000, Cate.SMS, 1, "短信");
