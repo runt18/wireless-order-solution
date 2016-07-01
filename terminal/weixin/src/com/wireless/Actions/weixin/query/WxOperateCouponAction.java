@@ -125,6 +125,7 @@ public class WxOperateCouponAction extends DispatchAction{
 					coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));
 				}
 			}
+			
 			jObject.setRoot(result);
 			
 		}catch(SQLException e){
