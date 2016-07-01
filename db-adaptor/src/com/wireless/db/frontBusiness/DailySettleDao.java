@@ -256,8 +256,10 @@ public class DailySettleDao {
 				}
 				dbCon.rs.close();
 				
+				StockAction stockAction = builder.build();
+				
 				//如果存在出库消耗单则插入
-				if(!builder.getStockActionDetails().isEmpty()){
+				if(!stockAction.getStockDetails().isEmpty()){
 					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insert(dbCon, staff, builder)));
 				}
 			}
