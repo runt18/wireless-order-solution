@@ -1,0 +1,66 @@
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+	<div id="container_div_ajustPoint" data-dismissible="false" class="ui-overlay-shadow ui-corner-all" style="width:400px;z-index: 1102;position: absolute; top: -40px; left: 50%; margin: -200px 0px 0px -300px;background-color: white;display:block;" align="center">	
+		 <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
+	        	积分调整
+	    </div> 
+
+
+		<table>
+			<tr align="center">
+		    	<td	>
+		    		<input placeholder="手机号/卡号/微信卡号" style="font-size:20px;font-weight: bold;" id="loadMember_input_ajustPoint">
+		    	</td>
+		    	<td>
+		    		<a data-role="button" id="loadMember_button_ajustPoint" class="numberInputStyle" data-theme="b" >读取会员</a>
+		    	</td>
+			</tr>
+			
+			<tr align="center">
+				<td class="readMemberTd">当前积分:</td>
+	    		<td class="readMemberTdValue"><label id="memberPoint_label_ajustPoint">----</label></td>   
+			</tr>
+			
+			<tr align="center">
+				<td class="readMemberTd">会员名称:</td>
+    			<td class="readMemberTdValue"><label id="memberName_label_recharge">----</label></td> 	
+			</tr>
+			
+			<tr>
+				<td>
+				    <div>
+						<fieldset id="pointType_fieldset_ajust" data-role="controlgroup" data-type="horizontal" data-theme="b">
+							<label>
+					        	<input type="radio" name="bookDateType" data-type="bookDate_all" value="1" checked="checked">增加
+					        </label>
+					        <label>
+					        	<input type="radio" name="bookDateType" value="2" >减少
+					        </label>
+					    </fieldset>
+				    </div>	    		
+    			</td>
+	    		<td><input id="point_input_ajustPoint" onkeypress="intOnly()"></td>    
+			</tr>
+			
+		</table>
+
+		<div data-role="footer" data-theme="b" class="ui-corner-bottom ui-bar-b" style="height: 47px;">
+			  <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="confrim_a_ajustPoint">确定</a>
+				 <a  data-role="button" data-inline="true" class="countPopbottomBtn" id="cancel_a_ajustPoint">取消</a>		 
+			 </div>
+			 <div id="searchMemberType_div_ajustPoint" data-theme="d" class="payment_searchMemberType" style="z-index:20008;width:100px;position:absolute;top:55px;left:80%;display:none;">
+				<ul id="searchMemberTypeCmp_ul_ajustPoint" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+					<li  class="popupButtonList" value="1"><a >手机卡</a></li>
+					<li  class="popupButtonList" value="3"><a >会员实体卡</a></li>
+					<li  class="popupButtonList" value="2"><a >微信卡</a></li>
+				</ul>
+			</div>
+	    </div>	
+	    
+	</div>
+</body>
+</html>
