@@ -10,6 +10,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
 
@@ -19,7 +20,7 @@ public class StockAction implements Jsonable{
 	 * The helper class to create the StockIn object to perform insert
 	 */
 	public static class InsertBuilder{
-		private final int restaurantId;
+		private int restaurantId;
 		private String oriStockId;
 		private long oriStockIdDate;
 		private Supplier supplier = new Supplier();
@@ -31,11 +32,14 @@ public class StockAction implements Jsonable{
 		private String comment;
 		private float actualPrice;
 		
-		private MaterialCate.Type cateType ;
+		private MaterialCate.Type cateType;
 		private Status status = Status.UNAUDIT;
 		private Type type;
 		private SubType subType;
+//		private int stockInRestaurantId;
+//		private int stockOutRestaurantId;
 		
+		private InsertBuilder(){}
 		private InsertBuilder(int restaurantId){
 			this.restaurantId = restaurantId;
 		}
@@ -114,36 +118,43 @@ public class StockAction implements Jsonable{
 
 			return builder;
 		}
+		
+		//配送发货
+		public static InsertBuilder newDistributionSend(){
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_SEND);
+			return builder;
+		}
+		//配送收货
+		public static InsertBuilder newDistributionReceive(){
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RECEIVE);
+			return builder;
+		}
+		//配送退货
+		public static InsertBuilder newDistributionReturn(){
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RETURN);
+			return builder;
+		}
+		//配送回收
+		public static InsertBuilder newDistributionRecovery(){
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RECOVERY);
+			return builder;
+		}
+		
 		public StockAction build(){
 			return new StockAction(this);
 		}
-		
-		public int getRestaurantId() {
-			return restaurantId;
-		}
 
-		public String getOriStockId() {
-			if(oriStockId == null){
-				oriStockId = "";
-			}
-			return oriStockId;
-		}
 		public InsertBuilder setOriStockId(String oriStockId){
 			this.oriStockId = oriStockId;
 			return this;
 		}
 
-		public List<StockActionDetail> getStockActionDetails() {
-			return stockActionDetails;
-		}
-		
-		
-		public float getActualPrice() {
+		private float getActualPrice() {
 			return actualPrice;
-		}
-
-		public long getOriStockDate() {
-			return oriStockIdDate;
 		}
 
 		public InsertBuilder setOriStockDate(long oriStockIdDate) {
@@ -155,13 +166,6 @@ public class StockAction implements Jsonable{
 			this.stockActionDetails.add(detail);
 			return this;
 		}
-
-
-
-		public Department getDeptIn() {
-			return deptIn;
-		}
-		
 		
 		public InsertBuilder setDeptIn(short i){
 			this.deptIn.setId(i);
@@ -180,11 +184,6 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 
-
-		public Department getDeptOut() {
-			return deptOut;
-		}
-		
 		public InsertBuilder setDeptOut(short deptOut){
 			this.deptOut.setId(deptOut);
 			return this;
@@ -200,10 +199,6 @@ public class StockAction implements Jsonable{
 			return this;
 		}	
 
-		public Supplier getSupplier() {
-			return supplier;
-		}
-
 		public void setSupplier(Supplier supplier) {
 			this.supplier = supplier;
 		}
@@ -218,16 +213,12 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 		
-		public int getOperatorId() {
-			return operatorId;
-		}
-
 		public InsertBuilder setOperatorId(int operatorId) {
 			this.operatorId = operatorId;
 			return this;
 		}
 
-		public String getOperator() {
+		private String getOperator() {
 			if(operator == null){
 				operator = "";
 			}
@@ -239,29 +230,13 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 
-
-		public String getComment() {
-			if(comment == null){
-				comment = "";
-			}
-			return comment;
-		}
-
 		public InsertBuilder setComment(String comment) {
 			this.comment = comment;
 			return this;
 		}
-		
-		public Status getStatus() {
-			return status;
-		}
 
 		public void setStatus(Status status) {
 			this.status = status;
-		}
-		
-		public Type getType() {
-			return type;
 		}
 
 		private InsertBuilder setType(Type type) {
@@ -269,19 +244,11 @@ public class StockAction implements Jsonable{
 			return this;
 		}
 		
-		public SubType getSubType() {
-			return subType;
-		}
-
 		private InsertBuilder setSubType(SubType subType) {
 			this.subType = subType;
 			return this;
 		}
 		
-		public MaterialCate.Type getCateType() {
-			return cateType;
-		}
-
 		public InsertBuilder setCateType(MaterialCate.Type cateType) {
 			this.cateType = cateType;
 			return this;
@@ -290,16 +257,6 @@ public class StockAction implements Jsonable{
 		public InsertBuilder setCateType(int val){
 			this.cateType = MaterialCate.Type.valueOf(val);
 			return this;
-		}
-		
-		public float getTotalPrice(){
-			float sum = 0;
-			if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.CONSUMPTION){
-				for (StockActionDetail sDetail : this.stockActionDetails) {
-					sum += sDetail.getAmount() * sDetail.getPrice();
-				}
-			}
-			return sum;
 		}
 		
 		public InsertBuilder setInitActualPrice(float actualPrice){
@@ -336,6 +293,304 @@ public class StockAction implements Jsonable{
 
 	
 	}
+	
+	
+	public static class UpdateBuilder{
+		private int id;
+		private String oriStockId;
+		private long oriStockDate;
+		private Supplier supplier = new Supplier();
+		private Department deptIn = new Department(0);
+		private Department deptOut = new Department(0);
+		private int operatorId;
+		private String operator;
+		private List<StockActionDetail> stockActionDetails = new ArrayList<StockActionDetail>(); 
+		private String comment;
+		private float actualPrice;
+		private MaterialCate.Type cateType ;
+		private Status status = Status.UNAUDIT;
+		private Type type;
+		private SubType subType;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		//入库采购
+		public static UpdateBuilder newStockIn(int id, long oriStockIdDate, float actualPrice){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_IN)
+					.setSubType(SubType.STOCK_IN)
+					.setOriStockDate(oriStockIdDate)
+					.setDeptOut((short) -1);
+			
+			builder.actualPrice = actualPrice;
+			return builder;
+		}
+		//初始化库存
+		public static UpdateBuilder stockInit(int id, long oriStockIdDate){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_IN)
+					.setSubType(SubType.INIT)
+					.setOriStockDate(oriStockIdDate)
+					.setDeptOut((short) -1);
+			
+			return builder;
+		}
+		//入库调拨
+		public static UpdateBuilder newStockInTransfer(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN_TRANSFER);
+			return builder;
+		}
+		//报溢
+		public static UpdateBuilder newSpill(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.SPILL).setDeptOut((short) -1);
+			return builder;
+		}
+		//退货
+		public static UpdateBuilder newStockOut(int id, long oriStockIdDate, float actualPrice){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockDate(oriStockIdDate).setDeptIn((short) -1);
+			builder.actualPrice = actualPrice;
+			return builder;
+		}
+		//出库调拨
+		public static UpdateBuilder newStockOutTransfer(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT_TRANSFER);
+			return builder;
+		}
+		//报损
+		public static UpdateBuilder newDamage(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE).setDeptIn((short) -1);
+			return builder;
+		}
+		//盘盈
+		public static UpdateBuilder newMore(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE).setDeptOut((short) -1).setStatus(Status.AUDIT);
+			return builder;
+		}
+		//盘亏
+		public static UpdateBuilder newLess(int id){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setDeptIn((short) -1).setStatus(Status.AUDIT);
+			return builder;
+		}
+		//消耗
+		public static UpdateBuilder newUseUp(int id, Department deptOut, MaterialCate.Type cateType){
+			UpdateBuilder builder = new UpdateBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.CONSUMPTION)
+			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
+			       .setCateType(cateType)
+			       .setOriStockDate(new Date().getTime())
+			       .setDeptIn((short) -1);
+
+			return builder;
+		}
+		
+		//配送发货
+		public static UpdateBuilder newDistributionSend(int id){
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_SEND);
+			return builder;
+		}
+		//配送收货
+		public static UpdateBuilder newDistributionReceive(int id){
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RECEIVE);
+			return builder;
+		}
+		//配送退货
+		public static UpdateBuilder newDistributionReturn(int id){
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RETURN);
+			return builder;
+		}
+		//配送回收
+		public static UpdateBuilder newDistributionRecovery(int id){
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RECOVERY);
+			return builder;
+		}
+		
+		public StockAction build(){
+			return new StockAction(this);
+		}
+		
+		public UpdateBuilder setOriStockId(String oriStockId){
+			this.oriStockId = oriStockId;
+			return this;
+		}
+		
+		public boolean isOriStockIdChange(){
+			return this.oriStockId != null;
+		}
+		
+		public boolean isStockActionDetailsChange(){
+			return this.stockActionDetails != null;
+		}
+		
+		private float getActualPrice() {
+			return actualPrice;
+		}
+		
+		public boolean isActutalPriceChange(){
+			return this.actualPrice != 0;
+		}
+		
+		public boolean isOriStockDateChange(){
+			return this.oriStockDate != 0;
+		}
+
+		public UpdateBuilder setOriStockDate(long oriStockDate) {
+			this.oriStockDate = oriStockDate;
+			return this;
+		}
+
+		public UpdateBuilder addDetail(StockActionDetail detail){
+			this.stockActionDetails.add(detail);
+			return this;
+		}
+		
+		public UpdateBuilder setDeptIn(short i){
+			this.deptIn.setId(i);
+			return this;
+		}
+		
+		public boolean isDeptInChange(){
+			return this.deptIn != null;
+		}
+
+		
+		public UpdateBuilder setDeptIn(Department deptIn) {
+			this.deptIn = deptIn;
+			return this;
+			
+		}
+		
+		public UpdateBuilder setDeptInName(String name){
+			this.deptIn.setName(name);
+			return this;
+		}
+
+		public UpdateBuilder setDeptOut(short deptOut){
+			this.deptOut.setId(deptOut);
+			return this;
+		}
+		
+		public boolean isDeptOutChange(){
+			return this.deptOut != null;
+		}
+		
+		public UpdateBuilder setDeptOutName(String name){
+			this.deptOut.setName(name);
+			return this;
+		}
+
+		public UpdateBuilder setDeptOut(Department deptOut) {
+			this.deptOut = deptOut;
+			return this;
+		}	
+
+		public void setSupplier(Supplier supplier) {
+			this.supplier = supplier;
+		}
+		
+		public boolean isSupplierChange(){
+			return this.supplier != null;
+		}
+		
+		public UpdateBuilder setSupplierId(int supplierId){
+			this.supplier.setId(supplierId);
+			return this;
+		}
+		
+		public UpdateBuilder setSupplierName(String name){
+			this.supplier.setName(name);
+			return this;
+		}
+
+		public UpdateBuilder setOperatorId(int operatorId) {
+			this.operatorId = operatorId;
+			return this;
+		}
+		
+		public boolean isOperatorIdChange(){
+			return this.operatorId != 0;
+		}
+		
+		public boolean isOperateChange(){
+			return this.operator != null;
+		}
+
+		public UpdateBuilder setOperator(String operator) {
+			this.operator = operator;
+			return this;
+		}
+
+		public boolean isCommentChange(){
+			return this.comment != null;
+		}
+		
+		public UpdateBuilder setComment(String comment) {
+			this.comment = comment;
+			return this;
+		}
+		
+		public Status getStatus() {
+			return status;
+		}
+
+		public UpdateBuilder setStatus(Status status) {
+			this.status = status;
+			return this;
+		}
+		
+		public boolean isStatusChange(){
+			return this.status != null;
+		}
+		
+		public Type getType() {
+			return type;
+		}
+
+		private UpdateBuilder setType(Type type) {
+			this.type = type;
+			return this;
+		}
+
+		public boolean isSubTypeChange(){
+			return this.subType != null;
+		}
+
+		private UpdateBuilder setSubType(SubType subType) {
+			this.subType = subType;
+			return this;
+		}
+		
+		public UpdateBuilder setCateType(MaterialCate.Type cateType) {
+			this.cateType = cateType;
+			return this;
+		}
+		
+		public boolean isCateTypeChange(){
+			return this.cateType != null;
+		}
+		
+		public UpdateBuilder setCateType(int val){
+			this.cateType = MaterialCate.Type.valueOf(val);
+			return this;
+		}
+		
+		public UpdateBuilder setInitActualPrice(float actualPrice){
+			this.actualPrice = actualPrice;
+			return this;
+		}
+	}
+	
 	/**
 	 * The helper class to create the StockIn object used in update
 	 */
@@ -401,6 +656,293 @@ public class StockAction implements Jsonable{
 		
 		
 
+	}
+	
+	public static class ReAuditBuilder{
+
+		private final int id;
+		private String oriStockId;
+		private long oriStockDate;
+		private Supplier supplier = new Supplier();
+		private Department deptIn = new Department(0);
+		private Department deptOut = new Department(0);
+		private int operatorId;
+		private String operator;
+		private List<StockActionDetail> stockActionDetails = new ArrayList<StockActionDetail>(); 
+		private String comment;
+		private float actualPrice;
+		private MaterialCate.Type cateType ;
+		private Status status = Status.UNAUDIT;
+		private Type type;
+		private SubType subType;
+		
+		public ReAuditBuilder(int id){
+			this.id = id;
+		}
+		//入库采购
+		public static ReAuditBuilder newStockIn(int id, long oriStockIdDate, float actualPrice){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_IN)
+					.setSubType(SubType.STOCK_IN)
+					.setOriStockDate(oriStockIdDate)
+					.setDeptOut((short) -1);
+			
+			builder.actualPrice = actualPrice;
+			return builder;
+		}
+		//初始化库存
+		public static ReAuditBuilder stockInit(int id, long oriStockIdDate){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_IN)
+					.setSubType(SubType.INIT)
+					.setOriStockDate(oriStockIdDate)
+					.setDeptOut((short) -1);
+			
+			return builder;
+		}
+		//入库调拨
+		public static ReAuditBuilder newStockInTransfer(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.STOCK_IN_TRANSFER);
+			return builder;
+		}
+		//报溢
+		public static ReAuditBuilder newSpill(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.SPILL).setDeptOut((short) -1);
+			return builder;
+		}
+		//退货
+		public static ReAuditBuilder newStockOut(int id, long oriStockIdDate, float actualPrice){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT).setOriStockDate(oriStockIdDate).setDeptIn((short) -1);
+			builder.actualPrice = actualPrice;
+			return builder;
+		}
+		//出库调拨
+		public static ReAuditBuilder newStockOutTransfer(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.STOCK_OUT_TRANSFER);
+			return builder;
+		}
+		//报损
+		public static ReAuditBuilder newDamage(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.DAMAGE).setDeptIn((short) -1);
+			return builder;
+		}
+		//盘盈
+		public static ReAuditBuilder newMore(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_IN).setSubType(SubType.MORE).setDeptOut((short) -1).setStatus(Status.AUDIT);
+			return builder;
+		}
+		//盘亏
+		public static ReAuditBuilder newLess(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setDeptIn((short) -1).setStatus(Status.AUDIT);
+			return builder;
+		}
+		//消耗
+		public static ReAuditBuilder newUseUp(int id, Department deptOut, MaterialCate.Type cateType){
+			ReAuditBuilder builder = new ReAuditBuilder(id);
+			builder.setType(Type.STOCK_OUT).setSubType(SubType.CONSUMPTION)
+			       .setDeptOut(deptOut.getId()).setDeptOutName(deptOut.getName())
+			       .setCateType(cateType)
+			       .setOriStockDate(new Date().getTime())
+			       .setDeptIn((short) -1);
+
+			return builder;
+		}
+		
+		//配送发货
+		public static ReAuditBuilder newDistributionSend(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_SEND);
+			return builder;
+		}
+		//配送收货
+		public static ReAuditBuilder newDistributionReceive(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RECEIVE);
+			return builder;
+		}
+		//配送退货
+		public static ReAuditBuilder newDistributionReturn(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RETURN);
+			return builder;
+		}
+		//配送回收
+		public static ReAuditBuilder newDistributionRecovery(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
+													   .setSubType(SubType.DISTRIBUTION_RECOVERY);
+			return builder;
+		}
+		
+		public StockAction build(){
+			return new StockAction(this);
+		}
+		
+		public ReAuditBuilder setOriStockId(String oriStockId){
+			this.oriStockId = oriStockId;
+			return this;
+		}
+		
+		public boolean isOriStockIdChange(){
+			return this.oriStockId != null;
+		}
+		
+		public boolean isStockActionDetailsChange(){
+			return this.stockActionDetails != null;
+		}
+		
+		public boolean isActutalPriceChange(){
+			return this.actualPrice != 0;
+		}
+		
+		public boolean isOriStockDateChange(){
+			return this.oriStockDate != 0;
+		}
+
+		public ReAuditBuilder setOriStockDate(long oriStockDate) {
+			this.oriStockDate = oriStockDate;
+			return this;
+		}
+
+		public ReAuditBuilder addDetail(StockActionDetail detail){
+			this.stockActionDetails.add(detail);
+			return this;
+		}
+		
+		public ReAuditBuilder setDeptIn(short i){
+			this.deptIn.setId(i);
+			return this;
+		}
+		
+		public boolean isDeptInChange(){
+			return this.deptIn != null;
+		}
+
+		
+		public ReAuditBuilder setDeptIn(Department deptIn) {
+			this.deptIn = deptIn;
+			return this;
+			
+		}
+		
+		public ReAuditBuilder setDeptInName(String name){
+			this.deptIn.setName(name);
+			return this;
+		}
+
+		public ReAuditBuilder setDeptOut(short deptOut){
+			this.deptOut.setId(deptOut);
+			return this;
+		}
+		
+		public boolean isDeptOutChange(){
+			return this.deptOut != null;
+		}
+		
+		public ReAuditBuilder setDeptOutName(String name){
+			this.deptOut.setName(name);
+			return this;
+		}
+
+		public ReAuditBuilder setDeptOut(Department deptOut) {
+			this.deptOut = deptOut;
+			return this;
+		}	
+
+		public ReAuditBuilder setSupplier(Supplier supplier) {
+			this.supplier = supplier;
+			return this;
+		}
+		
+		public boolean isSupplierChange(){
+			return this.supplier != null;
+		}
+		
+		public ReAuditBuilder setSupplierId(int supplierId){
+			this.supplier.setId(supplierId);
+			return this;
+		}
+		
+		public ReAuditBuilder setSupplierName(String name){
+			this.supplier.setName(name);
+			return this;
+		}
+
+		public ReAuditBuilder setOperatorId(int operatorId) {
+			this.operatorId = operatorId;
+			return this;
+		}
+		
+		public boolean isOperatorIdChange(){
+			return this.operatorId != 0;
+		}
+		
+		public boolean isOperateChange(){
+			return this.operator != null;
+		}
+
+		public ReAuditBuilder setOperator(String operator) {
+			this.operator = operator;
+			return this;
+		}
+
+		public boolean isCommentChange(){
+			return this.comment != null;
+		}
+		
+		public ReAuditBuilder setComment(String comment) {
+			this.comment = comment;
+			return this;
+		}
+
+		public ReAuditBuilder setStatus(Status status) {
+			this.status = status;
+			return this;
+		}
+		
+		public boolean isStatusChange(){
+			return this.status != null;
+		}
+
+		private ReAuditBuilder setType(Type type) {
+			this.type = type;
+			return this;
+		}
+
+		public boolean isSubTypeChange(){
+			return this.subType != null;
+		}
+
+		private ReAuditBuilder setSubType(SubType subType) {
+			this.subType = subType;
+			return this;
+		}
+		
+		public ReAuditBuilder setCateType(MaterialCate.Type cateType) {
+			this.cateType = cateType;
+			return this;
+		}
+		
+		public boolean isCateTypeChange(){
+			return this.cateType != null;
+		}
+		
+		public ReAuditBuilder setCateType(int val){
+			this.cateType = MaterialCate.Type.valueOf(val);
+			return this;
+		}
+		
+		public ReAuditBuilder setInitActualPrice(float actualPrice){
+			this.actualPrice = actualPrice;
+			return this;
+		}
+	
 	}
 	
 	/**
@@ -507,7 +1049,11 @@ public class StockAction implements Jsonable{
 		MORE(7, "盘盈"),
 		LESS(8, "盘亏"),
 		CONSUMPTION(9, "消耗"),
-		INIT(10, "初始化");
+		INIT(10, "初始化"),
+		DISTRIBUTION_SEND(11, "配送发货"),
+		DISTRIBUTION_RECEIVE(12, "配送收货"),
+		DISTRIBUTION_RETURN(13, "配送退货"),
+		DISTRIBUTION_RECOVERY(14, "配送回收");
 			
 		private final int val;
 		private final String text;
@@ -567,7 +1113,42 @@ public class StockAction implements Jsonable{
 	private Status status = Status.UNAUDIT;
 	private String comment;
 	private List<StockActionDetail> stockDetails = new ArrayList<StockActionDetail>();
-	
+	private Restaurant stockInRestaurant;
+	private int stockInRestaurantId;
+	private Restaurant stockOutRestaurant;
+	private int stockOutRestaurantId;
+
+	public int getStockInRestaurantId() {
+		return stockInRestaurantId;
+	}
+
+	public void setStockInRestaurantId(int stockInRestaurantId) {
+		this.stockInRestaurantId = stockInRestaurantId;
+	}
+
+	public int getStockOutRestaurantId() {
+		return stockOutRestaurantId;
+	}
+
+	public void setStockOutRestaurantId(int stockOutRestaurantId) {
+		this.stockOutRestaurantId = stockOutRestaurantId;
+	}
+
+	public Restaurant getStockInRestaurant() {
+		return stockInRestaurant;
+	}
+
+	public void setStockInRestaurant(Restaurant stockInRestaurant) {
+		this.stockInRestaurant = stockInRestaurant;
+	}
+
+	public Restaurant getStockOutRestaurant() {
+		return stockOutRestaurant;
+	}
+
+	public void setStockOutRestaurant(Restaurant stockOutRestaurant) {
+		this.stockOutRestaurant = stockOutRestaurant;
+	}
 
 	public long getApproverDate() {
 		return approverDate;
@@ -691,8 +1272,6 @@ public class StockAction implements Jsonable{
 		return deptIn;
 	}
 	
-	
-
 	public Department getDeptOut() {
 		return deptOut;
 	}
@@ -797,32 +1376,78 @@ public class StockAction implements Jsonable{
 	}
 	
 	public StockAction(InsertBuilder build){
-		setRestaurantId(build.getRestaurantId());
-		setOriStockId(build.getOriStockId());
-		setOriStockDate(build.getOriStockDate());
-		setDeptIn (build.getDeptIn());
-		setDeptOut(build.getDeptOut());
-		setSupplier(build.getSupplier());
-		setOperatorId(build.getOperatorId());
-		setOperator(build.getOperator());
-		setDetails(build.getStockActionDetails());
-		setCateType(build.getCateType());
-		setType(build.getType());
-		setSubType(build.getSubType());
-		setStatus(build.getStatus());
-		setComment(build.getComment());
-		if(build.getSubType() == SubType.STOCK_IN || build.getSubType() == SubType.STOCK_OUT){
+		setRestaurantId(build.restaurantId);
+		setOriStockId(build.oriStockId);
+		setOriStockDate(build.oriStockIdDate);
+		setDeptIn (build.deptIn);
+		setDeptOut(build.deptOut);
+		setSupplier(build.supplier);
+		setOperatorId(build.operatorId);
+		setOperator(build.operator);
+		setDetails(build.stockActionDetails);
+		setCateType(build.cateType);
+		setType(build.type);
+		setSubType(build.subType);
+		setStatus(build.status);
+		setComment(build.comment);
+		if(build.subType == SubType.STOCK_IN || build.subType == SubType.STOCK_OUT){
 			setActualPrice(build.getActualPrice());
 		}else{
 			setActualPrice(getTotalPrice());
 		}
 	}
 	
-	public StockAction(AuditBuilder build){
-		setId(build.getId());
-		setApprover(build.getApprover());
-		setApproverId(build.getApproverId());
+	public StockAction(UpdateBuilder build){
+		setId(build.id);
+		setOriStockId(build.oriStockId);
+		setOriStockDate(build.oriStockDate);
+		setDeptIn (build.deptIn);
+		setDeptOut(build.deptOut);
+		setSupplier(build.supplier);
+		setOperatorId(build.operatorId);
+		setOperator(build.operator);
+		setDetails(build.stockActionDetails);
+		setCateType(build.cateType);
+		setType(build.type);
+		setSubType(build.subType);
 		setStatus(build.status);
+		setComment(build.comment);
+		if(build.subType == SubType.STOCK_IN || build.subType == SubType.STOCK_OUT){
+			setActualPrice(build.getActualPrice());
+		}else{
+			setActualPrice(getTotalPrice());
+		}
+	}
+	
+	
+	public StockAction(AuditBuilder build){
+		setId(build.id);
+		setApprover(build.approver);
+		setApproverId(build.approverId);
+		setApproverDate(build.approverDate);
+		setStatus(build.status);
+	}
+	
+	public StockAction(ReAuditBuilder build){
+		setId(build.id);
+		setOriStockId(build.oriStockId);
+		setOriStockDate(build.oriStockDate);
+		setDeptIn (build.deptIn);
+		setDeptOut(build.deptOut);
+		setSupplier(build.supplier);
+		setOperatorId(build.operatorId);
+		setOperator(build.operator);
+		setDetails(build.stockActionDetails);
+		setCateType(build.cateType);
+		setType(build.type);
+		setSubType(build.subType);
+		setStatus(build.status);
+		setComment(build.comment);
+		if(build.subType == SubType.STOCK_IN || build.subType == SubType.STOCK_OUT){
+			setActualPrice(build.actualPrice);
+		}else{
+			setActualPrice(getTotalPrice());
+		}
 	}
 	
 	public float getTotalAmount(){
@@ -908,7 +1533,6 @@ public class StockAction implements Jsonable{
 		jm.putString("statusText", this.status.getDesc());
 		jm.putString("comment", this.comment);
 		jm.putJsonableList("stockDetails", this.stockDetails, 0);
-		
 		return jm;
 	}
 

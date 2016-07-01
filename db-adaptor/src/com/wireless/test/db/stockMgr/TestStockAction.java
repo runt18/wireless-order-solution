@@ -109,23 +109,23 @@ public class TestStockAction {
 		
 		StockAction expected = builder.build();
 		//根据不同类型获取供应商或部门
-		if(builder.getSubType() == SubType.STOCK_IN ){
-			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
-			Supplier supplier = SupplierDao.getById(mStaff, builder.getSupplier().getId());
+		if(expected.getSubType() == SubType.STOCK_IN ){
+			Department deptIn = DepartmentDao.getById(mStaff, expected.getDeptIn().getId());
+			Supplier supplier = SupplierDao.getById(mStaff, expected.getSupplier().getId());
 			expected.setDeptIn(deptIn);
 			expected.setSupplier(supplier);
-		}else if(builder.getSubType() == SubType.STOCK_OUT){
-			Department deptOut = DepartmentDao.getById(mStaff, builder.getDeptOut().getId());
-			Supplier supplier = SupplierDao.getById(mStaff, builder.getSupplier().getId());
+		}else if(expected.getSubType() == SubType.STOCK_OUT){
+			Department deptOut = DepartmentDao.getById(mStaff, expected.getDeptOut().getId());
+			Supplier supplier = SupplierDao.getById(mStaff, expected.getSupplier().getId());
 			expected.setDeptOut(deptOut);
 			expected.setSupplier(supplier);
-		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
-			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
-			Department deptOut = DepartmentDao.getById(mStaff, builder.getDeptOut().getId());
+		}else if(expected.getSubType() == SubType.STOCK_IN_TRANSFER || expected.getSubType() == SubType.STOCK_OUT_TRANSFER){
+			Department deptIn = DepartmentDao.getById(mStaff, expected.getDeptIn().getId());
+			Department deptOut = DepartmentDao.getById(mStaff, expected.getDeptOut().getId());
 			expected.setDeptIn(deptIn);
 			expected.setDeptOut(deptOut);
 		}else{
-			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
+			Department deptIn = DepartmentDao.getById(mStaff, expected.getDeptIn().getId());
 			expected.setDeptIn(deptIn);
 		}
 		expected.setId(stockActionId);
@@ -269,7 +269,6 @@ public class TestStockAction {
 			
 		}*/
 	}
-	
 	//采购
 	@Test
 	public void testStockIn() throws BusinessException, SQLException{
