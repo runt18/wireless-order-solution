@@ -19,9 +19,7 @@ import com.wireless.pojo.member.MemberOperation;
 public class OperateMemberOperationAction extends DispatchAction{
 
 	public ActionForward getMemberOperationType(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jObject = new JObject();
-		
-		
+		final JObject jObject = new JObject();
 		
 		final List<Jsonable> operations = new ArrayList<>();
 		
@@ -30,7 +28,6 @@ public class OperateMemberOperationAction extends DispatchAction{
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
-					// TODO Auto-generated method stub
 					JsonMap jm = new JsonMap();
 					jm.putInt("value", operate.getValue());
 					jm.putString("name", operate.toString());
@@ -39,7 +36,6 @@ public class OperateMemberOperationAction extends DispatchAction{
 
 				@Override
 				public void fromJsonMap(JsonMap jm, int flag) {
-					// TODO Auto-generated method stub
 					
 				}
 			});
