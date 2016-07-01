@@ -6,6 +6,8 @@ define(function(require, exports, module){
 		var _rechargePopup = null;
 		//保持充值会员对象
 		var _rechargeMember = null;
+		//防止连点下单
+		var _isProcessing = false;
 		//充值比率
 		var _chargeRate = null;
 		_rechargePopup = new JqmPopup({
@@ -28,13 +30,12 @@ define(function(require, exports, module){
 					});
 				});
 				
-				//防止连点下单
-				var isProcessing = false;
+				
 				//充值按钮
-				self.find('[id=toRecharge_a_recharge]').click(function(){
+				self.find('[id="toRecharge_a_recharge"]').click(function(){
 					
-					if(!isProcessing){
-						isProcessing = true;
+					if(!_isProcessing){
+						_isProcessing = true;
 						meberRechargeCheck(self);
 					}
 				});
@@ -222,7 +223,7 @@ define(function(require, exports, module){
 				}else{
 					Util.msg.tip(response.msg);
 				}	
-				isProcessing = false;
+				_isProcessing = false;
 			});
 		}
 		

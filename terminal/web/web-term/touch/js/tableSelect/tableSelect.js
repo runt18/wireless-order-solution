@@ -954,6 +954,27 @@ $(function(){
 			}, 300);
 		});
 		
+		//会员取款
+		$('#takeMoney_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				seajs.use('takeMoney', function(popup){
+					popup.newInstance().open();
+				});
+			},300);
+		});
+	
+		
+		$('#ajustPoint_a_tableSelect').click(function(){
+			$('#frontPageMemberOperation').popup('close');
+			setTimeout(function(){
+				seajs.use('ajustPoint', function(popup){
+					popup.newInstance().open();
+				});
+			},300);
+			
+		});
+		
 		//会员充值
 		$('#memberRecharge_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');

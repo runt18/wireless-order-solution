@@ -216,10 +216,10 @@ public class CouponDao {
 			}
 			
 			if(promotion.getCouponType().hasLimit()){
-				List<CouponOperation> issueds = CouponOperationDao.getByCond(dbCon, staff, new CouponOperationDao.ExtraCond()
+				List<CouponOperation> issuedCoupons = CouponOperationDao.getByCond(dbCon, staff, new CouponOperationDao.ExtraCond()
 																													   .setCouponType(promotion.getCouponType())
 																													   .addOperation(OperateType.ISSUE));
-				if(issueds.size() > promotion.getCouponType().getLimitAmount()){
+				if(issuedCoupons.size() > promotion.getCouponType().getLimitAmount()){
 					throw new BusinessException(("发送的张数超过了【$(promotion)】活动的优惠券的张数限制").replace("$(promotion)", promotion.getTitle()), PromotionError.COUPON_ISSUE_NOT_ALLOW);
 				}
 				

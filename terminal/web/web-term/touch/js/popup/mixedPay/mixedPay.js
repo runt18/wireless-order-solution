@@ -4,7 +4,8 @@ function createMixPayPopup(param){
 		left : function(){},     //左边按钮的方法
 		middle : function(){},	 //中间按钮的方法
 		right : function(){},	 //右边按钮的方法
-		orderMessage : null      //账单信息
+		orderMessage : null,     //账单信息
+		actualPrice : null       //实收
 	}
 	
 	var _payTypeData = null;   //支付类型数据
@@ -108,7 +109,7 @@ function createMixPayPopup(param){
 								
 								if(curCheckbox.attr('checked')){
 									
-									var mixedPayMoney = param.orderMessage.actualPrice;
+									var mixedPayMoney = param.actualPrice;
 									for (var i = 0; i < _payTypeData.length; i++) {
 										var checked = $('#chbForPayType' + _payTypeData[i].id).attr('checked');
 										var money = $('#numForPayType' + _payTypeData[i].id).val();

@@ -840,7 +840,8 @@ $(function(){
 						}
 					});
 				},
-				orderMessage : orderMsg
+				orderMessage : orderMsg,
+				actualPrice : $('#actualPrice_td_payment').text()
 			});
 			
 			mixPayPopup.open();

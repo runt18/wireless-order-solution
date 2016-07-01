@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
+import com.wireless.pojo.member.MemberLevel;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberType;
@@ -51,6 +53,8 @@ import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
+import com.wireless.sms.msg.Msg4Upgrade;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -1751,6 +1755,13 @@ public class MemberDao {
 					 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 
+		//执行会员升级
+		try{
+			upgrade(dbCon, staff, new Member.UpgradeBuilder(memberId));
+		}catch(BusinessException | SQLException ignored){
+			ignored.printStackTrace();
+		}
+		
 		//获取门店的佣金比例
 		try{
 			Represent represent = RepresentDao.getByCond(dbCon, staff, null).get(0);
@@ -2863,5 +2874,82 @@ public class MemberDao {
 		dbCon.rs.close();
 		
 		return new MemberRank(total, rank);
+	}
+	
+	/**
+	 * Upgrade the member
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder {@link Member#UpgradeBuilder}
+	 * 			the member to upgrade
+	 * @return the level this member upgrade to, <code>null</code> means no level upgrade
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to upgrade does NOT exist
+	 */
+	public static Msg4Upgrade upgrade(Staff staff, Member.UpgradeBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return upgrade(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Upgrade the member
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder {@link Member#UpgradeBuilder}
+	 * 			the member to upgrade
+	 * @return the level this member upgrade to, <code>null</code> means no level upgrade
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to upgrade does NOT exist
+	 */
+	public static Msg4Upgrade upgrade(DBCon dbCon, Staff staff, Member.UpgradeBuilder builder) throws SQLException, BusinessException{
+		//Check to see whether the member level to this restaurant exist.
+		List<MemberLevel> lvs = MemberLevelDao.get(dbCon, staff);
+		if(lvs.isEmpty()){
+			return null;
+		}
+		
+		//Sorted the level using threshold by descend 
+		List<MemberLevel> upLvs = SortedList.newInstance(lvs, new Comparator<MemberLevel>(){
+			@Override
+			public int compare(MemberLevel lv1, MemberLevel lv2) {
+				if(lv1.getPointThreshold() > lv2.getPointThreshold()){
+					return -1;
+				}else if(lv1.getPointThreshold() < lv2.getPointThreshold()){
+					return 1;
+				}else{
+					return 0;
+				}
+			}
+		});
+		
+		Member member = getById(dbCon, staff, builder.getMemberId());
+		
+		for(MemberLevel lv : lvs){
+			//If the member type belongs to level route and its total point is greater than the threshold, then perform member level upgrade.
+			if(member.getMemberType().equals(lv.getMemberType()) && member.getTotalPoint() > lv.getPointThreshold()){
+				for(MemberLevel lvToUpgrade : upLvs){
+					//upgrade the member to level whose threshold is nearest the member's
+					if(member.getTotalPoint() > lvToUpgrade.getPointThreshold()){
+						if(!member.getMemberType().equals(lvToUpgrade.getMemberType())){
+							MemberDao.update(dbCon, staff, new Member.UpdateBuilder(member.getId()).setMemberType(lvToUpgrade.getMemberType()));
+							return new Msg4Upgrade(member, lvToUpgrade);
+						}
+					}
+				}
+			}
+		}
+		
+		return null;
 	}
 }
