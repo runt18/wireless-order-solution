@@ -376,7 +376,7 @@ $(function(){
 						if(data.root.length > 0){
 							var templet = '<div class="box" promotion-id="{promotionId}">' +
 											'<div class="box_in"><img src="{couponImg}"></div>' +
-											'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>结束时间 : {beginExpired}</span><br><span>结束时间 : {endExpired}</span><br><span>来自 : {promotionName}</span>' +
+											'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>开始时间 : {beginExpired}</span><br><span>结束时间 : {endExpired}</span><br><span>来自 : {promotionName}</span>' +
 			  							  '</div>';
 							var html = [];
 						
