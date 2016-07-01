@@ -896,7 +896,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		if(represent.getRecommendPoint() > 0){
 			
 			this.point += represent.getRecommendPoint();
-			
+			this.totalPoint += represent.getRecommendPoint();
 			MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 			mo.setOperationType(OperationType.POINT_RECOMMEND);
 			
@@ -942,6 +942,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		if(represent.getSubscribePoint() > 0){
 			
 			this.point += represent.getSubscribePoint();
+			this.totalPoint += represent.getSubscribePoint();
 			
 			MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 			mo.setOperationType(OperationType.POINT_SUBSCRIBE);
@@ -1068,10 +1069,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		if(adjustType == AdjustType.INCREASE){
 			deltaPoint = Math.abs(deltaPoint);
 			point = point + deltaPoint;
+			//累计从消费兑换而增加的积分
+			totalPoint += deltaPoint;
 			
 		}else if(adjustType == AdjustType.REDUCE){
 			deltaPoint = -Math.abs(deltaPoint);
 			point = point + deltaPoint;
+			//累计从消费兑换而增加的积分
+			totalPoint -= Math.abs(deltaPoint);
 			
 		}else if(adjustType == AdjustType.SET){
 			int prePoint = point;
@@ -1082,6 +1087,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		if(point < 0){
 			throw new BusinessException(MemberError.EXCEED_POINT);
 		}
+		
 		
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		mo.setOperationType(OperationType.POINT_ADJUST);

@@ -9,7 +9,7 @@ define(function(require, exports, module){
 		var _isProcessing = false;
 		
 		_ajustPointPopup = new JqmPopup({
-			loadUrl : './popup/member/ajustPoint.html',
+			loadUrl : './popup/member/ajustPointPopup.html',
 			pageInit : function(self){
 			
 				self.find('[id=container_div_ajustPoint]').trigger('create').trigger('refresh');

@@ -1275,7 +1275,7 @@ public class MemberDao {
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member " +
 			  " (member_type_id, member_card, member_card_crc, restaurant_id, branch_id, name, sex, tele, mobile, mobile_crc, age, birthday, " +
-			  " id_card, company, contact_addr, create_date, referrer, referrer_id, point)" +
+			  " id_card, company, contact_addr, create_date, referrer, referrer_id, point, total_point)" +
 			  " VALUES( " +
 			  member.getMemberType().getId() + "," + 
 			  "'" + member.getMemberCard() + "'," +
@@ -1295,17 +1295,26 @@ public class MemberDao {
 			  " NOW(), " +
 			  (member.hasReferrer() ? "'" + member.getReferrer() + "'" : "NULL") + "," +
 			  (member.hasReferrer() ? member.getReferrerId() : "NULL") + "," +
-			  " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
+			  " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + "), " +
+			  " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ") " +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		
 		int memberId = 0;
 		if(dbCon.rs.next()){
 			memberId = dbCon.rs.getInt(1);
 		}else{
 			throw new SQLException("The id of member is not generated successfully.");
 		}	
+		
+		//执行会员升级
+		try{
+			upgrade(dbCon, staff, new Member.UpgradeBuilder(memberId));
+		}catch(BusinessException | SQLException ignored){
+			ignored.printStackTrace();
+		}
 		
 		return memberId;
 	}
@@ -1911,11 +1920,19 @@ public class MemberDao {
 		//Update the base & extra balance and point to subscriber.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
 					 " point = " + subscriber.getPoint() + "," + 
+					 " total_point = " + subscriber.getTotalPoint() + "," +
 					 " base_balance = " + subscriber.getBaseBalance() + ", " +
 					 " extra_balance = " + subscriber.getExtraBalance() + "," + 
 					 " total_charge = " + subscriber.getTotalCharge() + 
 					 " WHERE member_id = " + subscriber.getId();
 		dbCon.stmt.executeUpdate(sql);
+		
+		//执行关注人升级
+		try{
+			upgrade(dbCon, staff, new Member.UpgradeBuilder(subscriber));
+		}catch(BusinessException | SQLException ignored){
+			ignored.printStackTrace();
+		}
 		
 		final Member referrer = getById(dbCon, staff, builder.getReferrer());
 		
@@ -1932,11 +1949,19 @@ public class MemberDao {
 		//Update the base & extra balance and point to referrer.
 		sql = " UPDATE " + Params.dbName + ".member SET" +
 			  " point = " + referrer.getPoint() + "," + 
+			  " total_point = " + referrer.getTotalPoint() + "," +
 			  " base_balance = " + referrer.getBaseBalance() + ", " +
 			  " extra_balance = " + referrer.getExtraBalance() + "," + 
 			  " total_charge = " + referrer.getTotalCharge() + 
 			  " WHERE member_id = " + referrer.getId();
 		dbCon.stmt.executeUpdate(sql);
+		
+		//执行推荐人升级
+		try{
+			upgrade(dbCon, staff, new Member.UpgradeBuilder(referrer));
+		}catch(BusinessException | SQLException ignored){
+			ignored.printStackTrace();
+		}
 		
 //		//Insert the represent chain.
 		sql = " INSERT INTO " + Params.dbName + ".represent_chain ( " +
@@ -2352,6 +2377,9 @@ public class MemberDao {
 	 * 			throws if the member to this id is NOT found
 	 */
 	public static MemberOperation adjustPoint(DBCon dbCon, Staff staff, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_POINT)){
+			throw new BusinessException(StaffError.MEMBER_POINT_NOT_ALLOW);
+		}
 		
 		Member member = getById(dbCon, staff, memberId);
 		
@@ -2369,10 +2397,19 @@ public class MemberDao {
 		
 		//Update the point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
-					 " point = " + member.getPoint() + 
+					 " point = " + member.getPoint() + "," +
+					 " total_point = " + member.getTotalPoint() +
 					 " WHERE member_id = " + memberId;
 		
 		dbCon.stmt.executeUpdate(sql);
+		
+		//执行会员升级
+		try{
+			upgrade(dbCon, staff, new Member.UpgradeBuilder(memberId));
+		}catch(BusinessException | SQLException ignored){
+			ignored.printStackTrace();
+		}
+				
 		
 		return mo;
 		

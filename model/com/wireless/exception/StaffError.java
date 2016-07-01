@@ -26,6 +26,7 @@ public class StaffError extends ErrorEnum{
 	public static final ErrorCode MEMBER_UPDATE_NOT_ALLOW = build(7617, "你没有修改会员的权限");
 	public static final ErrorCode MEMBER_CHARGE_NOT_ALLOW = build(7618, "你没有会员充值的权限");
 	public static final ErrorCode MEMBER_REFUND_NOT_ALLOW = build(7619, "你没有会员取款的权限");
+	public static final ErrorCode MEMBER_POINT_NOT_ALLOW = build(7620, "你没有会员调整的权限");
 	
 	private StaffError(){
 		
