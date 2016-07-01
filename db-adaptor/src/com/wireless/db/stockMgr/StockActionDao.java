@@ -24,8 +24,10 @@ import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
+import com.wireless.pojo.stockMgr.StockAction.ReAuditBuilder;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
+import com.wireless.pojo.stockMgr.StockAction.UpdateBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.supplierMgr.Supplier;
@@ -289,8 +291,10 @@ public class StockActionDao {
 	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
 		
 		Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
+		StockAction stockAction = builder.build();
+		
 		//是否有库存模块授权&入库类型
-		if(!restaurant.hasModule(Module.Code.INVENTORY) && (builder.getSubType() != StockAction.SubType.CONSUMPTION)){
+		if(!restaurant.hasModule(Module.Code.INVENTORY) && (stockAction.getSubType() != StockAction.SubType.CONSUMPTION)){
 			//限制添加的条数
 			final int stockActionCountLimit = 50;
 			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".stock_action WHERE restaurant_id = " + staff.getRestaurantId() + " AND sub_type <> " + StockAction.SubType.CONSUMPTION.getVal();
@@ -305,7 +309,7 @@ public class StockActionDao {
 			dbCon.rs.close(); 
 		}
 		//判断是否同个部门下进行调拨
-		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
+		if((stockAction.getSubType() == SubType.STOCK_IN_TRANSFER || stockAction.getSubType() == SubType.STOCK_OUT_TRANSFER) && stockAction.getDeptIn().getId() == stockAction.getDeptOut().getId()){
 			throw new BusinessException(StockError.MATERIAL_DEPT_EXIST);
 		}
 		//获取当前工作月
@@ -318,7 +322,6 @@ public class StockActionDao {
 		 * 录入库单的最大值
 		 * 录入的库单只能在 【当前时间】 之前
 		 */
-		//TODO
 		long maxDate = DateUtil.parseDate(c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + day);
 		
 		//比较 时间和月结时间,取最大值
@@ -333,35 +336,33 @@ public class StockActionDao {
 				 * 录入库单的最小值
 				 * 录入的库单只能在 【当前会计月份第一天】 【最后一张已经审核的盘点单】 之后
 				 */
-				minDate = dbCon.rs.getTimestamp("date").getTime();
+				Calendar minC = Calendar.getInstance();
+				minC.setTime(dbCon.rs.getTimestamp("date"));
+				minDate = DateUtil.parseDate(minC.get(Calendar.YEAR)+ "-" + (minC.get(Calendar.MONTH) + 1) + "-" + minC.get(Calendar.DAY_OF_MONTH));
 			}
 		}
 		dbCon.rs.close();
 		
 		//如果是消耗类型或初始化类型的单则不需要限定时间
-		if(builder.getSubType() != SubType.INIT && builder.getSubType() != SubType.CONSUMPTION && builder.getSubType() != SubType.MORE && builder.getSubType() != SubType.LESS){
+		if(stockAction.getSubType() != SubType.INIT && stockAction.getSubType() != SubType.CONSUMPTION && stockAction.getSubType() != SubType.MORE && stockAction.getSubType() != SubType.LESS){
 			//货单原始时间必须大于最后一次已审核盘点时间或月结,小于当前月最后一天
-			if(minDate != 0 && builder.getOriStockDate() < minDate){
+			if(minDate != 0 && stockAction.getOriStockDate() < minDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-			}else if(builder.getOriStockDate() > maxDate){
+			}else if(stockAction.getOriStockDate() > maxDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 			}
 		}
 		//判断除了初始化, 消耗,盘盈,盘亏单外, 是否正在盘点中
-		if(builder.getSubType() != SubType.INIT && builder.getSubType() != SubType.CONSUMPTION && builder.getSubType() != SubType.LESS && builder.getSubType() != SubType.MORE){
+		if(stockAction.getSubType() != SubType.INIT && stockAction.getSubType() != SubType.CONSUMPTION && stockAction.getSubType() != SubType.LESS && stockAction.getSubType() != SubType.MORE){
 			checkStockTake(dbCon, staff);
 		}		
 
-		
-
-		StockAction stockAction = builder.build();
-		
 		String deptInName;
 		String deptOutName;
 		String supplierName;
 		
-		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + stockAction.getDeptIn().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		if(dbCon.rs.next()){
 			deptInName = dbCon.rs.getString("name");
@@ -370,7 +371,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close(); 
 		
-		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + staff.getRestaurantId();
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + stockAction.getDeptOut().getId() + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
 			deptOutName = dbCon.rs.getString("name");
@@ -379,7 +380,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close();
 		
-		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getId() + " AND restaurant_id = " + staff.getRestaurantId();
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + stockAction.getSupplier().getId() + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
 		if(dbCon.rs.next()){
 			supplierName = dbCon.rs.getString("name");
@@ -392,7 +393,7 @@ public class StockActionDao {
 		String insertsql = "INSERT INTO " + Params.dbName + ".stock_action (restaurant_id, birth_date, " +
 				"ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name, operator_id, operator, amount, price, actual_price, cate_type, type, sub_type, status, comment) "+
 				" VALUES( " +
-				+ stockAction.getRestaurantId() + ", "
+				+ staff.getRestaurantId() + ", "
 				+ "'" + DateUtil.format(new Date().getTime()) + "', "
 				+ "'" + stockAction.getOriStockId() + "', "
 				+ "'" + DateUtil.formatToDate(stockAction.getOriStockDate()) + "', "
@@ -411,7 +412,7 @@ public class StockActionDao {
 				+ stockAction.getType().getVal() + ", " 
 				+ stockAction.getSubType().getVal() + ", "
 				+ stockAction.getStatus().getVal() + ", "
-				+ "'" + stockAction.getComment() + "'" 
+				+ "'" + stockAction.getComment() + "'"
 				+ ")";
 		dbCon.stmt.executeUpdate(insertsql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -426,9 +427,9 @@ public class StockActionDao {
 		//计算结存数量
 		for (StockActionDetail detail : stockAction.getStockDetails()) {
 			Material material = MaterialDao.getById(dbCon, staff, detail.getMaterialId());
-			if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE){
+			if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE || stockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || stockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				material.addStock(detail.getAmount());
-			}else if(stockAction.getSubType() == SubType.STOCK_OUT || stockAction.getSubType() == SubType.DAMAGE || stockAction.getSubType() == SubType.LESS || stockAction.getSubType() == SubType.CONSUMPTION){
+			}else if(stockAction.getSubType() == SubType.STOCK_OUT || stockAction.getSubType() == SubType.DAMAGE || stockAction.getSubType() == SubType.LESS || stockAction.getSubType() == SubType.CONSUMPTION || stockAction.getSubType() == SubType.DISTRIBUTION_SEND || stockAction.getSubType() == SubType.DISTRIBUTION_RETURN){
 				material.cutStock(detail.getAmount());
 			}
 			//初始化库存单不进行加减
@@ -573,9 +574,10 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void update(DBCon dbCon, Staff staff, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+	public static void update(DBCon dbCon, Staff staff, UpdateBuilder updateBuilder) throws BusinessException, SQLException{
+		StockAction stockAction = updateBuilder.build();
 		//判断是否同个部门下进行调拨
-		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
+		if((stockAction.getSubType() == SubType.STOCK_IN_TRANSFER || stockAction.getSubType() == SubType.STOCK_OUT_TRANSFER) && stockAction.getDeptIn().getId() == stockAction.getDeptOut().getId()){
 			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE_EXIST);
 		}
 		//获取当前工作月
@@ -602,10 +604,10 @@ public class StockActionDao {
 		
 
 		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-		if(minDate != 0 && builder.getOriStockDate() < minDate){
+		if(minDate != 0 && stockAction.getOriStockDate() < minDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-		}else if(builder.getOriStockDate() > maxDate){
+		}else if(stockAction.getOriStockDate() > maxDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 		}
 	
@@ -614,7 +616,7 @@ public class StockActionDao {
 		String deptOutName;
 		String SupplierName;
 		
-		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + stockAction.getDeptIn().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		if(dbCon.rs.next()){
 			deptInName = dbCon.rs.getString("name");
@@ -623,7 +625,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close(); 
 		
-		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + staff.getRestaurantId();
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + stockAction.getDeptOut().getId() + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
 			deptOutName = dbCon.rs.getString("name");
@@ -631,7 +633,7 @@ public class StockActionDao {
 			deptOutName = "";
 		}
 		
-		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getId() + " AND restaurant_id = " + staff.getRestaurantId();
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + stockAction.getSupplier().getId() + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
 		if(dbCon.rs.next()){
 			SupplierName = dbCon.rs.getString("name");
@@ -639,36 +641,36 @@ public class StockActionDao {
 			SupplierName = "";
 		}		
 		dbCon.rs.close(); 
-		StockAction updateStockAction = builder.build();
+		StockAction updateStockAction = updateBuilder.build();
 
 		String sql = "UPDATE " + Params.dbName + ".stock_action SET " + 
-				" ori_stock_id = '" + builder.getOriStockId() + "' " +
-				", ori_stock_date = '" + DateUtil.format(builder.getOriStockDate()) + "' " +
-				", comment = '" + builder.getComment() + "' " +
-				", supplier_id = " + builder.getSupplier().getId() + 
-				", supplier_name = '" + SupplierName + "'" +
-				", dept_in = " + builder.getDeptIn().getId() + 
-				", dept_in_name = '" + deptInName + "'" +
-				", dept_out = " + builder.getDeptOut().getId() + 
-				", dept_out_name ='" + deptOutName + "'" +
-				", amount = " + updateStockAction.getTotalAmount() + 
-				", price = " + updateStockAction.getTotalPrice() +
-				", actual_price = " + updateStockAction.getActualPrice() + 
-				" WHERE id = " + stockActionId;
+					 " ori_stock_id = '" + stockAction.getOriStockId() + "' " +
+					 ", ori_stock_date = '" + DateUtil.format(stockAction.getOriStockDate()) + "' " +
+					 ", comment = '" + stockAction.getComment() + "' " +
+					 ", supplier_id = " + stockAction.getSupplier().getId() + 
+					 ", supplier_name = '" + SupplierName + "'" +
+					 ", dept_in = " + stockAction.getDeptIn().getId() + 
+					 ", dept_in_name = '" + deptInName + "'" +
+					 ", dept_out = " + stockAction.getDeptOut().getId() + 
+					 ", dept_out_name ='" + deptOutName + "'" +
+					 ", amount = " + updateStockAction.getTotalAmount() + 
+					 ", price = " + updateStockAction.getTotalPrice() +
+					 ", actual_price = " + updateStockAction.getActualPrice() + 
+					 " WHERE id = " + stockAction.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCK_ACTION_NOT_EXIST);
 		}
 		
-		StockActionDetailDao.deleteByCond(dbCon, staff, new StockActionDetailDao.ExtraCond().setStockAction(stockActionId));
+		StockActionDetailDao.deleteByCond(dbCon, staff, new StockActionDetailDao.ExtraCond().setStockAction(stockAction.getId()));
 		
-		for (StockActionDetail sDetail : builder.getStockActionDetails()) {
+		for (StockActionDetail sDetail : stockAction.getStockDetails()) {
 			Material material = MaterialDao.getById(staff, sDetail.getMaterialId());
-			if(builder.getSubType() == SubType.STOCK_IN || builder.getSubType() == SubType.SPILL || builder.getSubType() == SubType.MORE){
+			if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE || stockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || stockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				material.addStock(sDetail.getAmount());
-			}else if(builder.getSubType() == SubType.STOCK_OUT || builder.getSubType() == SubType.DAMAGE || builder.getSubType() == SubType.LESS || builder.getSubType() == SubType.CONSUMPTION){
+			}else if(stockAction.getSubType() == SubType.STOCK_OUT || stockAction.getSubType() == SubType.DAMAGE || stockAction.getSubType() == SubType.LESS || stockAction.getSubType() == SubType.CONSUMPTION || stockAction.getSubType() == SubType.DISTRIBUTION_SEND || stockAction.getSubType() == SubType.DISTRIBUTION_RETURN){
 				material.cutStock(sDetail.getAmount());
 			}
-			sDetail.setStockActionId(stockActionId);
+			sDetail.setStockActionId(stockAction.getId());
 			sDetail.setName(material.getName());
 			sDetail.setRemaining(material.getStock());
 			
@@ -689,12 +691,12 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void update(Staff term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+	public static void update(Staff staff, UpdateBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			update(dbCon, term, stockActionId, builder);
+			update(dbCon, staff, builder);
 			
 			dbCon.conn.commit();
 		}catch(BusinessException | SQLException e){
@@ -806,7 +808,7 @@ public class StockActionDao {
 					List<MaterialDept> materialDepts;
 					Material material;
 					//判断是库单是什么类型的
-					if(stock.getSubType() == SubType.STOCK_IN || stock.getSubType() == SubType.MORE || stock.getSubType() == SubType.SPILL || stock.getSubType() == SubType.INIT){
+					if(stock.getSubType() == SubType.STOCK_IN || stock.getSubType() == SubType.MORE || stock.getSubType() == SubType.SPILL || stock.getSubType() == SubType.INIT || stock.getSubType() == SubType.DISTRIBUTION_RECEIVE || stock.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 						deptInId = stock.getDeptIn().getId();
 
 						materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + stockDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
@@ -846,7 +848,7 @@ public class StockActionDao {
 						stockDetail.setRemaining(material.getStock());
 						StockActionDetailDao.update(dbCon, stockDetail);
 						
-					}else if(stock.getSubType() == SubType.STOCK_IN_TRANSFER || stock.getSubType() == SubType.STOCK_OUT_TRANSFER){
+					}else if(stock.getSubType() == SubType.STOCK_IN_TRANSFER || stock.getSubType() == SubType.STOCK_OUT_TRANSFER ){
 						deptInId = stock.getDeptIn().getId();
 						deptOutId = stock.getDeptOut().getId();
 						
@@ -936,12 +938,12 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static void reAuditStockAction(Staff staff, int stockInId, InsertBuilder builder) throws SQLException, BusinessException{
+	public static void reAuditStockAction(Staff staff, ReAuditBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 //			dbCon.conn.setAutoCommit(false);
-			reAuditStockAction(dbCon, staff, stockInId, builder);
+			reAuditStockAction(dbCon, staff, builder);
 //			dbCon.conn.commit();
 		}catch(BusinessException | SQLException e){
 //			dbCon.conn.rollback();
@@ -960,10 +962,11 @@ public class StockActionDao {
 	 * @throws BusinessException 
 	 * @throws SQLException 
 	 */
-	public static void reAuditStockAction(DBCon dbCon, Staff staff, int stockInId, InsertBuilder builder) throws SQLException, BusinessException{
+	public static void reAuditStockAction(DBCon dbCon, Staff staff, ReAuditBuilder builder) throws SQLException, BusinessException{
+		StockAction stockAction = builder.build();
 		
 		//判断是否同个部门下进行调拨
-		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
+		if((stockAction.getSubType() == SubType.STOCK_IN_TRANSFER || stockAction.getSubType() == SubType.STOCK_OUT_TRANSFER) && stockAction.getDeptIn().getId() == stockAction.getDeptOut().getId()){
 			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE_EXIST);
 		}
 		//获取当前工作月
@@ -993,16 +996,16 @@ public class StockActionDao {
 		 * 反审核能修改库单时间  库单时间    小于【会计月份的最后一天】  大于【最后一次的月结时间】 或  【盘点时间】 
 		 */
 		//货单原始时间必须大于最后一次盘点时间或月结,小于当前月最后一天
-		if(minDate != 0 && builder.getOriStockDate() < minDate){
+		if(minDate != 0 && stockAction.getOriStockDate() < minDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
 
-		}else if(builder.getOriStockDate() > maxDate){
+		}else if(stockAction.getOriStockDate() > maxDate){
 			throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 		}		
 		
 		
 		//获取库单和detail
-		StockAction updateStockAction = getById(dbCon, staff, stockInId, true);
+		StockAction updateStockAction = getById(dbCon, staff, stockAction.getId(), true);
 		int deptInId ;
 		int deptOutId ;
 		//还原material和materialDept
@@ -1011,7 +1014,7 @@ public class StockActionDao {
 			List<MaterialDept> materialDepts;
 			Material material;
 			//判断是库单是什么类型的
-			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
+			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL && updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				deptInId = updateStockAction.getDeptIn().getId();
 
 				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
@@ -1092,7 +1095,7 @@ public class StockActionDao {
 		String deptOutName;
 		String SupplierName;
 		
-		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + stockAction.getDeptIn().getId() + " AND restaurant_id = " + staff.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		if(dbCon.rs.next()){
 			deptInName = dbCon.rs.getString("name");
@@ -1101,7 +1104,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close(); 
 		
-		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + staff.getRestaurantId();
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + stockAction.getDeptOut().getId() + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
 			deptOutName = dbCon.rs.getString("name");
@@ -1109,7 +1112,7 @@ public class StockActionDao {
 			deptOutName = "";
 		}
 		
-		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getId() + " AND restaurant_id = " + staff.getRestaurantId();
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + stockAction.getSupplier().getId() + " AND restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
 		if(dbCon.rs.next()){
 			SupplierName = dbCon.rs.getString("name");
@@ -1119,38 +1122,39 @@ public class StockActionDao {
 		dbCon.rs.close(); 
 		StockAction reAuditStockAction = builder.build();
 
-		sql = "UPDATE " + Params.dbName + ".stock_action SET " + 
-				" ori_stock_id = '" + builder.getOriStockId() + "' " +
-				", ori_stock_date = '" + DateUtil.format(builder.getOriStockDate()) + "' " +
-				", comment = '" + builder.getComment() + "' " +
-				", supplier_id = " + builder.getSupplier().getId() + 
-				", supplier_name = '" + SupplierName + "'" +
-				", dept_in = " + builder.getDeptIn().getId() + 
-				", dept_in_name = '" + deptInName + "'" +
-				", dept_out = " + builder.getDeptOut().getId() + 
-				", dept_out_name ='" + deptOutName + "'" +
-				", amount = " + reAuditStockAction.getTotalAmount() + 
-				", price = " + reAuditStockAction.getTotalPrice() +
-				", actual_price = " + reAuditStockAction.getActualPrice() + 
-				", approver_id = " + staff.getId() + ", " +
-				" approver = '" + staff.getName() + "'," +
-				" approve_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
-				" status = " + StockAction.Status.RE_AUDIT.getVal() +
-				" WHERE id = " + stockInId;
+		sql = " UPDATE " + Params.dbName + ".stock_action SET " + 
+			  " id = id " +
+			  (builder.isOriStockIdChange() ? ", ori_stock_id = '" + stockAction.getOriStockId() + "' " : "") +
+			  (builder.isOriStockDateChange() ? ", ori_stock_date = '" + DateUtil.format(stockAction.getOriStockDate()) + "' " : "") +
+			  (builder.isCommentChange() ? ", comment = '" + stockAction.getComment() + "' " : "") +
+			  (builder.isSupplierChange() ? ", supplier_id = " + stockAction.getSupplier().getId() : "") + 
+			  (builder.isSupplierChange() ? ", supplier_name = '" + SupplierName + "'" : "") +
+			  (builder.isDeptInChange() ? ", dept_in = " + stockAction.getDeptIn().getId() : "") + 
+			  (builder.isDeptInChange() ? ", dept_in_name = '" + deptInName + "'" : "") +
+			  (builder.isDeptOutChange() ? ", dept_out = " + stockAction.getDeptOut().getId() : "") + 
+			  (builder.isDeptOutChange() ? ", dept_out_name ='" + deptOutName + "'" : "") +
+			  ", amount = " + reAuditStockAction.getTotalAmount() + 
+			  ", price = " + reAuditStockAction.getTotalPrice() +
+			  (builder.isActutalPriceChange() ? ", actual_price = " + reAuditStockAction.getActualPrice() : "") + 
+			  ", approver_id = " + staff.getId() + 
+			  ", approver = '" + staff.getName() + "'" +
+			  ", approve_date = " + "'" + DateUtil.format(new Date().getTime()) + "'" +
+			  (builder.isStatusChange() ? ", status = " + StockAction.Status.RE_AUDIT.getVal() : "") +
+			  " WHERE id = " + stockAction.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCK_ACTION_NOT_EXIST);
 		}
 		
-		StockActionDetailDao.deleteByCond(dbCon, staff, new StockActionDetailDao.ExtraCond().setStockAction(stockInId));
+		StockActionDetailDao.deleteByCond(dbCon, staff, new StockActionDetailDao.ExtraCond().setStockAction(stockAction.getId()));
 		
 		//重新计算material和materialDept
-		for (StockActionDetail sActionDetail : builder.getStockActionDetails()) {
-			sActionDetail.setStockActionId(stockInId);
+		for (StockActionDetail sActionDetail : stockAction.getStockDetails()) {
+			sActionDetail.setStockActionId(stockAction.getId());
 			MaterialDept materialDept;
 			List<MaterialDept> materialDepts;
 			Material material = null;
 			//判断是库单是什么类型的
-			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL){
+			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				deptInId = updateStockAction.getDeptIn().getId();
 
 				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
@@ -1385,7 +1389,6 @@ public class StockActionDao {
 			stockAction.setSubType(dbCon.rs.getInt("sub_type"));
 			stockAction.setStatus(dbCon.rs.getInt("status"));
 			stockAction.setComment(dbCon.rs.getString("comment"));
-			
 			stockActions.add(stockAction);
 		}
 		
