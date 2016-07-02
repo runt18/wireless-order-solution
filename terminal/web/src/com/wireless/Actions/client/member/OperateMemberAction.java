@@ -355,6 +355,7 @@ public class OperateMemberAction extends DispatchAction{
 		}
 		return null;
 	}
+	
 	/**
 	 * 取款
 	 * @param mapping
@@ -366,43 +367,42 @@ public class OperateMemberAction extends DispatchAction{
 	 */
 	public ActionForward takeMoney(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
-		
-		
-		JObject jobject = new JObject();
+		final String pin = (String)request.getAttribute("pin");
+		final String memberId = request.getParameter("memberID");
+		final String rechargeMoney = request.getParameter("takeMoney");
+		final String payMannerMoney = request.getParameter("payMannerMoney");
+		final String comment = request.getParameter("comment");
+		final String isPrint = request.getParameter("isPrint");
+		final String orientedPrinters = request.getParameter("orientedPrinter");		
+
+		final JObject jobject = new JObject();
 		
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String memberID = request.getParameter("memberID");
-			String rechargeMoney = request.getParameter("takeMoney");
-			String payMannerMoney = request.getParameter("payMannerMoney");
-			String comment = request.getParameter("comment");
-			String isPrint = request.getParameter("isPrint");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney));
-			if(comment != null){
+			final MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberId), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney));
+			if(comment != null && !comment.isEmpty()){
 				mo.setComment(comment);
 			}
-			if(mo == null || mo.getId() == 0){
-				jobject.initTip(false, JObject.TIP_TITLE_ERROE, 9998, "操作失败, 会员取款未成功, 未知错误, 请联系客服人员.");
-			}else{
-				jobject.initTip(true, "操作成功, 会员取款成功.");
-				if(isPrint != null && Boolean.valueOf(isPrint)){
-					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
-						if(reqPrintContent != null){
-							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent.build());
-							if(resp.header.type == Type.ACK){
-								jobject.setMsg(jobject.getMsg() + "打印取款信息成功.");
-							}else{
-								jobject.setMsg(jobject.getMsg() + "打印取款信息失败.");
-							}
+			jobject.initTip(true, "操作成功, 会员取款成功.");
+			if(isPrint != null && !isPrint.isEmpty() && Boolean.parseBoolean(isPrint)){
+				try{
+					ReqPrintContent reqPrintContent = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
+					if(orientedPrinters != null && !orientedPrinters.isEmpty()){
+						for(String orientedPrinter : orientedPrinters.split(",")){
+							reqPrintContent.addPrinter(Integer.parseInt(orientedPrinter));
 						}
-					}catch(IOException e){
-						e.printStackTrace();
-						jobject.setMsg(jobject.getMsg() + " 打印操作请求失败, 请联系客服人员.");
 					}
+					ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent.build());
+					if(resp.header.type == Type.ACK){
+						jobject.setMsg(jobject.getMsg() + "打印取款信息成功.");
+					}else{
+						jobject.setMsg(jobject.getMsg() + "打印取款信息失败.");
+					}
+				}catch(IOException e){
+					e.printStackTrace();
+					jobject.setMsg(jobject.getMsg() + " 打印操作请求失败, 请联系客服人员.");
 				}
 			}
 		}catch(BusinessException | SQLException e){	
