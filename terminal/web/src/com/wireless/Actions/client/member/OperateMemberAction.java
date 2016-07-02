@@ -371,12 +371,13 @@ public class OperateMemberAction extends DispatchAction{
 		JObject jobject = new JObject();
 		
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String memberID = request.getParameter("memberID");
-			String rechargeMoney = request.getParameter("takeMoney");
-			String payMannerMoney = request.getParameter("payMannerMoney");
-			String comment = request.getParameter("comment");
-			String isPrint = request.getParameter("isPrint");
+		    final String pin = (String)request.getAttribute("pin");
+			final String memberID = request.getParameter("memberID");
+			final String rechargeMoney = request.getParameter("takeMoney");
+			final String payMannerMoney = request.getParameter("payMannerMoney");
+			final String comment = request.getParameter("comment");
+			final String isPrint = request.getParameter("isPrint");
+			final String orientedPrinters = request.getParameter("orientedPrinter");		
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -390,9 +391,15 @@ public class OperateMemberAction extends DispatchAction{
 				jobject.initTip(true, "操作成功, 会员取款成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
-						if(reqPrintContent != null){
-							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent.build());
+						final ReqPrintContent reqPrint = ReqPrintContent.buildMemberReceipt(staff, mo.getId());
+						if(orientedPrinters != null && !orientedPrinters.isEmpty()){
+							for(String orientedPrinter : orientedPrinters.split(",")){
+								reqPrint.addPrinter(Integer.parseInt(orientedPrinter));
+							}
+						}
+						
+						if(reqPrint != null){
+							ProtocolPackage resp = ServerConnector.instance().ask(reqPrint.build());
 							if(resp.header.type == Type.ACK){
 								jobject.setMsg(jobject.getMsg() + "打印取款信息成功.");
 							}else{
