@@ -17,7 +17,6 @@ import org.marker.weixin.api.BaseAPI;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.member.MemberDao;
-import com.wireless.db.member.MemberLevelDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.InsertOrder;
@@ -67,9 +66,6 @@ import com.wireless.print.content.ContentParcel;
 import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.scheme.JobContentFactory;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.sms.SMS;
-import com.wireless.sms.msg.Msg4Consume;
-import com.wireless.sms.msg.Msg4Upgrade;
 /**
  * @author yzhang
  *
@@ -575,7 +571,6 @@ class OrderHandler implements Runnable{
 		if(request.header.type == Type.PAY_TEMP_ORDER){
 			if(payBuilder.getPrintOption() == PrintOption.DO_PRINT){
 				printHandler.process(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, staff,  printers, PayOrder.payTemp(staff, payBuilder)));
-
 			}else{
 				PayOrder.payTemp(staff, payBuilder);
 			}
@@ -605,23 +600,23 @@ class OrderHandler implements Runnable{
 							ignored.printStackTrace();
 						}
 						
-						try{
-							//Perform the member upgrade
-							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, order.getMemberId());
-
-							if(payBuilder.isSendSMS()){
-								MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, order);
-								//Send SMS if perform member consumption
-								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
-								//Send SMS if member upgrade
-								if(msg4Upgrade != null){
-									SMS.send(staff, mo.getMemberMobile(), msg4Upgrade);
-								}
-
-							}
-						}catch(BusinessException | SQLException | IOException e){
-							e.printStackTrace();
-						}
+//						try{
+//							//Perform the member upgrade
+//							Msg4Upgrade msg4Upgrade = MemberDao.upgrade(staff, new Member.UpgradeBuilder(order.getMemberId()));
+//
+//							if(payBuilder.isSendSMS()){
+//								MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, order);
+//								//Send SMS if perform member consumption
+//								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
+//								//Send SMS if member upgrade
+//								if(msg4Upgrade != null){
+//									SMS.send(staff, mo.getMemberMobile(), msg4Upgrade);
+//								}
+//
+//							}
+//						}catch(BusinessException | SQLException | IOException e){
+//							e.printStackTrace();
+//						}
 					}
 				});
 

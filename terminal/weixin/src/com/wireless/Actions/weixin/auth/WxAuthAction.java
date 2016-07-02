@@ -60,7 +60,9 @@ public class WxAuthAction extends Action {
             LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(authorizerInfo.getQrCodeUrl())).getScaledInstance(400, 400, Image.SCALE_SMOOTH)));  
             BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
             @SuppressWarnings("serial")
-			Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
+			Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK");
+																										   put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+																										}});
             
 			WxRestaurantDao.update(StaffDao.getAdminByRestaurant(restaurant.getId()), 
 									   new WxRestaurant.UpdateBuilder().setWeixinAppId(authorizerInfo.getAppId())
@@ -93,6 +95,8 @@ public class WxAuthAction extends Action {
 			}
 			
 		}catch(BusinessException | SQLException e){
+			response.getWriter().print(e.getMessage());
+		}catch(Exception e){
 			response.getWriter().print(e.getMessage());
 		}
 		
