@@ -199,8 +199,8 @@ define(function(require, exports, module){
 			$.post('../OperateMember.do', {
 				dataSource : 'takeMoney',
 				memberID : _takeMoneyMember.id,
-				takeMoney : TakeMoney.val(),
-				payMannerMoney : takeMoneyMoney.val(),
+				takeMoney : takeMoneyMoney.val(),
+				payMannerMoney : TakeMoney.val(),
 				isPrint : self.find('[id=printTakeMoney_checkbox_takeMoney]').attr('checked') ? true : false,
 				orientedPrinter : getcookie(document.domain + '_printers')
 			}, function(response){
