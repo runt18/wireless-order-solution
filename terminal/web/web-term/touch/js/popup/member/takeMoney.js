@@ -201,7 +201,8 @@ define(function(require, exports, module){
 				memberID : _takeMoneyMember.id,
 				takeMoney : TakeMoney.val(),
 				payMannerMoney : takeMoneyMoney.val(),
-				isPrint : self.find('[id=printTakeMoney_checkbox_takeMoney]').attr('checked') ? true : false
+				isPrint : self.find('[id=printTakeMoney_checkbox_takeMoney]').attr('checked') ? true : false,
+				orientedPrinter : getcookie(document.domain + '_printers')
 			}, function(response){
 				Util.LM.hide();
 				if(response.success){
