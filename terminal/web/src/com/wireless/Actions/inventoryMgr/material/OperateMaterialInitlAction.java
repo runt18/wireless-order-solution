@@ -86,7 +86,7 @@ public class OperateMaterialInitlAction extends DispatchAction{
 		final String cateType = request.getParameter("cateType");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		try{
-			if(!editData.isEmpty()){
+//			if(!editData.isEmpty()){
 
 				Calendar c = Calendar.getInstance();
 				c.add(Calendar.MONTH, -1);
@@ -100,18 +100,22 @@ public class OperateMaterialInitlAction extends DispatchAction{
 																 .setCateType(MaterialCate.Type.valueOf(Integer.parseInt(cateType)))
 															 	 .setDeptIn(Short.parseShort(deptId));
 				
-				for (String md : editData.split("<li>")) {
-					String[] m = md.split(",");
-					
-					builder.addDetail(new StockActionDetail(Integer.parseInt(m[0]), Float.parseFloat(m[2]), Float.parseFloat(m[1])));
-
+				if(!editData.isEmpty()){
+					for (String md : editData.split("<li>")) {
+						String[] m = md.split(",");
+						
+						builder.addDetail(new StockActionDetail(Integer.parseInt(m[0]), Float.parseFloat(m[2]), Float.parseFloat(m[1])));
+	
+					}
 				}
+			
+				StockAction stockAction = builder.build();
 				//设置总额
-				builder.setInitActualPrice(builder.getTotalPrice());
+				builder.setInitActualPrice(stockAction.getTotalPrice());
 				
 				StockInitDao.insert(staff, builder);
 				jObject.initTip(true, "保存成功");				
-			}
+//			}
 
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
