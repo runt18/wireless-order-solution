@@ -33,11 +33,7 @@ define(function(require, exports, module){
 				
 				//充值按钮
 				self.find('[id="toRecharge_a_recharge"]').click(function(){
-					
-					if(!_isProcessing){
-						_isProcessing = true;
 						meberRechargeCheck(self);
-					}
 				});
 				
 				//取消按钮
@@ -199,32 +195,37 @@ define(function(require, exports, module){
 			
 			Util.LM.show();
 			
-			$.post('../OperateMember.do', {
-				dataSource : 'charge',
-				memberID : _rechargeMember.id,
-				rechargeMoney : rechargeMoney.val(),
-				rechargeType : rechargeType.val(),
-				payMannerMoney : payMannerMoney.val(),
-				isPrint : self.find('[id=printRecharge_checkbox_recharge]').attr('checked') ? true : false,
-				sendSms : self.find('[id=sendReChargeMsg_check_recharge]').attr('checked') ? true : false,
-				orientedPrinter : getcookie(document.domain + '_printers')
-			}, function(response){
-				Util.LM.hide();
-				if(response.success){
-					if(self.find('[id=sendReChargeMsg_check_recharge]').attr('checked')){
-						setcookie(document.domain+'_chargeSms', true);
+			if(!_isProcessing){
+				_isProcessing = true;
+				
+				$.post('../OperateMember.do', {
+					dataSource : 'charge',
+					memberID : _rechargeMember.id,
+					rechargeMoney : rechargeMoney.val(),
+					rechargeType : rechargeType.val(),
+					payMannerMoney : payMannerMoney.val(),
+					isPrint : self.find('[id=printRecharge_checkbox_recharge]').attr('checked') ? true : false,
+					sendSms : self.find('[id=sendReChargeMsg_check_recharge]').attr('checked') ? true : false,
+					orientedPrinter : getcookie(document.domain + '_printers')
+				}, function(response){
+					Util.LM.hide();
+					if(response.success){
+						if(self.find('[id=sendReChargeMsg_check_recharge]').attr('checked')){
+							setcookie(document.domain+'_chargeSms', true);
+						}else{
+							delcookie(document.domain+'_chargeSms');
+						}
+						_self.close();
+						//更新短信
+						Util.sys.checkSmStat();
+						Util.msg.tip(response.msg);
 					}else{
-						delcookie(document.domain+'_chargeSms');
-					}
-					_self.close();
-					//更新短信
-					Util.sys.checkSmStat();
-					Util.msg.tip(response.msg);
-				}else{
-					Util.msg.tip(response.msg);
-				}	
-				_isProcessing = false;
-			});
+						Util.msg.tip(response.msg);
+					}	
+					_isProcessing = false;
+				});
+				
+			}
 		}
 		
 		
