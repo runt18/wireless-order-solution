@@ -2239,13 +2239,27 @@ Ext.onReady(function(){
 			    		var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
 			    		stockTaskNavWin.hide();
 			    		if(sn){
-			    			var cols = [{name : '货品名称', dataIndex : 'materialName'},
+			    			$.ajax({
+			    				url : '../../QueryStockAction.do',
+			    				type : 'post',
+			    				data : {
+			    					id : sn.json.id,
+			    					containsDetails : true
+			    				},
+			    				dataType : 'json',
+			    				success : function(data){
+			    					if(data.success){
+			    						var cols = [{name : '货品名称', dataIndex : 'materialName'},
 			    						{name : '数量', dataIndex : 'amount'},
 			    						{name : '单价', dataIndex : 'price'},
 			    						{name : '总价', dataIndex : '', renderer : function(data){
 											return data.amount * data.price;			    						
 			    						}}];
-			    			Ext.ux.printContain(1, cols, sn.data.stockDetails, sn);
+			    						Ext.ux.printContain(1, cols, data.root[0].stockDetails, sn);
+			    					}
+			    				}
+			    			
+			    			});
 			    		}
 			    	}
 				},{
