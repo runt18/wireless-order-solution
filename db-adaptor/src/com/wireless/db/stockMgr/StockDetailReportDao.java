@@ -186,6 +186,13 @@ public class StockDetailReportDao {
 		return result;
 	}
 	
+	/**
+	 * get the sum of stockDetail by extraCond
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 */
 	public static StockDetailReport getSumByCond(Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try {
@@ -197,7 +204,7 @@ public class StockDetailReportDao {
 	}
 	
 	/**
-	 * 
+	 * get the sum of stockDetail by extraCond
 	 * @param dbCon
 	 * @param staff
 	 * @param extraCond
@@ -207,12 +214,12 @@ public class StockDetailReportDao {
 	public static StockDetailReport getSumByCond(DBCon dbCon,Staff staff, StockActionDetailDao.ExtraCond extraCond) throws SQLException{
 		String sql = " SELECT " + 
 					 " 0 " +
-					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.amount, 0)) AS stock_in_amount " +
-					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", SD.price * SD.amount, 0), 2)) AS stock_in_price " +
-					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.amount, 0)) AS stock_out_amount " +
-					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", SD.price * SD.amount, 0), 2)) AS stock_out_price " +
-					 " FROM " + Params.dbName + ".stock_action_detail SD" + 
-					 " JOIN " + Params.dbName + ".stock_action S ON SD.stock_action_id = S.id " +
+					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", D.amount, 0)) AS stock_in_amount " +
+					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_IN.getVal() + ", D.price * D.amount, 0), 2)) AS stock_in_price " +
+					 ", SUM(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", D.amount, 0)) AS stock_out_amount " +
+					 ", SUM(ROUND(IF(S.type = " + StockAction.Type.STOCK_OUT.getVal() + ", D.price * D.amount, 0), 2)) AS stock_out_price " +
+					 " FROM " + Params.dbName + ".stock_action_detail D" + 
+					 " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
 					 " WHERE 1 = 1 " + 
 					 " AND S.restaurant_id = " + staff.getRestaurantId() +
 					 (extraCond != null ? extraCond.toString() : "");
