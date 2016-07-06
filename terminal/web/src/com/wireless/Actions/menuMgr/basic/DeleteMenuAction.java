@@ -21,10 +21,15 @@ public class DeleteMenuAction extends Action {
 		
 		try {			
 			
-			String pin = (String)request.getAttribute("pin");
+			final String pin = (String)request.getAttribute("pin");
+			final String foodID = request.getParameter("foodID");
+			final String branchId = request.getParameter("branchId");
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String foodID = request.getParameter("foodID");
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			FoodDao.deleteById(staff, Integer.parseInt(foodID));
 			

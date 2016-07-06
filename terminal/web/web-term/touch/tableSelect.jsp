@@ -161,8 +161,6 @@
 		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
 			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a>添加会员</a></li>
-			<li class="popupButtonList" id="ajustPoint_a_tableSelect"><a>积分调整</a></li>
-			<li class="popupButtonList" id="takeMoney_a_tableSelect"><a>会员取款</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
 			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分兑换</a></li>
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
@@ -171,6 +169,8 @@
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
 			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
 			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
+			<li class="popupButtonList" id="ajustPoint_a_tableSelect"><a>积分调整</a></li>
+			<li class="popupButtonList" id="takeMoney_a_tableSelect"><a>会员取款</a></li>
 		</ul>
 	</div>	
 	

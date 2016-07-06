@@ -65,7 +65,15 @@ public class QueryKitchenAction extends DispatchAction {
 		final StringBuilder jsonSB = new StringBuilder();
 		try{
 			final String pin = (String)request.getAttribute("pin");
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			final String branchId = request.getParameter("branchId");
+			
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			List<DeptNode> depts = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asDeptNodes();
 			for (int i = 0; i < depts.size(); i++) {
@@ -128,12 +136,17 @@ public class QueryKitchenAction extends DispatchAction {
 	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		
 		final JObject jObject = new JObject();
 		final String flag = request.getParameter("flag");
 		try{
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}			
 			
 			final List<Kitchen> root = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asKitchenList();
 			if(root != null){

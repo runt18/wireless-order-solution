@@ -13,6 +13,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class UpdateFoodCombinationAction extends Action{
 
@@ -23,11 +24,18 @@ public class UpdateFoodCombinationAction extends Action{
 		JObject jobject = new JObject();
 		try{
 			
-			String pin = (String)request.getAttribute("pin");
+			final String pin = (String)request.getAttribute("pin");
 			
-			String foodID = request.getParameter("foodID");
-			String comboContent = request.getParameter("comboContent");
+			final String foodID = request.getParameter("foodID");
+			final String comboContent = request.getParameter("comboContent");
+			final String branchId = request.getParameter("branchId");
 			
+			Staff staff;		
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				staff = StaffDao.verify(Integer.parseInt(pin));
+			}		
 			
 			if(foodID == null || foodID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取菜品信息失败!");
@@ -44,7 +52,7 @@ public class UpdateFoodCombinationAction extends Action{
 					}
 				}
 			}
-			FoodDao.buildCombo(StaffDao.verify(Integer.parseInt(pin)), comboBuilder);
+			FoodDao.buildCombo(staff, comboBuilder);
 			jobject.initTip(true, "操作成功,已修改套菜关联信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();

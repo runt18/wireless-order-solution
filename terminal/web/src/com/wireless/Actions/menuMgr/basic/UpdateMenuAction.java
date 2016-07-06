@@ -50,10 +50,16 @@ public class UpdateMenuAction extends Action {
 		final String foodImage = request.getParameter("foodImage");
 		final String multiFoodPrices = request.getParameter("multiFoodPrices");
 		
+		final String branchId = request.getParameter("branchId");
+		
 		final JObject jObject = new JObject();
 		try {
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			final Food.UpdateBuilder builder = new Food.UpdateBuilder(Integer.parseInt(foodId));
 			

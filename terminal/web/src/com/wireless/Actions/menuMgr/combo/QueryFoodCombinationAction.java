@@ -13,6 +13,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryFoodCombinationAction extends Action{
 
@@ -21,10 +22,18 @@ public class QueryFoodCombinationAction extends Action{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
+			final String pin = (String)request.getAttribute("pin");
+			final String foodID = request.getParameter("foodID");
+			final String branchId = request.getParameter("branchId");
 			
-			String foodID = request.getParameter("foodID");
-			Food food = FoodDao.getById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(foodID));
+			Staff staff;		
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}else{
+				staff = StaffDao.verify(Integer.parseInt(pin));
+			}		
+			
+			Food food = FoodDao.getById(staff, Integer.parseInt(foodID));
 			
 			jobject.setRoot(food.getChildFoods());
 		}catch(BusinessException e){

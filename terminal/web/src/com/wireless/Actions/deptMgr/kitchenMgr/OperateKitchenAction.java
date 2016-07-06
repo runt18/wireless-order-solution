@@ -74,12 +74,18 @@ public class OperateKitchenAction extends DispatchAction{
 		
 		final String kitchenA = request.getParameter("kitchenA");
 		final String kitchenB = request.getParameter("kitchenB");
-		
+		final String branchId = request.getParameter("branchId");
 		final String pin = (String) request.getAttribute("pin");
 		final JObject jobject = new JObject();
 		
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			final Kitchen.MoveBuilder builder = new MoveBuilder(Integer.parseInt(kitchenA), Integer.parseInt(kitchenB));
 			KitchenDao.move(staff, builder);
 		}catch(BusinessException | SQLException e){
@@ -109,10 +115,20 @@ public class OperateKitchenAction extends DispatchAction{
 		final String kitchenName = request.getParameter("kitchenName");
 		final String deptID = request.getParameter("deptID");
 		final String isAllowTemp = request.getParameter("isAllowTemp");
-		final String pin = (String) request.getAttribute("pin");		
+		final String pin = (String) request.getAttribute("pin");	
+		final String branchId = request.getParameter("branchId");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+		
+		
+		
 		try{
 			
-			KitchenDao.add(StaffDao.verify(Integer.parseInt(pin)), 
+			KitchenDao.add(staff, 
 							 new Kitchen.AddBuilder(kitchenName, Department.DeptId.valueOf(Integer.parseInt(deptID)))
 								.setAllowTmp(Boolean.parseBoolean(isAllowTemp)));
 			
@@ -145,10 +161,18 @@ public class OperateKitchenAction extends DispatchAction{
 		final String deptId = request.getParameter("deptID");
 		final String isAllowTemp = request.getParameter("isAllowTemp");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+		
 		
 		try{
 			
-			KitchenDao.update(StaffDao.verify(Integer.parseInt(pin)), 
+			KitchenDao.update(staff, 
 							 new UpdateBuilder(Integer.valueOf(kitchenId))
 									.setName(kitchenName)
 									.setDeptId(Department.DeptId.valueOf(Integer.parseInt(deptId)))
@@ -180,10 +204,17 @@ public class OperateKitchenAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		final String kitchenId = request.getParameter("kitchenID");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		
 		try{
 			
-			KitchenDao.remove(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(kitchenId));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			KitchenDao.remove(staff, Integer.parseInt(kitchenId));
 			
 			jobject.initTip(true, "操作成功,已修改厨房信息.");
 		}catch(BusinessException | SQLException e){

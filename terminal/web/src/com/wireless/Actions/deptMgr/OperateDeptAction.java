@@ -94,12 +94,16 @@ public class OperateDeptAction extends DispatchAction{
 		
 		final String deptA = request.getParameter("deptA");
 		final String deptB = request.getParameter("deptB");
-		
+		final String branchId = request.getParameter("branchId");
 		final String pin = (String) request.getAttribute("pin");
 		
 		JObject jobject = new JObject();
 		try{
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			final Department.MoveBuilder builder = new MoveBuilder(Integer.parseInt(deptA), Integer.parseInt(deptB));
 			
@@ -129,9 +133,18 @@ public class OperateDeptAction extends DispatchAction{
 	public ActionForward addDept(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String deptName = request.getParameter("deptName");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
 		final JObject jObject = new JObject();
 		try{
-			DepartmentDao.add(StaffDao.verify(Integer.parseInt(pin)), new AddBuilder(deptName));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			DepartmentDao.add(staff, new AddBuilder(deptName));
 			jObject.initTip(true, "添加部门成功");
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
@@ -159,9 +172,18 @@ public class OperateDeptAction extends DispatchAction{
 		final String deptId = request.getParameter("deptID");
 		final String deptName = request.getParameter("deptName");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
+		
 		final JObject jObject = new JObject();
 		try{
-			DepartmentDao.update(StaffDao.verify(Integer.parseInt(pin)), 
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			DepartmentDao.update(staff, 
 					new Department.UpdateBuilder(Department.DeptId.valueOf(Integer.parseInt(deptId)), deptName));
 			jObject.initTip(true, "修改部门成功");
 		}catch(BusinessException | SQLException e){
@@ -189,9 +211,16 @@ public class OperateDeptAction extends DispatchAction{
 	public ActionForward removeDept(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String deptId = request.getParameter("deptID");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
 		final JObject jObject = new JObject();
 		try{
-			DepartmentDao.remove(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(deptId));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			DepartmentDao.remove(staff, Integer.parseInt(deptId));
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jObject.initTip(e);
