@@ -31,10 +31,18 @@ public class OperatePricePlanAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String name = request.getParameter("name");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
 		
 		final JObject jObject = new JObject();
 		try{
-			PricePlanDao.insert(StaffDao.verify(Integer.parseInt(pin)), new PricePlan.InsertBuilder(name));
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			PricePlanDao.insert(staff, new PricePlan.InsertBuilder(name));
 			jObject.initTip(true, "添加成功");
 		}catch(BusinessException | SQLException e){
 			jObject.initTip(e);
@@ -62,10 +70,18 @@ public class OperatePricePlanAction extends DispatchAction{
 		final String id = request.getParameter("id");
 		final String name = request.getParameter("name");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
+		
 		
 		final JObject jObject = new JObject();
 		try{
-			PricePlanDao.update(StaffDao.verify(Integer.parseInt(pin)), new PricePlan.UpdateBuilder(Integer.parseInt(id)).setName(name));
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			PricePlanDao.update(staff, new PricePlan.UpdateBuilder(Integer.parseInt(id)).setName(name));
 			jObject.initTip(true, "修改成功");
 		}catch(BusinessException | SQLException e){
 			jObject.initTip(e);
@@ -92,10 +108,17 @@ public class OperatePricePlanAction extends DispatchAction{
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String id = request.getParameter("id");
 		final String pin = (String) request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		
 		final JObject jObject = new JObject();
 		try{
-			PricePlanDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(id));
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			PricePlanDao.deleteById(staff, Integer.parseInt(id));
 			jObject.initTip(true, "删除成功");
 		}catch(BusinessException | SQLException e){
 			jObject.initTip(e);
@@ -123,6 +146,7 @@ public class OperatePricePlanAction extends DispatchAction{
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
 		final String id = request.getParameter("pricePlanId");
+		
 		final JObject jObject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

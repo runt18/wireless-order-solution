@@ -97,9 +97,9 @@ public class OperateImageAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		String pin = (String)request.getAttribute("pin");
+		final String pin = (String)request.getAttribute("pin");
+		final String branchId = request.getParameter("branchId");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		
 		JObject jobject = new JObject();
 		
 		String foodId = request.getParameter("foodId");
@@ -108,6 +108,10 @@ public class OperateImageAction extends DispatchAction{
 		builder.setImage(null);
 		
 		try{
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			FoodDao.update(staff, builder);
 			jobject.initTip(true, "图片删除成功");
 		}catch(SQLException e){

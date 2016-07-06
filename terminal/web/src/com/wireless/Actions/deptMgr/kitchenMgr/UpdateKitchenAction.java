@@ -15,6 +15,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.Kitchen.MoveBuilder;
 import com.wireless.pojo.menuMgr.Kitchen.UpdateBuilder;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class UpdateKitchenAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -23,15 +24,22 @@ public class UpdateKitchenAction extends Action {
 		JObject jobject = new JObject();
 		
 		try{
-			String kitchenID = request.getParameter("kitchenID");
-			String kitchenName = request.getParameter("kitchenName");
-			String deptID = request.getParameter("deptID");
-			String isAllowTemp = request.getParameter("isAllowTemp");
-			String pin = (String) request.getAttribute("pin");
-			String move = request.getParameter("move");
-			String kitchenB = request.getParameter("kitchenB");
+			final String kitchenID = request.getParameter("kitchenID");
+			final String kitchenName = request.getParameter("kitchenName");
+			final String deptID = request.getParameter("deptID");
+			final String isAllowTemp = request.getParameter("isAllowTemp");
+			final String pin = (String) request.getAttribute("pin");
+			final String move = request.getParameter("move");
+			final String kitchenB = request.getParameter("kitchenB");
+			final String branchId = request.getParameter("branchId");
 			
-			KitchenDao.update(StaffDao.verify(Integer.parseInt(pin)), 
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
+			KitchenDao.update(staff, 
 							 new UpdateBuilder(Integer.valueOf(kitchenID))
 									.setName(kitchenName)
 									.setDeptId(Department.DeptId.valueOf(Integer.parseInt(deptID)))

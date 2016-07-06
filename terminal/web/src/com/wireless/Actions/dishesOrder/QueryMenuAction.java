@@ -330,9 +330,15 @@ public class QueryMenuAction extends DispatchAction {
 		JObject jobject = new JObject();
 		List<Jsonable> root = new ArrayList<Jsonable>();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String foodId = request.getParameter("foodId");
+			final String pin = (String)request.getAttribute("pin");
+			final String foodId = request.getParameter("foodId");
+			final String branchId = request.getParameter("branchId");
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			FoodDao.ExtraCond4Price extraCond = new FoodDao.ExtraCond4Price(new Food(Integer.parseInt(foodId)));
 			
 			final Map<PricePlan, Float> map = FoodDao.getPricePlan(staff, extraCond);
@@ -375,9 +381,16 @@ public class QueryMenuAction extends DispatchAction {
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			String foodId = request.getParameter("foodId");
+			final String pin = (String)request.getAttribute("pin");
+			final String foodId = request.getParameter("foodId");
+			final String branchId = request.getParameter("branchId");
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
+			
 			Food food = FoodDao.getById(staff, Integer.parseInt(foodId));
 			
 			List<FoodUnit> units = food.getFoodUnits();

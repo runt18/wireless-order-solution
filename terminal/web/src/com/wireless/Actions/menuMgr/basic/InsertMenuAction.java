@@ -46,12 +46,17 @@ public class InsertMenuAction extends Action {
 		final String split = request.getParameter("split");
 		final String commission = request.getParameter("commission");
 		final String multiFoodPrices = request.getParameter("multiFoodPrices");
+		final String branchId = request.getParameter("branchId");
 		
 		final JObject jObject = new JObject();
 				
 		try {
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			if(branchId != null && !branchId.isEmpty()){
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+			}
 			
 			final Food.InsertBuilder builder = new Food.InsertBuilder(foodName, Float.parseFloat(foodPrice), new Kitchen(Integer.parseInt(kitchenId)));
 			
