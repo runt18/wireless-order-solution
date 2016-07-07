@@ -1014,7 +1014,7 @@ public class StockActionDao {
 			List<MaterialDept> materialDepts;
 			Material material;
 			//判断是库单是什么类型的
-			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL && updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
+			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				deptInId = updateStockAction.getDeptIn().getId();
 
 				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);

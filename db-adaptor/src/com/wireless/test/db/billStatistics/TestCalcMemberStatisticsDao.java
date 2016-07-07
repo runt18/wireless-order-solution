@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -23,11 +24,16 @@ public class TestCalcMemberStatisticsDao {
 	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException, ParseException{
 		TestInit.init();
 		 mStaff = StaffDao.getAdminByRestaurant(40);
-		 mDutyRange = new DutyRange("2015-7-3", "2015-7-4"); 
+		 mDutyRange = new DutyRange("2015-7-3", "2016-7-4"); 
 	}
 	
 	@Test 
 	public void test() throws BusinessException, SQLException, ParseException{
-		System.out.println(CalcMemberStatisticsDao.calcStatisticsByEachDay(mStaff, mDutyRange, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY)));
+		System.out.println(CalcMemberStatisticsDao.calcStatisticsByEachDay(mStaff, mDutyRange, new MemberOperationDao.ExtraCond(DateType.HISTORY)));
+	}
+	
+	@Test
+	public void testCalcByEachMember() throws SQLException, BusinessException{
+		System.out.println(CalcMemberStatisticsDao.calcByEachMember(mStaff, new MemberOperationDao.ExtraCond(DateType.HISTORY).setOperateDate(mDutyRange)));
 	}
 }

@@ -170,6 +170,15 @@ public class WxRestaurantDao {
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 		}
 		
+		//Associated with the wx card image.
+		if(builder.isWxCardImgIdChange()){
+			try{
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(wr.getWxCardImg().getId()).setSingleAssociated(OssImage.Type.WX_CARD, staff.getRestaurantId()));
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		
 		//Associated with the logo oss image.
 		if(builder.isWeixinLogoChanged()){
 			try{
@@ -322,12 +331,12 @@ public class WxRestaurantDao {
 		
 		for(WxRestaurant wxRestaurant : result){
 			if(wxRestaurant.getWxCardImg() != null){
-//				try {
+				try {
 				wxRestaurant.setWxCardImg(OssImageDao.getById(dbCon, staff, wxRestaurant.getWxCardImg().getId()));
-//				} catch (BusinessException e) {
-//					e.printStackTrace();
-//					wxRestaurant.setWxCardImg(null);
-//				}
+				} catch (BusinessException e) {
+					e.printStackTrace();
+					wxRestaurant.setWxCardImg(null);
+				}
 			}
 		}
 		

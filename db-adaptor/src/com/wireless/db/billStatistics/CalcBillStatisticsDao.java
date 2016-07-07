@@ -15,6 +15,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
 import com.wireless.db.book.BookDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.orderMgr.PayTypeDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.ShiftDao;
@@ -1416,7 +1417,7 @@ public class CalcBillStatisticsDao {
 					income.setIncomeByService(calcServicePrice(dbCon, staff, extraCond));
 					
 					//Get the charge income by both cash and credit card
-					income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY).setStaff(extraCond.staffId)));
+					income.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.HISTORY).setOperateDate(range).setStaff(extraCond.staffId)));
 					
 				}
 				result.add(income);
