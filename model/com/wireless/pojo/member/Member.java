@@ -11,6 +11,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.member.MemberOperation.OperationType;
@@ -522,6 +523,55 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		
 		public int getMemberId(){
 			return this.memberId;
+		}
+	}
+	
+	public static class ConsumeBuilder{
+		private final int memberId;
+		private float consumePrice;
+		private float extraPrice;
+		private PayType payType;
+		private final int orderId;
+		
+		public ConsumeBuilder(Member member, Order order){
+			this.memberId = member.getId();
+			this.orderId = order.getId();
+		}
+		
+		public ConsumeBuilder(int memberId, int orderId){
+			this.memberId = memberId;
+			this.orderId = orderId;
+		}
+		
+		public ConsumeBuilder setPrice(PayType payType, float consumePrice, float extraPrice){
+			this.payType = payType;
+			this.consumePrice = consumePrice;
+			this.extraPrice = extraPrice;
+			return this;
+		}
+
+		public ConsumeBuilder setPrice(PayType payType, float consumePrice){
+			return setPrice(payType, consumePrice, 0);
+		}
+		
+		public int getMemberId(){
+			return this.memberId;
+		}
+		
+		public float getConsumePrice(){
+			return this.consumePrice;
+		}
+		
+		public float getExtraPrice(){
+			return this.extraPrice;
+		}
+		
+		public int getOrderId(){
+			return this.orderId;
+		}
+		
+		public PayType getPayType(){
+			return this.payType;
 		}
 	}
 	
