@@ -2826,7 +2826,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setMemberType(Integer.parseInt(memberType));
 		}
 		if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-			extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
+			extraCond.setOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
 		}else{
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
@@ -3145,7 +3145,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setMemberType(Integer.parseInt(memberType));
 		}
 		if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-			extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
+			extraCond.setOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
 		}else{
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
@@ -3450,7 +3450,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		//如果没选择小分类,则选择所有的小分类
 		if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-			extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
+			extraCond.setOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
 		}else{
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 				for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){

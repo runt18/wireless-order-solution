@@ -113,11 +113,7 @@ public class QueryMemberOperationAction extends Action{
 			}
 			
 			if(fuzzy != null && !fuzzy.trim().isEmpty()){
-				List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null);
-				extraCond.addMember(-1);
-				for (Member member : members) {
-					extraCond.addMember(member);
-				}
+				extraCond.setFuzzy(fuzzy);
 			}
 			
 			if(minDeltaCharge != null && !minDeltaCharge.isEmpty()){
@@ -153,7 +149,7 @@ public class QueryMemberOperationAction extends Action{
 			}
 			//如果没选择小分类,则选择所有的小分类
 			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
-				extraCond.addOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
+				extraCond.setOperationType(OperationType.valueOf(Integer.parseInt(detailOperate)));
 			}else{
 				if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
 					for(OperationType type : OperationType.typeOf(OperationCate.valueOf(Integer.parseInt(operateType)))){
@@ -166,9 +162,8 @@ public class QueryMemberOperationAction extends Action{
 				if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
 					extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 				}
-				jObject.setTotalProperty(MemberOperationDao.getAmountByCond(staff, extraCond));
+				jObject.setTotalProperty(MemberOperationDao.getByCond(staff, ((MemberOperationDao.ExtraCond)extraCond.clone()).setOnlyAmount(true), null).size());
 				
-//				orderClause += " LIMIT " + start + "," + limit;
 			}
 			
 			List<MemberOperation> list = MemberOperationDao.getByCond(staff, extraCond, null);
