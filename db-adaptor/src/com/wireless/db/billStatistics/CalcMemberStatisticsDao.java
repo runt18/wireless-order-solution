@@ -281,7 +281,7 @@ public class CalcMemberStatisticsDao {
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.REFUND.getValue() + " ,TMP.delta_extra_money, 0)) AS refund_money " +
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " OR TMP.operate_type = " + MemberOperation.OperationType.RE_CONSUME.getValue() + " ,TMP.delta_base_money, 0)) AS consume_base " +
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " OR TMP.operate_type = " + MemberOperation.OperationType.RE_CONSUME.getValue() + " ,TMP.delta_extra_money, 0)) AS consume_extra " +
-			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " OR TMP.operate_type = " + MemberOperation.OperationType.RE_CONSUME.getValue() + " ,TMP.delta_base_money + TMP.delta_extra_money, 0)) AS consume_total " +
+			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " OR TMP.operate_type = " + MemberOperation.OperationType.RE_CONSUME.getValue() + " ,TMP.pay_money, 0)) AS consume_total " +
 			  " ,SUM(IF(TMP.delta_point <> 0 " + " ,TMP.delta_point, 0)) AS changed_point " +
 			  " FROM ( " + MemberOperationDao.makeSql(staff, extraCond, null) + " ) AS TMP " +
 			  " GROUP BY TMP.member_id "; 
@@ -300,7 +300,7 @@ public class CalcMemberStatisticsDao {
 			//充值实收
 			summary.setChargeActual(dbCon.rs.getFloat("charge_actual"));
 			//充值实充
-			summary.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+			summary.setChargeMoney(dbCon.rs.getFloat("charge_money") + dbCon.rs.getFloat("charge_actual"));
 			//取款实退
 			summary.setRefundActual(dbCon.rs.getFloat("refund_actual"));
 			//取款实扣

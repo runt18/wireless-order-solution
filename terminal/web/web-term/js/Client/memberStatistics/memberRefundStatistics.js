@@ -178,6 +178,7 @@ Ext.onReady(function(){
 			}
 		});
 		mrs_search_memberName = new Ext.form.TextField({
+			id : 'mrs_search_memberName',
 			xtype : 'textfield',
 			width : 100
 			

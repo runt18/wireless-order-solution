@@ -3282,6 +3282,7 @@ Ext.onReady(function(){
 		
 		//门店选择
 		var branch_combo_memberMgrMain = new Ext.form.ComboBox({
+			id: 'branch_combo_memberMgrMain',
 			readOnly : false,
 			forceSelection : true,
 			width : 123,
@@ -3604,7 +3605,6 @@ Ext.onReady(function(){
 		    		
 		    		memberBasicGridExcavateMemberTbar.show();
 		    		memberBasicGridSortTbar.show();
-		    		
 		    		
 		    		memberBasicGrid.syncSize(); //强制计算高度
 		    		memberBasicGrid.doLayout();//重新布局 	

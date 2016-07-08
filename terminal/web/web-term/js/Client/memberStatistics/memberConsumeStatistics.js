@@ -148,6 +148,7 @@ Ext.onReady(function(){
 			}
 		});
 		mcus_search_onDuty = new Ext.form.DateField({
+			id : 'mcus_search_onDuty',
 			xtype : 'datefield',
 			width : 100,
 			format : 'Y-m-d',
@@ -158,6 +159,7 @@ Ext.onReady(function(){
 			allowBlank : false
 		});
 		mcus_search_offDuty = new Ext.form.DateField({
+			id : 'mcus_search_offDuty',
 			xtype : 'datefield',
 			width : 100,
 			format : 'Y-m-d',
@@ -175,6 +177,7 @@ Ext.onReady(function(){
 			}
 		});
 		mcus_search_memberName = new Ext.form.TextField({
+			id : 'mcus_search_memberName',
 			xtype : 'textfield',
 			width : 100
 			

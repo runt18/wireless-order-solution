@@ -87,7 +87,7 @@ public class OperateMemberOperationAction extends DispatchAction{
 			staff = StaffDao.verify(Integer.parseInt(pin));
 			
 
-			if(branchId != null && !branchId.isEmpty()){
+			if(branchId != null && !branchId.isEmpty() && Integer.valueOf(branchId) > 0){
 				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
 			}
 			
@@ -97,7 +97,7 @@ public class OperateMemberOperationAction extends DispatchAction{
 				extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
 			}
 			
-			if(memberTypeId != null && !memberTypeId.isEmpty()){
+			if(memberTypeId != null && !memberTypeId.isEmpty() && Integer.valueOf(memberTypeId) > 0){
 				extraCond.setMemberType(Integer.parseInt(memberTypeId));
 			}
 			
