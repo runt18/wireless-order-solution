@@ -147,7 +147,6 @@ Ext.onReady(function(){
 						}
 						memberType_combo_summary.store.loadData(jr);
 						memberType_combo_summary.setValue(-1);
-						
 					},
 					failure : function(res, opt){
 						memberType_combo_summary.store.loadData({root:[{typeId:-1, name:'全部'}]});
@@ -155,7 +154,10 @@ Ext.onReady(function(){
 					}
 				});
 				
-				Ext.getCmp('summary_search').handler();
+				setTimeout(function(){
+					Ext.getCmp('summary_search').handler();
+				}, 200);
+				
 			}
 		}
 	});	
@@ -210,7 +212,7 @@ Ext.onReady(function(){
 					start : 0,
 					limit : 20
 				}
-			})
+			});
 		
 		}
 	}, {
@@ -254,12 +256,14 @@ Ext.onReady(function(){
 	 	{header : '充值实充', dataIndex : 'chargeMoney', renderer : memberCharge},
 	 	{header : '取款实退', dataIndex : 'refundActual', renderer : memberRefund},
 	 	{header : '取款实扣', dataIndex : 'refundMoney', renderer : memberRefund},
-	 	{header : '消费基础扣额', dataIndex : 'consumeBase', renderer : memberConsume},
-	 	{header : '消费赠送扣额', dataIndex : 'consumeExtra', renderer : memberConsume},
+	 	{header : '基础账户消费', dataIndex : 'consumeBase', renderer : memberConsume},
+	 	{header : '赠送账户消费', dataIndex : 'consumeExtra', renderer : memberConsume},
 	 	{header : '消费额', dataIndex : 'consumeTotal', renderer : memberConsume},
-	 	{header : '剩余金额', dataIndex : 'remainingBalance'},
-	 	{header : '积分变动', dataIndex : 'changedPoint', renderer : changePoint},
-	 	{header : '剩余积分', dataIndex : 'remainingPoint', renderer : changePoint}
+	 	{header : '基础账户剩余金额', dataIndex : 'deltaBase'},
+	 	{header : '赠送账户剩余金额', dataIndex : 'deltaExtra'},
+	 	{header : '剩余金额', dataIndex : 'remainingBalance'}
+//	 	{header : '积分变动', dataIndex : 'changedPoint', renderer : changePoint},
+//	 	{header : '剩余积分', dataIndex : 'remainingPoint', renderer : changePoint}
 	]);
 	
 	//默认排序
@@ -279,9 +283,11 @@ Ext.onReady(function(){
 			{name : 'consumeBase'},
 			{name : 'consumeExtra'},
 			{name : 'consumeTotal'},
-			{name : 'remainingBalance'},
-			{name : 'changedPoint'},
-			{name : 'remainingPoint'}
+			{name : 'deltaBase'},
+			{name : 'deltaExtra'},
+			{name : 'remainingBalance'}
+//			{name : 'changedPoint'},
+//			{name : 'remainingPoint'}
 		])
 	});
 	
@@ -314,18 +320,27 @@ Ext.onReady(function(){
 		key : Ext.EventObject.ENTER,
 		scope : this,
 		fn : function(){
-			//TODO
+			Ext.getCmp('summary_search').handler();
 		}
 	}];
 	
 	summaryGrid.getStore().on('load', function(store, records, options){
-		if(records.length > 0){
-			//会员姓名、会员手机、会员卡号点击事件
-			$('#divMemberSummaryStatistics').find('.memberFuzzy').each(function(index, element){
-				element.onclick = function(){
-					linkMemberStatistics('memberFuzzy', $(element).attr('value'));
-				}
-			});	
+		if(store.getCount() > 0){
+			var sumRow = summaryGrid.getView().getRow(store.getCount() - 1);
+			sumRow.style.backgroundColor = '#EEEEEE';
+			
+			for(var i = 0; i < summaryGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = summaryGrid.getView().getCell(store.getCount() -1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color= 'green';
+			}
+			
+			summaryGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			summaryGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			summaryGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			
+			
 			
 			//充值
 			$('#divMemberSummaryStatistics').find('.memberCharge').each(function(index, element){
@@ -345,13 +360,6 @@ Ext.onReady(function(){
 			$('#divMemberSummaryStatistics').find('.memberConsume').each(function(index, element){
 				element.onclick = function(){
 					linkMemberStatistics('memberConsume', $(element).attr('value'));
-				}
-			});
-			
-			//积分
-			$('#divMemberSummaryStatistics').find('.changePoint').each(function(index, element){
-				element.onclick = function(){
-					linkMemberStatistics('changePoint', $(element).attr('value'));
 				}
 			});
 			
@@ -380,33 +388,43 @@ Ext.onReady(function(){
 	dataCombo.setValue(1);
 	dataCombo.fireEvent('select', dataCombo, null, 1);
 	
-	//会员姓名、会员手机、会员卡号
+	//会员卡号/手机号/姓名
 	function memberFuzzy(value, object, store){
 		if(value == ''){
 			return '无'
 		}else{
-			return '<a class="memberFuzzy" value="'+ value +'">'+ value +'</a>';
+			return value;
 		}
 	}
 	
 	//充值
-	function memberCharge(value, object, store){
-		return '<a class="memberCharge" value="'+ store.json.member.name +'">'+ value + '</a>';	
+	function memberCharge(value, object, store, index){
+		if(!(summaryGrid.getStore().getCount() -1 == index)){
+			return '<a class="memberCharge" value="'+ store.json.member.name +'">'+ value + '</a>';	
+		}else{
+			return value;
+		}
+		
 	}
 	
 	//取款
-	function memberRefund(value, object, store){
-		return '<a class="memberRefund" value="'+ store.json.member.name +'">'+ value + '</a>';	
+	function memberRefund(value, object, store, index){
+		if(!(summaryGrid.getStore().getCount() -1 == index)){
+			return '<a class="memberRefund" value="'+ store.json.member.name +'">'+ value + '</a>';	
+		}else{
+			return value;
+		}
+		
 	}
 	
 	//消费
-	function memberConsume(value, object, store){
-		return '<a class="memberConsume" value="'+ store.json.member.name +'">'+ value + '</a>';	
-	}
-	
-	//积分
-	function changePoint(value, object, store){
-		return '<a class="changePoint" value="'+ store.json.member.name +'">'+ value + '</a>';	
+	function memberConsume(value, object, store, index){
+		if(!(summaryGrid.getStore().getCount() -1 == index)){
+			return '<a class="memberConsume" value="'+ store.json.member.name +'">'+ value + '</a>';	
+		}else{
+			return value;
+		}
+		
 	}
 	
 	//跳转
@@ -421,31 +439,7 @@ Ext.onReady(function(){
 			msg : '正在获取数据...'
 		});
 		
-		if(type == 'memberFuzzy'){////会员姓名、会员手机、会员卡号
-			Ext.ux.addTab('memberMgrMain', '会员管理', 'Client_Module/MemberManagement.html', function(){
-				memberSummaryLoading.show();
-				(function(){
-					if(!Ext.getCmp('member_btnHeightSearch').hidden){
-						Ext.getCmp('member_btnHeightSearch').handler();
-					}
-					
-					if(branchId != -1){
-						Ext.getCmp('branch_combo_memberMgrMain').setValue(branchId);	
-					}else{
-						Ext.getCmp('branch_combo_memberMgrMain').setValue(null);	
-					}
-					
-					Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').setValue(memberFuzzy);
-					
-					setTimeout(function(){
-						Ext.getCmp('searchMember_btn_member').handler();
-					}, 200);
-					
-					memberSummaryLoading.hide();
-				})();
-			});
-			
-		}else if(type == 'memberCharge'){//充值
+		if(type == 'memberCharge'){//充值
 			Ext.ux.addTab('memberChargeStatistics', '充值统计', 'Client_Module/memberChargeStatistics.html', function(){
 				memberSummaryLoading.show();
 				(function(){
@@ -496,22 +490,6 @@ Ext.onReady(function(){
 					Ext.getCmp('branch_combo_memberConsume').setValue(branchId);	
 					
 					Ext.getCmp('memberConsume_btn_search').handler();
-					memberSummaryLoading.hide();
-					
-				})();
-			});
-		}else if(type = "changePoint"){//积分
-			Ext.ux.addTab('pointConsumeStatistics', '积分统计', 'Client_Module/pointConsumeStatistics.html', function(){
-				memberSummaryLoading.show();
-				(function(){
-					Ext.getCmp('beginDate_combo_pointConsumeStatistics').setValue(beginDate);
-					Ext.getCmp('endDate_combo_pointConsumeStatistics').setValue(endDate);	
-									
-					Ext.getCmp('pointMember_textfield_point').setValue(memberFuzzy);
-					
-					Ext.getCmp('branch_combo_point').setValue(branchId);	
-					
-					Ext.getCmp('search_btn_point').handler();
 					memberSummaryLoading.hide();
 					
 				})();

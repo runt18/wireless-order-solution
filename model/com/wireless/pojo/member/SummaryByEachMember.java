@@ -20,6 +20,8 @@ public class SummaryByEachMember implements Jsonable {
 	private float remainingBalance;	// 剩余金额
 	private int changedPoint;		// 变动积分
 	private int remainingPoint;		// 剩余积分
+	private float deltaBase;        //基础账户余额
+	private float deltaExtra;       //赠送账户余额
 	
 	public long getStartDate() {
 		return startDate;
@@ -27,6 +29,22 @@ public class SummaryByEachMember implements Jsonable {
 
 	public void setStartDate(long startDate) {
 		this.startDate = startDate;
+	}
+	
+	public float getDeltaBase() {
+		return deltaBase;
+	}
+
+	public void setDeltaBase(float deltaBase) {
+		this.deltaBase = deltaBase;
+	}
+
+	public float getDeltaExtra() {
+		return deltaExtra;
+	}
+
+	public void setDeltaExtra(float deltaExtra) {
+		this.deltaExtra = deltaExtra;
 	}
 
 	public long getEndDate() {
@@ -147,10 +165,11 @@ public class SummaryByEachMember implements Jsonable {
 		jm.putFloat("consumeExtra", this.consumeExtra);
 		jm.putFloat("consumeTotal", this.consumeTotal);
 		jm.putFloat("remainingBalance", this.remainingBalance);
+		jm.putFloat("deltaBase", this.deltaBase);
+		jm.putFloat("deltaExtra", this.deltaExtra);
 		jm.putInt("changedPoint", this.changedPoint);
 		jm.putInt("remainingPoint", this.remainingPoint);
 		jm.putJsonable("member", this.member, 0);			
-		
 		return jm;
 	}
 

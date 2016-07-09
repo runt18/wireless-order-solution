@@ -20,6 +20,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.SummaryByEachMember;
 import com.wireless.pojo.staffMgr.Staff;
@@ -85,13 +86,12 @@ public class OperateMemberOperationAction extends DispatchAction{
 		Staff staff;
 		try {
 			staff = StaffDao.verify(Integer.parseInt(pin));
-			
 
-			if(branchId != null && !branchId.isEmpty() && Integer.valueOf(branchId) > 0){
-				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
-			}
-			
 			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);;
+			
+			if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
+				extraCond.setBranch(Integer.parseInt(branchId));
+			}
 			
 			if(onDuty != null && !onDuty.isEmpty() && offDuty != null && !offDuty.isEmpty()){
 				extraCond.setOperateDate(new DutyRange(onDuty, offDuty));
@@ -107,12 +107,34 @@ public class OperateMemberOperationAction extends DispatchAction{
 			
 			final List<SummaryByEachMember> list = CalcMemberStatisticsDao.calcByEachMember(staff, extraCond);
 			
-			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-				jObject.setTotalProperty(CalcMemberStatisticsDao.calcByEachMember(staff, extraCond).size());
-				
-				List<SummaryByEachMember> limitResult = DataPaging.getPagingData(list, true, start, limit);
-				
-				jObject.setRoot(limitResult);
+			if(!list.isEmpty()){
+				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+					jObject.setTotalProperty(CalcMemberStatisticsDao.calcByEachMember(staff, extraCond).size());
+					
+					SummaryByEachMember sm = new SummaryByEachMember();
+					for(SummaryByEachMember s : list){
+						sm.setChargeActual(sm.getChargeActual() + s.getChargeActual());
+						sm.setChargeMoney(sm.getChargeMoney() + s.getChargeMoney());
+						sm.setRefundActual(sm.getRefundActual() + s.getRefundActual());
+						sm.setRefundMoney(sm.getRefundMoney() + s.getRefundMoney());
+						sm.setConsumeBase(sm.getConsumeBase() + s.getConsumeBase());
+						sm.setConsumeExtra(sm.getConsumeExtra() + s.getConsumeExtra());
+						sm.setConsumeTotal(sm.getConsumeTotal() + s.getConsumeTotal());
+						sm.setRemainingBalance(sm.getRemainingBalance() + s.getRemainingBalance());
+						sm.setChangedPoint(sm.getChangedPoint() + s.getChangedPoint());
+						sm.setRemainingPoint(sm.getRemainingPoint() + s.getRemainingPoint());
+						sm.setDeltaBase(sm.getDeltaBase() + s.getDeltaBase());
+						sm.setDeltaExtra(sm.getDeltaExtra() + s.getDeltaExtra());
+						sm.setMember(new Member(0));
+					}
+					
+					List<SummaryByEachMember> limitResult = DataPaging.getPagingData(list, true, start, limit);
+					limitResult.add(sm);
+					
+					jObject.setRoot(limitResult);
+				}else{
+					jObject.setRoot(list);
+				}
 			}else{
 				jObject.setRoot(list);
 			}

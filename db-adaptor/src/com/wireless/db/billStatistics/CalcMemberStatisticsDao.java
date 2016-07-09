@@ -322,6 +322,10 @@ public class CalcMemberStatisticsDao {
 			if(dbCon.rs.next()){
 				//剩余金额
 				summary.setRemainingBalance(dbCon.rs.getFloat("remaining_base_money") + dbCon.rs.getFloat("remaining_extra_money"));
+				//基础剩余余额
+				summary.setDeltaBase(dbCon.rs.getFloat("remaining_base_money"));
+				//赠送剩余余额
+				summary.setDeltaExtra(dbCon.rs.getFloat("remaining_extra_money"));
 				//剩余积分
 				summary.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			}
