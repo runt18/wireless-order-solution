@@ -261,9 +261,9 @@ Ext.onReady(function(){
 	 	{header : '消费额', dataIndex : 'consumeTotal', renderer : memberConsume},
 	 	{header : '基础账户剩余金额', dataIndex : 'deltaBase'},
 	 	{header : '赠送账户剩余金额', dataIndex : 'deltaExtra'},
-	 	{header : '剩余金额', dataIndex : 'remainingBalance'}
-//	 	{header : '积分变动', dataIndex : 'changedPoint', renderer : changePoint},
-//	 	{header : '剩余积分', dataIndex : 'remainingPoint', renderer : changePoint}
+	 	{header : '剩余金额', dataIndex : 'remainingBalance'},
+	 	{header : '积分变动', dataIndex : 'changedPoint', renderer : changePoint},
+	 	{header : '剩余积分', dataIndex : 'remainingPoint', renderer : changePoint}
 	]);
 	
 	//默认排序
@@ -285,9 +285,9 @@ Ext.onReady(function(){
 			{name : 'consumeTotal'},
 			{name : 'deltaBase'},
 			{name : 'deltaExtra'},
-			{name : 'remainingBalance'}
-//			{name : 'changedPoint'},
-//			{name : 'remainingPoint'}
+			{name : 'remainingBalance'},
+			{name : 'changedPoint'},
+			{name : 'remainingPoint'}
 		])
 	});
 	
@@ -339,6 +339,8 @@ Ext.onReady(function(){
 			summaryGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			summaryGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 			summaryGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			summaryGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
+			summaryGrid.getView().getCell(store.getCount()-1, 15).innerHTML = '--';
 			
 			
 			
@@ -362,6 +364,14 @@ Ext.onReady(function(){
 					linkMemberStatistics('memberConsume', $(element).attr('value'));
 				}
 			});
+			
+			//积分
+			$('#divMemberSummaryStatistics').find('.changePoint').each(function(index, element){
+				element.onclick = function(){
+					linkMemberStatistics('changePoint', $(element).attr('value'));
+				}
+			});
+			
 			
 		}
 	})
@@ -391,7 +401,7 @@ Ext.onReady(function(){
 	//会员卡号/手机号/姓名
 	function memberFuzzy(value, object, store){
 		if(value == ''){
-			return '无'
+			return '----'
 		}else{
 			return value;
 		}
@@ -424,7 +434,15 @@ Ext.onReady(function(){
 		}else{
 			return value;
 		}
-		
+	}
+	
+	//积分
+	function changePoint(value, object, store, index){
+		if(!(summaryGrid.getStore().getCount() -1 == index)){
+			return '<a class="changePoint" value="'+ store.json.member.name +'">'+ value + '</a>';		
+		}else{
+			return value;
+		}
 	}
 	
 	//跳转
@@ -488,8 +506,26 @@ Ext.onReady(function(){
 					Ext.getCmp('mcus_search_memberName').setValue(memberFuzzy);
 					
 					Ext.getCmp('branch_combo_memberConsume').setValue(branchId);	
+					memberSummaryLoading.hide();
 					
-					Ext.getCmp('memberConsume_btn_search').handler();
+					setTimeout(function(){
+						Ext.getCmp('memberConsume_btn_search').handler();
+					}, 500);
+					
+				})();
+			});
+		}else if(type = "changePoint"){//积分
+			Ext.ux.addTab('pointConsumeStatistics', '积分统计', 'Client_Module/pointConsumeStatistics.html', function(){
+				memberSummaryLoading.show();
+				(function(){
+					Ext.getCmp('beginDate_combo_pointConsumeStatistics').setValue(beginDate);
+					Ext.getCmp('endDate_combo_pointConsumeStatistics').setValue(endDate);	
+									
+					Ext.getCmp('pointMember_textfield_point').setValue(memberFuzzy);
+					
+					Ext.getCmp('branch_combo_point').setValue(branchId);	
+					
+					Ext.getCmp('search_btn_point').handler();
 					memberSummaryLoading.hide();
 					
 				})();
