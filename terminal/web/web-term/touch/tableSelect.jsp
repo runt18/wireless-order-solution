@@ -43,6 +43,11 @@
 	      }
 	    };
 	});
+	
+	//设置全部ajax请求超时时间
+	$.ajaxSetup({
+		timeout : 10000
+	});
 </script>
 <!-- seajs导包 -->
 <script type="text/javascript" src="./js/common/sea.js"></script>
