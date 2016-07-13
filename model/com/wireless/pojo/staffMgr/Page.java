@@ -91,6 +91,41 @@ public class Page{
 		}
 	}
 	
+	public static enum Distribution{
+		INIT_DISTIRBUTION("initStockDistribution", "配送初始化", "", "../../images/businessHour.png"),
+		SYNC_DISTRIBUTION("syncStockDistritbuion", "配送同步", "", "../../images/businessHour.png"),
+		STOCK_DISTRIBUTIONACTION("stockDistributionAction", "配送任务", "StockChainManagement_Module/StockDistributionAction.html", "../../images/supplierMgr.png"),
+		DISTRIBUTION_DETAIL_REPORT("distributionDetailReport", "配送明细", "StockChainManagement_Module/DistributionDetailReport.html", "../../images/stockDetailReport.png");
+		
+		private String mgrId;
+		private String desc;
+		private String url;
+		private String image;
+		
+		Distribution(String mgrId, String desc, String url, String image){
+			this.mgrId = mgrId;
+			this.image = image;
+			this.url = url;
+			this.desc = desc;
+		}
+
+		public String getMgrId() {
+			return mgrId;
+		}
+
+		public String getDesc() {
+			return desc;
+		}
+
+		public String getUrl() {
+			return url;
+		}
+
+		public String getImage() {
+			return image;
+		}
+	}
+	
 	public static enum History{
 		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png"),
 		HISTORY("history", "历史账单", "History_Module/HistoryStatistics.html", "../../images/history.png"),
