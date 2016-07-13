@@ -22,6 +22,7 @@ import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.finance.WeixinFinanceDao;
@@ -124,7 +125,7 @@ public class WXQueryBusinessStatisticsAction extends DispatchAction {
 			final DutyRange range = new DutyRange(onDuty, offDuty);
 			
 			shiftDetail = ShiftDao.getByRange(staff, extraCond.setDutyRange(range));
-			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, range, new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY));
+			memberStatistics = CalcMemberStatisticsDao.calcStatisticsByEachDay(staff, range, new MemberOperationDao.ExtraCond(DateType.HISTORY));
 			
 			jObject.setExtra(new Jsonable(){
 				@Override

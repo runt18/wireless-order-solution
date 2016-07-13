@@ -40,6 +40,8 @@ public class QueryStockDetailReportAction extends Action{
 		final String limit = request.getParameter("limit");
 		final String endDate = request.getParameter("endDate");
 		final String subTypes = request.getParameter("subTypes");
+		final String comment = request.getParameter("comment");
+		final String fuzzyId = request.getParameter("fuzzyId");
 		final JObject jObject = new JObject();
 		try{
 
@@ -86,6 +88,14 @@ public class QueryStockDetailReportAction extends Action{
 
 			if(deptOut != null && !deptOut.isEmpty()){
 				extraCond.setDeptOut(Integer.parseInt(deptOut));
+			}
+			
+			if(comment != null && !comment.isEmpty()){
+				extraCond.setComment(comment);
+			}
+			
+			if(fuzzyId != null && !fuzzyId.isEmpty()){
+				extraCond.setFuzzyId(fuzzyId);
 			}
 			
 			List<StockDetailReport> result = StockDetailReportDao.getByCond(staff, extraCond, ((start != null && limit != null) ? (" LIMIT " + start +", " + limit) : ""));

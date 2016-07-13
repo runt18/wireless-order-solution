@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcCouponStatisticsDao;
 import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -281,7 +282,7 @@ public class ShiftDao {
 		result.setRoundIncome(CalcBillStatisticsDao.calcRoundPrice(dbCon, staff, extraCond));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, extraCond.getDutyRange(), new CalcMemberStatisticsDao.ExtraCond(extraCond.dateType).setBranch(staff.getRestaurantId())));
+		result.setIncomeByCharge(CalcMemberStatisticsDao.calcIncomeByCharge(dbCon, staff, new MemberOperationDao.ExtraCond(extraCond.dateType).setOperateDate(extraCond.getDutyRange()).setBranch(staff.getRestaurantId())));
 		
 		//Get the income by book
 		result.setIncomeByBook(CalcBillStatisticsDao.calcIncomeByBook(dbCon, staff, extraCond.getDutyRange()));

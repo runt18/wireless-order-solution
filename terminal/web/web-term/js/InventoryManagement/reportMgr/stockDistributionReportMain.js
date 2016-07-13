@@ -329,7 +329,7 @@ Ext.onReady(function(){
 		]
 	});
 	var pagingBar = new Ext.PagingToolbar({
-		   pageSize : 13,	//显示记录条数
+		   pageSize : 20,	//显示记录条数
 		   store : ds,	//定义数据源
 		   displayInfo : true,	//是否显示提示信息
 		   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
@@ -393,6 +393,6 @@ Ext.onReady(function(){
 		items : [stockDistributionGrid]
 	});
 	
-	stockDistributionGrid.getStore().load({params:{start:0,limit:13}});
+	stockDistributionGrid.getStore().load({params:{start:0,limit:20}});
 });
 

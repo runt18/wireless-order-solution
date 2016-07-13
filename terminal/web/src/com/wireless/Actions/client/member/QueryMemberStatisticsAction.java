@@ -14,6 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcMemberStatisticsDao;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -48,7 +49,7 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));
@@ -116,7 +117,7 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));
@@ -182,7 +183,7 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));
@@ -248,7 +249,7 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final CalcMemberStatisticsDao.ExtraCond extraCond = new CalcMemberStatisticsDao.ExtraCond(DateType.HISTORY);
+			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));

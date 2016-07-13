@@ -207,7 +207,8 @@ public class TestMember {
 		final int orderId = 10;
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(branchStaff, expected.getId(), 50, 0, PayType.MEMBER, orderId);
+		MemberOperation mo = MemberDao.consume(branchStaff, new Member.ConsumeBuilder(expected.getId(), orderId)
+																	  .setPrice(PayType.MEMBER, 50));
 		expected.consume(50, PayType.MEMBER);
 		
 		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
@@ -217,7 +218,8 @@ public class TestMember {
 		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(branchStaff, expected.getId(), 50, 0, PayType.CASH, orderId);
+		mo = MemberDao.consume(branchStaff, new Member.ConsumeBuilder(expected.getId(), orderId)
+													  .setPrice(PayType.CASH, 50));
 		expected.consume(50, PayType.CASH);
 		
 		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
@@ -288,13 +290,13 @@ public class TestMember {
 			Staff referrer = StaffDao.getByCond(mStaff, null).get(1);
 			//Insert a new member
 			Member.InsertBuilder builder = new Member.InsertBuilder("张三", memberType.getId())
-															   .setMobile("13694260535")
+															   .setMobile("13094260535")
 													 		   .setSex(Sex.FEMALE)
 													 		   .setBirthday(DateUtil.parseDate("1981-03-15"))
 													 		   .setCompany("Digie Co.,Ltd")
 													 		   .setContactAddr("广州市东圃镇晨晖商务大厦")
 													 		   .setIdCard("440711198103154818")
-													 		   .setMemberCard("100010000")
+													 		   .setMemberCard("800010000")
 													 		   .setTele("020-87453214")
 													 		   .setReferrer(referrer.getId())
 													 		   .setAge(Member.Age.AGE_80);
@@ -320,14 +322,14 @@ public class TestMember {
 			referrer = StaffDao.getByCond(mStaff, null).get(2);
 			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId)
 														   .setName("李四")
-														   .setMobile("18520590931")
+														   .setMobile("18121590921")
 														   .setMemberType(memberType.getId())
 														   .setSex(Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")
 														   .setContactAddr("广州市萝岗区科学城")
 														   .setIdCard("4101234789965412")
-														   .setMemberCard("1000100001")
+														   .setMemberCard("320010001")
 														   .setTele("0750-3399559")
 														   .setReferrer(referrer.getId())
 														   .setAge(Member.Age.AGE_00);
@@ -335,6 +337,7 @@ public class TestMember {
 			
 			expect = updateBuilder.build();
 			expect.setId(memberId);
+			expect.setBranchId(mStaff.getRestaurantId());
 			expect.setRestaurantId(mStaff.getRestaurantId());
 			expect.setMemberType(memberType);
 			expect.setReferrer(referrer.getName());
@@ -364,6 +367,12 @@ public class TestMember {
 			
 		}finally{
 			if(memberId != 0){
+				Member member = MemberDao.getById(mStaff, memberId);
+				
+				if(member.getBaseBalance() > 0){
+					MemberDao.refund(mStaff, member.getId(), member.getBaseBalance(), member.getTotalBalance());
+				}
+				
 				//Delete the member 
 				MemberDao.deleteById(mStaff, memberId);
 				//Check to see whether the member is deleted
@@ -400,14 +409,16 @@ public class TestMember {
 		final int orderId = 10;
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, 0, PayType.MEMBER, orderId);
+		MemberOperation mo = MemberDao.consume(mStaff, new Member.ConsumeBuilder(expect.getId(), orderId)
+															     .setPrice(PayType.MEMBER, 50));
 		expect.consume(50, PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(mStaff, expect.getId(), 50, 0, PayType.CASH, orderId);
+		mo = MemberDao.consume(mStaff, new Member.ConsumeBuilder(expect.getId(), orderId)
+			     								 .setPrice(PayType.CASH, 50));
 		expect.consume(50, PayType.CASH);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));

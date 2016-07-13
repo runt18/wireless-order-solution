@@ -550,6 +550,9 @@ public class StaffDao {
 	 * 			throws if the role to any staff does NOT exist
 	 */
 	public static List<Staff> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		if(extraCond == null){
+			extraCond = new StaffDao.ExtraCond();
+		}
 		return getByCond(dbCon, extraCond.setRestaurantId(staff.getRestaurantId()), null);
 	}
 	

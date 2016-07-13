@@ -5,6 +5,36 @@ import com.wireless.json.Jsonable;
 
 public class MaterialCate implements Jsonable {
 	
+	public static enum Category{
+		NORMAL(1, "普通"),
+		DISTRIBUTION(2, "配送");
+		
+		private int value;
+		private String text;
+		
+		Category(int value, String text){
+			this.value = value;
+			this.text = text;
+		}
+		
+		public int getValue(){
+			return this.value;
+		}
+		
+		public String getDesc(){
+			return this.text;
+		}
+		
+		public static Category valueOf(int value){
+			for(Category category : values()){
+				if(category.getValue() == value){
+					return category;
+				}
+			}
+			throw new IllegalArgumentException("the Category (value = " + value +") is invaily");
+		}
+	}
+	
 	public static enum Type{
 		GOOD(1, "商品"),
 		MATERIAL(2, "原料");
@@ -37,6 +67,7 @@ public class MaterialCate implements Jsonable {
 	public static class InsertBuilder {
 		private String name;
 		private Type type;
+		private Category category;
 		
 		public InsertBuilder(){}
 		
@@ -50,9 +81,15 @@ public class MaterialCate implements Jsonable {
 			return this;
 		}
 		
+		public InsertBuilder setCategory(Category category){
+			this.category = category;
+			return this;
+		} 
+		
 		public MaterialCate build() {
 			return new MaterialCate(this);
 		}
+		
 	}
 	
 	
@@ -96,6 +133,7 @@ public class MaterialCate implements Jsonable {
 	private int restaurantId;
 	private String name;
 	private Type type;
+	private Category category;
 	
 	public MaterialCate(int id){
 		this.id = id;
@@ -104,6 +142,7 @@ public class MaterialCate implements Jsonable {
 	public MaterialCate(InsertBuilder builder) {
 		this.name = builder.name;
 		this.type = builder.type;
+		this.category = builder.category;
 	}
 	
 	public MaterialCate(UpdateBuilder builder) {
@@ -116,26 +155,13 @@ public class MaterialCate implements Jsonable {
 		}
 	}
 	
-//	public MaterialCate(int id){
-//		this.id = id;
-//	}
+	public Category getCategory(){
+		return this.category;
+	}
 	
-	
-	
-//	public MaterialCate(int restaurantId, String name){
-//		this(0, restaurantId, name);
-//	}
-//	
-//	public MaterialCate(int id, int restaurantId, String name){
-//		this(id, restaurantId, name, Type.MATERIAL);
-//	}
-//	
-//	public MaterialCate(int id, int restaurantId, String name, Type type){
-//		this.id = id;
-//		this.restaurantId = restaurantId;
-//		this.name = name;
-//		this.type = type;
-//	}
+	public void setCategory(Category category){
+		this.category = category;
+	}
 	
 	public int getId() {
 		return id;

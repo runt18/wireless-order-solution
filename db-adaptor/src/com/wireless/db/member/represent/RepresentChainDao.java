@@ -47,6 +47,11 @@ public class RepresentChainDao {
 			this.referrerId = referrerId;
 			return this;
 		}
+
+		public ExtraCond setReferrer(Member referrer){
+			this.referrerId = referrer.getId();
+			return this;
+		}
 		
 		public ExtraCond setSubscriberDate(long subscriberDate){
 			this.subscriberDate = subscriberDate;
@@ -55,6 +60,11 @@ public class RepresentChainDao {
 		
 		public ExtraCond setSubscriberId(int subscriberId){
 			this.subscriberId = subscriberId;
+			return this;
+		}
+		
+		public ExtraCond setSubscriber(Member subscriber){
+			this.subscriberId = subscriber.getId();
 			return this;
 		}
 		

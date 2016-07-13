@@ -432,7 +432,10 @@ Ext.onReady(function(){
 		materialCateComb,
 		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
-		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;单据编号:'},
+		{xtype : 'textfield', width : 100, id : 'oriStockId_stockDetail'},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;备注：'},
+		{xtype : 'textfield', width : 180, id : 'comment_stockDetail'},
 		'->', {
 			text : '刷新',
 			id : 'stockDetail_btnSearch',
@@ -448,6 +451,8 @@ Ext.onReady(function(){
 				store.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
 				store.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
 				store.baseParams['supplier'] = Ext.getCmp('comboSearchSupplierForDetail').getValue();
+				store.baseParams['fuzzyId'] = Ext.getCmp('oriStockId_stockDetail').getValue();
+				store.baseParams['comment'] = Ext.getCmp('comment_stockDetail').getValue();
 				//TODO
 				
 				stockDetailReportGrid.getStore().load({
@@ -714,4 +719,5 @@ Ext.onReady(function(){
 	});
    
    Ext.getCmp('stockDetail_btnSearch').handler();
+   
 });

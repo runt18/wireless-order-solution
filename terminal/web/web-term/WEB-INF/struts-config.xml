@@ -317,10 +317,6 @@
 			type="com.wireless.Actions.client.member.QueryMemberOperationAction"
 			scope="request">
 		</action>
-		<action path="/QueryMemberOperationSummary"
-			type="com.wireless.Actions.client.member.QueryMemberOperationSummaryAction"
-			scope="request" parameter="dataSource">
-		</action>
 		<action path="/OperateRestaurant"
 			type="com.wireless.Actions.restaurantMgr.OperateRestaurantAction"
 			scope="request" parameter="dataSource">

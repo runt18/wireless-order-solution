@@ -51,7 +51,7 @@ define(function(require, exports, module){
 				if(getcookie(document.domain+'_takeMoney') == 'true'){
 					self.find('[id=printTakeMoney_checkbox_takeMoney]').attr('checked', true).checkboxradio("refresh");
 				}else{
-					self.find('[id=printTakeMoney_checkbox_takeMoney]').attr('checked', false).checkboxradio("refresh");
+					self.find('[id=printTakeMoney_checkbox_takeMoney]').attr('checked', true).checkboxradio("refresh");
 				}
 			
 			}

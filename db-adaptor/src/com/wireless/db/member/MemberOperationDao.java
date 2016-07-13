@@ -1,11 +1,10 @@
 package com.wireless.db.member;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
@@ -15,7 +14,6 @@ import com.wireless.exception.MemberError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
-import com.wireless.pojo.member.MOSummary;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
@@ -27,7 +25,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
-import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
 	
@@ -51,7 +48,7 @@ public class MemberOperationDao {
 			extraCond.append(" AND MO.id IN (" +
 							 " SELECT MAX(id) FROM wireless_order_db." + super.dbTbl.moTbl + 
 							 " WHERE 1 = 1 " + 
-							 " AND " + (super.branchId != 0 ? " branch_id = " + super.branchId : " restaurant_id = " + super.restaurantId) +
+							 " AND " + (super.branchId != 0 ? " branch_id = " + super.branchId : " restaurant_id = " + super.operateStaff.getRestaurantId()) +
 							 " AND operate_type IN (" + operationCond.toString() + ") GROUP BY order_id )");
 			
 			return super.toString() + extraCond.toString();
@@ -59,24 +56,28 @@ public class MemberOperationDao {
 		
 	}
 	
-	public static class ExtraCond{
-		protected final DBTbl dbTbl;
+	public static class ExtraCond implements Cloneable{
+		public final DBTbl dbTbl;
 		private int id;
-		private final List<Integer> members = new ArrayList<Integer>();
+		private int staffId;
+		private List<Integer> members = new ArrayList<Integer>();
 		private int memberTypeId;
 		private int orderId;
 		private String mobile;
 		private String card;
 		private String name;
-		private final List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
+		private String fuzzy;		//会员模糊查找
+		private List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
 		private DutyRange operationDate;
 		private int payTypeId;
 		private int chargeTypeId;
 		private boolean containsCoupon;
 		private int branchId;
-		private int restaurantId;
 		private Float minChargeAmount;
 		private Float maxChargeAmount;
+		private boolean isOnlyAmount;
+		
+		private Staff operateStaff;
 		
 		//充值实收和充额差异
 		private Float minDeltaCharge;
@@ -100,6 +101,26 @@ public class MemberOperationDao {
 		
 		public ExtraCond(DateType dateType){
 			this.dbTbl = new DBTbl(dateType);
+		}
+		
+		private ExtraCond setOperateStaff(Staff staff){
+			this.operateStaff = staff;
+			return this;
+		}
+		
+		public ExtraCond setOnlyAmount(boolean onOff){
+			this.isOnlyAmount = onOff;
+			return this;
+		}
+		
+		public ExtraCond setStaff(int staffId){
+			this.staffId = staffId;
+			return this;
+		}
+		
+		public ExtraCond setFuzzy(String fuzzy){
+			this.fuzzy = fuzzy;
+			return this;
 		}
 		
 		public ExtraCond setComment(String comment){
@@ -162,11 +183,6 @@ public class MemberOperationDao {
 			return this;
 		}
 		
-		ExtraCond setRestaurant(int restaurantId){
-			this.restaurantId = restaurantId;
-			return this;
-		}
-		
 		public ExtraCond setBranch(int branchId){
 			this.branchId = branchId;
 			return this;
@@ -218,6 +234,14 @@ public class MemberOperationDao {
 		
 		public ExtraCond setName(String name){
 			this.name = name;
+			return this;
+		}
+
+		public ExtraCond setOperationType(OperationType type){
+			if(type != null){
+				this.operationTypes.clear();
+				operationTypes.add(type);
+			}
 			return this;
 		}
 		
@@ -276,10 +300,25 @@ public class MemberOperationDao {
 		}
 		
 		@Override
+	    public Object clone() {   
+	        try {   
+	            Object cloneObj = super.clone();
+	            ((ExtraCond)cloneObj).members = new ArrayList<Integer>(this.members);
+	            ((ExtraCond)cloneObj).operationTypes = new ArrayList<OperationType>(this.operationTypes);
+	            return cloneObj;
+	        } catch (CloneNotSupportedException e) {   
+	            return null;   
+	        }   
+	    } 
+		
+		@Override
 		public String toString(){
 			final StringBuilder extraCond = new StringBuilder();
 			if(id != 0){
 				extraCond.append(" AND MO.id = " + id);
+			}
+			if(staffId > 0){
+				extraCond.append(" AND MO.staff_id = " + staffId);
 			}
 			if(payTypeId != 0){
 				extraCond.append(" AND PT.pay_type_id = " + payTypeId);
@@ -287,6 +326,24 @@ public class MemberOperationDao {
 			if(chargeTypeId != 0){
 				extraCond.append(" AND MO.charge_type = " + chargeTypeId);
 			}
+			
+			if(fuzzy != null){
+				final StringBuilder fuzzyCond = new StringBuilder("-1");
+				try {
+					for (Member member : MemberDao.getByCond(this.operateStaff, new MemberDao.ExtraCond().setFuzzyName(fuzzy), null)) {
+						if(fuzzyCond.length() > 0){
+							fuzzyCond.append(",");
+						}
+						fuzzyCond.append(member.getId());
+					}
+					if(fuzzyCond.length() > 0){
+						extraCond.append(" AND MO.member_id IN ( " + fuzzyCond.toString() + ")");
+					}
+				} catch (SQLException | BusinessException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			StringBuilder memberCond = new StringBuilder();
 			for(Integer memberId : this.members){
 				if(memberCond.length() != 0){
@@ -412,6 +469,7 @@ public class MemberOperationDao {
 			mo.setRestaurantId(staff.getGroupId());
 			mo.setBranchId(staff.getRestaurantId());
 		}else{
+			mo.setBranchId(staff.getRestaurantId());
 			mo.setRestaurantId(staff.getRestaurantId());
 		}
 		mo.setStaffId(staff.getId());
@@ -523,67 +581,60 @@ public class MemberOperationDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<MemberOperation> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
-		String sql;
-		sql = " SELECT " +
-			  " MO.id, MO.restaurant_id, MO.branch_id, R.restaurant_name AS branch_name, MO.staff_id, MO.staff_name, " +
-			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
-			  " MO.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, MO.pay_money, " +
-			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.order_id, MO.charge_type, MO.charge_money,"	+
-			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
-			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
-			  " MO.coupon_id, MO.coupon_money, MO.coupon_name " +
-			  " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO " +
-			  " LEFT JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
-			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
-			  " LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = MO.branch_id " +
-			  " WHERE 1 = 1 " +
-			  " AND MO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
-			  extraCond.setRestaurant(staff.getRestaurantId()).toString() +
-			  (orderClause != null ? orderClause : " ORDER BY MO.id DESC ");
+		String sql = makeSql(staff, extraCond, orderClause);
 		
-		List<MemberOperation> result = new ArrayList<MemberOperation>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
-													   dbCon.rs.getString("member_name"), 
-													   dbCon.rs.getString("member_mobile"), 
-													   dbCon.rs.getString("member_card"));
-			mo.setId(dbCon.rs.getInt("id"));
-			mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			mo.setBranchId(dbCon.rs.getInt("branch_id"));
-			mo.setBranchName(dbCon.rs.getString("branch_name"));
-			mo.setStaffId(dbCon.rs.getInt("staff_id"));
-			mo.setStaffName(dbCon.rs.getString("staff_name"));
-			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
-			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
-			mo.setOperationType(dbCon.rs.getShort("operate_type"));
-			if(mo.getOperationType().isConsume()){
-				PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
-				payType.setName(dbCon.rs.getString("pay_type_name"));
-				mo.setPayType(payType);
-				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
-				mo.setOrderId(dbCon.rs.getInt("order_id"));
+		
+		if(extraCond.isOnlyAmount){
+			if(dbCon.rs.next()){
+				return Collections.nCopies(dbCon.rs.getInt(1), null);
+			}else{
+				return Collections.emptyList();
 			}
-			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.REFUND){
-				mo.setChargeType(dbCon.rs.getShort("charge_type"));
-				mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+		}else{
+			final List<MemberOperation> result = new ArrayList<MemberOperation>();
+			while(dbCon.rs.next()){
+				MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
+														   dbCon.rs.getString("member_name"), 
+														   dbCon.rs.getString("member_mobile"), 
+														   dbCon.rs.getString("member_card"));
+				mo.setId(dbCon.rs.getInt("id"));
+				mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				mo.setBranchId(dbCon.rs.getInt("branch_id"));
+				mo.setBranchName(dbCon.rs.getString("branch_name"));
+				mo.setStaffId(dbCon.rs.getInt("staff_id"));
+				mo.setStaffName(dbCon.rs.getString("staff_name"));
+				mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
+				mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
+				mo.setOperationType(dbCon.rs.getShort("operate_type"));
+				if(mo.getOperationType().isConsume()){
+					PayType payType = new PayType(dbCon.rs.getInt("pay_type_id"));
+					payType.setName(dbCon.rs.getString("pay_type_name"));
+					mo.setPayType(payType);
+					mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
+					mo.setOrderId(dbCon.rs.getInt("order_id"));
+				}
+				if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.REFUND){
+					mo.setChargeType(dbCon.rs.getShort("charge_type"));
+					mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
+				}
+				mo.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
+				mo.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
+				mo.setDeltaPoint(dbCon.rs.getInt("delta_point"));
+				mo.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
+				mo.setRemainingExtraMoney(dbCon.rs.getFloat("remaining_extra_money"));
+				mo.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
+				mo.setComment(dbCon.rs.getString("comment"));
+				
+				mo.setCouponId(dbCon.rs.getInt("coupon_id"));
+				mo.setCouponMoney(dbCon.rs.getFloat("coupon_money"));
+				mo.setCoupnName(dbCon.rs.getString("coupon_name"));
+				
+				result.add(mo);
 			}
-			mo.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
-			mo.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
-			mo.setDeltaPoint(dbCon.rs.getInt("delta_point"));
-			mo.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
-			mo.setRemainingExtraMoney(dbCon.rs.getFloat("remaining_extra_money"));
-			mo.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
-			mo.setComment(dbCon.rs.getString("comment"));
-			
-			mo.setCouponId(dbCon.rs.getInt("coupon_id"));
-			mo.setCouponMoney(dbCon.rs.getFloat("coupon_money"));
-			mo.setCoupnName(dbCon.rs.getString("coupon_name"));
-			
-			result.add(mo);
+			dbCon.rs.close();
+			return result;
 		}
-		dbCon.rs.close();
-		return result;
 	}
 	
 	/**
@@ -682,262 +733,26 @@ public class MemberOperationDao {
 		}
 	}
 	
-	/**
-	 * Get amount to member operation according to extra condition {@link ExtraCond}.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param extraCond
-	 * 			the extra condition
-	 * @return the amount to member operation
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static int getAmountByCond(Staff staff, ExtraCond extraCond) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getAmountByCond(dbCon, staff, extraCond);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get amount to member operation according to extra condition {@link ExtraCond}.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param extraCond
-	 * 			the extra condition
-	 * @return the amount to member operation
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static int getAmountByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+	public static String makeSql(Staff staff, ExtraCond extraCond, String orderClause){
 		String sql;
-		sql = " SELECT COUNT(*) " +
+		sql = " SELECT " +
+			  (extraCond.isOnlyAmount ? " COUNT(*) " :
+			  " MO.id, MO.restaurant_id, MO.branch_id, R.restaurant_name AS branch_name, MO.staff_id, MO.staff_name, " +
+			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
+			  " MO.pay_type_id, IFNULL(PT.name, '其他') AS pay_type_name, MO.pay_money, " +
+			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.order_id, MO.charge_type, MO.charge_money,"	+
+			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
+			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
+			  " MO.coupon_id, MO.coupon_money, MO.coupon_name ") +
 			  " FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl + " MO " +
-			  " JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
+			  " LEFT JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
 			  " LEFT JOIN " + Params.dbName + ".pay_type PT ON PT.pay_type_id = MO.pay_type_id " +
+			  " LEFT JOIN " + Params.dbName + ".restaurant R ON R.id = MO.branch_id " +
 			  " WHERE 1 = 1 " +
-			  " AND MO.restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond.toString() : "");
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		int amount = 0;
-		if(dbCon.rs.next()){
-			amount = dbCon.rs.getInt(1);
-		}
-		dbCon.rs.close();
-		return amount;
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static int getSummaryByTodayCount(DBCon dbCon, Map<Object, Object> params) throws BusinessException, SQLException{
-		int count = 0;
-		String querySQL = "SELECT COUNT(MO.member_id) FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id WHERE MO.member_id > 0 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		querySQL = "SELECT COUNT(*) FROM (" + querySQL + ") TT";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next()){
-			count = dbCon.rs.getInt(1);
-		}
-		dbCon.rs.close();
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static int getSummaryByTodayCount(Map<Object, Object> params) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MemberOperationDao.getSummaryByTodayCount(dbCon, params);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static List<MOSummary> getSummaryByToday(DBCon dbCon, Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
-		List<MOSummary> list = new ArrayList<MOSummary>();
-		MOSummary item = null;
-		String querySQL = "SELECT"
-			+ " MO.member_id, IFNULL(SUM(MO.charge_money), 0) charge_money, IFNULL(SUM(MO.pay_money), 0) pay_money,"
-			+ " SUM(CASE WHEN MO.operate_type = 2 THEN 1 ELSE 0 END) consume_amount,"
-			+ " SUM(CASE WHEN MO.operate_type = 2 THEN MO.delta_point ELSE 0 END) consume_point,"
-			+ " SUM(CASE WHEN MO.operate_type = 3 THEN MO.delta_point ELSE 0 END) point_consume,"
-			+ " SUM(CASE WHEN MO.operate_type = 4 THEN MO.delta_point ELSE 0 END) point_adjust,"
-			+ " SUM(CASE WHEN MO.operate_type = 5 THEN MO.delta_base_money + MO.delta_extra_money ELSE 0 END) money_adjust"
-			+ " FROM member_operation MO LEFT JOIN member M ON MO.member_id = M.member_id "
-			+ " WHERE MO.member_id > 0 ";
-		params.put(SQLUtil.SQL_PARAMS_GROUPBY, " GROUP BY MO.member_id ");
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		Statement stmt = dbCon.conn.createStatement();
-		ResultSet rs = stmt.executeQuery(querySQL);
-		while(rs != null && rs.next()){
-			item = new MOSummary();
-			item.setMember(MemberDao.getById(dbCon, staff, rs.getInt("member_id")));
-			item.setChargeMoney(rs.getFloat("charge_money"));
-			item.setConsumeAmount(rs.getInt("consume_amount"));
-			item.setPayMoney(rs.getFloat("pay_money"));
-			item.setConsumePoint(rs.getFloat("consume_point"));
-			item.setPointConsume(rs.getFloat("point_consume"));
-			item.setPointAdjust(rs.getFloat("point_adjust"));
-			item.setMoneyAdjust(rs.getFloat("money_adjust"));
-			
-			list.add(item);
-		}
-		item = null;
-		rs.close();
-		rs = null;
-		stmt.close();
-		stmt = null;
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static List<MOSummary> getSummaryByToday(Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MemberOperationDao.getSummaryByToday(dbCon, staff, params);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static int getSummaryByHistoryCount(DBCon dbCon, Map<Object, Object> params) throws BusinessException, SQLException{
-		int count = 0;
-		String querySQL = "SELECT COUNT(MO.member_id) FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id WHERE MO.member_id > 0 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		querySQL = "SELECT COUNT(*) FROM (" + querySQL + ") TT";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next()){
-			count = dbCon.rs.getInt(1);
-		}
-		dbCon.rs.close();
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static int getSummaryByHistoryCount(Map<Object, Object> params) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MemberOperationDao.getSummaryByHistoryCount(dbCon, params);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static List<MOSummary> getSummaryByHistory(DBCon dbCon, Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
-		List<MOSummary> list = new ArrayList<MOSummary>();
-		MOSummary item = null;
-		String querySQL = "SELECT"
-			+ " MO.member_id, IFNULL(SUM(MO.charge_money), 0) charge_money, IFNULL(SUM(MO.pay_money), 0) pay_money,"
-			+ " SUM(CASE WHEN MO.operate_type = 2 THEN 1 ELSE 0 END) consume_amount,"
-			+ " SUM(CASE WHEN MO.operate_type = 2 THEN MO.delta_point ELSE 0 END) consume_point,"
-			+ " SUM(CASE WHEN MO.operate_type = 3 THEN MO.delta_point ELSE 0 END) point_consume,"
-			+ " SUM(CASE WHEN MO.operate_type = 4 THEN MO.delta_point ELSE 0 END) point_adjust,"
-			+ " SUM(CASE WHEN MO.operate_type = 5 THEN MO.delta_base_money + MO.delta_extra_money ELSE 0 END) money_adjust"
-			+ " FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id "
-			+ " WHERE MO.member_id > 0 ";
-		params.put(SQLUtil.SQL_PARAMS_GROUPBY, " GROUP BY MO.member_id ");
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		Statement stmt = dbCon.conn.createStatement();
-		ResultSet rs = stmt.executeQuery(querySQL);
-		while(rs != null && rs.next()){
-			item = new MOSummary();
-			item.setMember(MemberDao.getById(dbCon, staff, rs.getInt("member_id")));
-			item.setChargeMoney(rs.getFloat("charge_money"));
-			item.setConsumeAmount(rs.getInt("consume_amount"));
-			item.setPayMoney(rs.getFloat("pay_money"));
-			item.setConsumePoint(rs.getFloat("consume_point"));
-			item.setPointConsume(rs.getFloat("point_consume"));
-			item.setPointAdjust(rs.getFloat("point_adjust"));
-			item.setMoneyAdjust(rs.getFloat("money_adjust"));
-			
-			list.add(item);
-		}
-		item = null;
-		rs.close();
-		rs = null;
-		stmt.close();
-		stmt = null;
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static List<MOSummary> getSummaryByHistory(Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MemberOperationDao.getSummaryByHistory(dbCon, staff, params);
-		}finally{
-			dbCon.disconnect();
-		}
+			  " AND MO.restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
+			  extraCond.setOperateStaff(staff).toString() +
+			  (orderClause != null ? orderClause : " ORDER BY MO.id DESC ");
+		return sql;
 	}
 	
 	public static class ArchiveResult{

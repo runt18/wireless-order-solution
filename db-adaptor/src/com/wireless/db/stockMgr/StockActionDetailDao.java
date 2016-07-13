@@ -37,6 +37,18 @@ public class StockActionDetailDao {
 		private String minOriDate;							//原始库单时间
 		private String maxOriDate;
 		private boolean isOnlyAmount;
+		private String fuzzyId;
+		private String comment;
+		
+		public ExtraCond setFuzzyId(String fuzzyId){
+			this.fuzzyId = fuzzyId;
+			return this;
+		}
+		
+		public ExtraCond setComment(String comment){
+			this.comment = comment;
+			return this;
+		}
 		
 		private ExtraCond setStaff(Staff staff){
 			this.staff = staff;
@@ -225,6 +237,14 @@ public class StockActionDetailDao {
 				extraCond.append(" AND S.ori_stock_date <= '" + maxOriDate + "'");
 			}
 			
+			if(this.comment != null){
+				extraCond.append(" AND S.comment = '" + this.comment + "' ");
+			}
+			
+			if(this.fuzzyId != null){
+				extraCond.append(" AND (S.ori_stock_id LIKE '%" + this.fuzzyId + "%' OR S.id LIKE '%" + this.fuzzyId +"%') ");
+			}
+			
 			return extraCond.toString();
 		}
 	}
@@ -242,11 +262,19 @@ public class StockActionDetailDao {
 	 * 			throws if the material does NOT exist 
 	 */
 	public static int insert(DBCon dbCon, Staff staff, StockActionDetail stockDetail) throws SQLException, BusinessException{
-		Material material = MaterialDao.getById(dbCon, staff, stockDetail.getMaterialId());
+		Material material;
+		
+		//分店获取对应的菜品 因为引用的id出来的是总店material的id
+		if(stockDetail.getMaterialAssociateId() > 0){
+			material = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setAssociateId(stockDetail.getMaterialAssociateId())).get(0);
+		}else{
+			material = MaterialDao.getById(dbCon, staff, stockDetail.getMaterialId());
+		}
+		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, dept_in_remaining, dept_out_remaining, remaining) " +
 			  " VALUES( " +
-			  stockDetail.getMaterialId() + ", " +
+			  material.getId() + ", " +
 			  "'" + material.getName() + "', " +
 			  stockDetail.getStockActionId() + ", " +
 			  stockDetail.getPrice() + ", " +

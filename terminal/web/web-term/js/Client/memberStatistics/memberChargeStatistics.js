@@ -178,6 +178,7 @@ Ext.onReady(function(){
 			}
 		});
 		mcs_search_memberName = new Ext.form.TextField({
+			id : 'mcs_search_memberName',
 			xtype : 'textfield',
 			width : 100
 			

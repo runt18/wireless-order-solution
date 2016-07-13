@@ -1738,15 +1738,15 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account
 	 *			<li>the member account to consume is NOT found
 	 */
-	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, float extraPrice, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff staff, Member.ConsumeBuilder builder) throws SQLException, BusinessException{
 		
-		Member member = getById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, builder.getMemberId());
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.consume(consumePrice, extraPrice, payType);
+		MemberOperation mo = member.consume(builder.getConsumePrice(), builder.getExtraPrice(), builder.getPayType());
 		
 		//Set the associate order id
-		mo.setOrderId(orderId);
+		mo.setOrderId(builder.getOrderId());
 		
 		//Insert the member operation to this consumption operation.
 		MemberOperationDao.insert(dbCon, staff, mo);
@@ -1761,12 +1761,12 @@ public class MemberDao {
 					 " ,total_consumption = " + member.getTotalConsumption() + 
 					 " ,total_point = " + member.getTotalPoint() +  
 					 " ,point = " + member.getPoint() +
-					 " WHERE member_id = " + memberId;
+					 " WHERE member_id = " + member.getId();
 		dbCon.stmt.executeUpdate(sql);
 
 		//执行会员升级
 		try{
-			upgrade(dbCon, staff, new Member.UpgradeBuilder(memberId));
+			upgrade(dbCon, staff, new Member.UpgradeBuilder(member));
 		}catch(BusinessException | SQLException ignored){
 			ignored.printStackTrace();
 		}
@@ -1776,18 +1776,18 @@ public class MemberDao {
 			Represent represent = RepresentDao.getByCond(dbCon, staff, null).get(0);
 			if(represent.isProgress() && represent.getComissionRate() > 0){
 				//获取关系链
-				final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriberId(memberId));
+				final List<RepresentChain> recommends = RepresentChainDao.getByCond(dbCon, staff, new RepresentChainDao.ExtraCond().setSubscriber(member));
 				if(!recommends.isEmpty()){
 					
 					//获取推荐人
 					Member referrer = getById(dbCon, staff, recommends.get(0).getRecommendMemberId());
 					
 					//计算出佣金充额(四舍五入)
-					int commission = Math.round(consumePrice * represent.getComissionRate());
+					int commission = Math.round(builder.getConsumePrice() * represent.getComissionRate());
 					
 					//为推荐人充值佣金 
 					if(commission > 0){
-						charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(orderId));
+						charge(dbCon, staff, referrer.getId(), 0, commission, ChargeType.COMMISSION, Integer.toString(builder.getOrderId()));
 					}
 				}
 			}
@@ -1819,13 +1819,13 @@ public class MemberDao {
 	 *			<li>the consume price exceeds total balance to this member account<br>
 	 *			<li>the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, float extraPrice, PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(Staff staff, Member.ConsumeBuilder builder) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.consume(dbCon, staff, memberId, consumePrice, extraPrice, payType, orderId);
+			MemberOperation mo = MemberDao.consume(dbCon, staff, builder);
 			dbCon.conn.commit();
 			return mo;
 			
@@ -2052,7 +2052,7 @@ public class MemberDao {
 			if(chargeType != ChargeType.COMMISSION){
 				List<MemberOperation> mo4Consume = MemberOperationDao.getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY)
 																		  .setOrder(Integer.parseInt(comment))
-																		  .addOperationType(MemberOperation.OperationType.CONSUME), null);
+																		  .setOperationType(MemberOperation.OperationType.CONSUME), null);
 				mo.setComment("账单号:" + comment + ",消费人:" + (mo4Consume.isEmpty() ? "---" : mo4Consume.get(0).getMemberName()));
 			}else{
 				mo.setComment(comment);

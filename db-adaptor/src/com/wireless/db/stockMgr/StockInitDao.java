@@ -271,11 +271,22 @@ public class StockInitDao {
 		//删除库存明细记录
 		sql = "DELETE SD FROM " + Params.dbName + ".stock_action_detail SD " + 
 				" JOIN " + Params.dbName + ".stock_action S ON S.id = SD.stock_action_id " +
-				" WHERE S.restaurant_id = " + staff.getRestaurantId();
+				" WHERE S.restaurant_id = " + staff.getRestaurantId() +
+				" AND S.sub_type NOT IN ( " + 
+				StockAction.SubType.DISTRIBUTION_SEND.getVal() + ", " +
+				StockAction.SubType.DISTRIBUTION_RECEIVE.getVal() + ", " +
+				StockAction.SubType.DISTRIBUTION_RETURN.getVal() + ", " +
+				StockAction.SubType.DISTRIBUTION_RECOVERY.getVal() + ")";
 		dbCon.stmt.executeUpdate(sql);				
 		
 		//删除库存记录
-		sql = "DELETE FROM " + Params.dbName + ".stock_action WHERE restaurant_id = " + staff.getRestaurantId();
+		sql = "DELETE FROM " + Params.dbName + ".stock_action " + 
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + 
+			  " AND sub_type NOT IN ( " +
+			  StockAction.SubType.DISTRIBUTION_SEND.getVal() + ", " +
+			  StockAction.SubType.DISTRIBUTION_RECEIVE.getVal() + ", " +
+			  StockAction.SubType.DISTRIBUTION_RETURN.getVal() + ", " +
+			  StockAction.SubType.DISTRIBUTION_RECOVERY.getVal() + ")";
 		dbCon.stmt.executeUpdate(sql);
 
 		//删除盘点明细记录
