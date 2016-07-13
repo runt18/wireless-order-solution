@@ -31,13 +31,13 @@ public class StockAction implements Jsonable{
 		private List<StockActionDetail> stockActionDetails = new ArrayList<StockActionDetail>(); 
 		private String comment;
 		private float actualPrice;
+		private int stockInRestaurantId;
+		private int stockOutRestaurantId;
 		
 		private MaterialCate.Type cateType;
 		private Status status = Status.UNAUDIT;
 		private Type type;
 		private SubType subType;
-//		private int stockInRestaurantId;
-//		private int stockOutRestaurantId;
 		
 		private InsertBuilder(){}
 		private InsertBuilder(int restaurantId){
@@ -127,7 +127,7 @@ public class StockAction implements Jsonable{
 		}
 		//配送收货
 		public static InsertBuilder newDistributionReceive(){
-			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_OUT)
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_IN)
 													   .setSubType(SubType.DISTRIBUTION_RECEIVE);
 			return builder;
 		}
@@ -139,7 +139,7 @@ public class StockAction implements Jsonable{
 		}
 		//配送回收
 		public static InsertBuilder newDistributionRecovery(){
-			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_OUT)
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_IN)
 													   .setSubType(SubType.DISTRIBUTION_RECOVERY);
 			return builder;
 		}
@@ -148,6 +148,24 @@ public class StockAction implements Jsonable{
 			return new StockAction(this);
 		}
 
+		public int getStockInRestaurantId() {
+			return stockInRestaurantId;
+		}
+		
+		public InsertBuilder setStockInRestaurantId(int stockInRestaurantId) {
+			this.stockInRestaurantId = stockInRestaurantId;
+			return this;
+		}
+		
+		public int getStockOutRestaurantId() {
+			return stockOutRestaurantId;
+		}
+		
+		public InsertBuilder setStockOutRestaurantId(int stockOutRestaurantId) {
+			this.stockOutRestaurantId = stockOutRestaurantId;
+			return this;
+		}
+		
 		public InsertBuilder setOriStockId(String oriStockId){
 			this.oriStockId = oriStockId;
 			return this;
@@ -399,7 +417,7 @@ public class StockAction implements Jsonable{
 		}
 		//配送收货
 		public static UpdateBuilder newDistributionReceive(int id){
-			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_IN)
 													   .setSubType(SubType.DISTRIBUTION_RECEIVE);
 			return builder;
 		}
@@ -411,7 +429,7 @@ public class StockAction implements Jsonable{
 		}
 		//配送回收
 		public static UpdateBuilder newDistributionRecovery(int id){
-			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_IN)
 													   .setSubType(SubType.DISTRIBUTION_RECOVERY);
 			return builder;
 		}
@@ -763,7 +781,7 @@ public class StockAction implements Jsonable{
 		}
 		//配送收货
 		public static ReAuditBuilder newDistributionReceive(int id){
-			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_IN)
 													   .setSubType(SubType.DISTRIBUTION_RECEIVE);
 			return builder;
 		}
@@ -775,7 +793,7 @@ public class StockAction implements Jsonable{
 		}
 		//配送回收
 		public static ReAuditBuilder newDistributionRecovery(int id){
-			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_IN)
 													   .setSubType(SubType.DISTRIBUTION_RECOVERY);
 			return builder;
 		}
@@ -1045,7 +1063,7 @@ public class StockAction implements Jsonable{
 		SPILL(3, "其他入库"),
 		STOCK_OUT(4, "退货"),
 		STOCK_OUT_TRANSFER(5, "退料"),
-		DAMAGE(6, "其他入库"),
+		DAMAGE(6, "其他出库"),
 		MORE(7, "盘盈"),
 		LESS(8, "盘亏"),
 		CONSUMPTION(9, "消耗"),
@@ -1390,6 +1408,8 @@ public class StockAction implements Jsonable{
 		setSubType(build.subType);
 		setStatus(build.status);
 		setComment(build.comment);
+		setStockInRestaurantId(build.stockInRestaurantId);
+		setStockOutRestaurantId(build.stockOutRestaurantId);
 		if(build.subType == SubType.STOCK_IN || build.subType == SubType.STOCK_OUT){
 			setActualPrice(build.getActualPrice());
 		}else{

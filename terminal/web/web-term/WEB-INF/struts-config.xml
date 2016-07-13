@@ -7,6 +7,14 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/DistributionDetailReport"
+			type="com.wireless.Actions.distributionMgr.DistributionDetailReportAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateStockDistribution"
+			type="com.wireless.Actions.distributionMgr.OperateStockDistributionAction"
+			scope="request" parameter="dataSource">
+		</action>
 		<action path="/OperateMemberOperation"
 			type="com.wireless.Actions.client.member.OperateMemberOperationAction" scope="request"
 			parameter="dataSource">
