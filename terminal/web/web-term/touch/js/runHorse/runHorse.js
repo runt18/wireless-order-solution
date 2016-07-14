@@ -48,7 +48,7 @@ function CreateRunHorse(param){
 				var port = null
 				hostname = window.location.hostname;
 				port = window.location.port; 
-				if(hostname === 'e-tones.net'){
+				if(hostname === 'e-tones.net' || hostname === 'lb.e-tones.net'){
 					hostname = 'wx.e-tones.net';
 				}
 				_messageSocket = new ReconnectingWebSocket('ws://' + hostname + ':' + port + '/wx-term/ws/wx-waiter/' + restaurantId, null, {debug : false});  

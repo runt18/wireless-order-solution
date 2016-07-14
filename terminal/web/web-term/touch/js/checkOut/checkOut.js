@@ -1442,7 +1442,7 @@ $(function(){
 		//微信店小二补打
 		$('#weixinWaiter_li_tableSelect').click(function(){
 			var url = null;
-			if(window.location.hostname === 'e-tones.net'){
+			if(window.location.hostname === 'e-tones.net' || window.location.hostname === 'lb.e-tones.net'){
 				url = 'http://wx.' + window.location.hostname + ':' + window.location.port + '/wx-term/WxOperateWaiter.do';
 			}else{
 				url = window.location.origin + '/wx-term/WxOperateWaiter.do';

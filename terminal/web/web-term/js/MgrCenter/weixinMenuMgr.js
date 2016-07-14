@@ -19,7 +19,7 @@ Ext.onReady(function(){
 	var rid = restaurantID;
 	//FIXME
 	var basePath;
-	if(window.location.hostname == 'e-tones.net'){
+	if(window.location.hostname == 'e-tones.net' || window.location.hostname == 'lb.e-tones.net'){
 		basePath = 'http://wx.e-tones.net';
 	}else if(window.location.hostname == 'ts.e-tones.net'){
 		basePath = 'http://ts.e-tones.net';
