@@ -591,7 +591,7 @@ $(function(){
 							type : 'post',
 							dataType : 'json',
 							data : {
-								timeout : 5 * 1000,
+								timeout : 30 * 1000,
 								orientedPrinter : getcookie(document.domain + '_printers')
 							},
 							beforeSend : function(){
