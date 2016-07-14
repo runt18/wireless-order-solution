@@ -417,7 +417,23 @@ public class FinanceWeixinAction extends Action {
 		}
 		
 		content.append("-------------------\n")
-			   .append("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getTotalActual())).append("\n");
+			   .append("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getTotalActual()));
+		
+		if(detail.getIncomeByCharge().getChargeAmount() > 0){
+			content.append("\n")
+			   .append("-------------------\n")
+			   .append("充值次数：" + detail.getIncomeByCharge().getChargeAmount()).append("\n")
+			   .append("充值实收：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getIncomeByCharge().getTotalActualCharge())).append("\n")
+			   .append("充值实充：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getIncomeByCharge().getTotalAccountCharge()));
+		}
+		
+		if(detail.getIncomeByCharge().getRefundAmount() > 0){
+			content.append("\n")
+			   .append("-------------------\n")
+			   .append("取款次数：" + detail.getIncomeByCharge().getRefundAmount()).append("\n")
+			   .append("取款实退：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getIncomeByCharge().getTotalActualRefund())).append("\n")
+			   .append("充值实扣：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getIncomeByCharge().getTotalAccountRefund()));
+		}
 		
 		return content.toString();
 	}
