@@ -1,5 +1,6 @@
 Ext.onReady(function(){
 	var orderShower;
+	var limitCount = 20;
 	
 	var dateBegin = new Ext.form.DateField({
 		id : 'beginDate_datefiled_wxCommissionStatistics',
@@ -125,7 +126,12 @@ Ext.onReady(function(){
 					store.baseParams['branchId'] = Ext.getCmp('branchSelect_combo_WxCommissionStatistics').getValue() ? Ext.getCmp('branchSelect_combo_WxCommissionStatistics').getValue() : restaurantID;
 					store.baseParams['minCommissionAmount'] = Ext.getCmp('minCommissionAmount_numberfield_wxCommissionStatistics').getValue();
 					store.baseParams['maxCommissionAmount'] = Ext.getCmp('maxCommissionAmount_numberfield_wxCommissionStatistics').getValue();
-					store.load();
+					store.load({
+						params : {
+							start : 0,
+							limit : limitCount
+						}
+					});
 				}
 			}
 		]
@@ -193,12 +199,20 @@ Ext.onReady(function(){
 		}])
 	});
 	
+	var pagingBar = new Ext.PagingToolbar({
+	   pageSize : limitCount,	//显示记录条数
+	   store : store,	//定义数据源
+	   displayInfo : true,	//是否显示提示信息
+	   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
+	   emptyMsg : "没有记录"
+	});
+	
 	
 	var commissionPanel = new Ext.grid.GridPanel({
 		id : 'commissionPanel_gridPanel_commissionStatistics',
 		frame : true,
 		autoScroll : true,
-		height : parseInt(Ext.getDom('statisticsPanel_div_WxCommissionStatistcs').parentElement.style.height.replace(/px/g, '')),
+		height : parseInt(Ext.getDom('statisticsPanel_div_WxCommissionStatistcs').parentElement.style.height.replace(/px/g, '')) - 30,
 		width : parseInt(Ext.getDom('statisticsPanel_div_WxCommissionStatistcs').parentElement.style.width.replace(/px/g, '')) - 20,
 		viewConfig : {
 			forceFit : true
@@ -209,6 +223,7 @@ Ext.onReady(function(){
 		},
 		store : store,
 		tbar : commissionToolbar,
+		bbar : pagingBar,
 		keys : {
 			key : Ext.EventObject.ENTER,
 			fn : function(){

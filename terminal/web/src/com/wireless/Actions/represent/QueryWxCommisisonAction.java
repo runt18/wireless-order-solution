@@ -21,6 +21,7 @@ import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
+import com.wireless.util.DataPaging;
 
 public class QueryWxCommisisonAction extends Action{
 	
@@ -34,6 +35,8 @@ public class QueryWxCommisisonAction extends Action{
 		final String minCommissionAmount = request.getParameter("minCommissionAmount");
 		final String maxCommissionAmount = request.getParameter("maxCommissionAmount");
 		final String branchId = request.getParameter("branchId");
+		final String start = request.getParameter("start");
+		final String limit = request.getParameter("limit");
 		
 		try {
 			final Staff staff = StaffDao.verify(Integer.valueOf(pin));
@@ -63,6 +66,10 @@ public class QueryWxCommisisonAction extends Action{
 			
 			operation = MemberOperationDao.getByCond(staff, extraCondToday, null);
 			operation.addAll(MemberOperationDao.getByCond(staff, extraCondHistory, null));
+			jObject.setTotalProperty(operation.size());
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				operation = DataPaging.getPagingData(operation, true, start, limit);
+			}
 			
 			jObject.setRoot(operation);
 		} catch (BusinessException | SQLException e) {
