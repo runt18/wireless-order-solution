@@ -67,8 +67,18 @@ public class QueryWxCommisisonAction extends Action{
 			operation = MemberOperationDao.getByCond(staff, extraCondToday, null);
 			operation.addAll(MemberOperationDao.getByCond(staff, extraCondHistory, null));
 			jObject.setTotalProperty(operation.size());
+			
+			MemberOperation sum = MemberOperation.newMO(0, "", "", "");
+			for(MemberOperation mp : operation){
+				sum.setDeltaExtraMoney(sum.getDeltaExtraMoney() + mp.getDeltaExtraMoney());
+			}
+			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				operation = DataPaging.getPagingData(operation, true, start, limit);
+			}
+			
+			if(operation.size() > 0){
+				operation.add(sum);
 			}
 			
 			jObject.setRoot(operation);

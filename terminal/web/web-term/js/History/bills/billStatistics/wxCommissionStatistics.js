@@ -247,6 +247,24 @@ Ext.onReady(function(){
 				showOrderMsg(el.innerHTML);
 			}
 		});
+		
+		if(store.getCount() > 0){
+			var sumRow = commissionPanel.getView().getRow(store.getCount() - 1);
+			sumRow.style.backgroundColor = '#EEEEEE';
+			for(var i = 0; i < commissionPanel.getColumnModel().getColumnCount(); i++){
+				var sumCell = commissionPanel.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
+			}
+			
+			commissionPanel.getView().getCell(store.getCount() - 1 , 1).innerHTML = '汇总';
+			commissionPanel.getView().getCell(store.getCount() - 1, 2).innerHTML = '--';
+			commissionPanel.getView().getCell(store.getCount() - 1, 3).innerHTML = '--';
+			commissionPanel.getView().getCell(store.getCount() - 1, 5).innerHTML = '--';
+			commissionPanel.getView().getCell(store.getCount() - 1, 6).innerHTML = '--';
+		}
+		
 	});
 	
 	function showOrderMsg(orderId){
