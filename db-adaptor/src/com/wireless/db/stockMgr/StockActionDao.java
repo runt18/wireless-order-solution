@@ -12,7 +12,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.DistributionError;
 import com.wireless.exception.ModuleError;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -56,6 +58,7 @@ public class StockActionDao {
 		private String comment;
 		private String fuzzId;
 		private Integer cateId;
+		
 		
 		ExtraCond setStaff(Staff staff){
 			this.staff = staff;
@@ -426,7 +429,49 @@ public class StockActionDao {
 		
 		//计算结存数量
 		for (StockActionDetail detail : stockAction.getStockDetails()) {
-			Material material = MaterialDao.getById(dbCon, staff, detail.getMaterialId());
+			Material material = null;
+			if(stockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE){
+				//传入的可能是总店的物品编号
+				List<Material> orderMaterials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setAssociateId(detail.getMaterialId()));
+				if(orderMaterials.size() > 0){
+					material = orderMaterials.get(0);
+//					detail.setMaterialAssociateId(detail.getMaterialId());
+					detail.setMaterialId(material.getId());
+				}else{
+					List<Material> materials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
+					if(materials.size() > 0){
+						material = materials.get(0);
+					}
+				}
+				
+				if(material == null){
+					throw new BusinessException(DistributionError.DISTRIBUTION_TYPE_NOMAP);
+				}
+				
+			}else if(stockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
+				List<Material> orderMaterials = MaterialDao.getByCond(dbCon, StaffDao.getAdminByRestaurant(dbCon, stockAction.getStockOutRestaurantId()), new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
+				//传入的可能是分店的物品编号
+				if(!orderMaterials.isEmpty()){
+					List<Material> associateMaterials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(orderMaterials.get(0).getAssociateId()));
+					if(associateMaterials.size() > 0){
+						material = associateMaterials.get(0);
+						detail.setMaterialId(material.getId());
+					}
+				}else{
+					List<Material> materials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
+					if(materials.size() > 0){
+						material = materials.get(0);
+						detail.setMaterialId(material.getId());
+					}
+				}
+
+				if(material == null){
+					throw new BusinessException(DistributionError.MATERIAL_NOT_MAP);
+				}
+			}else{
+				material = MaterialDao.getById(dbCon, staff, detail.getMaterialId());
+			}
+			
 			if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE || stockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || stockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				material.addStock(detail.getAmount());
 			}else if(stockAction.getSubType() == SubType.STOCK_OUT || stockAction.getSubType() == SubType.DAMAGE || stockAction.getSubType() == SubType.LESS || stockAction.getSubType() == SubType.CONSUMPTION || stockAction.getSubType() == SubType.DISTRIBUTION_SEND || stockAction.getSubType() == SubType.DISTRIBUTION_RETURN){
@@ -472,6 +517,34 @@ public class StockActionDao {
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param staff
+	 * @param extraCond
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		
+		String sql;
+		sql = " DELETE FROM " + Params.dbName + ".stock_action " +
+			  " WHERE 1 = 1 " + 
+			  " AND restuaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond.toString() : "");
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		
+		int amount = 0;
+		while(dbCon.rs.next()){
+			amount++;
+		}
+		dbCon.rs.close();
+		return amount;
+	}
+	
+	
 	/**
 	 * Delete the stockAction according to extra condition of a specified restaurant defined in terminal.
 	 * @param dbCon
@@ -484,11 +557,13 @@ public class StockActionDao {
 	 */	
 	public static int deleteStockAction(DBCon dbCon, String extraCond) throws SQLException{
 		String sql;
-		sql = "DELETE FROM " + Params.dbName + ".stock_action " +
-				" WHERE 1=1 " +
-				(extraCond == null ? "" : extraCond);
+		sql = " DELETE FROM " + Params.dbName + ".stock_action " +
+			  " WHERE 1=1 " +
+			  (extraCond == null ? "" : extraCond);
 		return dbCon.stmt.executeUpdate(sql);
 	}
+	
+	
 	/**
 	 * Delete the stockAction according to extra condition of a specified restaurant defined in terminal.
 	 * @param term
@@ -942,11 +1017,11 @@ public class StockActionDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-//			dbCon.conn.setAutoCommit(false);
+			dbCon.conn.setAutoCommit(false);
 			reAuditStockAction(dbCon, staff, builder);
-//			dbCon.conn.commit();
+			dbCon.conn.commit();
 		}catch(BusinessException | SQLException e){
-//			dbCon.conn.rollback();
+			dbCon.conn.rollback();
 			throw e;
 		}finally{
 			dbCon.disconnect();
@@ -1014,10 +1089,14 @@ public class StockActionDao {
 			List<MaterialDept> materialDepts;
 			Material material;
 			//判断是库单是什么类型的
-			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
+			if(updateStockAction.getSubType() == SubType.STOCK_IN || 				//采购
+			   updateStockAction.getSubType() == SubType.MORE || 					//盘盈
+			   updateStockAction.getSubType() == SubType.SPILL || 					//其他入库
+			   updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || 	//配送收货
+			   updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){	//配送回收
 				deptInId = updateStockAction.getDeptIn().getId();
 
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
 				
 				//还原materialDept的stock
 				//审核时已经添加, 所以一定有一条materialDept记录
@@ -1053,7 +1132,7 @@ public class StockActionDao {
 					sActionDetail.setDeptInRemaining(materialDeptPlus.getStock());
 				
 				//还原出库调拨
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 					MaterialDept materialDeptCut = materialDepts.get(0);
 					//还原部门库存
 					materialDeptCut.addStock(sActionDetail.getAmount());
@@ -1066,7 +1145,7 @@ public class StockActionDao {
 			}else{
 				deptOutId = updateStockAction.getDeptOut().getId();
 				material = MaterialDao.getById(dbCon, staff, sActionDetail.getMaterialId());
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 					materialDept = materialDepts.get(0);
 					//还原部门中库存
 					materialDept.addStock(sActionDetail.getAmount());
@@ -1157,7 +1236,7 @@ public class StockActionDao {
 			if(updateStockAction.getSubType() == SubType.STOCK_IN || updateStockAction.getSubType() == SubType.MORE || updateStockAction.getSubType() == SubType.SPILL || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || updateStockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
 				deptInId = updateStockAction.getDeptIn().getId();
 
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
 				
 				//还原materialDept的stock
 				//审核时已经添加, 所以一定有一条materialDept记录
@@ -1183,7 +1262,7 @@ public class StockActionDao {
 				deptOutId = updateStockAction.getDeptOut().getId();
 				
 				//还原入库调拨
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptInId, null);
 					MaterialDept materialDeptPlus = materialDepts.get(0);
 					//还原部门库存
 					materialDeptPlus.addStock(sActionDetail.getAmount());
@@ -1193,7 +1272,7 @@ public class StockActionDao {
 					sActionDetail.setDeptInRemaining(materialDeptPlus.getStock());
 				
 				//还原出库调拨
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 					MaterialDept materialDeptCut = materialDepts.get(0);
 					//还原部门库存
 					materialDeptCut.cutStock(sActionDetail.getAmount());
@@ -1206,7 +1285,7 @@ public class StockActionDao {
 			}else{
 				deptOutId = updateStockAction.getDeptOut().getId();
 
-				materialDepts = MaterialDeptDao.getMaterialDepts(staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
+				materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 					materialDept = materialDepts.get(0);
 					//还原部门中库存
 					materialDept.cutStock(sActionDetail.getAmount());

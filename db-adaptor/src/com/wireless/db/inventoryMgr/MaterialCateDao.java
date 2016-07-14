@@ -18,6 +18,8 @@ public class MaterialCateDao {
 		private int id;
 		private String name;
 		private MaterialCate.Type type;
+		private MaterialCate.Category category;
+		
 		public ExtraCond setId(int id) {
 			this.id = id;
 			return this;
@@ -30,6 +32,11 @@ public class MaterialCateDao {
 		
 		public ExtraCond setType(MaterialCate.Type type) {
 			this.type = type;
+			return this;
+		}
+		
+		public ExtraCond setCategory(MaterialCate.Category category){
+			this.category = category;
 			return this;
 		}
 		
@@ -47,6 +54,9 @@ public class MaterialCateDao {
 				extraCond.append(" AND type = " + this.type.getValue());
 			}
 			
+			if(category != null){
+				extraCond.append(" AND category = " + this.category.getValue());
+			}
 			return extraCond.toString();
 		}
 	}
@@ -70,10 +80,11 @@ public class MaterialCateDao {
 		MaterialCate materialCate = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".material_cate " 
-			  + " (`restaurant_id`, `name`, `type`)" + " VALUES(" 
+			  + " (`restaurant_id`, `name`, `type`, `category`)" + " VALUES(" 
 			  + staff.getRestaurantId() + ", " 
 			  + "'" + materialCate.getName()  + "', " 
-			  + materialCate.getType().getValue() + ")";
+			  + materialCate.getType().getValue() + ", "
+			  + materialCate.getCategory().getValue() + ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		int id = 0;

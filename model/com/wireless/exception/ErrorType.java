@@ -72,7 +72,8 @@ public enum ErrorType {
 	TOKEN_ERROR(33, "token_error"),
 	BILL_BOARD(34, "bill_board_error"),
 	BOOK(35, "book_error"),
-	WX_MENU(36, "weixin_menu_error");
+	WX_MENU(36, "weixin_menu_error"),
+	DISTRIBUTION(37, "distribution_error");
 	
 	private final String desc;
 	

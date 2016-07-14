@@ -701,7 +701,6 @@ Ext.ux.importShowerWin = function(params){
 }
 
 
-
 /*************************************
  * 部分通用显示格式
  */

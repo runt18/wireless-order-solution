@@ -27,9 +27,21 @@ public class MaterialDao {
 		private String name;
 		private MaterialCate.Type cateType;
 		private int cateId;
+		private int associateId;
+		private boolean hasAssociate;
+		
+		public ExtraCond setHasAssociate(boolean onOff){
+			this.hasAssociate = onOff;
+			return this;
+		}
 		
 		public ExtraCond setId(int id){
 			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setAssociateId(int associateId){
+			this.associateId = associateId;
 			return this;
 		}
 		
@@ -62,11 +74,17 @@ public class MaterialDao {
 			if(name != null){
 				extraCond.append(" AND M.name like '%" + name + "%' ");
 			}
+			if(associateId != 0){
+				extraCond.append(" AND M.associate_id = " + associateId);
+			}
 			if(cateType != null){
 				extraCond.append(" AND MC.type = " + cateType.getValue());
 			}
 			if(cateId != 0){
 				extraCond.append(" AND MC.cate_id = " + cateId);
+			}
+			if(hasAssociate){
+				extraCond.append(" AND M.associate_id > 0 ");
 			}
 			return extraCond.toString();
 		}
@@ -88,7 +106,7 @@ public class MaterialDao {
 		final List<Material> result = new ArrayList<Material>();
 		
 		String sql;
-		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.last_mod_staff, M.last_mod_date, M.alarm_amount, " +
+		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.last_mod_staff, M.last_mod_date, M.alarm_amount, M.associate_id, " +
 			  " MC.cate_id, MC.name cate_name, MC.type cate_type " + 
 			  " FROM " + Params.dbName + ".material M " + 
 			  " JOIN " + Params.dbName + ".material_cate MC ON MC.restaurant_id = M.restaurant_id AND MC.cate_id = M.cate_id "	+
@@ -114,6 +132,7 @@ public class MaterialDao {
 				item.setGood(true);
 			}
 			item.setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")).toUpperCase());
+			item.setAssociateId(dbCon.rs.getInt("associate_id"));
 			
 			result.add(item);
 		}
@@ -203,7 +222,7 @@ public class MaterialDao {
 		final Material material = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".material"
-			  + " (`restaurant_id`, `cate_id`, `price`, `stock`, `name`, `last_mod_staff`, `last_mod_date`, `alarm_amount`) values("
+			  + " (`restaurant_id`, `cate_id`, `price`, `stock`, `name`, `last_mod_staff`, `last_mod_date`, `alarm_amount`, `associate_id`) values("
 			  + staff.getRestaurantId()
 			  + ", " + material.getCate().getId()
 			  + ", " + material.getPrice()
@@ -212,6 +231,7 @@ public class MaterialDao {
 			  + ", '" + material.getLastModStaff() + "'"
 			  + ", NOW()" 
 			  + ", " + (material.hasAlarm() ? (material.getAlarmAmount()) : 0)
+			  + ", " + material.getAssociateId()
 			  + ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();

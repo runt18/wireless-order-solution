@@ -283,7 +283,7 @@ Ext.onReady(function(){
 			store.baseParams['supplier'] = supplierId;
 			store.baseParams['beginDate'] = dateBegin;
 			store.baseParams['endDate'] = dateEnd;
-			store.load();
+			store.load({params:{start:0,limit:20}});
 			store.on('load', function(){
 				store.baseParams['cateType'] = '';
 				store.baseParams['materialCateId'] = '';

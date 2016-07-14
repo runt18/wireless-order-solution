@@ -19,11 +19,22 @@ public class Material implements Jsonable {
 		private String pinyin;
 		private boolean isGood = false;
 		private int alarmAmount;
+		private int associateId;
 		
 		public InsertBuilder(){}
 		
 		public InsertBuilder setMaterialCate(MaterialCate cate){
 			this.cate = cate;
+			return this;
+		}
+		
+		public InsertBuilder setMaterialCate(int materialCate){
+			this.cate = new MaterialCate(materialCate);
+			return this;
+		}
+		
+		public InsertBuilder setAssociateId(int associateId){
+			this.associateId = associateId;
 			return this;
 		}
 		
@@ -193,6 +204,7 @@ public class Material implements Jsonable {
 	private String pinyin;
 	private boolean isGood = false;
 	private int alarmAmount;
+	private int associateId;
 	
 	public Material(){}
 
@@ -211,6 +223,7 @@ public class Material implements Jsonable {
 		this.pinyin = builder.pinyin;
 		this.isGood = builder.isGood;
 		this.alarmAmount = builder.alarmAmount;
+		this.associateId = builder.associateId;
 	}
 	
 	public Material(UpdateBuilder builder){
@@ -264,6 +277,12 @@ public class Material implements Jsonable {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	public int getAssociateId(){
+		return this.associateId;
+	}
+	public void setAssociateId(int associateId){
+		this.associateId = associateId;
 	}
 	public int getRestaurantId() {
 		return restaurantId;
@@ -493,6 +512,7 @@ public class Material implements Jsonable {
 		//记录当前价格是否修改
 		jm.putBoolean("changed", this.delta != 0 ? true : false);
 		jm.putBoolean("isGood", this.isGood);
+		jm.putInt("associateId", this.associateId);
 		
 		return jm;
 	}

@@ -8,6 +8,7 @@ public class StockActionDetail implements Jsonable{
 	private int id;
 	private int stockActionId;
 	private int materialId;
+	private int materialAssociateId;
 	private String name;
 	private float price;
 	private float amount;
@@ -16,6 +17,14 @@ public class StockActionDetail implements Jsonable{
 	private float deptOutRemaining;
 	
 	
+	public int getMaterialAssociateId() {
+		return materialAssociateId;
+	}
+
+	public void setMaterialAssociateId(int materialAssociateId) {
+		this.materialAssociateId = materialAssociateId;
+	}
+
 	public float getRemaining() {
 		return remaining;
 	}
@@ -47,7 +56,6 @@ public class StockActionDetail implements Jsonable{
 	public void setId(int id) {
 		this.id = id;
 	}
-
 	
 	public int getStockActionId() {
 		return stockActionId;
@@ -144,6 +152,7 @@ public class StockActionDetail implements Jsonable{
 		jm.putFloat("price", this.getPrice());
 		jm.putFloat("amount", this.getAmount());
 		jm.putFloat("remaining", this.getRemaining());
+		jm.putInt("associateId", this.materialAssociateId);
 		return jm;
 	}
 	@Override
