@@ -26,6 +26,11 @@ public class ReqPrintContent{
 		this.oriented.addAll(printers);
 		return this;
 	}
+
+	public ReqPrintContent addPrinter(Printer printer){
+		this.oriented.add(printer);
+		return this;
+	}
 	
 	public ReqPrintContent addPrinter(int printerId){
 		this.oriented.add(new Printer(printerId));

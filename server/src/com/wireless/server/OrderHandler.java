@@ -15,6 +15,8 @@ import java.util.List;
 import org.marker.weixin.api.BaseAPI;
 
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
+import com.wireless.db.frontBusiness.DailySettleDao;
+import com.wireless.db.frontBusiness.DailySettleDao.ManualResult;
 import com.wireless.db.frontBusiness.QueryMenu;
 import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberOperationDao;
@@ -66,6 +68,8 @@ import com.wireless.print.content.ContentParcel;
 import com.wireless.print.content.concrete.FoodDetailContent;
 import com.wireless.print.scheme.JobContentFactory;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.sms.SMS;
+import com.wireless.sms.msg.Msg4Consume;
 /**
  * @author yzhang
  *
@@ -233,6 +237,10 @@ class OrderHandler implements Runnable{
 					//handle the repaid order request
 					response = doRepayOrder(staff, request);
 					
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.DAILY_SETTLE){
+					//handle the daily settle
+					response = doDailySettle(staff, request);
+					
 				}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_DISPATCH_CONTENT){
 					//handle the print dispatch
 					response = new PrintHandler(staff).processDispatch(request, new Parcel(request.body).readParcel(ContentParcel.CREATOR));
@@ -378,7 +386,7 @@ class OrderHandler implements Runnable{
 		//新下单时打印【微信店小二】
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
-				if(func.isTypeMatched(PType.PRINT_WX_WAITER)){
+				if(func.isTypeMatched(PType.PRINT_WX_WAITER) && func.isRegionMatched(orderToInsert.getRegion())){
 					if(WirelessSocketServer.wxServer != null){
 						WirelessSocketServer.threadPool.execute(new Runnable(){
 							@Override
@@ -557,6 +565,18 @@ class OrderHandler implements Runnable{
 		return new RespACK(request.header);
 	}
 	
+	private RespPackage doDailySettle(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException, IOException{
+		//TODO
+		final ManualResult result = DailySettleDao.manual(staff);
+		final ReqPrintContent dailyContent = ReqPrintContent.buildShiftReceipt(staff, result.getRange(), PType.PRINT_DAILY_SETTLE_RECEIPT);
+		for(Printer printer : new Parcel(request.body).readParcelList(Printer.CREATOR)){
+			dailyContent.addPrinter(printer);
+		}
+		ServerConnector.instance().ask(dailyContent.build());
+		return new RespACK(request.header);
+	}
+	
+	
 	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
 		final Order.PayBuilder payBuilder = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
@@ -600,23 +620,15 @@ class OrderHandler implements Runnable{
 							ignored.printStackTrace();
 						}
 						
-//						try{
-//							//Perform the member upgrade
-//							Msg4Upgrade msg4Upgrade = MemberDao.upgrade(staff, new Member.UpgradeBuilder(order.getMemberId()));
-//
-//							if(payBuilder.isSendSMS()){
-//								MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, order);
-//								//Send SMS if perform member consumption
-//								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
-//								//Send SMS if member upgrade
-//								if(msg4Upgrade != null){
-//									SMS.send(staff, mo.getMemberMobile(), msg4Upgrade);
-//								}
-//
-//							}
-//						}catch(BusinessException | SQLException | IOException e){
-//							e.printStackTrace();
-//						}
+						//Send SMS if perform member consumption.
+						if(payBuilder.isSendSMS()){
+							try{
+								MemberOperation mo = MemberOperationDao.getLastConsumptionByOrder(staff, order);
+								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
+							}catch(BusinessException | SQLException | IOException ignored){
+								ignored.printStackTrace();
+							}
+						}
 					}
 				});
 
