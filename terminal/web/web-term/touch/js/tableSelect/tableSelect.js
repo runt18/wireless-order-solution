@@ -587,11 +587,18 @@ $(function(){
 					$.post('../DailySettleCheck.do', function(resultJSON){
 						if (resultJSON.success) {
 							//日结
-							$.post('../DailySettleExec.do', function(data){
+							Util.LM.show();
+							$.post('../DailySettleExec.do', {
+								orientedPrinter : getcookie(document.domain + '_printers')
+							}, function(data){
 								if (data.success) {
 									dailyPopup.close();
-									dutyRange = data.other.dutyRange;
-									dailyOperationDaYin(6, data.msg);
+									//dutyRange = data.other.dutyRange;
+									//dailyOperationDaYin(6, data.msg);
+									Util.msg.alert({
+										msg : data.msg,
+										topTip : true
+									});
 								} else {
 									dailyPopup.close(function(){
 										Util.msg.alert({
@@ -599,7 +606,8 @@ $(function(){
 											renderTo : 'tableSelectMgr'
 										});
 									}, 200);
-								}		
+								}
+								Util.LM.hide();
 							});			
 						} else {
 							dailyPopup.close(function(){
@@ -609,17 +617,21 @@ $(function(){
 									buttons : 'YESBACK',
 									certainCallback : function(btn){
 										if(btn == 'yes'){
-											$.post('../DailySettleExec.do', function(data){
+											Util.LM.show();
+					 						$.post('../DailySettleExec.do', {
+												orientedPrinter : getcookie(document.domain + '_printers')
+											}, function(data){
 												if (data.success) {
 													dailyPopup.close();
-													dutyRange = data.other.dutyRange;
-													dailyOperationDaYin(6, data.msg);
+													//dutyRange = data.other.dutyRange;
+													//dailyOperationDaYin(6, data.msg);
 												} else {
 													Util.msg.alert({
 														msg : data.msg,
 														renderTo : 'tableSelectMgr'
 													});
-												}		
+												}	
+												Util.LM.hide();
 											});
 										}
 									}
