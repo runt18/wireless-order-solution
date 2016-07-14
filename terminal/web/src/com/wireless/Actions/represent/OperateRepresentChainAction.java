@@ -59,6 +59,7 @@ public class OperateRepresentChainAction extends DispatchAction{
 			
 			List<RepresentChain> presentChainList = RepresentChainDao.getByCond(staff, extraCond);
 			
+			jObject.setTotalProperty(presentChainList.size());
 			
 			RepresentChain chainStatistics = new RepresentChain(0);
 			float recommendMoneyAmount = 0;
