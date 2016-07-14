@@ -476,7 +476,7 @@ Ext.onReady(function(){
 	loadPost();
 	function loadPost(){
 		var host = null;
-		if(window.location.hostname == 'e-tones.net'){
+		if(window.location.hostname == 'e-tones.net' || window.location.hostname == 'lb.e-tones.net'){
 			host = 'wx.e-tones.net'
 		}else if(window.location.hostname == 'ts.e-tones.net'){
 			host = 'ts.e-tones.net';

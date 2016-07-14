@@ -195,7 +195,7 @@
 	 */
 	function createRegionQrCode(){
 		var hostName = window.location.hostname;
-		if(hostName == 'e-tones.net'){
+		if(hostName == 'e-tones.net' || hostName == 'lb.e-tones.net'){
 			hostName = 'wx.e-tones.net';
 		}else if(hostName == 'localhost'){
 			hostName = 'ts.e-tones.net';

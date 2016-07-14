@@ -583,18 +583,23 @@ $(function(){
 						}		
 					});		
 				}else if(commitType == CommitTypeEnum.Daily){
-					// 未交班帳單檢查
-					$.post('../DailySettleCheck.do', function(resultJSON){
-						if (resultJSON.success) {
-							//日结
-							Util.LM.show();
-							$.post('../DailySettleExec.do', {
+					
+					function dailySettle(){
+						//日结
+						$.ajax({
+							url : '../DailySettleExec.do',
+							type : 'post',
+							dataType : 'json',
+							data : {
+								timeout : 30 * 1000,
 								orientedPrinter : getcookie(document.domain + '_printers')
-							}, function(data){
+							},
+							beforeSend : function(){
+								Util.LM.show();
+							},
+							success : function(data){
 								if (data.success) {
 									dailyPopup.close();
-									//dutyRange = data.other.dutyRange;
-									//dailyOperationDaYin(6, data.msg);
 									Util.msg.alert({
 										msg : data.msg,
 										topTip : true
@@ -607,8 +612,27 @@ $(function(){
 										});
 									}, 200);
 								}
+							},
+							error : function(){
+								dailyPopup.close(function(){
+									Util.msg.alert({
+										msg : '日结失败, 请重新执行日结',
+										renderTo : 'tableSelectMgr'
+									});
+								}, 200);
+
+							},
+							complete : function() {
 								Util.LM.hide();
-							});			
+                			}
+						});
+					}
+					
+					// 未交班帳單檢查
+					$.post('../DailySettleCheck.do', function(resultJSON){
+						if (resultJSON.success) {
+							dailySettle();
+							
 						} else {
 							dailyPopup.close(function(){
 								Util.msg.alert({
@@ -617,22 +641,7 @@ $(function(){
 									buttons : 'YESBACK',
 									certainCallback : function(btn){
 										if(btn == 'yes'){
-											Util.LM.show();
-					 						$.post('../DailySettleExec.do', {
-												orientedPrinter : getcookie(document.domain + '_printers')
-											}, function(data){
-												if (data.success) {
-													dailyPopup.close();
-													//dutyRange = data.other.dutyRange;
-													//dailyOperationDaYin(6, data.msg);
-												} else {
-													Util.msg.alert({
-														msg : data.msg,
-														renderTo : 'tableSelectMgr'
-													});
-												}	
-												Util.LM.hide();
-											});
+											dailySettle();
 										}
 									}
 								});
@@ -713,7 +722,7 @@ $(function(){
 														Util.msg.tip(jr.msg);
 													}
 												}
-											})
+											});
 										
 										}
 									});
