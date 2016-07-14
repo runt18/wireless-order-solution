@@ -140,7 +140,7 @@ Ext.onReady(function(){
 	});
 	
 	var pagingbar = new Ext.PagingToolbar({
-		pageSize : 10,
+		pageSize : 20,
 		store : store,
 		displayInfo : true,
 		displayMsg : '显示第{0} 条到{1} 条记录，共{2}条',
@@ -174,7 +174,7 @@ Ext.onReady(function(){
 				}]);
 	
 	var store = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url : '../../OperateRepresent.do'}),
+		proxy : new Ext.data.HttpProxy({url : '../../OperateRepresentChain.do'}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [{
 			name : 'subscribeDate'
 		},{
