@@ -390,7 +390,7 @@ public class MemberOperationDao {
 			if(pointChanged){
 				extraCond.append(" AND MO.delta_point <> 0");
 			}
-			if(branchId != 0){
+			if(branchId > 0){
 				extraCond.append(" AND MO.branch_id = " + branchId);
 			}
 			if(minChargeAmount != null && maxChargeAmount != null){
