@@ -1552,10 +1552,33 @@ var basicOperationPanel = new Ext.Panel({
 		 	    		check : function(checkbox, checked){
  	    					var selectRestaurant = Ext.getCmp('restaurant_checkbox_menuMgrMain');
 		 	    			
-		 	    			if(checked){
-		 	    				selectRestaurant.enable();
+		 	    			if(Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').checked){
+								setTimeout(function(){
+									selectRestaurant.enable();
+								}, 200);
+		 	    				
 							}else{
-								selectRestaurant.disable();
+								
+								setTimeout(function(){
+									selectRestaurant.disable();
+								}, 200);
+								
+							}
+						},
+						focus : function(){
+							var selectRestaurant = Ext.getCmp('restaurant_checkbox_menuMgrMain');
+		 	    			
+		 	    			if(Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').checked){
+								setTimeout(function(){
+									selectRestaurant.enable();
+								}, 200);
+		 	    				
+							}else{
+								
+								setTimeout(function(){
+									selectRestaurant.disable();
+								}, 200);
+								
 							}
 						}
 		 	    	}
@@ -1577,6 +1600,7 @@ var basicOperationPanel = new Ext.Panel({
 					mode : 'local',
 					triggerAction : 'all',
 					typeAhead : true,
+					disabled:true,
 					selectOnFocus : true,
 					forceSelection : true,
 					allowBlank : false,
@@ -2095,9 +2119,16 @@ function resetbBasicOperation(_d){
 	
 	if(data.printKitchenId){
 		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').setValue(true);
-		Ext.getCmp('restaurant_checkbox_menuMgrMain').setValue(data.printKitchenId);
+		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').fireEvent('check', Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain'));
+		setTimeout(function(){
+			Ext.getCmp('restaurant_checkbox_menuMgrMain').enable();
+			Ext.getCmp('restaurant_checkbox_menuMgrMain').setValue(data.printKitchenId);
+		}, 300);
+		
 	}else{
 		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').setValue(false);
+		Ext.getCmp('selectPrintRestaurant_checkBox_menuMgrMain').fireEvent('focus');
+		Ext.getCmp('restaurant_checkbox_menuMgrMain').disable();
 	}
 	
 	
