@@ -139,13 +139,6 @@ Ext.onReady(function(){
 		}]
 	});
 	
-	var pagingbar = new Ext.PagingToolbar({
-		pageSize : 10,
-		store : store,
-		displayInfo : true,
-		displayMsg : '显示第{0} 条到{1} 条记录，共{2}条',
-		emptyMsg : '没有记录'
-	}); 
 	
 	var cm = new Ext.grid.ColumnModel([
 	                                   
@@ -174,7 +167,7 @@ Ext.onReady(function(){
 				}]);
 	
 	var store = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url : '../../OperateRepresent.do'}),
+		proxy : new Ext.data.HttpProxy({url : '../../OperateRepresentChain.do'}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [{
 			name : 'subscribeDate'
 		},{
@@ -196,13 +189,20 @@ Ext.onReady(function(){
 		}
 	});
 	
+	var pagingBar = new Ext.PagingToolbar({
+		pageSize : 20,	//显示记录条数
+		store : store,	//定义数据源
+		displayInfo : true,	//是否显示提示信息
+		displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
+		emptyMsg : "没有记录"
+	});
 	
 	var representPanel = new Ext.grid.GridPanel({
 		id : 'datePanel_gridPanel_representStatistics',
 		frame : false,
 		autoScroll : true,
 		height : parseInt(Ext.getDom('representView_div_representStatistics').parentElement.style.height.replace(/px/g, '')) - 40,
-		width : parseInt(Ext.getDom('representView_div_representStatistics').parentElement.style.width.replace(/px/g, '')),
+		width : parseInt(Ext.getDom('representView_div_representStatistics').parentElement.style.width.replace(/px/g, '')) - 10,
 		viewConfig : {
 			forceFit : true
 		},
@@ -212,7 +212,7 @@ Ext.onReady(function(){
 		},
 		store : store,
 		tbar : representToolbar,
-		bbar : pagingbar,
+		bbar : pagingBar,
 		keys : {
 			key : Ext.EventObject.ENTER,
 			fn : function(){

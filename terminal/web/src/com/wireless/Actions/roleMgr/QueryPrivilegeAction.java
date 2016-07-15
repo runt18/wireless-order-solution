@@ -455,6 +455,34 @@ public class QueryPrivilegeAction extends DispatchAction{
 
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
+					
+					/**
+					 * 连锁库存模块
+					 */
+					tree.append("{");
+					tree.append("leaf:false");
+					tree.append(",expanded:false");
+					tree.append(",id:'distributionMgr'");
+					Module mModule2 = new Module(Module.Code.INVENTORY);
+					if(modules.indexOf(mModule2) < 0){
+						tree.append(",text:'配送(未开通)'");
+						tree.append(",cls:'unModuleFont'");
+						tree.append(",listeners : {beforeexpand : function(){warnModule('库存模块未开通, 只能录入50条信息');}}");
+					}else{
+						tree.append(",text:'配送'");
+						tree.append(",cls:'tFont'");
+					}
+					
+					StringBuilder children2 = new StringBuilder();
+					for (int i = 0; i < Page.Distribution.values().length; i++) {
+						if(i > 0){
+							children2.append(",");
+						}
+						children2.append("{leaf:true," + (Page.Distribution.values()[i].getUrl().isEmpty()?"id:'" +Page.Distribution.values()[i].getMgrId() + "'," : "") + " text:'" + Page.Distribution.values()[i].getDesc() + "'," + "icon:'" + Page.Distribution.values()[i].getImage() +"'" + ", mId:'" +Page.Distribution.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Distribution.values()[i].getUrl() + "'}");
+					}
+					
+					tree.append(",children : [" + children2.toString() + "]");
+					tree.append("},");
 				}else if(privilege.getCode() == Code.SYSTEM){
 					tree.append("{");
 					tree.append("leaf:false");

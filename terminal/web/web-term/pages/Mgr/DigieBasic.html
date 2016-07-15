@@ -283,9 +283,142 @@ Ext.onReady(function(){
 							}else{
 								getPayType();
 							}
-
-
+						}else if(e.attributes.mId == "initStockDistribution"){
+							(function(){
+								var checkWin;
+								checkWin = new Ext.Window({
+									height : 150,
+									width : 250,
+									resizable : false,
+									modal : true,
+									closable : false,
+									title : '配送初始化',
+									layout : 'form',
+									items : [{
+										xtype : 'tbtext',
+										text : '<span style="color:red;width:82%;margin:10px auto;text-align:center;display:block;font-weight:bold;font-size:14px;">配送初始化后， 所有配送库单会删除，确认是否初始化</span>'
+									}, {
+										xtype : 'textfield',
+										fieldLabel : '请填入"ok"确认',
+										labelStyle : 'color : red',
+										id : 'checkInit_textfield_digie'
+									}],
+									bbar : ['->', {
+										xtype : 'button',
+										text : '确认',
+										iconCls : 'btn_save',
+										handler : function(){
+											if(Ext.getCmp('checkInit_textfield_digie').getValue() != 'ok'){
+												Ext.example.msg('错误提示', '请输入"ok"字样确认初始化');
+												return;
+											}
+											
+											$.ajax({
+												url : '../../OperateStockDistribution.do',
+												type : 'post',
+												data : {
+													dataSource : 'initStockDistribution'
+												},
+												dataType : 'json',
+												success : function(res, status, req){
+													if(res.success){
+														Ext.example.msg('成功提示', res.msg);
+														checkWin.hide();
+														$('#' + checkWin.id).remove();
+													}else{
+														Ext.example.msg('错误提示', res.msg);
+													}
+												},
+												error : function(req, status, err){
+													Ext.example.msg('错误提示', res.msg);
+												}
+											});
+										}
+									}, {
+										xtype : 'button',
+										text : '取消',
+										id : 'btnClose_initMaterial',
+										iconCls : 'btn_close',
+										handler : function(){
+											checkWin.hide();
+											$('#' + checkWin.id).remove();
+										}
+									}]
+								});
+								checkWin.show();
+							})();
+						}else if(e.attributes.mId == "syncStockDistritbuion"){
+							(function(){
+								var checkWin;
+								checkWin = new Ext.Window({
+									height : 150,
+									width : 250,
+									resizable : false,
+									modal : true,
+									closable : false,
+									title : '配送初始化',
+									layout : 'form',
+									items : [{
+										xtype : 'tbtext',
+										text : '<span style="color:red;width:82%;margin:10px auto;text-align:center;display:block;font-weight:bold;font-size:14px;">配送初始化后， 所有配送库单会删除，确认是否初始化</span>'
+									}
+								/*	
+									, {
+										xtype : 'textfield',
+										fieldLabel : '请填入"ok"确认',
+										labelStyle : 'color : red',
+										id : 'checkInit_textfield_digie'
+									}
+								*/
+									],
+									bbar : ['->', {
+										xtype : 'button',
+										text : '确认',
+										iconCls : 'btn_save',
+										handler : function(){
+									/*		
+											if(Ext.getCmp('checkInit_textfield_digie').getValue() != 'ok'){
+												Ext.example.msg('错误提示', '请输入"ok"字样确认同步');
+												return;
+											}
+									*/
+											
+											$.ajax({
+												url : '../../OperateStockDistribution.do',
+												type : 'post',
+												data : {
+													dataSource : 'sync'
+												},
+												dataType : 'json',
+												success : function(res, status, req){
+													if(res.success){
+														Ext.example.msg('成功提示', res.msg);
+														checkWin.hide();
+														$('#' + checkWin.id).remove();
+													}else{
+														Ext.example.msg('错误提示', res.msg);
+													}
+												},
+												error : function(req, status, err){
+													Ext.example.msg('错误提示', res.msg);
+												}
+											});
+										}
+									}, {
+										xtype : 'button',
+										text : '取消',
+										id : 'btnClose_initMaterial',
+										iconCls : 'btn_close',
+										handler : function(){
+											checkWin.hide();
+											$('#' + checkWin.id).remove();
+										}
+									}]
+								});
+								checkWin.show();
+							})();
 						}
+
 					}
 				}
 			}

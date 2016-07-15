@@ -1021,6 +1021,12 @@ $(function(){
 				$('#payment4MemberCertainPhone').text(orderMsg.member.mobile ? orderMsg.member.mobile : '----');
 				$('#payment4MemberCertainCard').text(orderMsg.member.memberCard ? orderMsg.member.memberCard : '----');	
 				
+				if(parseInt($('#actualPrice_td_payment').text()) > orderMsg.member.baseBalance){
+					$('#memberTip_tip_payment').show();				
+				}else{
+					$('#memberTip_tip_payment').hide();
+				}
+				
 				$('#memberPaymentGiftPrice').attr('checked', false);
 				$('#useLimit_input_payment').attr('disabled', true);
 				

@@ -200,17 +200,48 @@ Ext.onReady(function(){
 		Ext.getCmp('txtOperatorNameForHistoryStockActionBasic').setValue(sn.data.operatorName);
 		Ext.getCmp('dateOperatorDateForHistoryStockActionBasic').setValue(sn.data.birthDateFormat);
 
-		if(typeof sn.data.stockDetails != 'undefined' && sn.data.stockDetails.length > 0){
-			for ( var i = 0; i < sn.data.stockDetails.length; i++) {
-				var item = sn.data.stockDetails[i];
-				dsStockDetail.add(new StockDetailRecord({
-					'material.name' : item['materialName'],
-					amount : item['amount'],
-					price : item['price'],
-					totalPrice : (item['amount'] * item['price']).toFixed(2)
-				}));
+//		if(typeof sn.data.stockDetails != 'undefined' && sn.data.stockDetails.length > 0){
+//			for ( var i = 0; i < sn.data.stockDetails.length; i++) {
+//				var item = sn.data.stockDetails[i];
+//				dsStockDetail.add(new StockDetailRecord({
+//					'material.name' : item['materialName'],
+//					amount : item['amount'],
+//					price : item['price'],
+//					totalPrice : (item['amount'] * item['price']).toFixed(2)
+//				}));
+//			}
+//		}else{
+		$.ajax({
+			url : '../../QueryStockAction.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				id : sn.data.id,
+				containsDetails : true,
+				isWithOutSum : true,
+				isHistory : true
+			},
+			success : function(res, status, req){
+				if(res.success){
+					for ( var i = 0; i < res.root[0].stockDetails.length; i++) {
+						var item = res.root[0].stockDetails[i];
+						dsStockDetail.add(new StockDetailRecord({
+							'material.name' : item['materialName'],
+							amount : item['amount'],
+							price : item['price'],
+							totalPrice : (item['amount'] * item['price']).toFixed(2)
+						}));
+					}
+				}else{
+					Ext.example.msg('错误提示', res.msg);
+				}
+			},
+			error : function(req, status, err){
+				Ext.example.msg('错误提示', err.msg);
 			}
-		}
+		});
+		
+//		}
 		
 		if(sn.data.subTypeValue == 1){
 			txtStockIn.show();
@@ -651,6 +682,8 @@ Ext.onReady(function(){
 			items : [
 			         {xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;货单编号/原始单号: '},
 				     {xtype : 'textfield', id : 'oriStockId', width: 120},
+		      		 {xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;备注: '},
+				     {xtype : 'textfield', id : 'comment_history', width: 200},
 				     '->',
 				     {
 				    	 text : '刷新',
@@ -671,6 +704,7 @@ Ext.onReady(function(){
 							 
 				    		 if(Ext.getCmp('tbarSecond').hidden){
 				    			 gs.baseParams['oriStockId'] = stockActionId.getValue();
+				    			 gs.baseParams['comment'] = Ext.getCmp('comment_history').getValue();
 								 gs.baseParams['beginDate'] = '';
 								 gs.baseParams['endDate'] = '';
 								 gs.baseParams['stockType'] = '';
@@ -680,7 +714,7 @@ Ext.onReady(function(){
 								 gs.baseParams['status'] = '';
 								 gs.baseParams['supplier'] = '';
 				    		 }else{
-
+								 gs.baseParams['comment'] = Ext.getCmp('comment_history').getValue();
 								 gs.baseParams['stockType'] = st.getValue();
 								 gs.baseParams['subType'] = subType.getValue();
 								 gs.baseParams['cateType'] = cate.getValue();

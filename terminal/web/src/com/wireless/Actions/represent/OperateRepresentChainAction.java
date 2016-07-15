@@ -59,6 +59,7 @@ public class OperateRepresentChainAction extends DispatchAction{
 			
 			List<RepresentChain> presentChainList = RepresentChainDao.getByCond(staff, extraCond);
 			
+			jObject.setTotalProperty(presentChainList.size());
 			
 			RepresentChain chainStatistics = new RepresentChain(0);
 			float recommendMoneyAmount = 0;
@@ -73,6 +74,10 @@ public class OperateRepresentChainAction extends DispatchAction{
 				subscribePointAmount += chain.getSubscribePoint();
 			}
 			
+			if(!start.isEmpty() && !limit.isEmpty()){
+				presentChainList = DataPaging.getPagingData(presentChainList, true, start, limit);
+			}
+			
 			if(presentChainList.size() > 0){
 				chainStatistics.setRecommendMoney(recommendMoneyAmount);
 				chainStatistics.setRecommendPoint(recommendPointAmount);
@@ -80,11 +85,7 @@ public class OperateRepresentChainAction extends DispatchAction{
 				chainStatistics.setSubscribePoint(subscribePointAmount);
 				presentChainList.add(chainStatistics);
 			}
-			
-			if(!start.isEmpty() && !limit.isEmpty()){
-				presentChainList = DataPaging.getPagingData(presentChainList, true, start, limit);
-			}
-			
+
 			jObject.setRoot(presentChainList);
 			
 		}catch(BusinessException | SQLException e){

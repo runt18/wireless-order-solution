@@ -5,13 +5,34 @@ var init_uploadMask = new Ext.LoadMask(document.body, {
 });
 
 function initStock(){
-	Ext.Msg.show({
-		title : '是否初始化库存?',
-		msg : '初始化后将清空所有库存库单和盘点单等信息',
-		icon: Ext.MessageBox.QUESTION,
-		buttons : Ext.Msg.YESNO,
-		fn : function(e){
-			if(e == 'yes'){
+	var checkWin;
+	checkWin = new Ext.Window({
+		height : 150,
+		width : 250,
+		title : '是否初始化库存',
+		resizable : false,
+		modal : true,
+		closable : false,
+		layout : 'form',
+		items : [{
+			xtype : 'tbtext',
+			text : '<span style="color:red;width:80%;margin:10px auto;text-align:center;display:block;font-weight:bold;font-size:14px;">初始化后将清空所有库存库单和盘点单等信息!!</span>'
+		}, {
+			xtype : 'textfield',
+			fieldLabel : '请填入"ok"确认',
+			labelStyle : 'color : red',
+			id : 'checkInit_textfield_initMaterial'
+		}],
+		bbar : ['->', {
+			xtype : 'button',
+			text : '确认',
+			iconCls : 'btn_save',
+			handler : function(){
+				if(Ext.getCmp('checkInit_textfield_initMaterial').getValue() != 'ok'){
+					Ext.example.msg('错误提示', '请输入"ok"字样确认初始化');
+					return;
+				}
+				
 				Ext.Ajax.request({
 					url : '../../OperateMaterialInit.do',
 					params : {
@@ -22,8 +43,9 @@ function initStock(){
 						if(jr.success){
 							isInit = true;
 							Ext.example.msg(jr.title, jr.msg);
-							Ext.getCmp('init_txtSearchForMaterialName').setValue();
+							Ext.getCmp('init_txtSearchForMaterialName').setValue();ok
 							Ext.getCmp('btnSearchInitMaterial').handler();
+							Ext.getCmp('btnClose_initMaterial').handler();
 						}else{
 							Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
 						}
@@ -34,8 +56,50 @@ function initStock(){
 					}
 				});
 			}
-		}
-	});		
+		}, {
+			xtype : 'button',
+			text : '取消',
+			id : 'btnClose_initMaterial',
+			iconCls : 'btn_close',
+			handler : function(){
+				checkWin.hide();
+				$('#' + checkWin.id).remove();
+			}
+		}]
+	});
+	checkWin.show();
+	
+//	Ext.Msg.show({
+//		title : '是否初始化库存?',
+//		msg : '初始化后将清空所有库存库单和盘点单等信息',
+//		icon: Ext.MessageBox.QUESTION,
+//		buttons : Ext.Msg.YESNO,
+//		fn : function(e){
+//			if(e == 'yes'){
+//				Ext.Ajax.request({
+//					url : '../../OperateMaterialInit.do',
+//					params : {
+//						dataSource : 'init'
+//					},
+//					success : function(res, opt){
+//						var jr = Ext.decode(res.responseText);
+//						if(jr.success){
+//							isInit = true;
+//							Ext.example.msg(jr.title, jr.msg);
+//							Ext.getCmp('init_txtSearchForMaterialName').setValue();
+//							Ext.getCmp('btnSearchInitMaterial').handler();
+//						}else{
+//							Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
+//						}
+//						
+//					},
+//					failure : function(res, opt) {
+//						Ext.ux.showMsg({success:false, msg:'操作失败, 请刷新页面后再试'});
+//					}
+//				});
+//			}
+//		}
+//	});		
 }
 
 function initMaterialControl(){
@@ -190,9 +254,9 @@ function initMaterialControl(){
 			id : 'btnSaveInitMaterial',
 			iconCls : 'btn_save',
 			handler : function(){
-				if(editData.size() == 0){
-					return;
-				}
+//				if(editData.size() == 0){
+//					return;
+//				}
 				$.post('../../OperateMaterialInit.do', {dataSource:'isInit'}, function(jr){
 					isInit = jr.success;
 					if(jr.success){

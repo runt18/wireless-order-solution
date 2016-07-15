@@ -317,6 +317,34 @@ public class OperateRestaurantAction extends DispatchAction {
 		return null;
 	}
 	
+	
+	/**
+	 * 分店获取总店信息
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getGroupRestaurant(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		final JObject jObject = new JObject();
+		final String pin = (String) request.getAttribute("pin");
+		try {
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Restaurant restaurant = RestaurantDao.getById(staff.getGroupId());
+			jObject.setRoot(restaurant);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			response.getWriter().print(jObject.toString());
+		}
+		
+		return null;
+	}	
+	
 	/**
 	 * 设置是否在账单打印二维码
 	 * @param mapping

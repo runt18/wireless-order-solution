@@ -204,7 +204,7 @@ public class DailySettleDao {
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static ManualResult manual(Staff staff) throws SQLException, BusinessException{
+	public static synchronized ManualResult manual(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
