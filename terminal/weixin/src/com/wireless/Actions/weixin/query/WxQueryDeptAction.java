@@ -2,6 +2,8 @@ package com.wireless.Actions.weixin.query;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,6 +170,25 @@ public class WxQueryDeptAction extends DispatchAction{
 			}
 			
 			list.addAll(KitchenDao.getByCond(staff, new KitchenDao.ExtraCond().setContainsImage(true), null));
+			
+			Collections.sort(list, new Comparator<Kitchen>() {
+				@Override
+				public int compare(Kitchen o1, Kitchen o2) {
+					if(o1.getDept().getDisplayId() > o2.getDept().getDisplayId()){
+						return 1;
+					}else if(o1.getDept().getDisplayId() < o2.getDept().getDisplayId()){
+						return -1;
+					}else{
+						if(o1.getDisplayId() > o2.getDisplayId()){
+							return 1;
+						}else if(o1.getDisplayId() < o2.getDisplayId()){
+							return -1;
+						}else{
+							return 0;
+						}
+					}
+				}
+			});
 			
 			jObject.setRoot(list);
 			
