@@ -165,6 +165,9 @@ $(function(){
 		
 		//刷新新点菜列表
 		$('#orderFoodsCmp').html(html.join('')).listview('refresh');
+		
+		 $("#divOrderFoodsCmp").scrollTop($("#divOrderFoodsCmp")[0].scrollHeight);
+		
 		//每个新点菜的click事件
 		$('#orderFoodsCmp').find('[data-type="orderFoodCmp"]').each(function(index, element){
 			element.onclick = function(){
@@ -1801,6 +1804,7 @@ $(function(){
 			of.selectedOrderFood = of.newFood.getSelected();
 			//刷新新点菜
 			initNewFoodContent();
+			
 			
 			if(popTastePopup){
 				popTastePopup.close();

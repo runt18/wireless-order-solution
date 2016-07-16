@@ -16,6 +16,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateSellOutFoodAction extends DispatchAction{
 
@@ -111,5 +112,40 @@ public class OperateSellOutFoodAction extends DispatchAction{
 
 		return null;
 	}	
-	
+
+	/**
+	 * 剩余数量设置
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward setFoodLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final String pin = (String)request.getAttribute("pin");
+		final String foodId = request.getParameter("foodId");
+		final String remain = request.getParameter("remain");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			Food.LimitRemainingBuilder builder = new Food.LimitRemainingBuilder(Integer.parseInt(foodId), Integer.parseInt(remain));
+			
+			FoodDao.update(staff, builder);
+			jobject.initTip(true, "设定成功");
+		}catch(Exception e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		
+		return null;
+	}
 }
+

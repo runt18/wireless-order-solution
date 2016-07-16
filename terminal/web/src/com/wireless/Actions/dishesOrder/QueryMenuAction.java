@@ -292,6 +292,29 @@ public class QueryMenuAction extends DispatchAction {
 		return null;
 	}
 	
+	public ActionForward limit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		
+		response.setContentType("text/json;charset=utf-8");
+		JObject jobject = new JObject();
+		final List<Food> food = new ArrayList<Food>();
+		try{
+			final String pin = (String)request.getAttribute("pin");
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			food.addAll(FoodDao.getPureByCond(staff, new FoodDao.ExtraCond().setLimit(true), null));
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip4Exception(e);
+			
+		}finally{
+			jobject.setTotalProperty(food.size());
+			jobject.setRoot(food);
+			response.getWriter().print(jobject.toString());
+			
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * 

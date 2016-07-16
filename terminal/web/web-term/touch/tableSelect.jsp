@@ -73,7 +73,9 @@
 			'handlerTable' : './js/popup/handlerTable/handlerTable',
 			'askTable' : './js/popup/table/ask',
 			'takeMoney' : './js/popup/member/takeMoney',
-			'ajustPoint' : './js/popup/member/ajustPointPopup'
+			'ajustPoint' : './js/popup/member/ajustPointPopup',
+			'limitSale' : './js/popup/limitSale/limitSale',
+			'setLimit' : './js/popup/limitSale/setLimit'
 		}
 	});
 </script>
@@ -236,12 +238,20 @@
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="searchTable_a_tableSelect">查台</a>
 		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="apartTable_a_tableSelect">拆台</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="tranTable_a_tableSelect">转台</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ts.stopSellMgr()">沽清</a>
+			<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#tableSelectStopLimitCmp">沽清</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#tableSelectOtherOperateCmp">更多</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="prevTablePage_a_tableSelect">上一页</a>
 			<a data-role="button" data-inline="true" class="bottomBtnFont" id="nextTablePage_a_tableSelect">下一页</a>		 
 		 </div>
 	</div>
+	
+	 <!-- 餐台更多操作 -->
+	<div data-role="popup" id="tableSelectStopLimitCmp" data-theme="d">
+        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+         	<li id="limitSale_a_tableSelect" class="tempFoodKitchen"><a>沽清限制</a></li>
+         	<li class="tempFoodKitchen" onclick="ts.stopSellMgr()"><a>快速沽清</a></li>
+        </ul>
+	</div>		
 
 	 <!-- 餐台更多操作 -->
 	<div data-role="popup" id="tableSelectOtherOperateCmp" data-theme="d">
@@ -1101,7 +1111,8 @@
 	 <!-- 显示会员信息 -->
 	<div id="showMemberInfoWin" data-role="popup"  data-overlay-theme="e" data-theme="d" data-dismissible="false" class="ui-corner-all" style="min-width:700px;" align="center">	
 	    <div data-role="header" data-theme="b" class="ui-corner-top ui-header ui-bar-b" style="line-height: 35px;">
-	        	会员信息
+	        	会员信息&nbsp;
+	        	<font color="red" id="memberTip_tip_payment">此会员的账户余额小于账单数额, 请注意!!!</font>
 	    </div>    
 	    <table>
 	    	<tr>
@@ -1117,11 +1128,10 @@
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPhone">----</label></td>       
 	    		<td class="readMemberTd">会员类型:</td>
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainType">----</label></td>
-	    		<td>
+	    		<td >
 					<label>
 				        <input type="checkbox" id="memberPaymentGiftPrice">赠送扣额:  
 				    </label>	 
-				    		
 	    		</td>
 	    		
 	    		<td>
@@ -1136,7 +1146,7 @@
 	    		<td >
 					<label>
 				        <input type="checkbox" id="memberPaymentSendSMS">是否发送短信
-				    </label>	    		
+				    </label>	
 	    		</td>
 	    		<td class="readMemberTdValue"><label id="payment4MemberCertainPoint"></label></td>   
 	    	</tr>	    

@@ -419,6 +419,8 @@ $(function(){
 				}
 			}
 			
+			
+			
 			//显示日结信息
 			function showDailyInfo(settleType){
 				
@@ -684,6 +686,29 @@ $(function(){
 			dailyHandler(CommitTypeEnum.Person);
 		});
 		
+		//沽清限制
+		$('#limitSale_a_tableSelect').click(function(){
+			$('#tableSelectStopLimitCmp').popup('close');
+			seajs.use(['limitSale', 'setLimit'], function(limitSale, setLimit){
+				var limitSalePopup = null;
+				limitSalePopup = limitSale.newInstance({
+					postClick : function(item){
+						var setLimitPopup = null;
+						setLimitPopup = setLimit.newInstance({
+							food : item,
+							title : '修改剩余数量----' + item.name.substring(0, 10),
+							postConfirm : function(){
+								limitSalePopup.reload();
+							}
+						})
+						
+						setLimitPopup.open();
+					}
+				});
+				limitSalePopup.open();
+				
+			});
+		})
 		
 		//积分兑换
 		$('#pointConsume_li_tableSelect').click(function(){
@@ -1789,8 +1814,12 @@ window.onload = function(){
  * 去沽清界面
  */
 ts.stopSellMgr = function(){
-	location.href = '#stopSellMgr';
-	ss.entry();
+	$('#tableSelectStopLimitCmp').popup('close');
+	setTimeout(function(){
+		location.href = '#stopSellMgr';
+		ss.entry();
+	}, 300);
+
 };
 
 //进入点菜界面
