@@ -11,6 +11,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.marker.weixin.api.Token;
+import org.marker.weixin.api.User;
+import org.marker.weixin.auth.AuthParam;
+import org.marker.weixin.auth.AuthorizerToken;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
@@ -35,6 +39,7 @@ import com.wireless.pojo.member.WxMember;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class WXOperateMemberAction extends DispatchAction {
 	
@@ -379,6 +384,34 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}		
+		return null;
+	}
+	
+	//获取微信用户资料
+	public ActionForward getUserMsg(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		final String fromId = request.getParameter("fid");
+		final String openId = request.getParameter("oid");
+		JObject jobject = new JObject();
+		
+		try{
+			final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fromId);
+			final Staff staff = StaffDao.getAdminByRestaurant(rid);
+			
+			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+			final Token token = Token.newInstance(authorizerToken);
+			
+			final User user = User.newInstance(token, openId);
+			
+			jobject.setRoot(user);
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}	
+		
 		return null;
 	}
 	

@@ -23,7 +23,7 @@ function WeDialogPopup(param){
 							+'<div class="weui_mask" id="weDialogMask_mask_weDialog"></div>'
 								+ '<div class="weui_dialog" id="dialogContainer_div_weDialog">'
 								+		'<div class="weui_dialog_hd"><strong class="weui_dialog_title" data-type="dialogTitle_div_dialogPopup"></strong></div>'
-								+ 		'<div class="weui_dialog_bd" data-type="dialogContent_div_dialogPopup"></div>'
+								+ 		'<div class="weui_dialog_bd" id="dialogContent_div_dialogPopup" data-type="dialogContent_div_dialogPopup"></div>'
 								+ 		'<div class="weui_dialog_ft">'
                					+			 '<a href="javascript:;" class="weui_btn_dialog default" data-type="left_button_WeDialogPopup" style="display:none;"></a>'
                 				+			 '<a href="javascript:;" class="weui_btn_dialog primary" data-type="right_button_WeDialogPopup" style="display:none;"></a>'
@@ -34,11 +34,11 @@ function WeDialogPopup(param){
 		$('body').append(_dialogDiv);
 		
 		_dialogDiv.find('[id=weDialogMask_mask_weDialog]').css({
-			'z-index' : '1000'
+			'z-index' : '4000'
 		});
 		
 		_dialogDiv.find('[id=dialogContainer_div_weDialog]').css({
-			'z-index' : '2000'
+			'z-index' : '5000'
 		});
 		if(param.left && typeof param.left == 'function' && param.right && typeof param.right == 'function'){
 			_dialogDiv.find('[data-type="dialogButton_div_dialogPopup"]').removeClass('dialog-buttons-dialogPopup').addClass('dialog-button-dialogPopup')

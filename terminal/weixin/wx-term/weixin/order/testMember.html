@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<title>会员中心</title>
+
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/member.css">
+<link rel="stylesheet" href="./css/food.css">
+<link rel="stylesheet" href="./css/weixinUi/weui.css" type="text/css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
+
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" ></script>
+<script type="text/javascript" src="./js/dialog/weDialog.js"></script>
+<script type='text/javascript' src='../../jquery/highcharts.js'></script>
+<script type="text/javascript" src="./js/Util.js"></script>
+<script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
+<script type="text/javascript" src="./js/dialog/dialog.js"></script>
+
+<script type="text/javascript">
+
+$(function(){
+	function fnDateInChinese(date){
+		var month = date.substring(5, 7);
+		var day = date.substring(8, 10);
+		var time = date.substring(11, date.length - 3);
+		
+		return month+ '月' +day + '日' + ' ' + time;
+		
+	}
+	
+	$.ajax({
+		url : '../../WXOperateMember.do',
+		type : 'post',
+		data : {
+			dataSource : 'getUserMsg',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
+		},
+		dataType : 'json',
+		success : function(data){
+			if(data.success){
+				$('#headImg_div_member').css({
+					'background': 'url("' + data.root[0].headimgurl + '")',
+					'background-size' : '100% 100%'
+				});
+			}		
+		}
+	});
+	
+	$.ajax({
+		url : '../../WxOperateRestaurant.do',
+		data : {
+			dataSource : 'getByCond',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid,
+			sessionId : Util.mp.params.sessionId
+		},
+		type : 'post',
+		dataType : 'json',
+		success : function(data, status, req){
+			if(data.success){
+				if(data.root[0].wxCardImg){
+					$('#divMemberCard').css({
+						'background': 'url("' + data.root[0].wxCardImg.image + '")',
+						'background-size' : '100% 100%'
+					});
+				}else{
+					$('#divMemberCard').css({
+						'background': 'url("../order/images/VIP.jpg")',
+						'background-size' : '100% 100%'
+					});
+				}
+				
+			}else{
+				$('#divMemberCard').css({
+					'background': 'url("../order/images/VIP.jpg")',
+					'background-size' : '100% 100%'
+				});
+			}
+		},
+		error : function(req, status, err){
+		
+		}
+	});
+	
+	$.ajax({
+		url : '../../WxOperateRepresent.do',
+		data : {
+			dataSource : 'getByCond',
+			fid : Util.mp.fid
+		},
+		type : 'post',
+		dataType : 'json',
+		success : function(res, status, req){
+			if(res.success){
+				$('#memberExtraBalanceDesc_div_member').show();
+				$('#memberExtraBalanceDesc_div_member').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
+				if(!res.root[0].giftDesc){
+					$('#memberExtraBalanceDesc_div_member').hide();		
+				}
+			}else{
+				Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+			}
+		},
+		error : function(req, status, err){
+			Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+		}
+	});
+	
+	$.ajax({
+		url : '../../WXQueryMemberOperation.do',
+		type : 'post',
+		data : {
+			dataSource : 'recent',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			
+			if(data.other.nearByCharge >= 0){
+				$('#newRecharge_font_member').text("(最近充值 : " + data.other.nearByCharge + "元)");
+			}
+			
+			if(data.other.nearByConsume >= 0){
+				$('#memberConsume_font_member').html("(最新消费 : " + data.other.nearByConsume + "元)");
+			}
+			
+			
+		},
+		error : function(data, errotType, eeor){
+			Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
+		}
+	});	
+	
+	var member;
+	var currentMemberLevelData;
+	$.ajax({
+		url : '../../WXOperateMember.do',
+		type : 'post',
+		data : {
+			dataSource : 'getInfo',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			if(data.success){
+				member = data.other.member;
+				member.restaurant = data.other.restaurant;
+				//添加会员等级当前位置
+				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
+				
+				if(member.mobile != ''){
+					$('#memberMobile_font_member').text("手机号 : " + member.mobile);
+				}else{
+					$('#memberMobile_font_member').text("微信卡号  : " + member.weixinCard);
+				}
+				
+				$('#memberLbelName_font_member').text(member.memberType.name);
+				$('#banlance_font_member').text(member.baseBalance);
+				$('#extra_font_member').text(member.extraBalance);
+				$('#memberCommission_font_member').text("(总佣金 : " + data.other.member.totalCommission +"元)")
+				$('#memberFans_font_member').html("(粉丝数 : " + data.other.member.fansAmount + ")");
+				
+				
+				$('#point_font_member').text(member.point);
+			}
+		}
+	});
+	
+	$.ajax({
+		url : '../../WxOperateCoupon.do',
+		type : 'post',
+		data : {
+			dataSource : 'getByCond',
+			status : 'issued',
+			expired : 'true',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			Util.lm.hide();
+			if(data.success){
+				if(data.root.length > 0){
+					$('#couponAmount_font_member').text(data.root.length);
+				}else{
+					$('#couponAmount_font_member').text('0');
+				}
+			}
+		}
+	});
+		
+	
+	//消费记录
+	$('#consume_div_member').click(function(){
+		
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'consumeDetails',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				if(data.success){
+					var content = $('<table/>');
+					content.addClass('d-list');		
+					
+					var tr = '<tr class="d-list-title">'
+								+'<td style="width:45%;text-align: center;">消费时间</td>'
+								+'<td style="width:30%;text-align:center;">消费人</td>'
+								+'<td style="width:20%;text-align:center;">佣金额</td>'
+							 +'</tr>';
+					
+							 
+					
+					if(data.root.length > 0){
+						
+						var template = '<tr class="d-list-item-consume">' +
+										'<td style="text-align: center;">{date}</td>' +
+										'<td>{balance}</td>' +
+										'<td>{point}</td>' +
+									   '</tr>';
+									   
+						var html = [], temp = null;
+						for(var i = 0; i < data.root.length; i++){
+							temp = data.root[i];
+							html.push(template.format({
+								date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
+								balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
+								point : temp.deltaPoint.toFixed(0) + '分'
+							}));
+						}
+						content.html(tr + html.join(''));
+					}else{
+						content.html('暂无消费记录');
+					}
+					
+					var errDialog;
+					errDialog = new WeDialogPopup({
+						titleText : '消费记录',
+						content : ($(content)[0]),
+						leftText : '确认',
+						left : function(){
+							errDialog.close();
+						}
+					});
+					errDialog.open();
+				}else{
+					Util.dialog.show({title: data.title, msg: data.msg});						
+				}
+			},
+			error : function(data, errotType, eeor){
+				Util.lm.hide();
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			}
+		});				
+	});
+	
+	//代言记录
+	$('#recomment_div_member').click(function(){
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'recommendDetail',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			datatype : 'josn',
+			success : function(data, status, res){
+				if(data.success){
+					var content = $('<table/>');
+					content.addClass('d-list');	
+					
+					var tr = '<tr class="d-list-title">'
+						+'<td style="width:39%;text-align: center;">关注时间</td>'
+						+'<td style="width:20%;text-align:center;">粉丝名</td>'
+						+'<td style="width:20%;text-align:center">金额</td>'
+						+'<td style="width:20%;text-align:center">积分</td>'
+					 +'</tr>';
+					 
+					if(data.root.length > 0){
+						
+						var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+						'<td style="width:39%;text-align: center;line-height:30px;">{subscribeDate}</td>' + 
+						'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
+						'</tr>';
+
+						var html = [], temp = null;
+						for(var i = 0; i < data.root.length; i++){
+							temp = data.root[i];
+							html.push(template.format({
+								subscribeDate : new Date(temp.subscribeDate).format('yyyy-MM-dd'),
+								subscribeMember : temp.subscribeMember,
+								recommendMoney : temp.recommendMoney,
+								recommendPoint : temp.recommendPoint
+							}));
+						}
+
+						content.html(tr + html.join(''));
+						
+					}else{
+						content.html('暂无记录');
+					}
+					
+					var errDialog;
+					errDialog = new WeDialogPopup({
+						titleText : '代言记录',
+						content : ($(content)[0]),
+						leftText : '确认',
+						left : function(){
+							errDialog.close();
+						}
+					});
+					errDialog.open();
+				}else{
+					Util.dialog.show({msg : '读取记录失败'});
+				}
+			},
+			error : function(req, status, error){
+				Util.lm.hide();
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			}
+		});
+	});
+	
+	//佣金记录
+	$('#commission_div_member').click(function(){
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'commissionDetail',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			datatype : 'json',
+			success : function(data, status, res){
+				if(data.success){
+					var content = $('<table/>');
+					content.addClass('d-list');		
+					
+					var tr = '<tr class="d-list-title">'
+								+'<td style="width:39%;text-align: center;">消费时间</td>'
+								+'<td style="width:30%;text-align:center;">消费人</td>'
+								+'<td style="width:20%;text-align:center;">佣金额</td>'
+							 +'</tr>';
+							 
+					if(data.root.length > 0){
+						var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+						'<td style="width:39%;text-align: center;line-height:30px;">{operateDateFormat}</td>' + 
+						'<td style="width:30%;text-align:center;line-height:30px;">{consumeMemberName}</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{deltaTotalMoney}元</td>' +
+						'</tr>';
+						
+						var html = [], temp = null;
+						for(var i = 0; i < data.root.length; i++){
+							temp = data.root[i];
+							html.push(template.format({
+								operateDateFormat : new Date(temp.operateDateFormat).format('yyyy-MM-dd'),
+								consumeMemberName : temp.member.name,
+								deltaTotalMoney : temp.deltaTotalMoney
+							}));
+						}
+						
+						content.html(tr + html.join(''));
+					}else{
+						content.html('暂无记录');
+					}
+					
+					var errDialog;
+					errDialog = new WeDialogPopup({
+						titleText : '佣金记录',
+						content : ($(content)[0]),
+						leftText : '确认',
+						left : function(){
+							errDialog.close();
+						}
+					});
+					errDialog.open();
+				}
+			},
+			error : function(res, status, err){
+				Util.lm.hide();
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			}
+		});
+		
+	});
+	
+	
+	//充值记录
+	$('#recharge_div_member').click(function(){
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'chargeDetails',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				Util.lm.hide();
+				if(data.success){
+					
+					var content = $('<table/>');
+					content.addClass('d-list');		
+					
+					var tr = '<tr class="d-list-title">'
+								+'<td style="width:39%;text-align: center;">充值时间</td>'
+								+'<td style="width:30%;text-align:center;">实收</td>'
+								+'<td style="width:20%;text-align:center;">实充</td>'
+							 +'</tr>';
+				
+					if(data.root.length > 0){
+						var templet = '<tr class="d-list-item">'
+							+ '<td style="text-align: center;">{date}</td>'
+							+ '<td>{chargeMoney}</td>'
+							+ '<td>{deltaTotalMoney}</td>'
+							+ '</tr>';
+						
+						var html = [], temp = null;
+						for(var i = 0; i < data.root.length; i++){
+							temp = data.root[i];
+							html.push(templet.format({
+								date : fnDateInChinese(temp.operateDateFormat),
+								chargeMoney : (checkDot(temp.chargeMoney)?parseFloat(temp.chargeMoney).toFixed(2) : temp.chargeMoney) + '元',
+								deltaTotalMoney : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元'
+							}));
+						}
+						content.html(tr + html.join(''));
+					}else{
+						content.html('暂无记录');
+					}
+					
+					var errDialog;
+					errDialog = new WeDialogPopup({
+						titleText : '充值记录',
+						content : ($(content)[0]),
+						leftText : '确认',
+						left : function(){
+							errDialog.close();
+						}
+					});
+					errDialog.open();
+					
+				}else{
+					Util.dialog.show({title: data.title, msg: data.msg});						
+				}
+			},
+			error : function(data, errotType, eeor){
+				Util.lm.hide();
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			}
+		});
+		
+	});
+	
+	//优惠券使用记录
+	$('#couponUse_div_member').click(function(){
+		window.location.href = 'myCoupon.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
+	
+	
+	//会员等级
+	$('#level_div_member').click(function(){
+		
+		
+		var errDialog;
+		errDialog = new WeDialogPopup({
+			titleText : '充值记录',
+			contentCallback : function(container){
+				$.post('../../WXQueryMemberOperation.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
+					if(typeof result == 'string'){
+						result = eval('(' + result + ')');
+					}
+					
+					if(result.success){
+						memberLevelData = result.root;
+						memberLevelData.push(currentMemberLevelData);
+						
+						chartDatas = eval('(' + result.other.chart + ')');
+				
+						yAxisData = chartDatas.data;
+						
+						if(yAxisData.length > 0){
+							
+							//动态变化chart高度
+							$('#divMemberLevelChart').height(yAxisData.length * (document.body.clientWidth > 330 ? 70 : 95) + 140);
+							
+							var chartMinAndMax;
+							
+							if(yAxisData[yAxisData.length-1].x >= currentMemberLevelData.x){
+								chartMinAndMax = yAxisData[yAxisData.length-1].x;
+							}else{
+								chartMinAndMax = currentMemberLevelData.x;
+							}
+							//添加用户等级位置
+							yAxisData.push(currentMemberLevelData);
+							
+							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.2, series:yAxisData});								
+						}else{
+							mainView.css('height', 'auto');
+							mainView.append('<div>会员等级建立中...</div>');
+						}
+					}else{
+						mainView.css('height', 'auto');
+						mainView.append('<div>会员等级建立中...</div>');
+					}
+					Util.lm.hide();
+				});	
+			
+			function member_loadMemberTypeChart(c){
+			 	var chart = {
+					    chart: {
+					        type: 'spline',
+					        inverted: true,
+					        width : container.find('[data-type="dialogContent_div_dialogPopup"]').width()+ 10,
+					        renderTo : 'dialogContent_div_dialogPopup'
+					    },
+					    title: {
+					        text: ''
+					    },
+					    xAxis: {
+					    	reversed : false,
+					        title: {
+					            enabled: false,
+					            text: '积分',
+					            align : 'high'
+					        },
+					        labels: {
+					            formatter: function() {
+					                return this.value;
+					            }
+					        },
+					        max : c.maxY,
+					        min: c.minY,
+					        showLastLabel: true
+					    },
+					    yAxis: {
+					        title: {
+					            text: '等级'
+					        },
+					        labels: {
+					            formatter: function() {
+					                return '' ;
+					            }
+					        },
+					        lineWidth: 2
+					    },
+					    legend: {
+					        enabled: false
+					    },
+					    tooltip: {
+					    	enabled : false,
+					        headerFormat: '<b>{series.name}</b><br/>',
+					        pointFormat: '{point.x} km: {point.y}°C',
+					        followPointer : true
+					    },
+						plotOptions : {
+							spline : {
+								cursor : 'pointer',
+								dataLabels : {
+									x: 5,
+									y : 37,							
+									align : 'right',
+									enabled : true,
+									style : {
+										fontWeight: 'bold', 
+										color: 'green'
+									},
+									formatter : function(){
+						                return getLevelChartInfo(this.x, this.point.memberTypeName);
+									}
+								},
+								marker: {
+									radius: 8,
+				                    lineColor: 'white',
+				                    lineWidth: 1
+					            }
+							}
+						},			    
+					    credits : {
+					    	enabled : false
+					    },         
+					    exporting : {
+					    	enabled : false
+					    },			    
+					    series:	[{data:c.series}]	    
+					};
+					new Highcharts.Chart(chart);
+		}
+			
+			function getLevelChartInfo(x,point){
+				var temp = {};
+				if(point){
+					temp = currentMemberLevelData;
+				}else{
+					for (var i = 0; i < memberLevelData.length; i++) {
+						if(memberLevelData[i].pointThreshold == x){
+							temp = memberLevelData[i];
+							break;
+						}
+					}	
+				}
+				
+				var pointFormat;
+				if(document.body.clientWidth > 330){
+					pointFormat = '<span style="font-size : 12px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
+						+ (temp.discount && temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>'
+						+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
+						+ (temp.desc  ? '<br/>'+ '<font style="font-size: 13px;color:maroon">'+ temp.desc : '')  + '</font>' 
+						;
+				}else{
+					pointFormat = '<span style="font-size : 12px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
+						+ (temp.discount && temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
+						+ (temp.desc  ? '<br/>'+ '<font style="font-size: 13px;color:maroon">'+ temp.desc : '')  + '</font>' 
+						;
+				}
+				
+				return pointFormat;		
+			}
+			},
+			leftText : '确认',
+			left : function(){
+				errDialog.close();
+			}
+		});
+		errDialog.open();
+		
+	})	
+})
+
+
+</script>
+
+
+
+</head>
+<body>
+<div id="WXCmp_div_member" >
+	<div id="divMemberCard" class="main-box" style="opacity:0.3;display:block;">
+		
+	</div>
+
+ 
+	<div id="headImg_div_member" style=" border-style: solid;  border-width: 5px; border-color: white;position:absolute;top:50px;left:39.5%;z-index:100;width:80px;height:80px; border-radius:80px;"></div>
+	<div style="position:absolute;top:23%;left:47%;z-index:100; font-family: Tahoma, Verdana, Arial, Helvetica;" align="center"><font size = "3">Mr.L</font></div>
+	<div style="position:absolute;top:27%;left:35%;z-index:1000;"><font id="memberMobile_font_member" color="black" size = "3"></font></div>
+	
+	
+	<div id="memberExtraBalanceDesc_div_member" style="display:none;" align="center"></div>
+
+	<div  style="height:50px;background-color:white;font-size:1.1em;">
+		<table width="100%" height="40px"> 
+			<tr width="100%">
+				<td style="BORDER-RIGHT: #DDD 1px solid;" width="25%" align="center">
+					<div style="color:#ff7d7c">基本余额 :<br><font id="banlance_font_member">0</font></div>
+				</td>
+				<td style="BORDER-RIGHT: #DDD 1px solid;" width="25%" align="center">
+					<div style="color:#ff7d7c">赠送余额 :<br><font id="extra_font_member">0</font></div>
+				</td>
+				<td style="BORDER-RIGHT: #DDD 1px solid;" width="25%" align="center">
+					<div style="color:#ff7d7c">优惠券 :<br><font id="couponAmount_font_member">0</font></div>
+				</td>
+				<td width="25%" align="center">
+					<div style="color:#ff7d7c">积分 :<br><font id="point_font_member">0</font></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div style="height:20px;"></div>
+	
+	<div style="height:50px;background-color:white;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="consume_div_member">
+		<div style="float:left;padding-left:10px;">消费记录 :&nbsp;<font id="memberConsume_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:white;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="recomment_div_member">
+		<div style="float:left;padding-left:10px;">代言记录 :&nbsp;<font id="memberFans_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:white;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="commission_div_member">
+		<div style="float:left;padding-left:10px;">佣金记录 :&nbsp;<font id="memberCommission_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:white;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="recharge_div_member">
+		<div style="float:left;padding-left:10px;">充值记录&nbsp;<font id="newRecharge_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:white;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="couponUse_div_member">
+		<div style="float:left;padding-left:10px;">优惠券使用记录</div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:white;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="level_div_member">
+		<div style="float:left;padding-left:10px;">会员等级 :&nbsp;<font id="memberLbelName_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div class="footer">&copy; 技术支持：志易科技</div>
+
+</div>
+</body>
+</html>

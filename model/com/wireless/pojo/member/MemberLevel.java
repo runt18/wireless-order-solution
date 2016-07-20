@@ -141,6 +141,7 @@ public class MemberLevel implements Jsonable{
 		jm.putInt("pointThreshold", this.pointThreshold);
 		jm.putInt("memberTypeId", this.memberType.getId());
 		jm.putString("memberTypeName", this.memberType.getName());
+		jm.putString("desc", this.getMemberType().getDesc());
 		return jm;
 	}
 	@Override
