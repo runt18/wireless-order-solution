@@ -1,6 +1,8 @@
 package com.wireless.Actions.weixin.query;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -157,6 +159,48 @@ public class WxNotifyMemberAction extends DispatchAction{
 					.addKeyword(new Keyword("remark", "如有疑问，请联系商家客服。"))
 					);
 		}	
+		return null;
+	}
+	
+	/**
+	 * 取款发送模板
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward refund(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String moId = request.getParameter("moId");
+		final String staffId = request.getParameter("staffId");
+		final Staff staff = StaffDao.getById(Integer.parseInt(staffId));
+		final MemberOperation mo = MemberOperationDao.getById(staff, DateType.TODAY, Integer.parseInt(moId));
+		final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+		final Member member = MemberDao.getById(staff, mo.getMemberId());
+		
+//		{{first.DATA}}
+//		商家名称：{{keyword1.DATA}}
+//		变更方式：{{keyword2.DATA}}
+//		变更金额：{{keyword3.DATA}}
+//		账户余额：{{keyword4.DATA}}
+//		变更时间：{{keyword5.DATA}}
+//		{{remark.DATA}}
+		
+		if(member.hasWeixin() && wxRestaurant.hasRefundTemplate()){
+			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+			final Token token = Token.newInstance(authorizerToken);
+			Template.send(token, new Template.Builder().setTemplateId(wxRestaurant.getRefundTemplate())
+													   .setToUser(member.getWeixin().getSerial())
+													   .addKeyword(new Keyword("first", 
+														("亲爱的会员【$(member)】,取款成功").replace("$(member)", member.getName())))
+													   .addKeyword(new Keyword("keyword1", mo.getBranchName()))
+													   .addKeyword(new Keyword("keyword2", mo.getOperationType().getName()))
+													   .addKeyword(new Keyword("keyword3", mo.getDeltaBaseMoney() + ""))
+													   .addKeyword(new Keyword("keyword4", mo.getRemainingTotalMoney() + ""))
+													   .addKeyword(new Keyword("keyword5", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date(mo.getOperateDate()))))
+													   .addKeyword(new Keyword("remark", "如有疑问，请联系商家客服")));
+		}
 		return null;
 	}
 	

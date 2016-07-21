@@ -27,6 +27,16 @@ public class WxRestaurant implements Jsonable{
 		private String orderNotifyTemplate;
 		private PayType defaultOrderType;
 		private PrefectMember prefectMemberStatus;
+		private String refundTemplate;
+		
+		public boolean isRefundTemplate(){
+			return this.refundTemplate != null;
+		}
+		
+		public UpdateBuilder setTakeMoneyTemplate(String refundTemplate){
+			this.refundTemplate = refundTemplate;
+			return this;
+		}
 		
 		public boolean isWxCardImgIdChange(){
 			return this.wxCardImgId != 0;
@@ -371,6 +381,7 @@ public class WxRestaurant implements Jsonable{
 	private String couponDrawTemplate;
 	private String couponTimeoutTemplate;
 	private String orderNotifyTemplate;
+	private String refundTemplate;
 	private OssImage wxCardImg;
 	private String chargeTemplate;
 	private PayType defaultOrderType = PayType.CONFIRM_BY_STAFF;
@@ -398,12 +409,25 @@ public class WxRestaurant implements Jsonable{
 		if(builder.wxCardImgId != 0){
 			this.wxCardImg = new OssImage(builder.wxCardImgId);
 		}
+		this.refundTemplate = builder.refundTemplate;
 	}
 	
 	public WxRestaurant(int restaurantId){
 		this.restaurantId = restaurantId;
 	}
 	
+	public boolean hasRefundTemplate(){
+		return refundTemplate != null;
+	}
+	
+	public String getRefundTemplate() {
+		return refundTemplate;
+	}
+
+	public void setRefundTemplate(String takeMoneyTemplate) {
+		this.refundTemplate = takeMoneyTemplate;
+	}
+
 	public OssImage getWxCardImg() {
 		return wxCardImg;
 	}

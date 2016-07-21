@@ -1,5 +1,6 @@
 package com.wireless.db.member;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -10,6 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.http.client.ClientProtocolException;
+import org.marker.weixin.api.BaseAPI;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -2131,8 +2137,10 @@ public class MemberDao {
 	 * 			<li>the staff does NOT contains member refund privilege
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
 	 */
-	public static MemberOperation refund(DBCon dbCon, Staff staff, int memberId, float refundMoney, float accountMoney) throws BusinessException, SQLException{
+	public static MemberOperation refund(DBCon dbCon, final Staff staff, int memberId, float refundMoney, float accountMoney, final String wxServer) throws BusinessException, SQLException, ClientProtocolException, IOException{
 		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_REFUND)){
 			throw new BusinessException(StaffError.MEMBER_REFUND_NOT_ALLOW);
 		}
@@ -2142,7 +2150,7 @@ public class MemberDao {
 		}
 		Member member = getById(dbCon, staff, memberId);
 		
-		MemberOperation mo = member.refund(refundMoney, accountMoney);
+		final MemberOperation mo = member.refund(refundMoney, accountMoney);
 		
 		if(mo.getRemainingBaseMoney() < 0){
 			throw new BusinessException("无足够余额取款");
@@ -2156,6 +2164,23 @@ public class MemberDao {
 				 " total_refund = " + member.getTotalRefund() +  
 				 " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
+		
+		
+		if(wxServer != null){
+			final ScheduledThreadPoolExecutor schedule = new ScheduledThreadPoolExecutor(1);
+			schedule.schedule(new Runnable(){
+				@Override
+				public void run() {
+					try {
+						BaseAPI.doPost("http://" + wxServer + "/wx-term/WxNotifyMember.do?dataSource=refund&staffId=" + staff.getId() + "moId=" + mo.getId(), "");
+					} catch (Exception ignored) {
+						ignored.printStackTrace();
+					}
+					schedule.shutdown();
+				}
+				
+			}, 1, TimeUnit.SECONDS);
+		}
 		
 		return mo;
 		
@@ -2180,13 +2205,15 @@ public class MemberDao {
 	 * 			<li>the staff does NOT contains member refund privilege
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
 	 */
-	public static MemberOperation refund(Staff staff, int memberId, float refundMoney, float accountMoney) throws BusinessException, SQLException{
+	public static MemberOperation refund(Staff staff, int memberId, float refundMoney, float accountMoney, String wxServer) throws BusinessException, SQLException, ClientProtocolException, IOException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.refund(dbCon, staff, memberId, refundMoney, accountMoney);
+			MemberOperation mo = MemberDao.refund(dbCon, staff, memberId, refundMoney, accountMoney, wxServer);
 			dbCon.conn.commit();
 			return mo;
 			
