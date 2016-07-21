@@ -373,7 +373,8 @@ public class OperateMemberAction extends DispatchAction{
 		final String payMannerMoney = request.getParameter("payMannerMoney");
 		final String comment = request.getParameter("comment");
 		final String isPrint = request.getParameter("isPrint");
-		final String orientedPrinters = request.getParameter("orientedPrinter");		
+		final String orientedPrinters = request.getParameter("orientedPrinter");
+		final String wxServer = request.getParameter("wxServer");
 
 		final JObject jobject = new JObject();
 		
@@ -381,7 +382,7 @@ public class OperateMemberAction extends DispatchAction{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberId), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney));
+			final MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberId), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), wxServer);
 			if(comment != null && !comment.isEmpty()){
 				mo.setComment(comment);
 			}

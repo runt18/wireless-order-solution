@@ -165,6 +165,7 @@ public class WxRestaurantDao {
 			  (builder.isDefaultOrderTypeChanged() ? " ,default_order_type = " + wr.getDefaultOrderType().getValue() : "") + 
 			  (builder.isPrefectMemberStatusChanged() ? " , prefect_member_status = " + wr.getPrefectMemberStatus().getValue() : "") +
 			  (builder.isWxCardImgIdChange() ? " ,weixin_card_img = '" + wr.getWxCardImg().getId() + "'": "") +
+			  (builder.isRefundTemplate() ? ", refund_template = '" +wr.getRefundTemplate() + "'" : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WxRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
@@ -325,6 +326,7 @@ public class WxRestaurantDao {
 			if(dbCon.rs.getInt("weixin_card_img") != 0){
 				wr.setWxCardImg(new OssImage(dbCon.rs.getInt("weixin_card_img")));
 			}
+			wr.setRefundTemplate(dbCon.rs.getString("refund_template"));
 			result.add(wr);
 		}
 		dbCon.rs.close();
