@@ -100,7 +100,7 @@ public class PrintFuncDao {
 		deleteByCond(dbCon, staff, new ExtraCond().setPrinter(func.getPrinterId()).setType(func.getType()));
 		
 		sql = " INSERT INTO " + Params.dbName + ".print_func" +
-		      "( `printer_id`, `repeat`, `type`, `comment`, `enabled`, `extra` )" +
+		      "( `printer_id`, `repeat`, `type`, `comment`, `enabled`, `extra`, `extra_str` )" +
 			  " VALUES( " +
 			  func.getPrinterId() + 
 			  "," + func.getRepeat() + 
@@ -108,6 +108,7 @@ public class PrintFuncDao {
 			  "," + (func.hasComment() ? "'" + func.getComment() + "'" : " NULL ") + 
 			  "," + (func.isEnabled() ? "1" : "0") +
 			  "," + func.getExtra() +
+			  "," + (func.hasExtraStr() ? "'" + func.getExtraStr() + "'" : " NULL ") + 
 		      ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -358,6 +359,7 @@ public class PrintFuncDao {
 			  (builder.isCommentChanged() ? " ,comment = '" + func.getComment() + "'" : "") +
 			  (builder.isEnabledChanged() ? " ,enabled = " + (func.isEnabled() ? "1" : "0") : "") +
 			  (builder.isExtraChanged() ? " ,extra = " + func.getExtra() : "") +
+			  (builder.isExtraStrChanged() ? " ,extra_str = '" + func.getExtraStr() + "'" : "") +
 			  " WHERE func_id = " +  func.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
