@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.http.client.ClientProtocolException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -100,7 +102,7 @@ public class TestMember {
 	}
 	
 	@Test
-	public void testMemberChain() throws BusinessException, SQLException{
+	public void testMemberChain() throws BusinessException, SQLException, ClientProtocolException, IOException{
 		Restaurant group = RestaurantDao.getById(40);
 		Staff groupStaff = StaffDao.getAdminByRestaurant(group.getId());
 		Restaurant branch = RestaurantDao.getById(41);
@@ -269,8 +271,8 @@ public class TestMember {
 		compareMemberOperation(mo, MemberOperationDao.getById(groupStaff, DateType.TODAY, mo.getId()));
 	}
 	
-	private void testRefund4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.refund(branchStaff, expected.getId(), 10, 10);
+	private void testRefund4Chain(Staff groupStaff, Staff branchStaff, Member expected) throws SQLException, BusinessException, ClientProtocolException, IOException{
+		MemberOperation mo = MemberDao.refund(branchStaff, expected.getId(), 10, 10, null);
 		expected.refund(10, 10);
 		
 		compareMember(expected, MemberDao.getById(branchStaff, expected.getId()));
@@ -280,7 +282,7 @@ public class TestMember {
 	}
 	
 	@Test
-	public void testMemberBasicOperation() throws BusinessException, SQLException{
+	public void testMemberBasicOperation() throws BusinessException, SQLException, ClientProtocolException, IOException{
 		
 		MemberType memberType = MemberTypeDao.getWxMemberType(mStaff);
 		int memberId = 0;
@@ -370,7 +372,7 @@ public class TestMember {
 				Member member = MemberDao.getById(mStaff, memberId);
 				
 				if(member.getBaseBalance() > 0){
-					MemberDao.refund(mStaff, member.getId(), member.getBaseBalance(), member.getTotalBalance());
+					MemberDao.refund(mStaff, member.getId(), member.getBaseBalance(), member.getTotalBalance(), null);
 				}
 				
 				//Delete the member 
@@ -455,8 +457,8 @@ public class TestMember {
 		compareMemberOperation(mo, MemberOperationDao.getById(mStaff, DateType.TODAY, mo.getId()));
 	}
 	
-	private void testRefund(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.refund(mStaff, expect.getId(), 10, 10);
+	private void testRefund(Member expect) throws SQLException, BusinessException, ClientProtocolException, IOException{
+		MemberOperation mo = MemberDao.refund(mStaff, expect.getId(), 10, 10, null);
 		expect.refund(10, 10);
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
