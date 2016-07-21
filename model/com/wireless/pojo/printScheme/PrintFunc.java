@@ -33,6 +33,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private int extra;
 	
+	private String extraString;
+	
 	public static class SummaryUpdateBuilder{
 		private final UpdateBuilder builder;
 		  
@@ -163,6 +165,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private List<Kitchen> mKitchens;
 		private int enabled = -1;
 		private Integer extra;
+		private String extraString;
 		
 		private UpdateBuilder(int printerId, PType type, UpdateBuilder src){
 			this(printerId, type);
@@ -211,6 +214,15 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		public UpdateBuilder(int printerId, PType type){
 			this.mPrinterId = printerId;
 			this.mPType = type;
+		}
+		
+		public UpdateBuilder setExtraString(String extra){
+			this.extraString = extra;
+			return this;
+		}
+		
+		public boolean isExtraStrChanged(){
+			return this.extraString != null;
 		}
 		
 		public UpdateBuilder setExtra(int extra){
@@ -315,7 +327,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
-	//Options to summary
+	//Options to summary.
 	public static class SummaryOptions{
 		
 		private final static int DISPLAY_SUMMARY_TOTAL = 1 << 1;		//点菜总单显示小计
@@ -363,6 +375,57 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	//Options to temporary payment.
+	public static enum QrCodeType{
+		None(0, "不显示"),
+		Manual(1, "自定义"),
+		Offical(2, "公众号"),
+		WxWaiter(3, "微信店小二")
+		;
+		
+		private final int val;
+		private final String desc;
+		
+		public static QrCodeType valueOf(int val){
+			for(QrCodeType qrCode : values()){
+				if(qrCode.val == val){
+					return qrCode;
+				}
+			}
+			return None;
+		}
+		
+		QrCodeType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+		
+		public boolean isNone(){
+			return this == None;
+		}
+		
+		public boolean isManual(){
+			return this == Manual;
+		}
+		
+		public boolean isOffical(){
+			return this == Offical;
+		}
+		
+		public boolean isWxWaiter(){
+			return this == WxWaiter;
+		}
+		
+	}
 	
 	/**
 	 * The helper class to create the print function of summary.
@@ -503,6 +566,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private PType mType ;
 		private final List<Region> mRegions = SortedList.newInstance();
 		private String mComment;
+		private int extra;
+		private String extraString;
 		
 		private Builder(int printerId){
 			this.mPrinterId = printerId;
@@ -581,21 +646,21 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public String getComment(){
-			if(this.mComment == null){
-				return "";
-			}
-			return this.mComment;
-		}
-		
-		public void setComment(String comment){
+		public Builder setComment(String comment){
 			this.mComment = comment;
+			return this;
 		}
 		
-		public PType getType() {
-			return mType;
+		public Builder setExtra(int extra){
+			this.extra = extra;
+			return this;
 		}
-
+		
+		public Builder setExtraStr(String extra){
+			this.extraString = extra;
+			return this;
+		}
+		
 		private Builder setType(PType mType) {
 			this.mType = mType;
 			return this;
@@ -650,10 +715,12 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 	
 	private PrintFunc(Builder builder){
-		this(builder.getType(), builder.mRepeat);
+		this(builder.mType, builder.mRepeat);
 		this.printerId = builder.mPrinterId;
-		mRegions.addAll(builder.mRegions);
-		mComment = builder.mComment;
+		this.mRegions.addAll(builder.mRegions);
+		this.mComment = builder.mComment;
+		this.extra = builder.extra;
+		this.extraString = builder.extraString;
 	}
 	
 	public PrintFunc(PType type, int repeat){
@@ -699,6 +766,21 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	public void setExtra(int extra){
 		this.extra = extra;
+	}
+	
+	public String getExtraStr(){
+		if(this.extraString == null){
+			return "";
+		}
+		return this.extraString;
+	}
+	
+	public boolean hasExtraStr(){
+		return getExtraStr().length() > 0;
+	}
+	
+	public void setExtraStr(String extra){
+		this.extraString = extra;
 	}
 	
 	public List<Department> getDepartment(){
@@ -899,6 +981,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.putInt("repeat", this.mRepeat);
 		jm.putString("comment", this.mComment);
 		jm.putInt("extra", this.extra);
+		jm.putString("extraStr", this.extraString);
 		jm.putBoolean("enabled", this.enabled);
 		
 		if(this.mRegions.size() > 0){
@@ -988,7 +1071,6 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		jm.putString("dept", depts);
 		jm.putString("deptValue", deptValues);
-		
 		
 		return jm;
 	}
