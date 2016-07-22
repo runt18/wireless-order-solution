@@ -2172,7 +2172,7 @@ public class MemberDao {
 				@Override
 				public void run() {
 					try {
-						BaseAPI.doPost("http://" + wxServer + "/wx-term/WxNotifyMember.do?dataSource=refund&staffId=" + staff.getId() + "moId=" + mo.getId(), "");
+						BaseAPI.doPost("http://" + wxServer + "/wx-term/WxNotifyMember.do?dataSource=refund&staffId=" + staff.getId() + "&moId=" + mo.getId(), "");
 					} catch (Exception ignored) {
 						ignored.printStackTrace();
 					}

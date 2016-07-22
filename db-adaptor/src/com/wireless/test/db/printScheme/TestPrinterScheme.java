@@ -68,6 +68,8 @@ public class TestPrinterScheme {
 		assertEquals("print function repeat", expected.getRepeat(), actual.getRepeat());
 		assertEquals("print function comment", expected.getComment(), actual.getComment());
 		assertEquals("print function enabled", expected.isEnabled(), actual.isEnabled());
+		assertEquals("print function extra", expected.getExtra(), actual.getExtra());
+		assertEquals("print function extra string", expected.getExtraStr(), actual.getExtraStr());
 		
 		if(expected.getType().isSummary()){
 			//Compare the department if the print type is summary
@@ -135,7 +137,8 @@ public class TestPrinterScheme {
 			int receiptId = PrintFuncDao.addFunc(dbCon, mStaff, receiptBuilder);
 			
 			//暂结
-			PrintFunc.Builder tempReceiptBuilder = Builder.newTempReceipt(printerId)
+			PrintFunc.Builder tempReceiptBuilder = new PrintFunc.InsertBuilder4TempReceipt(printerId)
+															.setManualQrCode("http://www.digi-e.com")
 															.setRepeat(2)
 															.addRegion(regions.get(0))
 															.addRegion(regions.get(2));

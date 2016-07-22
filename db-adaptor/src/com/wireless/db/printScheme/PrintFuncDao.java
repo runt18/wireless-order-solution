@@ -487,6 +487,7 @@ public class PrintFuncDao {
 			func.setComment(dbCon.rs.getString("comment"));
 			func.setEnabled(dbCon.rs.getBoolean("enabled"));
 			func.setExtra(dbCon.rs.getInt("extra"));
+			func.setExtraStr(dbCon.rs.getString("extra_str"));
 			result.add(func);
 		}
 		dbCon.rs.close();
