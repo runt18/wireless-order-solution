@@ -374,7 +374,7 @@ Ext.onReady(function(){
 					console.log(Ext.getCmp('giftStatistic_comboRegion').getValue());
 					
 					var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'giftStatistic_'}).data;
-					var url = '../../{0}?beginDate={1}&endDate={2}&region={3}&foodName={4}&staffID={5}&dataSource={6}&branchId={7}&opening={8}&ending={9}';
+					var url = '../../{0}?onDuty={1}&offDuty={2}&region={3}&foodName={4}&staffID={5}&dataSource={6}&branchId={7}&opening={8}&ending={9}';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 

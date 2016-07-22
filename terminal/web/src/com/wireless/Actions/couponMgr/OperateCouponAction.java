@@ -433,10 +433,10 @@ public class OperateCouponAction extends DispatchAction{
 			}
 
 			final String serverName;
-			if(request.getServerName().equals("e-tones.net")){
-				serverName = "wx.e-tones.net";
+			if(request.getServerName().equals("ts.e-tones.net")){
+				serverName = "ts.e-tones.net";
 			}else{
-				serverName = request.getServerName();
+				serverName = "wx.e-tones.net";
 			}
 			
 			CouponDao.issue(staff, builder.setWxServer(serverName));

@@ -186,7 +186,6 @@ public class WxNotifyMemberAction extends DispatchAction{
 //		账户余额：{{keyword4.DATA}}
 //		变更时间：{{keyword5.DATA}}
 //		{{remark.DATA}}
-		
 		if(member.hasWeixin() && wxRestaurant.hasRefundTemplate()){
 			final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
 			final Token token = Token.newInstance(authorizerToken);
