@@ -155,6 +155,26 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	public static class UpdateBuilder4TempReceipt extends UpdateBuilder{
+		
+		public UpdateBuilder4TempReceipt(int printerId){
+			super(printerId, PType.PRINT_TEMP_RECEIPT);
+		}
+		
+		public UpdateBuilder4TempReceipt setQrCode(PrintFunc.QrCodeType qrCode){
+			super.setExtra(qrCode.val);
+			return this;
+		}
+		
+		public UpdateBuilder4TempReceipt setManualQrCode(String qrCode){
+			if(qrCode != null && qrCode.length() > 0){
+				super.setExtra(PrintFunc.QrCodeType.Manual.val);
+				super.setExtraString(qrCode);
+			}
+			return this;
+		}
+	}
+	
 	public static class UpdateBuilder{
 		private final int mPrinterId;
 		private int mRepeat;
@@ -216,7 +236,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			this.mPType = type;
 		}
 		
-		public UpdateBuilder setExtraString(String extra){
+		private UpdateBuilder setExtraString(String extra){
 			this.extraString = extra;
 			return this;
 		}
@@ -225,7 +245,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this.extraString != null;
 		}
 		
-		public UpdateBuilder setExtra(int extra){
+		private UpdateBuilder setExtra(int extra){
 			this.extra = extra;
 			return this;
 		}
@@ -560,6 +580,28 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	public static class InsertBuilder4TempReceipt extends Builder{
+		
+		public InsertBuilder4TempReceipt(int printerId){
+			super(printerId);
+			super.setType(PType.PRINT_TEMP_RECEIPT);
+			this.setQrCode(PrintFunc.QrCodeType.None);
+		}
+		
+		public InsertBuilder4TempReceipt setQrCode(PrintFunc.QrCodeType qrCodeType){
+			super.setExtra(qrCodeType.val);
+			return this;
+		}
+		
+		public InsertBuilder4TempReceipt setManualQrCode(String qrCode){
+			if(qrCode != null && qrCode.length() > 0){
+				super.setExtra(QrCodeType.Manual.val);
+				super.setExtraStr(qrCode);
+			}
+			return this;
+		}
+	}
+	
 	public static class Builder{
 		private final int mPrinterId;
 		private int mRepeat = 1;
@@ -579,11 +621,11 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return builder;
 		}
 		
-		public static Builder newTempReceipt(int printerId){
-			Builder builder = new Builder(printerId);
-			builder.setType(PType.PRINT_TEMP_RECEIPT);
-			return builder;
-		}
+//		private static Builder newTempReceipt(int printerId){
+//			Builder builder = new Builder(printerId);
+//			builder.setType(PType.PRINT_TEMP_RECEIPT);
+//			return builder;
+//		}
 
 		public static Builder newTransferTable(int printerId){
 			Builder builder = new Builder(printerId);
@@ -651,18 +693,18 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public Builder setExtra(int extra){
+		private Builder setExtra(int extra){
 			this.extra = extra;
 			return this;
 		}
 		
-		public Builder setExtraStr(String extra){
+		private Builder setExtraStr(String extra){
 			this.extraString = extra;
 			return this;
 		}
 		
-		private Builder setType(PType mType) {
-			this.mType = mType;
+		private Builder setType(PType type) {
+			this.mType = type;
 			return this;
 		}
 		
