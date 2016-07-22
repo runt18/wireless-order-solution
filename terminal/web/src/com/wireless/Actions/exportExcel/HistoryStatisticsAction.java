@@ -5501,18 +5501,19 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		final String pin = (String) request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
-		final String onDuty = request.getParameter("beginDate");
-		final String offDuty = request.getParameter("endDate");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
 		final String region = request.getParameter("region");
 		final String foodName = request.getParameter("foodName");
-		final String giftStaffId = request.getParameter("staffId");
+		final String giftStaffId = request.getParameter("staffID");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
 		
+			
 		final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
-																.setDutyRange(new DutyRange(onDuty, offDuty))
-																.setCalcByDuty(true);
-		
+																	.setDutyRange(new DutyRange(onDuty, offDuty))
+																	.setCalcByDuty(true);
+
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		if(branchId != null && !branchId.isEmpty()){
@@ -5534,7 +5535,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(giftStaffId != null && !giftStaffId.isEmpty() && !giftStaffId.equals("-1")){
 			extraCond.setStaffId(Integer.parseInt(giftStaffId));
 		}
-		
 		if(opening != null && !opening.isEmpty()){
 			extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 		}
