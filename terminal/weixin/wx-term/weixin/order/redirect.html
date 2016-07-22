@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="./js/dialog/weDialog.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		$(function(){
+			$.ajax({
+				url : '../../WxOperateInterface.do',
+				data : {
+					code : Util.mp.params.code,
+					dataSource : 'getOpenIdByCode'
+				},
+				type : 'post'
+				dataType : 'json',
+				success : function(data, status, req){
+					if(data){
+						console.log(data);
+//						window.location.href = '';
+					}
+				},
+				error : function(req, stauts, err){
+					var errorDialog = new WeDialogPopup({
+						leftText : '确定',
+						left : function(){
+							errorDialog.close();
+						},
+						content : '<span style="display: block;text-align: center;font-size: 16px;">' + err.msg + '<span>',
+						titleText : '温磬提示'
+					});
+					remindDialog.open();
+				}
+			});
+		});
+	</script>
+</body>
+</html>
