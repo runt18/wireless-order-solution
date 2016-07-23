@@ -20,6 +20,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
 import com.wireless.db.promotion.PromotionDao;
+import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -160,14 +161,19 @@ public class OperateCouponAction extends DispatchAction{
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		final String memberId = request.getParameter("memberId");
 		final String orderId = request.getParameter("orderId");
+		final String filter = request.getParameter("filter");
 		final JObject jObject = new JObject();
 		
 		try{
+			
 			//获取账单已用的优惠券
-			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setOperation(CouponOperation.Operate.ORDER_USE, Integer.parseInt(orderId)), null);
+			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setFilter(ExtraCond.Filter.valueOf(filter)).setOperation(CouponOperation.Operate.ORDER_USE, Integer.parseInt(orderId)), null);
+			
+			
 			
 			//获取会员可用的优惠券
 			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond()
+																  .setFilter(ExtraCond.Filter.valueOf(filter))
 																  .setStatus(Coupon.Status.ISSUED)
 																  .setMember(Integer.parseInt(memberId))
 																  .addPromotions(PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addUseRule(PromotionTrigger.UseRule.FREE)
@@ -212,6 +218,7 @@ public class OperateCouponAction extends DispatchAction{
 		final String pin = (String) request.getAttribute("pin");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		final String memberId = request.getParameter("memberId");
+		final String filter = request.getParameter("filter");
 		final JObject jObject = new JObject();
 		
 		try{
@@ -219,6 +226,7 @@ public class OperateCouponAction extends DispatchAction{
 			
 			//获取会员可用的优惠券
 			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond()
+					                                              .setFilter(ExtraCond.Filter.valueOf(filter))
 																  .setStatus(Coupon.Status.ISSUED)
 																  .setMember(Integer.parseInt(memberId))
 																  .addPromotions(PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addUseRule(PromotionTrigger.UseRule.FREE))), 
@@ -314,8 +322,8 @@ public class OperateCouponAction extends DispatchAction{
 		final String memberId = request.getParameter("memberId");
 		final String operation = request.getParameter("operate");
 		final String associateId = request.getParameter("associateId");
-		final String expired = request.getParameter("expired");
 		final String start = request.getParameter("start");
+		final String filter = request.getParameter("filter");
 		final String limit = request.getParameter("limit");
 		
 		JObject jObject = new JObject();
@@ -337,13 +345,14 @@ public class OperateCouponAction extends DispatchAction{
 				}
 			}
 			
+			if(filter != null && !filter.isEmpty()){
+				extraCond.setFilter(ExtraCond.Filter.valueOf(filter));
+			}
+			
 			if(memberId != null && !memberId.isEmpty()){
 				extraCond.setMember(Integer.parseInt(memberId));
 			}
 			
-			if(expired != null && !expired.isEmpty()){
-				extraCond.isExpired(Boolean.parseBoolean(expired));
-			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				jObject.setTotalProperty(CouponDao.getByCond(staff, extraCond.setOnlyAmount(true), null).size());
@@ -529,7 +538,7 @@ public class OperateCouponAction extends DispatchAction{
 		try{
 			final int couponIssued = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.ISSUED).setOnlyAmount(true), null).size();
 			final int couponUsed = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(Integer.parseInt(pId)).setStatus(Coupon.Status.USED).setOnlyAmount(true), null).size();
-			final int couponExpired = CouponDao.getByCond(staff, new CouponDao.ExtraCond().isExpired(true), null).size();
+			final int couponExpired = CouponDao.getByCond(staff, new CouponDao.ExtraCond(), null).size();
 			jobject.setExtra(new Jsonable(){
 
 				@Override
