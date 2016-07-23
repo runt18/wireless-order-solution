@@ -113,7 +113,7 @@ define(function(require, exports, module){
 						if(jr.root.length == 1){
 							Util.msg.alert({msg : '会员信息读取成功.', topTip : true});
 							//获取优惠券信息
-							$.post('../OperateCoupon.do', {dataSource : 'getByCond', status : 'issued', expired : false, memberId : jr.root[0].id}, function(response, status, xhr){
+							$.post('../OperateCoupon.do', {dataSource : 'getByCond',filter : '1', status : 'issued', memberId : jr.root[0].id}, function(response, status, xhr){
 								if(response.success){
 										coupons = coupons.concat(response.root);
 										loadMemberInfo(jr.root[0], self, coupons);

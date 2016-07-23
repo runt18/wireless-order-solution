@@ -18,7 +18,7 @@ define(function(require, exports, module){
 			var availableCoupons = [];
 			if(param.orderId){
 				//搜索账单已用的
-				$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByOrder', orderId : param.orderId, memberId : param.useTo, orderId : param.orderId}, function(response, status, xhr){
+				$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByOrder',filter : '1', orderId : param.orderId, memberId : param.useTo, orderId : param.orderId}, function(response, status, xhr){
 					if(response.success){
 						if(response.root.length > 0){
 							availableCoupons = availableCoupons.concat(response.root);
@@ -31,7 +31,7 @@ define(function(require, exports, module){
 
 				}, 'json');
 			}else{
-				$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByManual', status : 'issued', expired : false, memberId : param.useTo}, function(response, status, xhr){
+				$.post('../OperateCoupon.do',  {dataSource : 'getAvailableByManual',filter : '1', status : 'issued', expired : false, memberId : param.useTo}, function(response, status, xhr){
 					if(response.success){
 						if(response.root.length > 0){
 							availableCoupons = availableCoupons.concat(response.root);

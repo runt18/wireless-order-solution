@@ -16,6 +16,7 @@ import com.wireless.db.member.MemberDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
+import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -85,7 +86,7 @@ public class WxOperateCouponAction extends DispatchAction{
 		final String couponId = request.getParameter("cid");
 		final String promotionId = request.getParameter("pid");
 		final String status = request.getParameter("status");
-		final String expired = request.getParameter("expired");
+		final String filter = request.getParameter("filter");
 		
 		JObject jObject = new JObject();
 		try{
@@ -115,8 +116,8 @@ public class WxOperateCouponAction extends DispatchAction{
 				extraCond.setMember(MemberDao.getByWxSerial(staff, oid));
 			}
 			
-			if(expired != null && !expired.isEmpty()){
-				extraCond.isExpired(Boolean.parseBoolean(expired));
+			if(filter != null && !filter.isEmpty()){
+				extraCond.setFilter(ExtraCond.Filter.valueOf(filter));
 			}
 			
 			final List<Coupon> result = CouponDao.getByCond(staff, extraCond, null);

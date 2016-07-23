@@ -279,16 +279,28 @@ public class CouponType implements Jsonable{
 		return this.beginExpired != 0;
 	}
 	
-	public boolean isExpired(){
-		if(beginExpired != 0 && endExpired != 0){
-			return System.currentTimeMillis() > endExpired || beginExpired > System.currentTimeMillis();
-		}else if(beginExpired == 0 && endExpired != 0){
-			return System.currentTimeMillis() > endExpired;
-		}else if(beginExpired != 0 && endExpired == 0){
-			return System.currentTimeMillis() < beginExpired;
-		}else{
+	public boolean isBeforeBegin(){
+		if(beginExpired == 0){
 			return false;
+		}else{
+			return System.currentTimeMillis() < beginExpired;
 		}
+	}
+	
+	public boolean isAfterEnd(){
+		if(endExpired == 0){
+			return false;
+		}else{
+			return System.currentTimeMillis() > endExpired;
+		}
+	}
+
+	public boolean isBetween(){
+		return !isBeforeBegin() && !isAfterEnd();
+	}
+	
+	public boolean isExpired(){
+		return isBeforeBegin() || isAfterEnd();
 	}
 	
 	public void setComment(String comment){
