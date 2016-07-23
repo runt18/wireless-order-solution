@@ -23,24 +23,59 @@ import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
+import com.wireless.pojo.promotion.CouponOperation.OperateType;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
-import com.wireless.pojo.promotion.CouponOperation.OperateType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.StringHtml;
 
 public class CouponDao {
 
 	public static class ExtraCond{
+		public static enum Filter{
+			AVAILABLE(0, "开始和中间"),
+			BETWEENS(1, "中间"),;
+			
+			private final int val;
+			private final String desc;
+			
+			Filter(int val, String desc){
+				this.val = val;
+				this.desc = desc;
+			}
+			
+			public static Filter valueOf(int val){
+				for(Filter filter : values()){
+					if(filter.val == val){
+						return filter;
+					}
+				}
+				throw new IllegalArgumentException("The filter(val=" + val + ") is invalid.");
+			}
+			
+			public int getVal(){
+				return this.val;
+			}
+			
+			public String getDesc(){
+				return this.desc;
+			}
+			
+			@Override
+			public String toString(){
+				return this.desc;
+			}
+		}
+		
 		private boolean isOnlyAmount = false;
 		private int id;
 		private Coupon.Status status;
 		private int memberId;
 		private int couponTypeId;
 		private List<Integer> promotions = new ArrayList<>();
-		private boolean expired;
 		private CouponOperation.Operate operation;
 		private int associateId;
+		private Filter filter;
 		private DutyRange range;
 		
 		private int restaurantId;
@@ -50,13 +85,14 @@ public class CouponDao {
 			return this;
 		}
 		
-		public ExtraCond isExpired(boolean onOff){
-			this.expired = onOff;
-			return this;
-		}
 		
 		public ExtraCond setOnlyAmount(boolean onOff){
 			this.isOnlyAmount = onOff;
+			return this;
+		}
+		
+		public ExtraCond setFilter(Filter filter){
+			this.filter = filter;
 			return this;
 		}
 		
@@ -150,6 +186,7 @@ public class CouponDao {
 			return extraCond.toString();
 		}
 	}
+	
 	
 	/**
 	 * Issue the coupon according to specific builder {@link Coupon.IssueBuilder}.
@@ -668,7 +705,16 @@ public class CouponDao {
 				promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
 				coupon.setPromotion(promotion);
 				
-				if(!(extraCond.expired && ct.isExpired())){
+				//筛选出符合条件的券
+				if(extraCond.filter == ExtraCond.Filter.AVAILABLE){
+					if((ct.isBeforeBegin() || ct.isBetween())){
+						result.add(coupon);
+					}
+				}else if(extraCond.filter == ExtraCond.Filter.BETWEENS){
+					if(ct.isBetween()){
+						result.add(coupon);	
+					}
+				}else{
 					result.add(coupon);
 				}
 				
@@ -676,6 +722,7 @@ public class CouponDao {
 		}
 
 		dbCon.rs.close();
+		
 		
 		return result;
 	}
