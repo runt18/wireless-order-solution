@@ -163,6 +163,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		public UpdateBuilder4TempReceipt setQrCode(PrintFunc.QrCodeType qrCode){
 			super.setExtra(qrCode.val);
+			super.setExtraString("");
 			return this;
 		}
 		
@@ -737,6 +738,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 		if(builder.isExtraChanged()){
 			extra = builder.extra.intValue();
+		}
+		if(builder.isExtraStrChanged()){
+			extraString = builder.extraString;
 		}
 	}
 	

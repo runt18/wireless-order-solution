@@ -1,6 +1,11 @@
-
-
 Ext.onReady(function(){
+	var printQrCodeType = {
+		None : {val : 0,desc : "不显示"},
+		Manual : {val : 1,desc : "自定义"},
+		Offical : {val : 2,desc : "公众号"},
+		WxWaiter : {val : 3,desc : "微信店小二"}	
+	};
+	
 	//初始化打印机和打印方案控件
 	init();
 	
@@ -291,7 +296,9 @@ function init(){
 						isNeedToAdd : Ext.getDom('chkIsNeedToAdd').checked,
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
 						displayTotalPrice : Ext.getDom('chkIsNeedToTotalPrice').checked,
-						dataSource : 'insert'
+						dataSource : 'insert',
+						qrCodeType : pType == 127 ? Ext.getCmp('radiogroupQrCode_radiogroup_printScheme').getValue().inputValue : '',
+						qrCodeContent : pType == 127 && Ext.getCmp('radiogroupQrCode_radiogroup_printScheme').getValue().inputValue == 1 ? Ext.getCmp('qrCodeLink_textfield_printScheme').getValue() : ''
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -403,7 +410,9 @@ function init(){
 						isNeedToCancel : Ext.getDom('chkIsNeedToCancel').checked, 
 						displayTotalPrice : Ext.getDom('chkIsNeedToTotalPrice').checked,
 						comment : printComment,
-						dataSource : dataSource
+						dataSource : dataSource,
+						qrCodeType : pType == 127 ? Ext.getCmp('radiogroupQrCode_radiogroup_printScheme').getValue().inputValue : '',
+						qrCodeContent : pType == 127 && Ext.getCmp('radiogroupQrCode_radiogroup_printScheme').getValue().inputValue == 1 ? Ext.getCmp('qrCodeLink_textfield_printScheme').getValue() : ''
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -800,6 +809,78 @@ function init(){
 						labelWidth : 70
 					}
 				}]
+			}, {
+				layout : 'column',
+				frame : true,
+				id : 'printQrcode_container_printScheme',
+				items : [{
+					columnWidth : 1,
+					xtype : 'label',
+					text : '打印二维码设置：'
+				}, {
+					columnWidth : 1,
+					xtype : 'radiogroup',
+					id : 'radiogroupQrCode_radiogroup_printScheme',
+					items : [{
+						boxLabel : '不打印',
+						name : 'printQrCode',
+						checked : true,
+						id : 'noneQrcode_radio',
+						inputValue : printQrCodeType.None.val,
+						listeners : {
+							focus : function(){
+								Ext.getCmp('setQrCodePrint_container_printScheme').hide();
+								Ext.getCmp('qrCodeLink_textfield_printScheme').setValue('');
+							}
+						}
+					}, {
+						boxLabel : '店小二',
+						name : 'printQrCode',
+						id : 'wxWaiterQrcode_radio',
+						inputValue : printQrCodeType.WxWaiter.val,
+						listeners : {
+							focus : function(){
+								Ext.getCmp('setQrCodePrint_container_printScheme').hide();		
+								Ext.getCmp('qrCodeLink_textfield_printScheme').setValue('');
+							}
+						}
+					}, {
+						boxLabel : '公众号',
+						name : 'printQrCode',
+						id : 'officalQrCode_radio',
+						inputValue : printQrCodeType.Offical.val,
+						listeners : {
+							focus : function(){
+								Ext.getCmp('setQrCodePrint_container_printScheme').hide();
+								Ext.getCmp('qrCodeLink_textfield_printScheme').setValue('');
+							}
+						}
+					}, {
+						boxLabel : '自定义',
+						name : 'printQrCode',
+						id : 'manualQrcode_radio',
+						inputValue : printQrCodeType.Manual.val,
+						listeners : {
+							focus : function(){
+								Ext.getCmp('setQrCodePrint_container_printScheme').show();
+								Ext.getCmp('qrCodeLink_textfield_printScheme').setValue('');
+								Ext.getCmp('qrCodeLink_textfield_printScheme').focus();
+							}
+						}
+					}]
+				},{
+					xtyle : 'container',
+					columnWidth : 1,
+					id : 'setQrCodePrint_container_printScheme',
+					items : [{
+						xtype : 'label',
+						text : "自定义二维码链接： "
+					}, {
+						xtype : 'textfield',
+						width : 300,
+						id : 'qrCodeLink_textfield_printScheme'
+					}]
+				}]
 			},{
 				layout : 'column',
 				id : 'kitchensTree',
@@ -1181,7 +1262,7 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').show();
 		Ext.getCmp('regions').show();
-		
+		Ext.getCmp('printQrcode_container_printScheme').hide();
 		
 		if(v == 1){
 			Ext.getCmp('printCommentPanel').show();
@@ -1211,6 +1292,7 @@ function showPanel(v){
 		cancelFoodBtn.setBoxLabel('打印退菜分单');
 		addFoodBtn.show();
 		addFoodBtn.setBoxLabel('打印加菜分单');
+		Ext.getCmp('printQrcode_container_printScheme').hide();
 		
 		totalPriceBtn.hide();
 	}else if(v == 18){//客显
@@ -1219,6 +1301,7 @@ function showPanel(v){
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
+		Ext.getCmp('printQrcode_container_printScheme').hide();
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/2ndDisplay.jpg)';
 	}else if(v == 22){//呼叫结账
 		Ext.getCmp('kitchens').hide();
@@ -1226,6 +1309,7 @@ function showPanel(v){
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').hide();
 		Ext.getCmp('printCommentPanel').hide();
+		Ext.getCmp('printQrcode_container_printScheme').hide();
 		paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/wxCallPay.jpg)';
 		
 	}else{
@@ -1233,11 +1317,13 @@ function showPanel(v){
 		Ext.getCmp('kitchensTree').hide();
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
+		Ext.getCmp('printQrcode_container_printScheme').hide();
 		cancelFoodBtn.hide();
 		addFoodBtn.hide();
 		totalPriceBtn.hide();
 		
 		if(v == 127){//暂结
+			Ext.getCmp('printQrcode_container_printScheme').show();
 			Ext.getCmp('printCommentPanel').show();
 			paperDemoCmp.style.backgroundImage = 'url(http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/PrintSample/%E6%9A%82%E7%BB%93%E5%8D%95.jpg)';
 		}else if(v == 3){//结账
@@ -1332,6 +1418,7 @@ function printFuncOperactionHandler(c){
 	
 	var sn = printerTree.getSelectionModel().getSelectedNode();
 	var ss = Ext.getCmp('printFunc_grid').getSelectionModel().getSelected();
+	console.log(ss);
 	if(c.type == 'update'){
 		kitchenTree.loader.dataUrl = "../../QueryKitchen.do";
 		kitchenTree.loader.baseParams = {dataSource : 'printKitchenTree4Update', schemeId : ss.data.printFuncId, printerId:sn.id};
@@ -1358,6 +1445,7 @@ function printFuncOperactionHandler(c){
 		Ext.getDom('chkAllDept').checked = true;
 		Ext.getDom('chkAllRegion').checked = true;
 		Ext.getDom('chkAllKitchen').checked = true;
+		Ext.getCmp('noneQrcode_radio').fireEvent('focus');
 		
 	}else{
 		if(ss == null){
@@ -1413,7 +1501,20 @@ function printFuncOperactionHandler(c){
 			});	
 		}
 		
-		
+		if(ss.data.pTypeValue == 127){
+			Ext.getCmp('radiogroupQrCode_radiogroup_printScheme').setValue(ss.json.extra);
+			switch(ss.json.extra){
+				case printQrCodeType.None.val : Ext.getCmp('noneQrcode_radio').fireEvent('focus');
+						 break;
+				case printQrCodeType.Manual.val : Ext.getCmp('manualQrcode_radio').fireEvent('focus');
+												  Ext.getCmp('qrCodeLink_textfield_printScheme').setValue(ss.json.extraStr);
+						 break;
+				case printQrCodeType.Offical.val : Ext.getCmp('officalQrCode_radio').fireEvent('focus');
+						 break;
+				case printQrCodeType.WxWaiter.val : Ext.getCmp('wxWaiterQrcode_radio').fireEvent('focus');
+						 break;
+			}
+		}
 		
 		if(c.type == 'update'){
 			addPrintFunc.setTitle('修改方案');
