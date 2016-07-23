@@ -872,12 +872,20 @@ function init(){
 					xtyle : 'container',
 					columnWidth : 1,
 					id : 'setQrCodePrint_container_printScheme',
+					dolayout : 'column',
 					items : [{
+						columnWidth : 1,
 						xtype : 'label',
 						text : "自定义二维码链接： "
 					}, {
-						xtype : 'textfield',
-						width : 300,
+						columnWidth : 1,
+						xtype : 'tbtext',
+						text : '&nbsp;&nbsp;&nbsp;&nbsp;'
+					}, {
+						columnWidth : 1,
+						xtype : 'textarea',
+						width : 400,
+						height : 100,
 						id : 'qrCodeLink_textfield_printScheme'
 					}]
 				}]
