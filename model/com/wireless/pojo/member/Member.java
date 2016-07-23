@@ -356,7 +356,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public static class PointExchangeBuilder{
 		private final int memberId;
-		private final List<Map.Entry<Integer, Integer>> coupons = new ArrayList<>();
+		private final List<Map.Entry<Integer, Integer>> coupons = new ArrayList<Map.Entry<Integer, Integer>>();
 		private String comment;
 		private boolean isIssueAndUse;
 		

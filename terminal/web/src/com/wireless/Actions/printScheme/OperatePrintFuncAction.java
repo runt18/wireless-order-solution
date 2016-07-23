@@ -57,32 +57,28 @@ public class OperatePrintFuncAction extends DispatchAction{
 	
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
+		final String pin = (String)request.getAttribute("pin");
+
+		final int printerId = Integer.parseInt(request.getParameter("printerId"));
+		final int printType = Integer.parseInt(request.getParameter("pType"));
+		
+		final String repeat = request.getParameter("repeat");
+		final String kitchenParam = request.getParameter("kitchens");
+		final String deptParam = request.getParameter("dept");
+		final String regionParam = request.getParameter("regions");
+		final String comment = request.getParameter("comment");
+		final String isNeedToAdd = request.getParameter("isNeedToAdd");
+		final String isNeedToCancel = request.getParameter("isNeedToCancel");
+		final String displayTotalPrice = request.getParameter("displayTotalPrice");
+		final String qrCodeType = request.getParameter("qrCodeType");
+		final String qrCodeContent = request.getParameter("qrCodeContent");
 		
 		final JObject jObject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			
-			final String pin = (String)request.getAttribute("pin");
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			final int printerId = Integer.parseInt(request.getParameter("printerId"));
-			final int printType = Integer.parseInt(request.getParameter("pType"));
-			
-			final String repeat = request.getParameter("repeat");
-			final String kitchenParam = request.getParameter("kitchens");
-			final String deptParam = request.getParameter("dept");
-			final String regionParam = request.getParameter("regions");
-			final String comment = request.getParameter("comment");
-			final String isNeedToAdd = request.getParameter("isNeedToAdd");
-			final String isNeedToCancel = request.getParameter("isNeedToCancel");
-			final String displayTotalPrice = request.getParameter("displayTotalPrice");
-			
-//			final int printerId;
-//			if(request.getParameter("printerId") == null){
-//				printerId = PrinterDao.getByCond(staff, new PrinterDao.ExtraCond().setName(request.getParameter("printerName"))).get(0).getId();
-//			}else{
-//				printerId = Integer.parseInt(request.getParameter("printerId"));
-//			}
 			
 			final String[] kitchens;
 			if(kitchenParam != null && !kitchenParam.trim().isEmpty()){
@@ -152,8 +148,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 				PrintFuncDao.addFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_TEMP_RECEIPT){
-				//暂结单
-				PrintFunc.Builder builder = Builder.newTempReceipt(printerId);
+				//TODO 暂结单
+				PrintFunc.InsertBuilder4TempReceipt builder = new PrintFunc.InsertBuilder4TempReceipt(printerId);
 				for (String regionId : regions) {
 					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
@@ -164,6 +160,17 @@ public class OperatePrintFuncAction extends DispatchAction{
 					builder.setComment(comment);
 				}
 				
+				//暂结单二维码类型
+				if(qrCodeType != null && !qrCodeType.isEmpty()){
+					final PrintFunc.QrCodeType qrType = PrintFunc.QrCodeType.valueOf(Integer.parseInt(qrCodeType));
+					if(qrType.isManual()){
+						if(qrCodeContent != null && !qrCodeContent.isEmpty()){
+							builder.setManualQrCode(qrCodeContent);
+						}
+					}else{
+						builder.setQrCode(qrType);
+					}
+				}
 				PrintFuncDao.addFunc(dbCon, staff, builder);
 				
 			}else if(PType.valueOf(printType) == PType.PRINT_TRANSFER_TABLE){
@@ -257,17 +264,19 @@ public class OperatePrintFuncAction extends DispatchAction{
 		final String depts = request.getParameter("dept");
 		final String regions = request.getParameter("regions");
 		final String ending = request.getParameter("comment");
+		final String isNeedToAdd = request.getParameter("isNeedToAdd");
+		final String isNeedToCancel = request.getParameter("isNeedToCancel");
+		final String displayTotalPrice = request.getParameter("displayTotalPrice");
+		final String qrCodeType = request.getParameter("qrCodeType");
+		final String qrCodeContent = request.getParameter("qrCodeContent");
 		final JObject jObject = new JObject();
-		DBCon dbCon = new DBCon();
+		final DBCon dbCon = new DBCon();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			dbCon.connect();
 			int printerId = Integer.parseInt(request.getParameter("printerId"));
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
-			String isNeedToAdd = request.getParameter("isNeedToAdd");
-			String isNeedToCancel = request.getParameter("isNeedToCancel");
-			final String displayTotalPrice = request.getParameter("displayTotalPrice");
 			
 			String[] kitchen = null, region = null, dept = null;
 			if(!kitchens.trim().isEmpty()){
@@ -337,9 +346,9 @@ public class OperatePrintFuncAction extends DispatchAction{
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 				
-			}else if(printType == PType.PRINT_RECEIPT){
+			}else if(printType == PType.PRINT_TEMP_RECEIPT){
 				//结账单
-				PrintFunc.UpdateBuilder builder = new PrintFunc.UpdateBuilder(printerId, printType);
+				PrintFunc.UpdateBuilder4TempReceipt builder = new PrintFunc.UpdateBuilder4TempReceipt(printerId);
 				if(region.length == 0){
 					builder.setRegionAll();
 				}else{
@@ -353,6 +362,17 @@ public class OperatePrintFuncAction extends DispatchAction{
 				if(ending != null && !ending.isEmpty()){
 					builder.setComment(ending);
 				}
+				
+				//暂结单二维码类型
+				if(qrCodeType != null && !qrCodeType.isEmpty()){
+					final PrintFunc.QrCodeType qrType = PrintFunc.QrCodeType.valueOf(Integer.parseInt(qrCodeType));
+					if(qrType.isManual() && qrCodeContent != null && !qrCodeContent.isEmpty()){
+						builder.setManualQrCode(qrCodeContent);
+					}else{
+						builder.setQrCode(qrType);
+					}
+				}
+				
 				PrintFuncDao.updateFunc(dbCon, staff, builder);
 				
 			}else{

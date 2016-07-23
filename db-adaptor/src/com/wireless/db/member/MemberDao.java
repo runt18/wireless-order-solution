@@ -2055,7 +2055,7 @@ public class MemberDao {
 		//Perform the charge operation and get the related member operation.
 		MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
 		if(comment != null){
-			if(chargeType != ChargeType.COMMISSION){
+			if(chargeType == ChargeType.COMMISSION){
 				List<MemberOperation> mo4Consume = MemberOperationDao.getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY)
 																		  .setOrder(Integer.parseInt(comment))
 																		  .setOperationType(MemberOperation.OperationType.CONSUME), null);
@@ -2172,7 +2172,7 @@ public class MemberDao {
 				@Override
 				public void run() {
 					try {
-						BaseAPI.doPost("http://" + wxServer + "/wx-term/WxNotifyMember.do?dataSource=refund&staffId=" + staff.getId() + "moId=" + mo.getId(), "");
+						BaseAPI.doPost("http://" + wxServer + "/wx-term/WxNotifyMember.do?dataSource=refund&staffId=" + staff.getId() + "&moId=" + mo.getId(), "");
 					} catch (Exception ignored) {
 						ignored.printStackTrace();
 					}

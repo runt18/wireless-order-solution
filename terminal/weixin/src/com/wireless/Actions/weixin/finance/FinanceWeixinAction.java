@@ -374,10 +374,10 @@ public class FinanceWeixinAction extends Action {
 		content.append("结束时间:" + new SimpleDateFormat("M月d日 HH:mm").format(DateUtil.parseDate(detail.getOffDuty())) + "\n");
 		
 		content.append("-------------------\n")
-			   .append(grid3Item(new String[]{"收款", "账单数", "金额"}, new int[]{10, 20}) + "\n");
+			   .append(grid3Item(new String[]{"收款", "账单数", "实收"}, new int[]{10, 20}) + "\n");
 		
 		for(PaymentIncome income : detail.getIncomeByPay().getPaymentIncomes()){
-			if(income.getAmount() > 0){
+			if(income.getActual() > 0){
 				content.append(grid3Item(new String[]{income.getPayType().getName(), Integer.toString(income.getAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(income.getActual())}, new int[]{10, 16}) + "\n");
 			}
 		}

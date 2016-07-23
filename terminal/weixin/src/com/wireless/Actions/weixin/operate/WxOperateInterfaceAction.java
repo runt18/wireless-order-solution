@@ -177,6 +177,30 @@ public class WxOperateInterfaceAction extends DispatchAction{
 		}
 		return null;
 	}	
+	
+	
+	/**
+	 * 
+	 * @param maping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getOpenIdByCode(ActionMapping maping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final String code = request.getParameter("code");
+		String openId = null;
+		try {
+			openId = org.marker.weixin.oauth2.AccessToken.newInstance(AuthParam.APP_ID, AuthParam.APP_SECRET, code).getOpenId();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			response.getWriter().print(openId);
+		} 
+
+		return null;
+	}
 
 	/**
 	 * 获取餐厅信息

@@ -322,10 +322,10 @@ public class OperateMemberAction extends DispatchAction{
 			}
 			
 			final String serverName;
-			if(request.getServerName().equals("e-tones.net")){
-				serverName = "wx.e-tones.net";
+			if(request.getServerName().equals("ts.e-tones.net")){
+				serverName = "ts.e-tones.net";
 			}else{
-				serverName = request.getServerName();
+				serverName = "wx.e-tones.net";
 			}
 			
 			//Perform to send the weixin charge msg to member.
@@ -374,7 +374,6 @@ public class OperateMemberAction extends DispatchAction{
 		final String comment = request.getParameter("comment");
 		final String isPrint = request.getParameter("isPrint");
 		final String orientedPrinters = request.getParameter("orientedPrinter");
-		final String wxServer = request.getParameter("wxServer");
 
 		final JObject jobject = new JObject();
 		
@@ -382,7 +381,14 @@ public class OperateMemberAction extends DispatchAction{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberId), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), wxServer);
+			final String serverName;
+			if(request.getServerName().equals("ts.e-tones.net")){
+				serverName = "ts.e-tones.net";
+			}else{
+				serverName = "wx.e-tones.net";
+			}
+			
+			final MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberId), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), serverName);
 			if(comment != null && !comment.isEmpty()){
 				mo.setComment(comment);
 			}
