@@ -8,6 +8,8 @@ var	ts = {
 
 $(function(){
 	
+	//餐台分页控件
+	var tablePadding = null;
 	//消息中心跑马灯
 	var runHorseDiv;
 	//作为收银端或触摸屏时, 餐台列表的高度
@@ -153,7 +155,7 @@ $(function(){
 		$(window).resize();
 	
 		//餐台分页
-		ts.padding = new WirelessOrder.Padding({
+		tablePadding = new WirelessOrder.Padding({
 			renderTo : $('#divTableShowForSelect'),
 			displayTo : $('#divDescForTableSelect-padding-msg'),
 			itemLook : function(index, item){
@@ -203,12 +205,12 @@ $(function(){
 		
 		//餐台上一页
 		$('#prevTablePage_a_tableSelect').click(function(){
-			ts.padding.prev();
+			tablePadding.prev();
 		});
 		
 		//餐台下一页
 		$('#nextTablePage_a_tableSelect').click(function(){
-			ts.padding.next();
+			tablePadding.next();
 		});
 	
 		Util.LM.show();		
@@ -1393,7 +1395,6 @@ $(function(){
 	 * toPay : 是否去结账界面
 	 */
 	function updateTable(c){
-		var table = null;
 		$.ajax({
 			url : '../QueryTable.do',
 			type : 'post',
@@ -1404,8 +1405,7 @@ $(function(){
 	//		async : false,
 			success : function(data, status, xhr){
 				if(data.success && data.root.length > 0){
-					table = data.root[0];
-					c.table = table;
+					c.table = WirelessOrder.TableWrapper(data.root[0]);
 					if(c.toPay){
 						//关闭选台
 						pm.entry(c);
@@ -1435,27 +1435,26 @@ $(function(){
 	 * 当选中餐桌时，依据餐桌状态处理餐桌
 	 */
 	function handleTableForTS(c){
-		var table = c.table;
-		if(table != null){
+		if(c.table != null){
 			//判断是否为已点菜餐桌
-			if(table.statusValue == WirelessOrder.TableList.Status.BUSY.val){	
+			if(c.table.isBusy()){	
 				//判断餐桌是否已经改变状态
 				if(c.event && $(c.event).attr('data-theme') != 'e'){
 					initTableData();
 				}
 				//去已点菜界面
 				uo.entry({
-					table : table
+					table : c.table
 				});
 	
 			}else{
-				ts.table = table;
+				ts.table = c.table;
 				//判断餐桌是否已经改变状态
 				if(c.event && $(c.event).attr('data-theme') == 'e'){ 
 					initTableData();
 				}
 				
-				if(ts.table.isBook){
+				if(c.table.isBook){
 					var customerPopup = null;
 					customerPopup = new NumKeyBoardPopup({
 						header : '请输入人数--' + c.table.name,
@@ -1517,27 +1516,34 @@ $(function(){
 							
 						},
 						middle : function(){
-								var customNum = $('#input_input_numKbPopup').val();
-								var comment = $('#inputTableOpenCommon').val();
-								if(isNaN(customNum)){
-									Util.msg.alert({
-										msg : '请填写正确的人数',
-										topTip : true
-									});			
-									$('#input_input_numKbPopup').focus();
-									return;
-								}else if(customNum <= 0){
-									Util.msg.alert({
-										msg : '就餐人数不能少于0',
-										topTip : true
-									});
-									$('#input_input_numKbPopup').focus();
-									return;
-								}
-								
-								ts.renderToCreateOrder(ts.table.alias, customNum, comment);
-								customerPopup.close();
-							},
+							var customNum = $('#input_input_numKbPopup').val();
+							var comment = $('#inputTableOpenCommon').val();
+							if(isNaN(customNum)){
+								Util.msg.alert({
+									msg : '请填写正确的人数',
+									topTip : true
+								});			
+								$('#input_input_numKbPopup').focus();
+								return;
+							}else if(customNum <= 0){
+								Util.msg.alert({
+									msg : '就餐人数不能少于0',
+									topTip : true
+								});
+								$('#input_input_numKbPopup').focus();
+								return;
+							}
+							
+							//跳转到点菜界面						
+							customerPopup.close(function(){
+								of.entry({
+									table : c.table,
+									customNum : customNum,
+									comment : comment,
+									orderFoodOperateType : 'normal'
+								});
+							}, 250);
+						},
 						hasComment : true
 					});
 					
@@ -1620,27 +1626,34 @@ $(function(){
 							customerPopup.close();
 						},
 						middle : function(){
-								var customNum = $('#input_input_numKbPopup').val();
-								var comment = $('#inputTableOpenCommon').val();
-								if(isNaN(customNum)){
-									Util.msg.alert({
-										msg : '请填写正确的人数',
-										topTip : true
-									});			
-									$('#input_input_numKbPopup').focus();
-									return;
-								}else if(customNum <= 0){
-									Util.msg.alert({
-										msg : '就餐人数不能少于0',
-										topTip : true
-									});
-									$('#input_input_numKbPopup').focus();
-									return;
-								}
-								
-								ts.renderToCreateOrder(ts.table.alias, customNum, comment);
-								customerPopup.close();
-							},
+							var customNum = $('#input_input_numKbPopup').val();
+							var comment = $('#inputTableOpenCommon').val();
+							if(isNaN(customNum)){
+								Util.msg.alert({
+									msg : '请填写正确的人数',
+									topTip : true
+								});			
+								$('#input_input_numKbPopup').focus();
+								return;
+							}else if(customNum <= 0){
+								Util.msg.alert({
+									msg : '就餐人数不能少于0',
+									topTip : true
+								});
+								$('#input_input_numKbPopup').focus();
+								return;
+							}
+							
+							//跳转到点菜界面
+							customerPopup.close(function(){
+								of.entry({
+									table : c.table,
+									customNum : customNum,
+									comment : comment,
+									orderFoodOperateType : 'normal'
+								});
+							}, 250);
+						},
 						hasComment : true
 					});
 					
@@ -1742,12 +1755,7 @@ $(function(){
 		
 	}
 
-
-
-	/**
-	 * 显示餐桌
-	 * @param {object} temp 需要显示的餐桌数组
-	 */
+	//显示餐台
 	function showTable(){
 		
 		var tableStatus = null;
@@ -1778,7 +1786,7 @@ $(function(){
 		}
 		
 		if(result.length != 0){
-			ts.padding.data(result);
+			tablePadding.data(result);
 		}else{
 			$("#divTableShowForSelect").html("");
 		}	
@@ -1792,36 +1800,5 @@ ts.loadData = function(){
 	location.href = '#tableSelectMgr';
 };
 
-//进入点菜界面
-ts.renderToCreateOrder = function(tableNo, customNum, comment){
-	if(tableNo > 0){
-		
-		setTimeout(function(){
-			var tableToAlias = WirelessOrder.tables.getByAlias(tableNo);
-			//同时操作餐台时,选中状态没变化的餐桌处理
-			//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
-			if(tableToAlias.statusValue == 1){
-				of.entry({
-					table : tableToAlias,
-					orderFoodOperateType : 'normal'
-				});
-			}else{
-				of.entry({
-					table : tableToAlias,
-					customNum : customNum,
-					comment : comment,
-					orderFoodOperateType : 'normal'
-				});
-			}				
-		}, 250);
-		
-	
-	}else{
-		Util.msg.alert({
-			msg : '没有该餐桌，请重新输入一个桌号.', 
-			topTip : true
-		});
-	}
-};
 
 
