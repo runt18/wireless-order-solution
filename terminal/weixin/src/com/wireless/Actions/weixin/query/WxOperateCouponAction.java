@@ -117,7 +117,7 @@ public class WxOperateCouponAction extends DispatchAction{
 			}
 			
 			if(filter != null && !filter.isEmpty()){
-				extraCond.setFilter(ExtraCond.Filter.valueOf(filter));
+				extraCond.setFilter(ExtraCond.Filter.valueOf(Integer.parseInt(filter)));
 			}
 			
 			final List<Coupon> result = CouponDao.getByCond(staff, extraCond, null);
