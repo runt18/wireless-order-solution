@@ -300,6 +300,7 @@ var HandWritingAttacher = (function () {
 						   							_handWritingPanel.rewrite();	
 						   						}else{
 													$(activeInput.attachObj).val($(activeInput.attachObj).val() + element.value);	
+													$(activeInput.attachObj).trigger('input');
 													_handWritingPanel.rewrite();	
 													if(activeInput.onWordSelected){
 														activeInput.onWordSelected(activeInput.attachObj, element.value);

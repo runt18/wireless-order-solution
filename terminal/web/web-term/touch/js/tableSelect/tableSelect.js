@@ -36,10 +36,6 @@ $(function(){
 		//点菜界面高度
 		$('#orderFoodCenterCmp').height(document.body.clientHeight - 210);
 		document.getElementById('foodsCmp_div_orderFood').style.height = (document.body.clientHeight - 210)+'px';		
-		//沽清菜界面高度
-		$('#stopSellCmp').height(document.body.clientHeight - 125);	
-		document.getElementById('foods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
-		document.getElementById('divFoods4StopSellCmp').style.height = (document.body.clientHeight - 210)+'px';
 		//已点菜界面高度
 		$('#orderFoodListCmp').height(document.body.clientHeight - 125);
 		//预订列表
@@ -709,6 +705,15 @@ $(function(){
 				
 			});
 		})
+		
+		//快速沽请
+		$('#saleOut_a_tableSelect').click(function(){
+			$('#tableSelectStopLimitCmp').popup('close');
+			seajs.use('saleOut', function(saleOut){
+				var saleOutPopup = null;
+				saleOutPopup = saleOut.newInstance().open();
+			});
+		});
 		
 		//积分兑换
 		$('#pointConsume_li_tableSelect').click(function(){
@@ -1785,41 +1790,6 @@ $(function(){
  */
 ts.loadData = function(){
 	location.href = '#tableSelectMgr';
-};
-
-
-window.onload = function(){
-	//沽清搜索
-	$('#searchSelloutFoodInput').focus(function(){
-		focusInput = this.id;
-		if(this.id == 'searchSelloutFoodInput'){
-			ss.s.fireEvent();
-		}		
-	});
-	
-	//渲染会员读取窗口
-	$('#lookupOrderDetail').trigger('create').trigger('refresh');
-    
-    //会员消费详情
-    $('#consumeDetail_memberName').on('keypress',function(event){
-        if(event.keyCode == "13")    
-        {
-        	ts.member.searchMemberDetail();
-        }
-    });
-    
-};
-
-/**
- * 去沽清界面
- */
-ts.stopSellMgr = function(){
-	$('#tableSelectStopLimitCmp').popup('close');
-	setTimeout(function(){
-		location.href = '#stopSellMgr';
-		ss.entry();
-	}, 300);
-
 };
 
 //进入点菜界面

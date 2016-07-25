@@ -75,7 +75,8 @@
 			'takeMoney' : './js/popup/member/takeMoney',
 			'ajustPoint' : './js/popup/member/ajustPointPopup',
 			'limitSale' : './js/popup/limitSale/limitSale',
-			'setLimit' : './js/popup/limitSale/setLimit'
+			'setLimit' : './js/popup/limitSale/setLimit',
+			'saleOut' : './js/popup/limitSale/saleOut'
 		}
 	});
 </script>
@@ -93,7 +94,6 @@
 <script type="text/javascript" src="../extjs/wireless.ux.js"></script>
 <script type="text/javascript" src="js/orderFood/orderFood.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/checkOut/checkOut.js?v=<%=v %>"></script>
-<script type="text/javascript" src="js/stopSet/stopSet.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/payment/payment.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/books/book.js?v=<%=v %>"></script>
 <script type="text/javascript" src="js/wxOrder/wxOrder.js?v=<%=v %>"></script>
@@ -249,7 +249,7 @@
 	<div data-role="popup" id="tableSelectStopLimitCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
          	<li id="limitSale_a_tableSelect" class="tempFoodKitchen"><a>沽清限制</a></li>
-         	<li class="tempFoodKitchen" onclick="ts.stopSellMgr()"><a>快速沽清</a></li>
+         	<li class="tempFoodKitchen" id="saleOut_a_tableSelect"><a>快速沽清</a></li>
         </ul>
 	</div>		
 
@@ -805,121 +805,6 @@
 
 </div>
 <!-- end 点菜界面-->
-
-<!-- 沽清界面 start -->
-<div data-role="page" id="stopSellMgr" >
-	<div class="ui-grid-a" style="width: 100%;background-color: skyblue;border-bottom:1px solid white;">
-		<div class="ui-block-a" data-role="controlgroup" data-corners="false" style="width:102px;">
-			 <a id="divBtnSellFood" data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this, isStop:false})">在售菜品</a>
-			 <a data-role="button" data-inline="true" class="tableStatus" onclick="ss.searchData({event:this,isStop:true})">沽清菜品</a>		 
-		</div>
-		<div class="ui-block-b" style="width: -webkit-calc(100% - 102px);width: -moz-calc(100% - 102px);width: -ms-calc(100% - 102px);width: -o-calc(100% - 102px);">
-			<!-- 部门 -->
-			 <div id="depts4StopSellCmp" data-role="controlgroup" data-type="horizontal"></div>		
-			<!-- 厨房 -->
-			 <div id="kitchens4StopSellCmp" data-role="controlgroup" data-type="horizontal" ></div>					 		
-		</div>	
-
-	</div>
-	<div id="stopSellCmp" class="ui-grid-a" style="height: 470px;overflow: hidden;">
-	     <div id="divFoods4StopSellCmp" class="ui-block-a" style="width: 350px;height: inherit;overflow-y: auto;background-color: skyblue;border-right: 1px solid white;">
-	     	<!--已点菜列表  -->
-			<ul id="toStopSellFoodCmp" data-role="listview" data-theme="d" data-inset="true"></ul>		    	
-	     </div>
-	     
-	     <!-- 菜品列表 -->
-	     <div id="foods4StopSellCmp" class="ui-block-b" style="width: -webkit-calc(100% - 350px);width: -moz-calc(100% - 350px);width: -ms-calc(100% - 350px);width: -o-calc(100% - 350px);background-color: skyblue;"></div>			
-	</div>
-	
-	<div data-role="footer" data-position="fixed" data-tap-toggle="false" data-theme="b">
-		<div class="bottomGeneralBar">
-			<div id="count4StopSellFoods" style="float: left;margin-left: 20px;">总数量: 4份, 合计: ￥300.50</div>
-			<div id="foods4StopSellCmp-padding-msg" style="float: right;margin-right: 20px;">共0项, 第1/1页, 每页?项</div>
-		</div>	
-		
-		<div id="normalOperateFood4StopSellCmp" style="height: 60px;padding-top: 25px;">		
-			<div data-role="controlgroup" class="ui-btn-left " data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.back()">返回</a>
-			 	<a onclick="Util.to.scroll({content:'divFoods4StopSellCmp', otype:'up'})" data-role="button" data-inline="true" class="bottomBtnFont">上翻</a>
-			 	<a onclick="Util.to.scroll({content:'divFoods4StopSellCmp', otype:'down'})" data-role="button" data-inline="true" class="bottomBtnFont">下翻</a>
-			 </div>
-			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.resetFoodLimit()">限量重置</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : true})">沽清</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
-			 	<!-- <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="of.openAliasOrderFood()">助记码</a> -->
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="searchSelloutFood('on')">搜索</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.prev()">上一页</a>
-			 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.tp.next()">下一页</a>
-			 </div>
-		</div>
-		<!-- 搜索组件 -->
-		<div id="searchSelloutFoodCmp" style="height: 60px;padding-top: 25px;display: none;">		
-			 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal" style="margin-right: 410px;">
-			 <table>
-			 	<tr>
-			 		<td>
-			 			<input id="searchSelloutFoodInput"  type="text" placeholder="输入菜名"  style="font-size: 20px;font-weight: bold;width: 150px;">
-			 		</td>
-			 		<td>
-						<div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-block-b" style="width:60px;" align="center">
-						    <a data-role="button" data-iconpos="notext" data-icon="delete" data-theme="b" class="btnDeleteWord" onclick="ss.s.valueBack()">D</a>
-						</div>			 		
-			 		</td>
-			 		<td>
-					 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : true})">沽清</a>
-					 	<a data-role="button" data-inline="true" class="bottomBtnFont" onclick="ss.soldOut({type : false})">开售</a>
-			 			<a data-role="button" data-inline="true" class="bottomBtnFont" style="margin-top: -5px;" onclick="searchSelloutFood()">关闭</a>
-			 		</td>
-			 	</tr>
-			 </table>
-			 </div>
-		 </div>			
-	
-		<!--限量沽清修改数量 -->
-		<div id="orderFoodLimitCmp" data-role="popup" data-theme="c" data-dismissible="false" style="max-width:900px;" class="ui-corner-all" align="center">
-		    <div data-role="header" data-theme="b" class="ui-corner-top">
-		        <h1>输入剩余数量</h1>
-		    </div>
-		    <div style="min-height: 300px; overflow-y: auto;">
-				<div class="calculator">
-					<div class="top">
-						<span class="clear">+</span>
-						<span class="inputs">
-							<input id="inputOrderFoodLimitCountSet" style="font-size: 20px;font-weight: bold;" onkeypress="intOnly()" onfocus="setInput('inputOrderFoodLimitCountSet')">
-						</span>
-						<span class="clear">-</span>
-					</div>
-					<div class="keys">
-						<span>7</span>
-						<span>8</span>
-						<span>9</span>
-						<span>0</span>
-						
-						<span>4</span>
-						<span>5</span>
-						<span>6</span>
-						<span>.</span>
-						
-						<span>1</span>
-						<span>2</span>
-						<span>3</span>
-						<span class="clear">C</span>
-					</div>
-				</div>		    
-		    
-			</div>	
-			<div data-role="footer" data-theme="b" class="ui-corner-bottom">
-				 <div data-role="controlgroup" data-type="horizontal" class="bottomBarFullWidth">
-					 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ss.setFoodLimitRemaining()">确定</a>
-					 <a  data-role="button" data-inline="true" class="countPopbottomBtn" onclick="ss.closeFoodLimitCmp()">取消</a>		 
-				 </div>
-		    </div>
-		</div>			
-		 
-	</div>	
-</div>
-<!-- end 沽清界面  -->
 
 <!-- 结账界面 start -->
 <div data-role="page" id="paymentMgr" data-theme="e">
