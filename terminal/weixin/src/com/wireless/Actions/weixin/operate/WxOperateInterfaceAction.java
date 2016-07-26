@@ -190,13 +190,29 @@ public class WxOperateInterfaceAction extends DispatchAction{
 	 */
 	public ActionForward getOpenIdByCode(ActionMapping maping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		final String code = request.getParameter("code");
-		String openId = null;
+		final JObject jObject = new JObject();
 		try {
-			openId = org.marker.weixin.oauth2.AccessToken.newInstance(AuthParam.APP_ID, AuthParam.APP_SECRET, code).getOpenId();
+			final String openId = org.marker.weixin.oauth2.AccessToken.newInstance(AuthParam.APP_ID, AuthParam.APP_SECRET, code).getOpenId();
+			jObject.setRoot(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("openId", openId);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jm, int flag) {
+					
+				}
+				
+			});
+			System.out.println(jObject.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			response.getWriter().print(openId);
+			response.getWriter().print(jObject.toString());
 		} 
 
 		return null;
