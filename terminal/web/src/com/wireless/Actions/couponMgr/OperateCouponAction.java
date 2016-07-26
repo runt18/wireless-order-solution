@@ -167,13 +167,15 @@ public class OperateCouponAction extends DispatchAction{
 		try{
 			
 			//获取账单已用的优惠券
-			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setFilter(ExtraCond.Filter.valueOf(filter)).setOperation(CouponOperation.Operate.ORDER_USE, Integer.parseInt(orderId)), null);
+			final List<Coupon> result = CouponDao.getByCond(staff, new CouponDao.ExtraCond()
+																				.setFilter(ExtraCond.Filter.valueOf(Integer.parseInt(filter)))
+																				.setOperation(CouponOperation.Operate.ORDER_USE, Integer.parseInt(orderId)), null);
 			
 			
 			
 			//获取会员可用的优惠券
 			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond()
-																  .setFilter(ExtraCond.Filter.valueOf(filter))
+																  .setFilter(ExtraCond.Filter.valueOf(Integer.parseInt(filter)))
 																  .setStatus(Coupon.Status.ISSUED)
 																  .setMember(Integer.parseInt(memberId))
 																  .addPromotions(PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addUseRule(PromotionTrigger.UseRule.FREE)
@@ -226,7 +228,7 @@ public class OperateCouponAction extends DispatchAction{
 			
 			//获取会员可用的优惠券
 			result.addAll(CouponDao.getByCond(staff, new CouponDao.ExtraCond()
-					                                              .setFilter(ExtraCond.Filter.valueOf(filter))
+					                                              .setFilter(ExtraCond.Filter.valueOf(Integer.parseInt(filter)))
 																  .setStatus(Coupon.Status.ISSUED)
 																  .setMember(Integer.parseInt(memberId))
 																  .addPromotions(PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addUseRule(PromotionTrigger.UseRule.FREE))), 
@@ -269,7 +271,6 @@ public class OperateCouponAction extends DispatchAction{
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
-					// TODO Auto-generated method stub
 					JsonMap jm = new JsonMap();
 					jm.putInt("value", operate.getVal());
 					jm.putString("name", operate.toString());
@@ -278,7 +279,6 @@ public class OperateCouponAction extends DispatchAction{
 
 				@Override
 				public void fromJsonMap(JsonMap jm, int flag) {
-					// TODO Auto-generated method stub
 					
 				}
 				
@@ -346,7 +346,7 @@ public class OperateCouponAction extends DispatchAction{
 			}
 			
 			if(filter != null && !filter.isEmpty()){
-				extraCond.setFilter(ExtraCond.Filter.valueOf(filter));
+				extraCond.setFilter(ExtraCond.Filter.valueOf(Integer.parseInt(filter)));
 			}
 			
 			if(memberId != null && !memberId.isEmpty()){
