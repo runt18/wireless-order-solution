@@ -18,7 +18,6 @@ public class WxRestaurant implements Jsonable{
 		private int wxCardImgId;
 		private String refreshToken;
 		private String qrCode;
-		private QrCodeStatus qrCodeStatus;
 		private String wxSerial;
 		private String paymentTemplate;
 		private String couponDrawTemplate;
@@ -130,15 +129,6 @@ public class WxRestaurant implements Jsonable{
 		public UpdateBuilder setQrCode(String qrCode){
 			this.qrCode = qrCode;
 			return this;
-		}
-		
-		public UpdateBuilder setQrCodeStatus(QrCodeStatus status){
-			this.qrCodeStatus = status;
-			return this;
-		}
-		
-		public boolean isQrCodeStatusChanged(){
-			return this.qrCodeStatus != null;
 		}
 		
 		public UpdateBuilder setWeixinLogo(int ossImageId){
@@ -259,50 +249,6 @@ public class WxRestaurant implements Jsonable{
 		}
 	}
 	
-	public static enum QrCodeStatus{
-		NORMAL(1, "正常"),
-		HIDDEN(2, "隐藏");
-		
-		private final int val;
-		private final String desc;
-		
-		QrCodeStatus(int val, String desc){
-			this.val = val;
-			this.desc = desc;
-		}
-		
-		public int getVal(){
-			return this.val;
-		}
-		
-		public String getDesc(){
-			return this.desc;
-		}
-		
-		public boolean isNormal(){
-			return this == NORMAL;
-		}
-		
-		public boolean isHidden(){
-			return this == HIDDEN;
-		}
-		
-		public static QrCodeStatus valueOf(int val){
-			for(QrCodeStatus status : values()){
-				if(status.val == val){
-					return status;
-				}
-			}
-			throw new IllegalArgumentException("The status(val = " + val + ") is invalid.");
-		}
-		
-		@Override
-		public String toString(){
-			return "status(val=" + val + ", desc=" + desc + ")";
-		}
-	}
-	
-	
 	public static enum PayType{
 		WX_PAY(1, "微信下单"),
 		CONFIRM_BY_STAFF(2,"确认下单"),
@@ -373,7 +319,6 @@ public class WxRestaurant implements Jsonable{
 	private String weixinAppSecret;
 	private String qrCodeUrl;
 	private String qrCode;
-	private QrCodeStatus qrCodeStatus;
 	private String nickName;
 	private String headImgUrl;
 	private String refreshToken;
@@ -397,7 +342,6 @@ public class WxRestaurant implements Jsonable{
 		this.headImgUrl = builder.headImgUrl;
 		this.refreshToken = builder.refreshToken;
 		this.qrCode = builder.qrCode;
-		this.qrCodeStatus = builder.qrCodeStatus;
 		this.weixinSerial = builder.wxSerial;
 		this.paymentTemplate = builder.paymentTemplate;
 		this.couponDrawTemplate = builder.couponDrawTemplate;
@@ -469,14 +413,6 @@ public class WxRestaurant implements Jsonable{
 	
 	public boolean hasOrderNotifyTemplate(){
 		return this.orderNotifyTemplate != null;
-	}
-	
-	public void setQrCodeStatus(QrCodeStatus status){
-		this.qrCodeStatus = status;
-	}
-	
-	public QrCodeStatus getQrCodeStatus(){
-		return this.qrCodeStatus;
 	}
 	
 	public void setWeixinSerial(String weixinSerial) {
@@ -702,7 +638,6 @@ public class WxRestaurant implements Jsonable{
 		jm.putString("refreshToken", getRefreshToken());
 		jm.putString("qrCodeUrl", getQrCodeUrl());
 		jm.putString("qrCode", getQrCode());
-		jm.putInt("qrCodeStatus", getQrCodeStatus().getVal());
 		jm.putBoolean("isAuth", hasQrCode());
 		jm.putInt("defaultOrderType", getDefaultOrderType().val);
 		jm.putString("defaultOrderTypeText", getDefaultOrderType().desc);
