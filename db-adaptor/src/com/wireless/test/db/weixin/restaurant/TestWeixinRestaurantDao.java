@@ -22,7 +22,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
-import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 import com.wireless.test.db.TestInit;
 import com.wireless.test.db.oss.TestOssImage;
 
@@ -80,7 +79,6 @@ public class TestWeixinRestaurantDao {
 																	.setWeixinAppSecret("dadsftwe")
 																	.setQrCodeUrl("http://www.qrcode")
 																	.setQrCode("http://qrcode")
-																	.setQrCodeStatus(QrCodeStatus.NORMAL)
 																	.setHeadImgUrl("http://www.headimg")
 																	.setNickName("测试昵称")
 																	.setRefreshToken("adfeiilmasd;iottt")
@@ -111,7 +109,6 @@ public class TestWeixinRestaurantDao {
 		Assert.assertEquals("weixin secret", expected.getWeixinAppSecret(), actual.getWeixinAppSecret());
 		Assert.assertEquals("weixin qr code url", expected.getQrCodeUrl(), actual.getQrCodeUrl());
 		Assert.assertEquals("weixin qr code", expected.getQrCode(), actual.getQrCode());
-		Assert.assertEquals("weixin qr code status", expected.getQrCodeStatus(), actual.getQrCodeStatus());
 		Assert.assertEquals("weixin head image url", expected.getHeadImgUrl(), actual.getHeadImgUrl());
 		Assert.assertEquals("weixin nick name", expected.getNickName(), actual.getNickName());
 		Assert.assertEquals("weixin refresh token", expected.getRefreshToken(), actual.getRefreshToken());
