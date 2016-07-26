@@ -1,10 +1,10 @@
 //餐桌选择包
 var	ts = {
-	table : {},
-	member : {}
+	//通过其他界面返回餐台选择
+	loadData : function(){
+		location.href = '#tableSelectMgr';
+	}
 };
-
-
 
 $(function(){
 	
@@ -1448,7 +1448,6 @@ $(function(){
 				});
 	
 			}else{
-				ts.table = c.table;
 				//判断餐桌是否已经改变状态
 				if(c.event && $(c.event).attr('data-theme') == 'e'){ 
 					initTableData();
@@ -1482,10 +1481,10 @@ $(function(){
 								Util.LM.show();
 								
 								var orderDataModel = {};
-								orderDataModel.tableID = ts.table.id;
+								orderDataModel.tableID = c.table.id;
 								orderDataModel.customNum = customNum;
 								orderDataModel.orderFoods = [];
-								orderDataModel.categoryValue =  ts.table.categoryValue;
+								orderDataModel.categoryValue =  c.table.categoryValue;
 								orderDataModel.comment = $('#inputTableOpenCommon').val();
 								
 								$.post('../InsertOrder.do', {
@@ -1595,10 +1594,10 @@ $(function(){
 							Util.LM.show();
 							
 							var orderDataModel = {};
-							orderDataModel.tableID = ts.table.id;
+							orderDataModel.tableID = c.table.id;
 							orderDataModel.customNum = customNum;
 							orderDataModel.orderFoods = [];
-							orderDataModel.categoryValue =  ts.table.categoryValue;
+							orderDataModel.categoryValue =  c.table.categoryValue;
 							orderDataModel.comment = $('#inputTableOpenCommon').val();
 							
 							$.post('../InsertOrder.do', {
@@ -1793,12 +1792,7 @@ $(function(){
 	}
 });	
 
-/** 
- * 通过其他界面返回餐台选择
- */
-ts.loadData = function(){
-	location.href = '#tableSelectMgr';
-};
+
 
 
 

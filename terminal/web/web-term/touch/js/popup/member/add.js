@@ -3,6 +3,7 @@ define(function(require, exports, module){
 	function AddMemberPopup(){
 		
 		var _addMemberPopup = null;
+		var _chargeRate = null;
 		_addMemberPopup = new JqmPopup({
 			loadUrl : './popup/member/add.html',
 			pageInit : function(self){
@@ -16,7 +17,7 @@ define(function(require, exports, module){
 					if(parseInt(selected.attr('data-attrVal')) == 0){
 						self.find('[id=memberMoney_tr_memberAdd]').show();
 						self.find('[id=memberPrint_tr_memberAdd]').show();
-						ts.member.chargeRate = parseFloat(selected.attr('data-chargeRate'));
+						_chargeRate = parseFloat(selected.attr('data-chargeRate'));
 						setTimeout(function(){
 							$('#cm_numFirstCharge').focus();
 						}, 250);
@@ -120,7 +121,7 @@ define(function(require, exports, module){
 				$('#memberFirst_input_memberAdd').on('keyup', function(){
 					var chargeMoney = $('#memberFirst_input_memberAdd').val();
 					var actualChargeMoney = $('#memberActual_input_memberAdd');
-					actualChargeMoney.val(Math.round(chargeMoney * ts.member.chargeRate));
+					actualChargeMoney.val(Math.round(chargeMoney * _chargeRate));
 				});	
 				
 				

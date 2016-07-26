@@ -115,8 +115,10 @@ define(function(require, exports, module){
 							//获取优惠券信息
 							$.post('../OperateCoupon.do', {dataSource : 'getByCond',filter : '1', status : 'issued', memberId : jr.root[0].id}, function(response, status, xhr){
 								if(response.success){
-										coupons = coupons.concat(response.root);
-										loadMemberInfo(jr.root[0], self, coupons);
+									coupons = coupons.concat(response.root);
+									loadMemberInfo(jr.root[0], self, coupons);
+								}else{
+									Util.msg.alert({msg : '读取会员优惠券信息不成功, 请重新输入条件后重试', topTip : true});
 								}
 							}, 'json');
 							$('#selectSearch_div_memberRead').hide();
@@ -158,7 +160,7 @@ define(function(require, exports, module){
 		}
 		
 		function loadMemberInfo(member, self, coupon){
-			self.find('[id=name_lable_memberRead]').text(member.name);
+			self.find('[id=name_lable_memberRead]').text(member.name.substring(0, 7));
 			self.find('[id=memberType_label_memberRead]').text(member.memberType.name);
 			self.find('[id=baseBalance_label_memberRead]').text(member.baseBalance ?　member.baseBalance : '----');
 			self.find('[id=extraBalance_label_memberRead]').text(member.extraBalance ? member.extraBalance : '----');
