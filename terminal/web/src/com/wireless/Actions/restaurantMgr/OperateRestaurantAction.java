@@ -32,7 +32,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.token.Token;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
-import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 import com.wireless.util.DataPaging;
 
 public class OperateRestaurantAction extends DispatchAction {
@@ -342,31 +341,6 @@ public class OperateRestaurantAction extends DispatchAction {
 			response.getWriter().print(jObject.toString());
 		}
 		
-		return null;
-	}	
-	
-	/**
-	 * 设置是否在账单打印二维码
-	 * @param mapping
-	 * @param form
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
-	public ActionForward updateRestaurantPrintCode(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		JObject jobject = new JObject();
-		String pin = (String) request.getAttribute("pin");
-		String printCode = request.getParameter("printCode");
-		try{
-			WxRestaurant.UpdateBuilder builder = new WxRestaurant.UpdateBuilder().setQrCodeStatus(printCode.equals("true")?QrCodeStatus.NORMAL:QrCodeStatus.HIDDEN);
-			WxRestaurantDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
-		} catch(BusinessException e) {
-			e.printStackTrace();
-			jobject.initTip(e);
-		} finally {
-			response.getWriter().print(jobject.toString());
-		}
 		return null;
 	}	
 	
