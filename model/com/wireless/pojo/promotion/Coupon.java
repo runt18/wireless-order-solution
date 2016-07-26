@@ -217,11 +217,14 @@ public class Coupon implements Jsonable{
 		}
 		
 		public String getWxServer(){
+			if(this.wxServer == null){
+				return "";
+			}
 			return this.wxServer;
 		}
 		
 		public boolean hasWxServer(){
-			return this.wxServer != null;
+			return getWxServer().length() > 0;
 		}
 		
 	}
