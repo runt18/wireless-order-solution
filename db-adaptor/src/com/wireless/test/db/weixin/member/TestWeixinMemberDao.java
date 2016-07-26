@@ -38,7 +38,7 @@ public class TestWeixinMemberDao {
 		String weixinCard = "";
 		try{
 			//--------Test to interest a weixin member---------------
-			int memberId = WxMemberDao.interest(mStaff, WEIXIN_MEMBER_SERIAL, null);
+			int memberId = WxMemberDao.interest(mStaff, new WxMember.InterestBuilder(WEIXIN_MEMBER_SERIAL));
 			
 			Member actual = MemberDao.getById(mStaff, memberId);
 			weixinCard = actual.getWeixin().getCard()+"";
