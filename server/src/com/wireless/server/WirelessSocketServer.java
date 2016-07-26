@@ -58,7 +58,7 @@ public class WirelessSocketServer {
     //the password to database
     static String password = "";
     //the wx server
-    static String wxServer = "wx.e-tones.net";
+    public static String wxServer = "wx.e-tones.net";
     
     static int coolPoolSize = 100;
     static int maxPoolSize = 200;

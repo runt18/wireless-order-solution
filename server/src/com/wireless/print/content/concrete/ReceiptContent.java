@@ -4,12 +4,15 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Map.Entry;
 
+import org.marker.weixin.api.BaseAPI;
+
 import com.wireless.pojo.billStatistics.CouponUsage;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.NumericUtil;
@@ -34,6 +37,8 @@ public class ReceiptContent extends ConcreteContent {
 	private Member member;
 	private String wxPayUrl;
 	private CouponUsage couponUsage;
+	private PrintFunc.QrCodeType qrCodeType;
+	private String qrCode;
 	
 	public ReceiptContent(int receiptStyle, Restaurant restaurant, WxRestaurant wxRestaurant, Order order, String waiter, PType printType, PStyle style) {
 		super(printType, style);
@@ -45,6 +50,12 @@ public class ReceiptContent extends ConcreteContent {
 		mOrder = order;
 	}
 
+	public ReceiptContent setQrCode(PrintFunc.QrCodeType qrCodeType, String qrCode){
+		this.qrCodeType = qrCodeType;
+		this.qrCode = qrCode;
+		return this;
+	}
+	
 	public ReceiptContent setEnding(String ending){
 		this.ending = ending;
 		return this;
@@ -203,11 +214,42 @@ public class ReceiptContent extends ConcreteContent {
 		}
 		
 		//replace the $(ending)
-		if(mPrintType == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && mWxRestaurant.getQrCodeStatus().isNormal() && mStyle == PStyle.PRINT_STYLE_80MM){
-			final String qrCodeContent = mWxRestaurant.getQrCode() + "?" + mOrder.getId();
-			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(mPrintType, mStyle, qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
-																		  SEP +
-																		  new CenterAlignedDecorator(hasEnding() ? ending : "微信扫一扫", mStyle).toString());
+//		if(mPrintType == PType.PRINT_TEMP_RECEIPT && mWxRestaurant.hasQrCode() && mWxRestaurant.getQrCodeStatus().isNormal() && mStyle == PStyle.PRINT_STYLE_80MM){
+//			final String qrCodeContent = mWxRestaurant.getQrCode() + "?" + mOrder.getId();
+//			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(mPrintType, mStyle, qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
+//																		  SEP +
+//																		  new CenterAlignedDecorator(hasEnding() ? ending : "微信扫一扫", mStyle).toString());
+//
+//		}else 
+		if(mPrintType == PType.PRINT_TEMP_RECEIPT && mStyle == PStyle.PRINT_STYLE_80MM && !this.qrCodeType.isNone()){
+			String qrCodeContent = "";
+			if(this.qrCodeType.isManual() && this.qrCode != null && !this.qrCode.isEmpty()){
+				//自定义二维码
+				qrCodeContent = this.qrCode;
+				
+			}else if(this.qrCodeType.isOffical() && mWxRestaurant.hasQrCode()){
+				//微信公众号
+				qrCodeContent = mWxRestaurant.getQrCode();
+				
+			}else if(this.qrCodeType.isWxWaiter()){
+				//微信店小二
+				if(WirelessSocketServer.wxServer != null){
+					try {
+						qrCodeContent = BaseAPI.doGet("http://" + WirelessSocketServer.wxServer + "/wx-term/WxOperateWaiter.do?dataSource=qrCode&orderId=" + mOrder.getId() + "&restaurantId=" + mOrder.getRestaurantId());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			if(qrCodeContent.isEmpty()){
+				mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator(hasEnding() ? ending : "", mStyle).toString());
+			}else{
+				mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new String(new char[]{0x1B, 0x61, 0x01}) + new QRCodeContent(mPrintType, mStyle, qrCodeContent) + new String(new char[]{0x1B, 0x61, 0x00}) +
+											  SEP +
+											  new CenterAlignedDecorator(hasEnding() ? ending : "微信扫一扫", mStyle).toString());
+				
+			}
 
 		}else if(mPrintType == PType.PRINT_RECEIPT || mPrintType == PType.PRINT_TEMP_RECEIPT){
 			if(hasEnding()){
