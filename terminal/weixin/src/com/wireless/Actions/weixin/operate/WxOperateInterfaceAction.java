@@ -190,9 +190,13 @@ public class WxOperateInterfaceAction extends DispatchAction{
 	 */
 	public ActionForward getOpenIdByCode(ActionMapping maping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		final String code = request.getParameter("code");
+		final String fid = request.getParameter("fid");
+		final int rid = WxRestaurantDao.getRestaurantIdByWeixin(fid);
+		final Staff staff = StaffDao.getAdminByRestaurant(rid);
+		final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 		final JObject jObject = new JObject();
 		try {
-			final String openId = org.marker.weixin.oauth2.AccessToken.newInstance(AuthParam.APP_ID, AuthParam.APP_SECRET, code).getOpenId();
+			final String openId = org.marker.weixin.oauth2.AccessToken.newInstance(wxRestaurant.getWeixinAppId(), wxRestaurant.getWeixinAppSecret(), code).getOpenId();
 			jObject.setRoot(new Jsonable(){
 
 				@Override
@@ -208,7 +212,6 @@ public class WxOperateInterfaceAction extends DispatchAction{
 				}
 				
 			});
-			System.out.println(jObject.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
