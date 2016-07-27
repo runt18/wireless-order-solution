@@ -100,7 +100,7 @@ public class Material implements Jsonable {
 		private long lastModDate;
 		private String pinyin;
 		private boolean isGood = false;
-		private int alarmAmount;
+		private Integer alarmAmount;
 		private boolean isStockChanged = false;
 		
 		public UpdateBuilder(int id){
@@ -133,7 +133,7 @@ public class Material implements Jsonable {
 		}
 		
 		public boolean hasAlarmChanged(){
-			return this.alarmAmount != 0;
+			return this.alarmAmount != null;
 		}
 		
 		public UpdateBuilder setMaterialCate(MaterialCate cate){
@@ -237,7 +237,9 @@ public class Material implements Jsonable {
 		this.lastModDate = builder.lastModDate;
 		this.pinyin = builder.pinyin;
 		this.isGood = builder.isGood;
-		this.alarmAmount = builder.alarmAmount;
+		if(builder.alarmAmount != null){
+			this.alarmAmount = builder.alarmAmount;
+		}
 	}
 	
 	/**

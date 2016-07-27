@@ -343,19 +343,27 @@ Ext.onReady(function(){
 //			Ext.getCmp('materialCate').setValue(cateId == -1 ? '' : cateId);
 //			Ext.getCmp('materialId_stockDetail').setValue(materialId == -1 ? '' : materialId);
 //			Ext.getCmp('comboSearchSupplierForDetail').setValue(supplierId);
-			store.baseParams['beginDate'] = dateBegin;
-			store.baseParams['endDate'] = dateEnd;
-			store.baseParams['materialId'] = (materialId == -1 ? '' : materialId);
-			store.baseParams['materialCateId'] = (cateId == -1 ? '' : cateId);
-			store.baseParams['cateType'] = cateType;
-			store.baseParams['supplier'] = supplierId;
-			store.baseParams['subTypes'] = subTyps.STOCK_IN.val + '&' + subTyps.STOCK_OUT.val;
-//			Ext.getCmp('stockDetail_btnSearch').handler();
-			Ext.getCmp('stock_detail_grid').getStore().load();
-			Ext.getCmp('stock_detail_grid').getStore().on('load', function(){
-				store.baseParams['endDate'] = '';
-				store.baseParams['subTypes'] = '';
-			});
+//			store.baseParams['beginDate'] = dateBegin;
+//			store.baseParams['endDate'] = dateEnd;
+//			store.baseParams['materialId'] = (materialId == -1 ? '' : materialId);
+//			store.baseParams['materialCateId'] = (cateId == -1 ? '' : cateId);
+//			store.baseParams['cateType'] = cateType;
+//			store.baseParams['supplier'] = supplierId;
+//			store.baseParams['subTypes'] = subTyps.STOCK_IN.val + '&' + subTyps.STOCK_OUT.val;
+////			Ext.getCmp('stockDetail_btnSearch').handler();
+//			Ext.getCmp('stock_detail_grid').getStore().load();
+//			Ext.getCmp('stock_detail_grid').getStore().on('load', function(){
+//				store.baseParams['endDate'] = '';
+//				store.baseParams['subTypes'] = '';
+//			});
+			
+			Ext.getCmp('materialType').setValue(cateType);
+			Ext.getCmp('materialCate').setValue(cateId == -1 ? '' : cateId);
+			Ext.getCmp('materialId_stockDetail').setValue(materialId == -1 ? '' : materialId);
+			Ext.getCmp('comboSearchSupplierForDetail').setValue(supplierId);
+			Ext.getCmp('sdr_beginDate').setValue(dateBegin);
+			Ext.getCmp('sdr_endDate').setValue(dateEnd);
+			Ext.getCmp('stockDetail_btnSearch').handler();
 		});
 	}
 	

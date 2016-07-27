@@ -25,6 +25,7 @@ public class StockActionDetailDao {
 		private int id;
 		private int materialId;								//商品或原料Id
 		private List<StockAction.SubType> subTypes = new ArrayList<StockAction.SubType>();	//库单操作子类型
+		private List<StockAction.SubType> exceptSubTypes = new ArrayList<StockAction.SubType>();
 		private List<StockAction.Status> status = new ArrayList<StockAction.Status>();		//库单状态
 		private int stockActionId;							//库单Id
 		public int deptId = -1;								//出入库部门		
@@ -39,6 +40,11 @@ public class StockActionDetailDao {
 		private boolean isOnlyAmount;
 		private String fuzzyId;
 		private String comment;
+		
+		public ExtraCond addExceptSubTypes(StockAction.SubType type){
+			exceptSubTypes.add(type);
+			return this;
+		}
 		
 		public ExtraCond setFuzzyId(String fuzzyId){
 			this.fuzzyId = fuzzyId;
@@ -225,6 +231,17 @@ public class StockActionDetailDao {
 				extraCond.append(" AND S.sub_type IN ( " + subTypeCond.toString() + ")");
 			}
 			
+			if(this.exceptSubTypes.size() > 0){
+				final StringBuilder exceptSubTypeCond = new StringBuilder();
+				for(StockAction.SubType subType : exceptSubTypes){
+					if(exceptSubTypeCond.length() > 0){
+						exceptSubTypeCond.append(",");
+					}
+					exceptSubTypeCond.append(subType.getVal());
+				}
+				extraCond.append(" AND S.sub_type NOT IN ( " + exceptSubTypeCond.toString() + ")");
+			}
+			
 			if(this.supplierId != 0){
 				extraCond.append(" AND S.supplier_id = " + this.supplierId);
 			}
@@ -265,14 +282,10 @@ public class StockActionDetailDao {
 		Material material;
 		
 		//分店获取对应的菜品 因为引用的id出来的是总店material的id
-		if(stockDetail.getMaterialAssociateId() > 0){
-			material = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setAssociateId(stockDetail.getMaterialAssociateId())).get(0);
-		}else{
-			material = MaterialDao.getById(dbCon, staff, stockDetail.getMaterialId());
-		}
+		material = MaterialDao.getById(dbCon, staff, stockDetail.getMaterialId());
 		
 		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, dept_in_remaining, dept_out_remaining, remaining) " +
+		sql = " INSERT INTO " + Params.dbName + ".stock_action_detail (material_id,name,stock_action_id, price, amount, dept_in_remaining, dept_out_remaining, remaining, associate_id) " +
 			  " VALUES( " +
 			  material.getId() + ", " +
 			  "'" + material.getName() + "', " +
@@ -281,7 +294,8 @@ public class StockActionDetailDao {
 			  stockDetail.getAmount() + ", " +
 			  stockDetail.getDeptInRemaining() + ", " +
 			  stockDetail.getDeptOutRemaining() + ", " +
-			  stockDetail.getRemaining() + ")"; 
+			  stockDetail.getRemaining() + ", " +
+			  stockDetail.getMaterialAssociateId() + ")"; 
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -355,7 +369,7 @@ public class StockActionDetailDao {
 		String sql;
 		sql = " SELECT " +
 			  (extraCond.isOnlyAmount ? " COUNT(*) " :
-			  " D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount, D.dept_in_remaining, D.dept_out_remaining, D.remaining ") +
+			  " D.id, D.stock_action_id, D.material_id, D.name, D.price, D.amount, D.dept_in_remaining, D.dept_out_remaining, D.remaining, D.associate_id ") +
 			  " FROM " + Params.dbName + ".stock_action_detail D " +
 			  " JOIN " + Params.dbName + ".stock_action S ON D.stock_action_id = S.id " +
 			  " WHERE 1 = 1 " +
@@ -385,6 +399,7 @@ public class StockActionDetailDao {
 				detail.setDeptInRemaining(dbCon.rs.getFloat("dept_in_remaining"));
 				detail.setDeptOutRemaining(dbCon.rs.getFloat("dept_out_remaining"));
 				detail.setRemaining(dbCon.rs.getFloat("remaining"));
+				detail.setMaterialAssociateId(dbCon.rs.getInt("associate_id"));
 				result.add(detail);
 			}
 		}
