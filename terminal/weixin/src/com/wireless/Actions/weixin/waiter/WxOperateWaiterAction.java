@@ -217,6 +217,50 @@ public class WxOperateWaiterAction extends DispatchAction{
 		}
 		return null;
 	}
+
+	/**
+	 * 微信店小二二维码内容
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws IOException
+	 */
+	public ActionForward qrCode(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		final String restaurantId = request.getParameter("restaurantId");
+		final String orderId = request.getParameter("orderId");
+		final JObject jObject= new JObject();
+		try{
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId));
+			final Order order = OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY);
+			final WxRestaurant wxRestaurant;
+			if(staff.isBranch()){
+				wxRestaurant = WxRestaurantDao.get(StaffDao.getAdminByRestaurant(staff.getGroupId()));
+			}else{
+				wxRestaurant = WxRestaurantDao.get(staff);
+			}
+			
+			//生成带账单ID的微信二维码
+			final String qrCodeUrl = new QRCode().setTemp(String.valueOf(WxHandleMessage.QrCodeParam.newWaiter(order.getId()).sceneId()))
+												 .setExpired(14400)	//4 hour
+												 .createUrl(Token.newInstance(AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken())));
+												 //.createUrl(Token.newInstance(FinanceWeixinAction.APP_ID, FinanceWeixinAction.APP_SECRET));
+			//获取此二维码的内容
+            LuminanceSource source = new BufferedImageLuminanceSource(toBufferedImage(ImageIO.read(new URL(qrCodeUrl)).getScaledInstance(400, 400, Image.SCALE_SMOOTH)));  
+            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));  
+            @SuppressWarnings("serial")
+			Result qrCode = new MultiFormatReader().decode(bitmap, new HashMap<DecodeHintType, Object>(){{ put(DecodeHintType.CHARACTER_SET, "GBK"); }});
+            
+            response.getWriter().print(qrCode.getText());
+            
+		}catch(BusinessException | SQLException | NotFoundException | IOException e){
+			jObject.initTip4Exception(e);
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * 打印微信小二

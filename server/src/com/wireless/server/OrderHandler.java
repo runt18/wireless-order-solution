@@ -393,7 +393,6 @@ class OrderHandler implements Runnable{
 							public void run() {
 								try {
 									BaseAPI.doGet("http://" + WirelessSocketServer.wxServer + "/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderToInsert.getId());
-									//BaseAPI.doGet("http://ts.e-tones.net/wx-term/WxOperateWaiter.do?dataSource=print&restaurantId=" + staff.getRestaurantId() + "&orderId=" + orderToInsert.getId());
 								} catch (IOException e) {
 									e.printStackTrace();
 								}
@@ -566,7 +565,6 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doDailySettle(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException, IOException{
-		//TODO
 		final ManualResult result = DailySettleDao.manual(staff);
 		final ReqPrintContent dailyContent = ReqPrintContent.buildShiftReceipt(staff, result.getRange(), PType.PRINT_DAILY_SETTLE_RECEIPT);
 		for(Printer printer : new Parcel(request.body).readParcelList(Printer.CREATOR)){

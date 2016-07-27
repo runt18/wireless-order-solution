@@ -44,7 +44,7 @@ define(function(require, exports, module){
 				self.find('[id="allResrt_a_limitSale"]').click(function(){
 					Util.msg.alert({
 						msg : '是否重置限量菜品?',
-						renderTo : 'stopSellMgr',
+						renderTo : 'limitSale_div_limitSale',
 						buttons : 'yesback',
 						certainCallback : function(){
 							Util.LM.show();
