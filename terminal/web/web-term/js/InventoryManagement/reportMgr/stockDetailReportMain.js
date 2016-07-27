@@ -278,7 +278,9 @@ Ext.onReady(function(){
 	         new Ext.grid.RowNumberer(),
 //	         {header:'id', dataIndex:'id', hidden: true },
 	         {header:'日期', dataIndex:'date'},
-	         {header:'库单号', dataIndex:'stockActionId', align : 'center'},
+	         {header:'库单号', dataIndex:'stockActionId', align : 'center', renderer : function(data){
+	         	return '<a href="javascript:void(0);" data-type="checkStockActionById_a_stockDetail">' + data + '</a>';
+	         }},
 	         {header:'原始单号', dataIndex:'oriStockId'},
 	         {header:'货品名称', dataIndex:'materialName', width:160},
 	         {header:'供应商', dataIndex:'supplier'},
@@ -412,19 +414,61 @@ Ext.onReady(function(){
 		}
 	});
 	
+	var dateBegin = new Ext.form.DateField({
+		id : 'sdr_beginDate',
+		xtype : 'datefield',
+		format : 'Y-m-d',
+		maxValue : new Date(),
+		readOnly : false,
+		allowBlank : false
+	});
+	
+	var dateEnd = new Ext.form.DateField({
+		id : 'sdr_endDate',
+		xtype : 'datefield',
+		format : 'Y-m-d',
+		maxValue : new Date(),
+		readyOnly : false,
+		allowBlank : false
+	});
+	
+	var dateCombo = Ext.ux.createDateCombo({
+		beginDate : dateBegin,
+		endDate : dateEnd,
+		callback : function(){
+			Ext.getCmp('stockDetail_btnSearch').handler();
+		}
+	});
+	
 	var detailReportBar = new Ext.Toolbar({
 		items : [
 		{ xtype:'tbtext', text:'日期:'},
-		{
-			xtype : 'datefield',
-			id : 'sdr_beginDate',
-			allowBlank : false,
-			maxValue : new Date(),
-			value : new Date(),
-            width:100,  
-            plugins: 'monthPickerPlugin',  
-            format: 'Y-m'			
-		},
+		dateCombo,
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		dateBegin,
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;至&nbsp;&nbsp;'},
+		dateEnd,
+//		{
+//			xtype : 'datefield',
+//			id : 'sdr_beginDate',
+//			allowBlank : false,
+//			maxValue : new Date(),
+//			value : new Date(),
+//            width:100,  
+//            plugins: 'monthPickerPlugin',  
+//            format: 'Y-m-d'			
+//		},
+//		{ xtype:'tbtext', text:'日期:'},
+//		{
+//			xtype : 'datefield',
+//			id : 'sdr_beginDate',
+//			allowBlank : false,
+//			maxValue : new Date(),
+//			value : new Date(),
+//            width:100,  
+//            plugins: 'monthPickerPlugin',  
+//            format: 'Y-m-d'			
+//		},
 		{xtype : 'tbtext', text : '&nbsp;'},
 		{xtype : 'tbtext', text : '类型:'},
 		materialTypeComb,
@@ -432,17 +476,14 @@ Ext.onReady(function(){
 		materialCateComb,
 		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
-		{xtype:'tbtext', text:'&nbsp;&nbsp;单据编号:'},
-		{xtype : 'textfield', width : 100, id : 'oriStockId_stockDetail'},
-		{xtype:'tbtext', text:'&nbsp;&nbsp;备注：'},
-		{xtype : 'textfield', width : 180, id : 'comment_stockDetail'},
 		'->', {
 			text : '刷新',
 			id : 'stockDetail_btnSearch',
 			iconCls : 'btn_refresh',
 			handler : function(){
 				var store = stockDetailReportGrid.getStore();
-				store.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m');
+				store.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
+				store.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
 				store.baseParams['deptOut'] = Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getStore().getCount() > 0 ? Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getValue() : '-1';
 				store.baseParams['deptIn'] = Ext.getCmp('stockInDeptComb_comboBox_stockDetailPeport').getValue();
 				store.baseParams['materialId'] = Ext.getCmp('materialId_stockDetail').getValue();
@@ -611,6 +652,13 @@ Ext.onReady(function(){
 		]
 	});	
 	
+	var detailReportThirdBar = new Ext.Toolbar({
+		items : [{xtype:'tbtext', text:'&nbsp;&nbsp;单据编号:'},
+		{xtype : 'textfield', width : 100, id : 'oriStockId_stockDetail'},
+		{xtype:'tbtext', text:'&nbsp;&nbsp;备注：'},
+		{xtype : 'textfield', width : 180, id : 'comment_stockDetail'}]
+	});
+	
 	
 	var pagingBar = new Ext.PagingToolbar({
 		id : 'pagingToolbar_stockDistribution',
@@ -642,6 +690,7 @@ Ext.onReady(function(){
 		listeners : {
 			render : function(){
 				detailReportSecondBar.render(stockDetailReportGrid.tbar);
+				detailReportThirdBar.render(stockDetailReportGrid.tbar);
 			},
 			rowdblclick : function(grid, rowindex, e){ 
 				var id = -1;
@@ -663,10 +712,55 @@ Ext.onReady(function(){
 		}
 
 	});
+
+	//查看库单
+	function checkStockActionById(){
+		var selectCol = stockDetailReportGrid.getSelectionModel().getSelected();
+		$.ajax({
+			url : '../../QueryStockAction.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				id : selectCol.data.stockActionId,
+				containsDetails : true,
+				isWithOutSum : true
+			},
+			success : function(res){
+				Ext.stockDistributionAction.newInstance({
+					cateType : res.root[0].cateTypeValue,
+					checkWithOutMsg : true,
+					isOnlyRestaurant : true,
+					isOnlyShow : true,
+					stockActionId : selectCol.data.stockActionId,
+					stockType : res.root[0].typeValue,
+					subType : res.root[0].subTypeValue,
+					supplier : res.root[0].supplier.supplierID,
+					deptOut : res.root[0].deptOut.id,
+					deptIn : res.root[0].deptIn.id,
+					details : res.root[0].stockDetails,
+					actualPrice : res.root[0].actualPrice,
+					oriId : res.root[0].oriStockId,
+					oriDate : res.root[0].oriStockDateFormat,					
+					comment : res.root[0].comment,
+					appover : res.root[0].approverName,
+					appoverDate : res.root[0].approverDateFormat,
+					operator : res.root[0].operatorName,
+					operateDate : res.root[0].birthDateFormat	
+				}).open();
+			},
+			error : function(){
+			
+			}
+		});
+	}
 	
 	
 	//汇总
 	stockDetailReportGrid.getStore().on('load', function(store, records, options){
+		$('[data-type=checkStockActionById_a_stockDetail]').click(function(){
+			checkStockActionById();
+		});
+		
 		var sumRow = null;
 		if(store.getCount() > 0){
 
@@ -718,6 +812,8 @@ Ext.onReady(function(){
 		}
 	});
    
-   Ext.getCmp('stockDetail_btnSearch').handler();
+	dateCombo.setValue(1);
+	dateCombo.fireEvent('select');
+	
    
 });

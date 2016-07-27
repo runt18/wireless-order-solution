@@ -66,7 +66,7 @@ function getRestaurantInfo(){
 			//显示二维码
 			$('#weixinCodeToRestaurant').attr('src', rest.qrCodeUrl);
 			//显示是否打印二维码
-			$('#isPrintQrCodeInOrderPaper').attr('checked', rest.qrCodeStatus == 1 ? true : false);
+//			$('#isPrintQrCodeInOrderPaper').attr('checked', rest.qrCodeStatus == 1 ? true : false);
 			$('#weixinAuthRestInfo').show();
 			
 		}else{
@@ -187,17 +187,17 @@ $(function (){
 	}, 100);
 
 
-	$('#isPrintQrCodeInOrderPaper').change(function(){
-		wx.lm.show();
-		$.post('../../OperateRestaurant.do', {
-			dataSource: 'updateRestaurantPrintCode', 
-			printCode : $('#isPrintQrCodeInOrderPaper').attr('checked') ? true:false
-		}, function(rt){
-			wx.lm.hide();
-		}).error(function(){
-			wx.lm.hide();
-		});
-	});
+//	$('#isPrintQrCodeInOrderPaper').change(function(){
+//		wx.lm.show();
+//		$.post('../../OperateRestaurant.do', {
+//			dataSource: 'updateRestaurantPrintCode', 
+//			printCode : $('#isPrintQrCodeInOrderPaper').attr('checked') ? true:false
+//		}, function(rt){
+//			wx.lm.hide();
+//		}).error(function(){
+//			wx.lm.hide();
+//		});
+//	});
 	
 	
 	

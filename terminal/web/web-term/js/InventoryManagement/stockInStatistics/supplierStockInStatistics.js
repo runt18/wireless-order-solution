@@ -272,25 +272,31 @@ Ext.onReady(function(){
 		var cateId = cateIdCombo.getValue();
 		var supplierId = selectCol.json.supplier.supplierID;
 		Ext.ux.addTab('stockDetail', '进销存明细', 'InventoryManagement_Module/StockDetailReport.html', function(){
-			var store = Ext.getCmp('stock_detail_grid').getStore();
+//			var store = Ext.getCmp('stock_detail_grid').getStore();
+//			Ext.getCmp('materialType').setValue(cateType);
+//			Ext.getCmp('materialCate').setValue(cateId >= 0 ? cateId : '');
+////			Ext.getCmp('sdr_beginDate').setValue('');
+//			Ext.getCmp('comboSearchSupplierForDetail').setValue(supplierId);
+//			
+//			store.baseParams['cateType'] = cateType;
+//			store.baseParams['materialCateId'] = (cateId >= 0 ? cateId : '');
+//			store.baseParams['supplier'] = supplierId;
+//			store.baseParams['beginDate'] = dateBegin;
+//			store.baseParams['endDate'] = dateEnd;
+//			store.load({params:{start:0,limit:20}});
+//			store.on('load', function(){
+//				store.baseParams['cateType'] = '';
+//				store.baseParams['materialCateId'] = '';
+//				store.baseParams['supplier'] = '';
+//				store.baseParams['beginDate'] = '';
+//				store.baseParams['endDate'] = '';
+//			});
+			Ext.getCmp('sdr_beginDate').setValue(dateBegin);
+			Ext.getCmp('sdr_endDate').setValue(dateEnd);
 			Ext.getCmp('materialType').setValue(cateType);
 			Ext.getCmp('materialCate').setValue(cateId >= 0 ? cateId : '');
-//			Ext.getCmp('sdr_beginDate').setValue('');
 			Ext.getCmp('comboSearchSupplierForDetail').setValue(supplierId);
-			
-			store.baseParams['cateType'] = cateType;
-			store.baseParams['materialCateId'] = (cateId >= 0 ? cateId : '');
-			store.baseParams['supplier'] = supplierId;
-			store.baseParams['beginDate'] = dateBegin;
-			store.baseParams['endDate'] = dateEnd;
-			store.load({params:{start:0,limit:20}});
-			store.on('load', function(){
-				store.baseParams['cateType'] = '';
-				store.baseParams['materialCateId'] = '';
-				store.baseParams['supplier'] = '';
-				store.baseParams['beginDate'] = '';
-				store.baseParams['endDate'] = '';
-			});
+			Ext.getCmp('stockDetail_btnSearch').handler();
 		});
 	}
 	
