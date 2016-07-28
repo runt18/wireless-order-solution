@@ -22,6 +22,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.gift.GiftDetail;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByEachDay;
+import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -52,6 +53,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final String giftStaffId = request.getParameter("giftStaffId");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
+		final String deptId = request.getParameter("deptId");
 		
 		final JObject jobject = new JObject();
 		try{
@@ -72,6 +74,10 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
+			}
+			
+			if(deptId != null && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
 			
 			if(foodName != null && !foodName.trim().isEmpty()){
@@ -136,6 +142,7 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		final String giftStaffId = request.getParameter("giftStaffId");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
+		final String deptId = request.getParameter("deptId");
 		
 		final JObject jObject = new JObject();
 		
@@ -157,6 +164,10 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
+			}
+			
+			if(deptId != null && !deptId.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
 			
 			if(foodName != null && !foodName.trim().isEmpty()){
