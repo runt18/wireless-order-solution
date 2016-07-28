@@ -28,9 +28,7 @@ public class OperateFoodMaterialAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward update(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
 		JObject jobject = new JObject();

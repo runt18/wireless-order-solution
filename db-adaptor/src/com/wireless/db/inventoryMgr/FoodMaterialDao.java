@@ -2,7 +2,6 @@ package com.wireless.db.inventoryMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +12,9 @@ import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 
 public class FoodMaterialDao {
@@ -25,7 +27,7 @@ public class FoodMaterialDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int insert(DBCon dbCon, FoodMaterial item) throws BusinessException, SQLException{
+	private static int insert(DBCon dbCon, FoodMaterial item) throws BusinessException, SQLException{
 		int count = 0;
 		String querySQL = "", insertSQL = "";
 		querySQL = "SELECT COUNT(*) FROM food WHERE food_id = " + item.getFoodId();
@@ -42,24 +44,6 @@ public class FoodMaterialDao {
 		return count;	
 	}
 	
-	/**
-	 * 
-	 * @param item
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void insert(FoodMaterial item) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			int count = FoodMaterialDao.insert(dbCon, item);
-			if(count == 0){
-				throw new BusinessException(MaterialError.BINDING_INSERT_FAIL);
-			}
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 	
 	/**
 	 * 
@@ -68,7 +52,7 @@ public class FoodMaterialDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insertList(DBCon dbCon, List<FoodMaterial> list) throws NullPointerException, BusinessException, SQLException{
+	private static void insertList(DBCon dbCon, List<FoodMaterial> list) throws NullPointerException, BusinessException, SQLException{
 		if(list == null || list.isEmpty()){
 			throw new NullPointerException("The list is null or empty. ");
 		}
@@ -87,20 +71,6 @@ public class FoodMaterialDao {
 		}
 	}
 	
-	/**
-	 * 
-	 * @param list
-	 * @throws SQLException
-	 */
-	public static void insertList(List<FoodMaterial> list) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			FoodMaterialDao.insertList(dbCon, list);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 	
 	/**
 	 * 
@@ -109,7 +79,7 @@ public class FoodMaterialDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<FoodMaterial> getList(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	private static List<FoodMaterial> getList(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<FoodMaterial> list = new ArrayList<FoodMaterial>();
 		FoodMaterial item = null;
 		
@@ -156,56 +126,12 @@ public class FoodMaterialDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int delete(DBCon dbCon, Map<Object, Object> params) throws SQLException{
-		int count = 0;
-		String deleteSQL = "DELETE FROM food_material FM WHERE 1=1 ";
-		deleteSQL  = SQLUtil.bindSQLParams(deleteSQL, params);
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param id
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int delete(DBCon dbCon, int id) throws SQLException{
-		Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND FM.id = " + id);
-		return FoodMaterialDao.delete(dbCon, params);
-	}
-	
-	/**
-	 * 
-	 * @param id
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void delete(int id) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			FoodMaterialDao.delete(dbCon, id);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
 	 * @param foodId
 	 * @param deleteGood
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int deleteAll(DBCon dbCon, int foodId, boolean deleteGood) throws SQLException{
+	private static int deleteAll(DBCon dbCon, int foodId, boolean deleteGood) throws SQLException{
 		int count = 0;
 		String deleteSQL = "DELETE FROM food_material WHERE food_id = " + foodId;
 		if(!deleteGood){
@@ -227,32 +153,6 @@ public class FoodMaterialDao {
 		return count;
 	}
 	
-	/**
-	 * 
-	 * @param foodId
-	 * @param deleteGood
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void deleteAll(int foodId, boolean deleteGood) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			FoodMaterialDao.deleteAll(dbCon, foodId, deleteGood);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param foodId
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void deleteAll(int foodId) throws BusinessException, SQLException{
-		FoodMaterialDao.deleteAll(foodId, false);
-	}
 	
 	/**
 	 * 
@@ -262,7 +162,7 @@ public class FoodMaterialDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void update(DBCon dbCon, int foodId, List<FoodMaterial> list) throws BusinessException, SQLException{
+	private static void update(DBCon dbCon, int foodId, List<FoodMaterial> list) throws BusinessException, SQLException{
 		if(list == null ){
 			throw new NullPointerException("The list is null. ");
 		}
@@ -293,6 +193,50 @@ public class FoodMaterialDao {
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	
+	private static Food relativeToFood(DBCon dbCon, Staff staff, int materialId) throws SQLException{
+		Food food = null;
+		String sql = "SELECT FM.food_id,  F.name AS foodName, F.kitchen_id, K.name AS kitchenName FROM food_material FM "
+					+ " JOIN food F ON FM.food_id = F.food_id " 
+					+ " JOIN kitchen K ON K.kitchen_id = F.kitchen_id " 
+					+ " WHERE FM.restaurant_id = " + staff.getRestaurantId() 
+					+ " AND FM.material_id = " + materialId;
+		
+		try{
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while (dbCon.rs != null && dbCon.rs.next()) {
+				food = new Food(dbCon.rs.getInt("food_id"));
+				food.setName(dbCon.rs.getString("foodName"));
+				Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+				k.setName(dbCon.rs.getString("kitchenName"));
+				food.setKitchen(k);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			throw new SQLException("Failed to get the food");
+		}
+		return food;
+	}
+	
+	/**
+	 * get the relative of food
+	 * @param staff
+	 * @param materialId
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Food relativeToFood(Staff staff, int materialId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return relativeToFood(dbCon, staff, materialId);
+		}finally{
+			dbCon.disconnect();
+		}
+		
 	}
 	
 }
