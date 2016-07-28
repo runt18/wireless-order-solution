@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.inventoryMgr.FoodMaterialDao;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -51,6 +52,7 @@ public class QueryMaterialAction extends DispatchAction{
 		final String cateId = request.getParameter("cateId");
 		final String cateType = request.getParameter("cateType");
 		final String materialId = request.getParameter("materialId");
+		final String isGetRelative = request.getParameter("isGetRelative");
 		MaterialDao.ExtraCond extra = new MaterialDao.ExtraCond();
 		
 		List<Material> root = null;
@@ -90,8 +92,8 @@ public class QueryMaterialAction extends DispatchAction{
 				}
 				
 				for (final Material m : root) {
-					if(m.isGood()){
-						final Food food = FoodDao.relativeToFood(staff, m.getId());
+					if(m.isGood() && isGetRelative != null && !isGetRelative.isEmpty() && Boolean.parseBoolean(isGetRelative)){
+						final Food food = FoodMaterialDao.relativeToFood(staff, m.getId());
 						Jsonable j = new Jsonable() {
 							
 							@Override
