@@ -84,6 +84,8 @@ import com.wireless.pojo.book.Book;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
+import com.wireless.pojo.member.WxMember;
+import com.wireless.pojo.member.WxMember.InterestBuilder;
 import com.wireless.pojo.member.represent.Represent;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponOperation;
@@ -402,11 +404,21 @@ public class WxHandleMessage extends HandleMessageAdapter {
 			if(msg.getEvent() == Event.SUBSCRIBE){
 				//会员关注
 				Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName()));
-				WxMemberDao.interest(staff, msg.getFromUserName(), this.serverName);
+				final InterestBuilder builder = new WxMember.InterestBuilder(msg.getFromUserName()).setWxServer(this.serverName);
+				final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+				//获取关注人的昵称
+				try{
+					final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+					final Token token = Token.newInstance(authorizerToken);
+					User user = User.newInstance(token, msg.getFromUserName());
+					builder.setNickName(user.getNickName());
+				}catch(Exception ignored){
+					ignored.printStackTrace();
+				}
+				WxMemberDao.interest(staff, builder);
 				if(msg.getTicket().isEmpty()){
 					final List<WxMenuAction> reply = WxMenuActionDao.getByCond(staff, new WxMenuActionDao.ExtraCond().setCate(WxMenuAction.Cate.SUBSCRIBE_REPLY));
 					if(reply.isEmpty()){
-						WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 						String picUrl;
 						if(wxRestaurant.hasWeixinLogo()){
 							picUrl = wxRestaurant.getWeixinLogo().getObjectUrl();

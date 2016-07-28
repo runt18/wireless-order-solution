@@ -248,7 +248,7 @@
 	 <!-- 餐台更多操作 -->
 	<div data-role="popup" id="tableSelectStopLimitCmp" data-theme="d">
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-         	<li id="limitSale_a_tableSelect" class="tempFoodKitchen"><a>沽清限制</a></li>
+         	<li id="limitSale_a_tableSelect" class="tempFoodKitchen"><a>限量设置</a></li>
          	<li class="tempFoodKitchen" id="saleOut_a_tableSelect"><a>快速沽清</a></li>
         </ul>
 	</div>		

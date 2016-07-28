@@ -224,7 +224,7 @@ $(function(){
 			data : {
 				dataSource : 'getByCond',
 				status : 'issued',
-				expired : 'true',
+				filter : '0',
 				oid : Util.mp.oid,
 				fid : Util.mp.fid
 			},
@@ -364,7 +364,7 @@ $(function(){
 				data : {
 					dataSource : 'getByCond',
 					status : 'issued',
-					expired : 'true',
+					filter : '0',
 					oid : Util.mp.oid,
 					fid : Util.mp.fid
 				},

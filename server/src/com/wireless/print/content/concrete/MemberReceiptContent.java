@@ -62,6 +62,8 @@ public class MemberReceiptContent extends ConcreteContent {
 		
 		if(!mMo.getMemberCard().isEmpty()){
 			s.append("会员卡号：" + mMo.getMemberCard()).append(SEP);
+		}else if(!mMo.getMemberMobile().isEmpty()){
+			s.append("手机号码：" + mMo.getMemberMobile()).append(SEP);
 		}
 
 		
