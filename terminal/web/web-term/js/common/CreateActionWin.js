@@ -1292,6 +1292,14 @@
 						}
 						deptIn.store.loadData(depts);
 						deptOut.store.loadData(depts);
+						if(_param.subType == Ext.stockDistributionAction.stockSubType.values.STOCK_OUT_TRANSFER.val){
+							deptIn.setValue(252);
+							deptIn.disable();
+						}else{
+							deptOut.setValue(252);
+							deptOut.disable();
+						}
+						
 						if(_param.deptIn || typeof _param.deptIn == 'number'){
 							deptIn.setValue(_param.deptIn);
 						}

@@ -12,7 +12,7 @@ Ext.onReady(function(){
 		SPILL : {value : 3, desc : '其他入库'},
 		STOCK_OUT : {value : 4, desc : "退货"},
 		STOCK_OUT_TRANSFER : {value : 5, desc : "退料"},
-		DAMAGE : {value : 6, desc : "其他入库"},
+		DAMAGE : {value : 6, desc : "其他出库"},
 		MORE : {value : 7,desc : "盘盈"},
 		LESS : {value : 8, desc : "盘亏"},
 		CONSUMPTION : {value : 9, desc : "消耗"}
@@ -88,7 +88,7 @@ Ext.onReady(function(){
 		    	}
 		    }],
 		    callback : function(data){
-		    	if(data.subType == stockActionSubType.STOCK_IN.value || data.subType == stockActionSubType.STOCK_IN_TRANSFER.value || data.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || data.subType == stockActionSubType.DAMAGE.value){
+		    	if(data.subType == stockActionSubType.STOCK_IN.value || data.subType == stockActionSubType.STOCK_IN_TRANSFER.value || data.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || data.subType == stockActionSubType.SPILL.value){
 		    		if(!data.deptIn && typeof data.deptIn != 'number'){
 		    			Ext.ux.showMsg({
 		    				title : '错误提示',
@@ -99,8 +99,8 @@ Ext.onReady(function(){
 		    		}
 		    	}
 		    	
-		    	if(data.subType == stockActionSubType.STOCK_OUT || data.subType == stockActionSubType.STOCK_IN_TRANSFER.value || data.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || data.subType == stockActionSubType.SPILL.value){
-		    		if(!data.deptOut && typeof data.deptIn != 'number'){
+		    	if(data.subType == stockActionSubType.STOCK_OUT || data.subType == stockActionSubType.STOCK_IN_TRANSFER.value || data.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || data.subType == stockActionSubType.DAMAGE.value){
+		    		if(!data.deptOut && typeof data.deptOut != 'number'){
 		    			Ext.ux.showMsg({
 		    				title : '错误提示',
 		    				msg : '请选择出库仓'
