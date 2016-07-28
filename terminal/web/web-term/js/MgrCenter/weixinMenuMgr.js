@@ -591,7 +591,8 @@ Ext.onReady(function(){
 	        			jsonpCallback : "callback",
 	        			data : {
 	        				key : this.value,
-	        				dataSource : 'getUrlJumpByKey'
+	        				dataSource : 'getUrlJumpByKey',
+	        				restaurantId : restaurantID
 	        			},
 	        			success : function(res, status, req){
 	        				if(res.success){

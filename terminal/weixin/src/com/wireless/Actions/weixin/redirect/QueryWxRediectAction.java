@@ -23,9 +23,9 @@ import com.wireless.pojo.weixin.restaurant.WxRestaurant;
 
 public class QueryWxRediectAction extends DispatchAction {
 	public ActionForward getUrlJumpByKey(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		final String pin = (String)request.getAttribute("pin");
+		final String restaurantId = request.getParameter("restaurantId");
 		final String key = request.getParameter("key");
-		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId));
 		final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
 		final String callback = request.getParameter("callback");
 		final JObject jObject = new JObject();
