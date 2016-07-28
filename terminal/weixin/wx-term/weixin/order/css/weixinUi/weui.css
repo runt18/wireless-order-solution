@@ -387,11 +387,11 @@ input.weui_btn_plain_default {
 }
 .weui_cells_title {
   margin-top: .77em;
-  margin-bottom: .3em;
+  margin-bottom: .7em;
   padding-left: 15px;
   padding-right: 15px;
   color: #888;
-  font-size: 14px;
+  font-size: 17px;
 }
 .weui_cells_title + .weui_cells {
   margin-top: 0;
@@ -484,8 +484,10 @@ input.weui_btn_plain_default {
   color: #09BB07;
 }
 .weui_label {
-  display: block;
-  width: 3em;
+    display: block;
+    width: 5.5em;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 .weui_input {
   width: 100%;
@@ -1069,7 +1071,7 @@ input.weui_btn_plain_default {
 }
 .weui_toast {
   position: fixed;
-  z-index: 3;
+  z-index: 6000;
   width: 7.6em;
   min-height: 7.6em;
   top: 180px;
@@ -1430,7 +1432,7 @@ input.weui_btn_plain_default {
 }
 .weui_mask_transparent {
   position: fixed;
-  z-index: 1;
+  z-index: 7000;
   width: 100%;
   height: 100%;
   top: 0;

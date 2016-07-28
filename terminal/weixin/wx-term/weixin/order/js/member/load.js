@@ -1,181 +1,92 @@
 $(function(){
+	$.ajaxSetup({
+		timeout : 10 * 1000      //设置timeout时间为10s
+	})
 	
-	//会员生日判定
-	//月
-	$('#birthdayMonth_input_member').on('blur', function(){
-		var month = parseInt($('#birthdayMonth_input_member').val());
-		if(month < 1 || month > 12){
-			Util.dialog.show({title:'提示', msg: '月份输入错误,请重新输入', btn : 'yes', callback : function(){
-				$('#birthdayMonth_input_member').val('');
-				$('#birthdayMonth_input_member').focus();
-			}});
-		}
-	});
-	//日
-	$('#birthdayDay_input_member').on('blur', function(){
-		var month = parseInt($('#birthdayDay_input_member').val());
-		if(month < 1 || month > 31){
-			Util.dialog.show({title:'提示', msg: '天数输入错误,请重新输入', btn : 'yes', callback : function(){
-				$('#birthdayDay_input_member').val('');
-				$('#birthdayDay_input_member').focus();
-			}});
-		}
-	});
+	function fnDateInChinese(date){
+		var month = date.substring(5, 7);
+		var day = date.substring(8, 10);
+		var time = date.substring(11, date.length - 3);
+		
+		return month+ '月' +day + '日' + ' ' + time;
+		
+	}
 	
-	//性别点击
-	$('#bindMember_div_member').find('[data-type="personSex"]').each(function(index, element){
-		element.onclick = function(){
-			if($(element).hasClass('selectedRegion_css_book')){
-				$(element).addClass('selectedRegion_css_book');
-			}else{
-				$('#bindMember_div_member').find('[data-type="personSex"]').removeClass('selectedRegion_css_book');
-				$(element).addClass('selectedRegion_css_book');
-			}
-		}
-	});
-	
-	$('html, body').animate({scrollTop: 0}, 'fast');
-//	Util.lbar('', function(html){$(document.body).append(html);  });
-	Util.lm.show();
+	//获取用户头像
 	$.ajax({
 		url : '../../WXOperateMember.do',
 		type : 'post',
 		data : {
-			dataSource : 'getInfo',
+			dataSource : 'getUserMsg',
 			oid : Util.mp.oid,
 			fid : Util.mp.fid
 		},
 		dataType : 'json',
-		success : function(data, status, xhr){
-			Util.lm.hide();
+		success : function(data){
 			if(data.success){
-				//会员卡号
-				$('#divWXMemberCard').html('No.' + data.other.weixinCard);
-				$('#fansAmount_span_member').html(data.other.member.fansAmount);
-				$('#totalCommission_span_member').html(data.other.member.totalCommission);
-				
-				if(data.other.status == 2){
-					//手机号已绑定状态
-					$('#phone_div_member').show();
-					$('#bind_div_member').hide();
-					
-					$('#divMemberRecommendHistory').css('display', 'block');
-				}else if(data.other.status == 1){
-					//手机号码未绑定状态
-					$('#bind_div_member').show();
-					$('#phone_div_member').hide();					
-				}
-				
-				$.ajax({
-					url : '../../WXQueryMemberOperation.do',
-					type : 'post',
-					data : {
-						dataSource : 'recent',
-						oid : Util.mp.oid,
-						fid : Util.mp.fid
-					},
-					dataType : 'json',
-					success : function(data, status, xhr){
-						
-						if(data.other.nearByCharge >= 0){
-							$('#spanNearByCharge').html(data.other.nearByCharge);
-							$('#divMemberBalanceContent').css('display', 'block');
-						}
-						
-						if(data.other.nearByConsume >= 0){
-							$('#spanNearByCost').html(data.other.nearByConsume);
-							$('#divMemberPointContent').css('display', 'block');
-						}
-						if(data.other.couponConsume >= 0){ 
-							$('#couponDetails_div_member').css('display', 'block');
-						}							
-					},
-					error : function(data, errotType, eeor){
-						Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
-					}
-				});				
-				
-				$.ajax({
-					url : '../../WxOperateRestaurant.do',
-					data : {
-						dataSource : 'getByCond',
-						oid : Util.mp.oid,
-						fid : Util.mp.fid,
-						sessionId : Util.mp.params.sessionId
-					},
-					type : 'post',
-					dataType : 'json',
-					success : function(data, status, req){
-						if(data.success){
-							$('#divMemberCard').css({
-								'background': 'url("' + data.root[0].wxCardImg.image + '")',
-								'background-size' : '100% 100%'
-							});
-						}else{
-							$('#divMemberCard').css({
-								'background': 'url("../images/member_vip.jpg")',
-								'background-size' : '100% 100%'
-							});
-						}
-					},
-					error : function(req, status, err){
-					
-					}
+				$('#headImg_div_member').css({
+					'background': 'url("' + data.root[0].headimgurl + '")',
+					'background-size' : '100% 100%'
 				});
 				
-				$('#divMemberCard').css('display', 'block');
-				$('#divMemberContent').css('display', 'block');
-				$('#divMemberTypeContent').css('display', 'block');
-				$('#divMemberBalanceAndPiont').css('display', 'block');
+				$('#userName_div_member').text(data.root[0].nickName);
 				
-				if(data.other.member.memberType.desc){
-					$('#divCurrentMemberTypeDesc').css('display', 'block');
-					$('#spanCurrentMemberTypeDesc').html(data.other.member.memberType.desc);
-				}
-				
-				if(data.other.hasCoupon){
-					$('#divMemberCouponContent').css('display', 'block');
-					if(Util.mp.extra && Util.mp.extra == 'coupon'){
-						$('#myCoupon_li_member').click();
-					}
-				}					
-								
-				member = data.other.member;
-				member.restaurant = data.other.restaurant;
-				initMemberMsg({data:member});
-				
-				//添加会员等级当前位置
-				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
-				
-				//设置会员排名
-				if(member.rank > 0){
-					$('#fontDefeatMemberCount').text(member.rank);
-					$('#span_currentMemberDefeat').show();
-				}
-				
-				var memberType = data.other.member.memberType;
-				$('#privilege_ul_member').append(memberType.discount.type != 2 ? '<li>'+ memberType.discount.name +'优惠</li>' : '');	
-				$('#privilege_ul_member').append(memberType.chargeRate >1 ? '<li>'+ memberType.chargeRate +'倍充值优惠, 充 100 元送 '+parseInt((memberType.chargeRate-1)*100)+' 元</li>':'');
-				$('#privilege_ul_member').append(memberType.exchangeRate >1 ? '<li>'+ memberType.exchangeRate +'倍积分特权, 消费 1 元积 '+memberType.exchangeRate+' 分</li>':'');
-				$('#privilege_ul_member').append(typeof memberType.desc != 'undefined' && memberType.desc != '' ? '<li>'+ memberType.desc +'</li>':'');
-				
-				
-				if($('#privilege_ul_member').html()){
-					$('#privilege_div_member').css('display', 'block');
-				}else{
-					$('#privilege_div_member').css('display', 'none');
-				}					
-					
 			}else{
-				Util.dialog.show({title:'提示', msg: data.msg});
-			}
+				$('#headImg_div_member').css({
+					'background': 'url("../order/images/userHead.jpg")',
+					'background-size' : '100% 100%'
+				});
+			}		
 		},
-		error : function(data, errotType, err){
-			Util.lm.hide();
-			Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+		error : function(){
+			$('#headImg_div_member').css({
+				'background': 'url("../order/images/userHead.jpg")',
+				'background-size' : '100% 100%'
+			});
 		}
 	});
 	
+	//获取餐厅图片
+	$.ajax({
+		url : '../../WxOperateRestaurant.do',
+		data : {
+			dataSource : 'getByCond',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid,
+			sessionId : Util.mp.params.sessionId
+		},
+		type : 'post',
+		dataType : 'json',
+		success : function(data, status, req){
+			if(data.success){
+				if(data.root[0].wxCardImg){
+					$('#divMemberCard').css({
+						'background': 'url("' + data.root[0].wxCardImg.image + '")',
+						'background-size' : '100% 100%'
+					});
+				}else{
+					$('#divMemberCard').css({
+						'background': 'url("../order/images/VIP.jpg")',
+						'background-size' : '100% 100%'
+					});
+				}
+				
+			}else{
+				$('#divMemberCard').css({
+					'background': 'url("../order/images/VIP.jpg")',
+					'background-size' : '100% 100%'
+				});
+			}
+		},
+		error : function(req, status, err){
+			$('#divMemberCard').css({
+				'background': 'url("../order/images/VIP.jpg")',
+				'background-size' : '100% 100%'
+			});
+		}
+	});
+	
+	//获取赠送余额说明
 	$.ajax({
 		url : '../../WxOperateRepresent.do',
 		data : {
@@ -186,484 +97,769 @@ $(function(){
 		dataType : 'json',
 		success : function(res, status, req){
 			if(res.success){
-				$('#spanMemberExtraBalanceDesc').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
+				$('#memberExtraBalanceDesc_div_member').show();
+				$('#memberExtraBalanceDesc_div_member').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
 				if(!res.root[0].giftDesc){
-					$('#spanMemberExtraBalanceDesc_li_member').css('line-height', '0px');
+					$('#memberExtraBalanceDesc_div_member').hide();		
 				}
 			}else{
-				Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+				$('#memberExtraBalanceDesc_div_member').hide();		
 			}
 		},
 		error : function(req, status, err){
-			Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
+			$('#memberExtraBalanceDesc_div_member').hide();		
 		}
 	});
 	
-	function initMemberMsg(c){
-		c = c == null ? {} : c;
-		var data = typeof c.data == 'undefined' ? {} : c.data;
-		
-	//	var restaurantName = $('#divRestaurantName');
-		var name = $('#name_span_member');
-		var mobile = $('#mobile_span_member');
-		var point = $('#spanMemberPoint');
-		var totalBalance = $('#spanMemberTotalBalance');
-		var baseBalance = $('#spanMemberBaseBalance');
-		var extraBalance = $('#spanMemberExtraBalance');
-		var typeName = $('#spanMemberTypeName');
-		var birthday = $('#memberBirthday_span_member');
-	//	var weixinMemberCard = $('#divWXMemberCard');
-		var defaultMemberDiscount = $('#fontMemberDiscount');
-		var memberTotalPoint = $('#fontMemberPoint');
-		var myCoupon = $('#myCoupon');
-		//年龄
-		$('#memberAge_select_member').val("3");
-		$.ajax({
-			url : '../../WxOperateCoupon.do',
-			type : 'post',
-			data : {
-				dataSource : 'getByCond',
-				status : 'issued',
-				expired : 'true',
-				oid : Util.mp.oid,
-				fid : Util.mp.fid
-			},
-			dataType : 'json',
-			success : function(data, status, xhr){
-				Util.lm.hide();
-				if(data.success){
-					var couponAmount = 0;
-					if(data.root.length > 0){
-						myCoupon.html(data.root.length + '张');
-					}else{
-						myCoupon.html('无优惠券');
-					}
-				}
-			}
-		});
-	//	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
-		name.html(typeof data.name == 'undefined' ? '--' : data.name);
-		mobile.html(typeof data.mobile == 'undefined' ? '--' : data.mobile);
-		point.html(typeof data.point == 'undefined' ? '--' : data.point);
-		totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : checkDot(data.totalBalance)?parseFloat(data.totalBalance).toFixed(2) : data.totalBalance);
-		extraBalance.html(typeof data.extraBalance == 'undefined' ? '--' : checkDot(data.extraBalance)?parseFloat(data.extraBalance).toFixed(2) : data.extraBalance);
-		baseBalance.html(typeof data.baseBalance == 'undefined' ? '--' : checkDot(data.baseBalance)?parseFloat(data.baseBalance).toFixed(2) : data.baseBalance);
-		typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
-	//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
-		defaultMemberDiscount.html(typeof data.memberType.discount != 'undefined' && data.memberType.discount.type != 2 ? data.memberType.discount.name : '');
-		memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
-		if(data.birthdayFormat){
-			birthday.html(data.birthdayFormat);
-		}else{
-			$('#birthday_li_member').hide();
-		}
-		
-	}
-	
-	//绑定会员	
-	$('#bind_div_member').toggle(
-		function(){
-			$('#bindMember_div_member').show();
-			$('html, body').animate({scrollTop: 200}, 'fast'); 
+	//获取用户最近消费和最近充值
+	$.ajax({
+		url : '../../WXQueryMemberOperation.do',
+		type : 'post',
+		data : {
+			dataSource : 'recent',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
 		},
-		function(){
-			$('#bindMember_div_member').hide();
-		}
-	);
-	
-	//'确认绑定'Click
-	$('#bind_a_member').click(function(){
-		var mobile = $('#mobile_input_member').val().trim();
-		if(!/^1[3,5,8][0-9]{9}$/.test(mobile)){
-			Util.dialog.show({
-				msg: '请输入 11 位纯数字的有效手机号码',
-				callback : function(){
-					$('#mobile_input_member').select();
-				}
-			});
-			return;
-		}
-		
-		var name = $('#name_input_member').val();
-		if(name == ''){
-			Util.dialog.show({
-				msg: '会员名称不能为空',
-				callback : function(){
-					$('#name_input_member').select();
-				}
-			});
-			return;
-		}
-		
-		var month = $('#birthdayMonth_input_member').val();
-		var day = $('#birthdayDay_input_member').val();
-		if(month == '' || day == ''){
-			Util.dialog.show({
-				msg: '生日不能为空',
-				callback : function(){
-					$('#birthdayMonth_input_member').focus();
-				},
-				btn: 'yes'
-			});
-			return;
-		}
-		
-		var birthday = month + '-' + day;
-		var age = $('#memberAge_select_member').val();
-		var sex;
-		$('#bindMember_div_member').find('[data-type="personSex"]').each(function(index, element){
-			if($(element).hasClass('selectedRegion_css_book')){
-				sex = $(element).attr('data-value');
+		dataType : 'json',
+		success : function(data, status, xhr){
+			
+			if(data.other.nearByCharge >= 0){
+				$('#newRecharge_font_member').text("(最近充值 : " + data.other.nearByCharge + "元)");
 			}
-		});
-		
-		
-		$.ajax({
-			url : '../../WXOperateMember.do',
-			type : 'post',
-			data : {
-				dataSource : 'bind',
-				oid : Util.mp.oid,
-				fid : Util.mp.fid,
-				mobile : mobile,
-				name : name,
-				birthday : birthday,
-				sex : sex,
-				age : age
-			},
-			dataType : 'json',
-			success : function(data, status, xhr){
-				if(data.success){
-					Util.dialog.show({msg: '绑定成功', callback : function(){
-						$('#bind_div_member').hide();
-						$('#bindMember_div_member').hide();
-						$('#phone_div_member').show();
-						if(name.length != 0){
-							$('#name_span_member').html(name);
-						}
-						$('#mobile_span_member').html(mobile);
-					}});
+			
+			if(data.other.nearByConsume >= 0){
+				$('#memberConsume_font_member').html("(最新消费 : " + data.other.nearByConsume + "元)");
+			}
+			
+			
+		},
+		error : function(data, errotType, eeor){
+			Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
+		}
+	});	
+	
+	//获取用户信息
+	var member;
+	var currentMemberLevelData;
+	$.ajax({
+		url : '../../WXOperateMember.do',
+		type : 'post',
+		data : {
+			dataSource : 'getInfo',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			if(data.success){
+				member = data.other.member;
+				member.restaurant = data.other.restaurant;
+				//添加会员等级当前位置
+				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
+				
+				if(member.name != ''){
+					$('#userName_div_member').text(member.name);
+				}
+				
+				if(member.mobile != ''){
+					$('#memberMobile_font_member').text("手机号 : " + member.mobile);
+					$('#memberHead_div_member').css('left', '30%');
 				}else{
-					Util.dialog.show({msg: data.msg});
-				}					
+					$('#memberMobile_font_member').text("微信卡号  : " + member.weixinCard);
+					$('#memberHead_div_member').css('left', '32%');
+				}
+				
+				$('#memberLbelName_font_member').text(member.memberType.name);
+				$('#banlance_font_member').text(member.baseBalance);
+				$('#extra_font_member').text(member.extraBalance);
+				$('#memberCommission_font_member').text("(总佣金 : " + member.totalCommission +"元)")
+				$('#memberFans_font_member').html("(粉丝数 : " + member.fansAmount + ")");
+				
+				
+				$('#point_font_member').text(member.point);
 			}
-		});
-		
+		}
 	});
 	
-	//我的优惠券
-	$('#myCoupon_li_member').click(function(){
-		var mainView = $('#coupons_div_member');
-		
-		function showCoupons(){
-
-			Util.lm.show();
-			$.ajax({
-				url : '../../WxOperateCoupon.do',
-				type : 'post',
-				data : {
-					dataSource : 'getByCond',
-					status : 'issued',
-					expired : 'true',
-					oid : Util.mp.oid,
-					fid : Util.mp.fid
-				},
-				dataType : 'json',
-				success : function(data, status, xhr){
-					Util.lm.hide();
-					if(data.success){
-						var couponAmount = 0;
-						if(data.root.length > 0){
-							var templet = '<div class="box" promotion-id="{promotionId}">' +
-											'<div class="box_in"><img src="{couponImg}"></div>' +
-											'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>开始时间 : {beginExpired}</span><br><span>结束时间 : {endExpired}</span><br><span>来自 : {promotionName}</span>' +
-			  							  '</div>';
-							var html = [];
-						
-							for(var i = 0; i < data.root.length; i++){
-								var coupon = data.root[i];
-								html.push(templet.format({
-									couponImg : coupon.couponType.ossImage ? coupon.couponType.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
-									name : coupon.couponType.name,
-									cPrice : coupon.couponType.price,
-									beginExpired : coupon.couponType.beginExpired != '' ? coupon.couponType.beginExpired : '无',
-									endExpired : coupon.couponType.endExpired != '' ? coupon.couponType.endExpired : '无',
-									promotionName : coupon.promotion.title,
-									promotionId : coupon.promotion.id
-								}));
-								couponAmount++;
-							}
-							mainView.html(html);
-							
-							//点击优惠券的处理事件
-							mainView.find('.box').each(function(index, element){
-								element.onclick = function(){
-									Util.jump('sales.html?pid=' + $(element).attr('promotion-id'));
-								}
-							});
-							
-						}else{
-							mainView.html('暂无优惠券');
-						}
-						member.couponCount = couponAmount;
-						
-					}else{
-						Util.dialog.show({title: data.title, msg: data.msg});						
-					}
-				},
-				error : function(data, errotType, eeor){
-					Util.lm.hide();
-					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+	//获取用户的优惠券张数
+	$.ajax({
+		url : '../../WxOperateCoupon.do',
+		type : 'post',
+		data : {
+			dataSource : 'getByCond',
+			status : 'issued',
+			filter : '1',
+			oid : Util.mp.oid,
+			fid : Util.mp.fid
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			if(data.success){
+				if(data.root.length > 0){
+					$('#couponAmount_font_member').text(data.root.length);
+				}else{
+					$('#couponAmount_font_member').text('0');
 				}
-			});
-		};
-		mainView.fadeToggle(function(){
-			if(mainView.css('display') == 'block'){
-				$('html, body').animate({scrollTop: 0});
-				$('html, body').animate({scrollTop: 310 + $('#divMemberPointContent').height() + $('#divMemberBalanceContent').height() + $('#divMemberTypeContent').height()}, 'fast');			
-				showCoupons();
-			}else{
-				mainView.html('');
 			}
-		});
+		}
 	});
-	
-	//优惠券消费记录
-	$('#couponDetails_li_member').click(function(){
-		var mainView = $('#couponDetailItems_div_member');
-		var tbody = mainView.find('table > tbody');
-	
-		// 加载近5条消费记录
-		function showCouponDetails(){
-			Util.lm.show();
-			$.ajax({
-				url : '../../WxOperateCoupon.do',
-				type : 'post',
-				data : {
-					dataSource : 'getDetails',
-					status : 'order_use',
-					limit : 5,
-					oid : Util.mp.oid,
-					fid : Util.mp.fid
-				},
-				dataType : 'json',
-				success : function(data, status, xhr){
-					Util.lm.hide();
-					if(data.success){
-						if(data.root.length > 0){
-							var template = '<tr class="d-list-item-coupon">' +
-											'<td>{time}</td>' +
-											'<td>{useMode}</td>' +
-											'<td>{couponMoney}</td>' +
-										  '</tr>';
-							var html = [];
-							for(var i = 0; i < data.root.length; i++){
-								var temp = data.root[i];
-								html.push(template.format({
-									time : fnDateInChinese(temp.operateDate) + '</br><div style="font-size:13px;text-align:center;">' + temp.couponName +'</div>',
-									useMode : temp.operateText + '</br><font style="font-size:13px;">(' + temp.associateId + ')</font>',
-									couponMoney : (checkDot(temp.couponPrice) ? parseFloat(temp.couponPrice).toFixed(2) : temp.couponPrice) + '元'
-								}));
-							}
-							tbody.html(html);
-						}else{
-							tbody.html('暂无优惠券使用记录.');
-						}
-					}else{
-						Util.dialog.show({title: data.title, msg: data.msg});						
-					}
-				},
-				error : function(data, errotType, eeor){
-					Util.lm.hide();
-					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-				}
-			});
-		};
 		
-		mainView.fadeToggle(function(){
-			if(mainView.css('display') == 'block'){
-				$('html, body').animate({scrollTop : $('#couponDetailItems_div_member').offset().top}, 'fast');
-				showCouponDetails();
-			}else{
-				tbody.html('');
+	//点击头像事件
+	$('#headImg_div_member').click(function(){
+		var memberMsgDialog;
+		memberMsgDialog = new WeDialogPopup({
+			titleText : '会员资料',
+			contentCallback : function(container){
+				wxLoadDialog.instance().show();
+				if(member.isRaw){
+					var bindMember = '<div class="weui_cells weui_celss_form weui_cells_radio" style="color:black;">'
+										+'<div class="weui_cell">'
+											+'<div class="weui_cell_hd"> '
+												+'<label class="weui_label">姓名:</label>'
+											+'</div>'
+											+'<div class="weui_cell_bd weui_cell_primary">' 
+												+'<input id="name_input_member" class="weui_input" pattern="[0-9]*" placeholder="请输入姓名"></input>'
+											+'</div>'
+										+'</div>'
+										
+										+'<div class="weui_cell">'
+											+'<div class="weui_cell_hd"> '
+												+'<label  class="weui_label">手机:</label>'
+											+'</div>'
+											+'<div class="weui_cell_bd weui_cell_primary">' 
+												+'<input id="mobile_input_member" style="border:0" class="weui_input" type="number" pattern="[0-9]*" placeholder="请输入手机号"></input>'
+											+'</div>'
+										+'</div>'
+										
+										+'<div class="weui_cell">'
+											+'<div class="weui_cell_hd"> '
+												+'<label  class="weui_label">生日:</label>'
+											+'</div>'
+											+'<div class="weui_cell_bd weui_cell_primary">' 
+												+'<input id="birthday_input_member" style="border:0" class="weui_input" type="date" placeholder="请选择生日"></input>'
+											+'</div>'
+										+'</div>'
+										
+										 +'<div class="weui_cell weui_cell_select">' 
+									 	+' <div class="weui_cells_title" style="color:black;">性别:</div>'
+						                  +'<div class="weui_cell_bd weui_cell_primary">'  
+						                      +'<select id="sex_select_member" class="weui_select" name="select1">'  
+						                          +'<option selected="" value="0">先生</option>'  
+						                           +'<option value="1">女士</option>' 
+						                        +'</select>'
+						                    +'</div>'
+						                +'</div>'
+							                
+						                 +'<div class="weui_cell weui_cell_select">' 
+										 +' <div class="weui_cells_title" style="color:black;">年龄段:</div>'
+						                  +'<div class="weui_cell_bd weui_cell_primary">'  
+						                      +'<select id="age_select_member" class="weui_select" name="select1">'  
+						                          +'<option selected="" value="5">00后</option>'  
+						                          +'<option selected="" value="4">90后</option>'  
+						                          +'<option selected="" value="3">80后</option>'  
+						                          +'<option selected="" value="2">70后</option>'  
+						                          +'<option selected="" value="1">60后</option>'  
+						                          +'<option selected="" value="6">50后</option>'  
+						                        +'</select>'
+						                    +'</div>'
+						                +'</div>'
+									 +'</div>';
+									 
+					container.find('[id="dialogContent_div_dialogPopup"]').html(bindMember);
+					
+					container.find('[age_select_member]').val(3);
+				}else{
+					var table = '<table style="color:black">'
+									+'<tr align="left">' 
+										+'<td>姓名 : '+ member.name + '</td>'
+										+'<td>性别 : '+ member.sexText + '</td>'
+									+'</tr>'
+									+'<tr align="left">' 
+										+'<td>年龄段 : '+ member.ageText + '</td>'
+										+'<td>生日 : '+ member.birthdayFormat + '</td>'
+									+'</tr>'
+									+'<hr/>'
+									+'<tr height="5px"></tr>'
+									+'<tr>' 
+										+'<td colspan="2"><img width="100%" height="90%" src="http://qr.topscan.com/api.php?text='+ member.weixinCard +'"></td>'
+									+'</tr>'
+								+'</table>';
+					
+					container.find('[id="dialogContent_div_dialogPopup"]').html(table);
+				}
+				
+				wxLoadDialog.instance().hide();
+				
+			},
+			leftText : '确定',
+			left : function(container){
+				if(member.isRaw){
+					var errorDialog;
+					errorDialog = new WeDialogPopup({
+						titleText : '绑定失败',
+						content : '<font color="black">姓名或者手机号或者生日不能为空</font>',
+						leftText : '确认',
+						left : function(){
+							errorDialog.close();
+						}
+					});
+					
+					var memberName = container.find('[id="name_input_member"]').val();
+					if(memberName == ''){
+						errorDialog.open();
+						return;
+						memberName.focus();
+					}
+					var sex = container.find('[id="sex_select_member"]').val();
+					
+					var mobile = container.find('[id="mobile_input_member"]').val();
+					if(mobile == ''){
+						errorDialog.open();
+						return;
+					}
+					if(!/^1[3,5,8][0-9]{9}$/.test(mobile)){
+						var mobileDialog;
+						mobileDialog = new WeDialogPopup({
+							titleText : '提示',
+							content : '<font color="black">请输入 11 位纯数字的有效手机号码</font>',
+							leftText : '确认',
+							left : function(){
+								mobileDialog.close();
+							}
+						});
+						mobileDialog.open();
+					}
+					
+					var birthday = container.find('[id="birthday_input_member"]').val();
+					if(birthday == ''){
+						errorDialog.open();
+						return;
+					}
+					var age = container.find('[id="age_select_member"]').val();
+					
+					$.ajax({
+						url : '../../WXOperateMember.do',
+						type : 'post',
+						data : {
+							dataSource : 'bind',
+							oid : Util.mp.oid,
+							fid : Util.mp.fid,
+							mobile : mobile,
+							name : memberName,
+							birthday : birthday.substring(5),
+							sex : sex,
+							age : age
+						},
+						dataType : 'json',
+						success : function(data, status, xhr){
+							if(data.success){
+								wxLoadDialog.success().show();
+								setTimeout(function(){
+									window.location.reload();
+								}, 200);
+								
+							}else{
+								var bindErrorDialog;
+								bindErrorDialog = new WeDialogPopup({
+									titleText : '绑定失败',
+									content : '<font color="black">'+ data.msg +'</font>',
+									leftText : '确认',
+									left : function(){
+										bindErrorDialog.close();
+									}
+								});
+								bindErrorDialog.open();
+							}					
+						}
+					});
+				}else{
+					memberMsgDialog.close();
+				}
 			}
 		});
+		memberMsgDialog.open();
 	});
 	
 	//消费记录
-	$('#consumeDetails_li_member').click(function(){
-		var mainView = $('#consumeDetails_div_member');
-		var tbody = mainView.find('table > tbody');
+	$('#consume_div_member').click(function(){
 		
-		function showConsumeDetails(){
-		
-			// 加载近5条消费记录
-			Util.lm.show();
-			$.ajax({
-				url : '../../WXQueryMemberOperation.do',
-				type : 'post',
-				data : {
-					dataSource : 'consumeDetails',
-					oid : Util.mp.oid,
-					fid : Util.mp.fid
-				},
-				dataType : 'json',
-				success : function(data, status, xhr){
-					Util.lm.hide();
-					if(data.success){
-						if(data.root.length > 0){
-							var template = '<tr class="d-list-item-consume">' +
-											'<td style="text-align: center;">{date}</td>' +
-											'<td>{balance}</td>' +
-											'<td>{point}</td>' +
-										   '</tr>';
-							var html = [], temp = null;
-							for(var i = 0; i < data.root.length; i++){
-								temp = data.root[i];
-								html.push(template.format({
-									date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
-									balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
-									point : temp.deltaPoint.toFixed(0) + '分'
-								}));
+		var consumeDialog;
+		consumeDialog = new WeDialogPopup({
+			titleText : '消费记录',
+			contentCallback : function(container){
+				$.ajax({
+					url : '../../WXQueryMemberOperation.do',
+					type : 'post',
+					data : {
+						dataSource : 'consumeDetails',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid
+					},
+					dataType : 'json',
+					beforeSend  : function(){
+						wxLoadDialog.instance().show();
+					},
+					success : function(data, status, xhr){
+						if(data.success){
+							var content = $('<table/>');
+							content.addClass('d-list');		
+							
+							var tr = '<tr class="d-list-title">'
+										+'<td style="width:45%;text-align: center;">消费时间</td>'
+										+'<td style="width:30%;text-align:center;">消费人</td>'
+										+'<td style="width:20%;text-align:center;">佣金额</td>'
+									 +'</tr>';
+							
+							if(data.root.length > 0){
+								
+								var template = '<tr class="d-list-item-consume">' +
+												'<td style="text-align: center;">{date}</td>' +
+												'<td>{balance}</td>' +
+												'<td>{point}</td>' +
+											   '</tr>';
+											   
+								var html = [], temp = null;
+								for(var i = 0; i < data.root.length; i++){
+									temp = data.root[i];
+									html.push(template.format({
+										date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
+										balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
+										point : temp.deltaPoint.toFixed(0) + '分'
+									}));
+								}
+								content.html(tr + html.join(''));
+							}else{
+								content.html('暂无消费记录');
 							}
-							tbody.html(html.join(''));
+							
+							container.find('[id="dialogContent_div_dialogPopup"]').html(content);
 						}else{
-							tbody.html('暂无消费记录');
+							container.find('[id="dialogContent_div_dialogPopup"]').html(data.msg);				
 						}
-					}else{
-						Util.dialog.show({title: data.title, msg: data.msg});						
+					},
+					error : function(data, errotType, eeor){
+						container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">服务器请求失败, 请稍候再试.</font>');
+					},
+					complete : function(){
+						wxLoadDialog.instance().hide();
 					}
-				},
-				error : function(data, errotType, eeor){
-					Util.lm.hide();
-					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-				}
-			});
-		}
-	
-		mainView.fadeToggle(function(){
-			if(mainView.css('display') == 'block'){
-				$('html, body').animate({scrollTop: 0}, 'fast'); 
-				$('html, body').animate({scrollTop: 300}, 'fast'); 
-				showConsumeDetails();
-			}else{
-				tbody.html('');
+				});				
+			},
+			leftText : '确认',
+			left : function(){
+				wxLoadDialog.instance().hide();
+				consumeDialog.close();
 			}
 		});
+		consumeDialog.open();
 	});
 	
 	
 	//代言记录
-	$('#recommendAmount_li_member').click(function(){
-		$('#recommendDetails_div_member').fadeToggle();
-		showRecommendDetail();
+	$('#recomment_div_member').click(function(){
+		var commentDialog;
+		commentDialog = new WeDialogPopup({
+			titleText : '代言记录',
+			contentCallback : function(container){
+				
+				$.ajax({
+					url : '../../WXQueryMemberOperation.do',
+					type : 'post',
+					data : {
+						dataSource : 'recommendDetail',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid
+					},
+					datatype : 'josn',
+					beforeSend : function(){
+						wxLoadDialog.instance().show();
+					},
+					success : function(data, status, res){
+						if(data.success){
+							var content = $('<table/>');
+							content.addClass('d-list');	
+							
+							var tr = '<tr class="d-list-title">'
+								+'<td style="width:39%;text-align: center;">关注时间</td>'
+								+'<td style="width:20%;text-align:center;">粉丝名</td>'
+								+'<td style="width:20%;text-align:center">金额</td>'
+								+'<td style="width:20%;text-align:center">积分</td>'
+							 +'</tr>';
+							 
+							if(data.root.length > 0){
+								
+								var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+								'<td style="width:39%;text-align: center;line-height:30px;">{subscribeDate}</td>' + 
+								'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
+								'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
+								'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
+								'</tr>';
+		
+								var html = [], temp = null;
+								for(var i = 0; i < data.root.length; i++){
+									temp = data.root[i];
+									html.push(template.format({
+										subscribeDate : new Date(temp.subscribeDate).format('yyyy-MM-dd'),
+										subscribeMember : temp.subscribeMember,
+										recommendMoney : temp.recommendMoney,
+										recommendPoint : temp.recommendPoint
+									}));
+								}
+		
+								content.html(tr + html.join(''));
+							}else{
+								content.html('暂无记录');
+							}
+							
+							container.find('[id="dialogContent_div_dialogPopup"]').html(content);
+						}else{
+							container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">加载失败,请重新刷新</font>');
+						}
+					},
+					error : function(req, status, error){
+						
+						container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">服务器请求失败, 请稍候再试.</font>');
+					},
+					complete : function(){
+						wxLoadDialog.instance().hide();
+					}
+				});
+			},
+			leftText : '确认',
+			left : function(){
+				wxLoadDialog.instance().hide();
+				commentDialog.close();
+			}
+		});
+		commentDialog.open();
+		
 	});
 	
 	//佣金记录
-	$('#totalCommission_li_member').click(function(){
-		$('#commissionDetail_div_member').fadeToggle();
-		showCommissionDetail();
-	});
-	
-	function showRecommendDetail(){
-		Util.lm.show();
-		$.ajax({
-			url : '../../WXQueryMemberOperation.do',
-			type : 'post',
-			data : {
-				dataSource : 'recommendDetail',
-				oid : Util.mp.oid,
-				fid : Util.mp.fid
-			},
-			datatype : 'josn',
-			success : function(data, status, res){
-				Util.lm.hide();
-				if(data.success){
-
-					if(data.root.length > 0){
-						var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
-						'<td style="width:39%;text-align: center;line-height:30px;">{subscribeDate}</td>' + 
-						'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
-						'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}元</td>' +
-						'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}分</td>' +
-						'</tr>';
-
-						var html = [], temp = null;
-						for(var i = 0; i < data.root.length; i++){
-							temp = data.root[i];
-							html.push(template.format({
-								subscribeDate : new Date(temp.subscribeDate).format('yyyy-MM-dd'),
-								subscribeMember : temp.subscribeMember,
-								recommendMoney : temp.recommendMoney,
-								recommendPoint : temp.recommendPoint
-							}));
+	$('#commission_div_member').click(function(){
+		var commissionDialog;
+		commissionDialog = new WeDialogPopup({
+			titleText : '佣金记录',
+			contentCallback : function(container){
+				$.ajax({
+					url : '../../WXQueryMemberOperation.do',
+					type : 'post',
+					data : {
+						dataSource : 'commissionDetail',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid
+					},
+					datatype : 'json',
+					beforeSend : function(){
+						wxLoadDialog.instance().show();
+					},
+					success : function(data, status, res){
+						if(data.success){
+							var content = $('<table/>');
+							content.addClass('d-list');		
+							
+							var tr = '<tr class="d-list-title">'
+										+'<td style="width:39%;text-align: center;">消费时间</td>'
+										+'<td style="width:30%;text-align:center;">消费人</td>'
+										+'<td style="width:20%;text-align:center;">佣金额</td>'
+									 +'</tr>';
+									 
+							if(data.root.length > 0){
+								var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+								'<td style="width:39%;text-align: center;line-height:30px;">{operateDateFormat}</td>' + 
+								'<td style="width:30%;text-align:center;line-height:30px;">{consumeMemberName}</td>' +
+								'<td style="width:20%;text-align:center;line-height:30px;">{deltaTotalMoney}元</td>' +
+								'</tr>';
+								
+								var html = [], temp = null;
+								for(var i = 0; i < data.root.length; i++){
+									temp = data.root[i];
+									html.push(template.format({
+										operateDateFormat : new Date(temp.operateDateFormat).format('yyyy-MM-dd'),
+										consumeMemberName : temp.member.name,
+										deltaTotalMoney : temp.deltaTotalMoney
+									}));
+								}
+								
+								content.html(tr + html.join(''));
+							}else{
+								content.html('暂无记录');
+							}
+							
+							container.find('[id="dialogContent_div_dialogPopup"]').html(content);
+							
+						}else{
+							container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">加载出错,请重新刷新</font>');
 						}
-
-						$('#table_recommendDetails').find('tbody')[0].innerHTML = html.join('');
+						
+					},
+					error : function(res, status, err){
+						
+						container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">服务器请求失败, 请稍候再试.</font>');
+					},
+					complete : function(){
+						wxLoadDialog.instance().hide();
 					}
-				}else{
-					Util.dialog.show({msg : '读取记录失败'});
-				}
+				});
 			},
-			error : function(req, status, error){
-				Util.lm.hide();
-				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			leftText : '确认',
+			left : function(){
+				commissionDialog.close();
 			}
 		});
-	}
+		commissionDialog.open();
+	});
 	
-	function showCommissionDetail(){
-		var tobdy = $('#tableCommissionDetails_table_member').find('tbody')[0];
-		Util.lm.show();
-		$.ajax({
-			url : '../../WXQueryMemberOperation.do',
-			type : 'post',
-			data : {
-				dataSource : 'commissionDetail',
-				oid : Util.mp.oid,
-				fid : Util.mp.fid
-			},
-			datatype : 'json',
-			success : function(data, status, res){
-				Util.lm.hide();
-				if(data.success){
-					var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
-					'<td style="width:39%;text-align: center;line-height:30px;">{operateDateFormat}</td>' + 
-					'<td style="width:30%;text-align:center;line-height:30px;">{consumeMemberName}</td>' +
-					'<td style="width:20%;text-align:center;line-height:30px;">{deltaTotalMoney}元</td>' +
-					'</tr>';
-					
-					var html = [], temp = null;
-					for(var i = 0; i < data.root.length; i++){
-						temp = data.root[i];
-						html.push(template.format({
-							operateDateFormat : new Date(temp.operateDateFormat).format('yyyy-MM-dd'),
-							consumeMemberName : temp.member.name,
-							deltaTotalMoney : temp.deltaTotalMoney
-						}));
+	
+	//充值记录
+	$('#recharge_div_member').click(function(){
+		
+		var rechargeDialog;
+		rechargeDialog = new WeDialogPopup({
+			titleText : '充值记录',
+			contentCallback : function(container){
+				$.ajax({
+					url : '../../WXQueryMemberOperation.do',
+					type : 'post',
+					data : {
+						dataSource : 'chargeDetails',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid
+					},
+					dataType : 'json',
+					beforeSend : function(){
+						wxLoadDialog.instance().show();
+					},
+					success : function(data, status, xhr){
+						if(data.success){
+							
+							var content = $('<table/>');
+							content.addClass('d-list');		
+							
+							var tr = '<tr class="d-list-title">'
+										+'<td style="width:42%;text-align: center;">充值时间</td>'
+										+'<td style="width:30%;text-align:center;">实收</td>'
+										+'<td style="width:20%;text-align:center;">实充</td>'
+									 +'</tr>';
+						
+							if(data.root.length > 0){
+								var templet = '<tr class="d-list-item">'
+									+ '<td style="text-align: center;">{date}</td>'
+									+ '<td>{chargeMoney}</td>'
+									+ '<td>{deltaTotalMoney}</td>'
+									+ '</tr>';
+								
+								var html = [], temp = null;
+								for(var i = 0; i < data.root.length; i++){
+									temp = data.root[i];
+									html.push(templet.format({
+										date : fnDateInChinese(temp.operateDateFormat),
+										chargeMoney : (checkDot(temp.chargeMoney)?parseFloat(temp.chargeMoney).toFixed(2) : temp.chargeMoney) + '元',
+										deltaTotalMoney : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元'
+									}));
+								}
+								content.html(tr + html.join(''));
+							}else{
+								content.html('暂无记录');
+							}
+							
+							container.find('[id="dialogContent_div_dialogPopup"]').html(content);
+							
+						}else{
+							container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">'+ data.msg +'</font>');					
+						}
+						
+					},
+					error : function(data, errotType, eeor){
+						container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">服务器请求失败, 请稍候再试.</font>');
+					},
+					complete : function(){
+						wxLoadDialog.instance().hide();
 					}
-					
-					tobdy.innerHTML = html.join('');
-				}
+				});
 			},
-			error : function(res, status, err){
-				Util.lm.hide();
-				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+			leftText : '确认',
+			left : function(){
+				wxLoadDialog.instance().hide();
+				rechargeDialog.close();
 			}
 		});
-	}
-	
-	
-	//自助点餐
-	$('#pickOrderFood_a_member').click(function(){
-//		Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
-		window.location.href = 'food.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
-	});
-	$('#mbarMemberCenter').click(function(){
-		window.location.href = 'member.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
-	});
-	$('#jumpIndex_a_member').click(function(){
-		window.location.href = 'index.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+		rechargeDialog.open();
 	});
 	
-});
+	//优惠券使用记录
+	$('#couponUse_div_member').click(function(){
+		window.location.href = 'myCoupon.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
+	
+	
+	//会员等级
+	$('#level_div_member').click(function(){
+		
+		var memberLevelDialog;
+		memberLevelDialog = new WeDialogPopup({
+			titleText : '会员等级',
+			contentCallback : function(container){
+				wxLoadDialog.instance().show();
+				$.post('../../WXQueryMemberOperation.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
+					if(typeof result == 'string'){
+						result = eval('(' + result + ')');
+					}
+					
+					if(result.success){
+						memberLevelData = result.root;
+						memberLevelData.push(currentMemberLevelData);
+						
+						chartDatas = eval('(' + result.other.chart + ')');
+				
+						yAxisData = chartDatas.data;
+						
+						if(yAxisData.length > 0){
+							
+							//动态变化chart高度
+							$('#divMemberLevelChart').height(yAxisData.length * (document.body.clientWidth > 330 ? 70 : 95) + 140);
+							
+							var chartMinAndMax;
+							
+							if(yAxisData[yAxisData.length-1].x >= currentMemberLevelData.x){
+								chartMinAndMax = yAxisData[yAxisData.length-1].x;
+							}else{
+								chartMinAndMax = currentMemberLevelData.x;
+							}
+							//添加用户等级位置
+							yAxisData.push(currentMemberLevelData);
+							
+							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.2, series:yAxisData});		
+						}else{
+							container.find('[id="dialogContent_div_dialogPopup"]').html('<div>会员等级建立中...</div>');
+						}
+					}else{
+						container.find('[id="dialogContent_div_dialogPopup"]').html('<div>会员等级建立中...</div>');
+					}
+				}).error(function() {
+					container.find('[id="dialogContent_div_dialogPopup"]').html('<div>会员等级建立中...</div>');
+				}).complete(function(){
+					wxLoadDialog.instance().hide();
+				});	
+			
+				function member_loadMemberTypeChart(c){
+				 	var chart = {
+						    chart: {
+						        type: 'spline',
+						        inverted: true,
+						        width : container.find('[data-type="dialogContent_div_dialogPopup"]').width()+ 10,
+						        renderTo : 'dialogContent_div_dialogPopup'
+						    },
+						    title: {
+						        text: ''
+						    },
+						    xAxis: {
+						    	reversed : false,
+						        title: {
+						            enabled: false,
+						            text: '积分',
+						            align : 'high'
+						        },
+						        labels: {
+						            formatter: function() {
+						                return this.value;
+						            }
+						        },
+						        max : c.maxY,
+						        min: c.minY,
+						        showLastLabel: true
+						    },
+						    yAxis: {
+						        title: {
+						            text: '等级'
+						        },
+						        labels: {
+						            formatter: function() {
+						                return '' ;
+						            }
+						        },
+						        lineWidth: 2
+						    },
+						    legend: {
+						        enabled: false
+						    },
+						    tooltip: {
+						    	enabled : false,
+						        headerFormat: '<b>{series.name}</b><br/>',
+						        pointFormat: '{point.x} km: {point.y}°C',
+						        followPointer : true
+						    },
+							plotOptions : {
+								spline : {
+									cursor : 'pointer',
+									dataLabels : {
+										x: 5,
+										y : 37,							
+										align : 'right',
+										enabled : true,
+										style : {
+											fontWeight: 'bold', 
+											color: 'green'
+										},
+										formatter : function(){
+							                return getLevelChartInfo(this.x, this.point.memberTypeName);
+										}
+									},
+									marker: {
+										radius: 8,
+					                    lineColor: 'white',
+					                    lineWidth: 1
+						            }
+								}
+							},			    
+						    credits : {
+						    	enabled : false
+						    },         
+						    exporting : {
+						    	enabled : false
+						    },			    
+						    series:	[{data:c.series}]	    
+						};
+						new Highcharts.Chart(chart);
+				}
+				
+				function getLevelChartInfo(x,point){
+					var temp = {};
+					if(point){
+						temp = currentMemberLevelData;
+					}else{
+						for (var i = 0; i < memberLevelData.length; i++) {
+							if(memberLevelData[i].pointThreshold == x){
+								temp = memberLevelData[i];
+								break;
+							}
+						}	
+					}
+					
+					var pointFormat;
+					if(document.body.clientWidth > 330){
+						pointFormat = '<span style="font-size : 12px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
+							+ (temp.discount && temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>'
+							+ (temp.chargeRate > 1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠，充100送'+parseInt((temp.chargeRate*100 - 100))+'元':'')  + '</font>' 
+							+ (temp.desc  ? '<br/>'+ '<font style="font-size: 13px;color:maroon">'+ temp.desc : '')  + '</font>' 
+							;
+					}else{
+						pointFormat = '<span style="font-size : 12px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
+							+ (temp.discount && temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
+							+ (temp.desc  ? '<br/>'+ '<font style="font-size: 13px;color:maroon">'+ temp.desc : '')  + '</font>' 
+							;
+					}
+					
+					return pointFormat;		
+				}
+			},
+			leftText : '确认',
+			left : function(){
+				wxLoadDialog.instance().hide();
+				memberLevelDialog.close();
+			}
+		});
+		memberLevelDialog.open();
+		
+	})	
+})

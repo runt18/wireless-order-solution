@@ -6,7 +6,7 @@ function WeDialogPopup(param){
 		titleText : null,      				//标题内容
 		titleClass : null,     				//标题样式
 		content : null,       				//内容
-		contentCallback : function(){},   	//内容的回调
+		contentCallback : function(container){},   	//内容的回调
 		leftText : null,      				//左边按钮文字
 		leftClass : null,     				//左边按钮的样式
 		left : function(_dialogDiv){},  	//左边按钮的方法
