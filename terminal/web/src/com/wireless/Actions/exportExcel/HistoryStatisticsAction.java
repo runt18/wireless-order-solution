@@ -5508,7 +5508,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String giftStaffId = request.getParameter("staffID");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
-		
+		final String deptId = request.getParameter("deptId");
 			
 		final CalcGiftStatisticsDao.ExtraCond extraCond = new CalcGiftStatisticsDao.ExtraCond(DateType.HISTORY)
 																	.setDutyRange(new DutyRange(onDuty, offDuty))
@@ -5526,6 +5526,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		if(region != null && !region.equals("-1")){
 			extraCond.setRegionId(RegionId.valueOf(Integer.parseInt(region)));
+		}
+		
+		if(deptId != null && !deptId.equals("-1")){
+			extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 		}
 		
 		if(foodName != null && !foodName.trim().isEmpty()){
