@@ -1557,49 +1557,4 @@ public class FoodDao {
 		return foods;
 	}	
 	
-	/**
-	 * Get the food content By materialId
-	 * @param staff
-	 * @param foodId
-	 * @return
-	 * @throws SQLException
-	 */
-	public static Food relativeToFood(Staff staff, int materialId) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return relativeToFood(dbCon, staff, materialId);
-		}finally{
-			dbCon.disconnect();
-		}
-		
-	}	
-	
-	public static Food relativeToFood(DBCon dbCon, Staff staff, int materialId) throws SQLException{
-		Food food = null;
-		String sql = "SELECT FM.food_id,  F.name AS foodName, F.kitchen_id, K.name AS kitchenName FROM food_material FM "
-					+ " JOIN food F ON FM.food_id = F.food_id " 
-					+ " JOIN kitchen K ON K.kitchen_id = F.kitchen_id " 
-					+ " WHERE FM.restaurant_id = " + staff.getRestaurantId() 
-					+ " AND FM.material_id = " + materialId;
-		
-		try{
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			
-			while (dbCon.rs != null && dbCon.rs.next()) {
-				food = new Food(dbCon.rs.getInt("food_id"));
-				food.setName(dbCon.rs.getString("foodName"));
-				Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
-				k.setName(dbCon.rs.getString("kitchenName"));
-				food.setKitchen(k);
-			}
-		}catch(SQLException e){
-			e.printStackTrace();
-			throw new SQLException("Failed to get the food");
-		}
-		return food;
-	}	
-	
-	
-	
 }
