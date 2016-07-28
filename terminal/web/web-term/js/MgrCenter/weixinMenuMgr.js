@@ -503,7 +503,7 @@ Ext.onReady(function(){
 	    jsonp: "callback",//服务端用于接收callback调用的function名的参数 
 	    jsonpCallback : "jsonpCallback4SystemMenu",
 	    success : function(data){ 
-	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{desc}</label><div><br>';
+	    	var systemMenuTemplate = '<div style="float:left;"><input id={id} type="radio" name="systemSet" value={key}><label for={id}>{desc}</label><button style="font-size:12px;margin-left:2px;font-weight: bold;" value={key} data-type="getUrlByKey_weixinMenu">地址</button><div><br>';
 	    	function format(str, args){
 	    		var result = str;
 	            for(var key in args) {
@@ -553,6 +553,61 @@ Ext.onReady(function(){
 	        			}
 	        			
 	        		}
+	        	});
+	        	
+	        	function showMsgWin(msg){
+	        		var showMsgWin;
+	        		showMsgWin = new Ext.Window({
+	        			width : 400,
+	        			height : 200,
+	        			resizable : false,
+						modal : true,
+						closable : false,
+						items : [{
+							xtype : 'textarea',
+							width : 400,
+							height : 200,
+							value : msg
+						}],
+						bbar : ['->', {
+							text : '确认',
+							iconCls : 'btn_save',
+							handler : function(){
+								showMsgWin.hide();
+								$(showMsgWin.id).remove();
+							}
+						}]
+	        		});
+	        		showMsgWin.render(document.body);
+	        		showMsgWin.show();
+	        	}
+	        	
+	        	$('[data-type=getUrlByKey_weixinMenu]').click(function(){
+//	        		alert(this.value);
+	        		$.ajax({
+	        			url : basePath + "/wx-term/QueryWxRediect.do",
+	        			type : 'post',
+	        			dataType : "jsonp",
+	        			jsonpCallback : "callback",
+	        			data : {
+	        				key : this.value,
+	        				dataSource : 'getUrlJumpByKey'
+	        			},
+	        			success : function(res, status, req){
+	        				if(res.success){
+	        					showMsgWin(res.root[0].url);
+	        				}else{
+	        					Ext.ux.showMsg({
+	        						title : '错误提示',
+	        						msg : res.msg,
+	        						code : '0000'
+	        					});
+	        				}
+	        			},
+	        			error : function(req, status, err){
+	        			
+	        			}
+	        		});
 	        	});
 	        	
 	        }
