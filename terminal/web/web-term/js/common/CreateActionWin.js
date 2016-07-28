@@ -1295,7 +1295,7 @@
 						if(_param.subType == Ext.stockDistributionAction.stockSubType.values.STOCK_OUT_TRANSFER.val){
 							deptIn.setValue(252);
 							deptIn.disable();
-						}else{
+						}else if(_param.subType == Ext.stockDistributionAction.stockSubType.values.STOCK_IN_TRANSFER.val){
 							deptOut.setValue(252);
 							deptOut.disable();
 						}
