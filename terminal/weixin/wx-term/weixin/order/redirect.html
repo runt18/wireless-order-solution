@@ -10,27 +10,18 @@
 <body>
 	<script type="text/javascript">
 		$(function(){
-//			alert(Util.mp.params.code);
-//			window.location.href = Util.mp.params.code;
 			$.ajax({
 				url : '../../WxInterface.do',
 				data : {
 					code : Util.mp.params.code,
+					fid : Util.mp.params.fid,
 					dataSource : 'getOpenIdByCode'
 				},
 				type : 'post',
 				dataType : 'json',
 				success : function(data, status, req){
 					if(data){
-						var errorDialog = new WeDialogPopup({
-							leftText : '确定',
-							left : function(){
-								errorDialog.close();
-							},
-							content : '<span style="display: block;text-align: center;font-size: 16px;">' + data + '<span>',
-							titleText : '温磬提示'
-						});
-						errorDialog.open();
+						window.location.href = Util.mp.params.href + '?r=' + Util.mp.params.fid + '&m=' + data.root[0].openId;
 					}else{
 						var errorDialog = new WeDialogPopup({
 							leftText : '确定',

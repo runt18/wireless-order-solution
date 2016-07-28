@@ -605,7 +605,11 @@ Ext.onReady(function(){
 	        				}
 	        			},
 	        			error : function(req, status, err){
-	        			
+	        				Ext.ux.showMsg({
+	        					title : '错误提示',
+	        					msg : err,
+	        					code : '0000'
+	        				});
 	        			}
 	        		});
 	        	});
