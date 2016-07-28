@@ -51,438 +51,132 @@ Ext.onReady(function(){
 			contentEl : 'stockActionTotalPrice'
 		});
 	}
-	/**
-	 * 处理导航
-	 * @param e
-	 */
-	function stockTaskNavHandler(e){
-		if(typeof stockTaskNavWin != 'undefined'){
-			var btnPrevious = Ext.getCmp('btnPreviousForStockNav');
-			var btnNext = Ext.getCmp('btnNextForStockNav');
-			var act = stockTaskNavWin.getLayout().activeItem;
-			var index = e.change + act.index;
-			
-			/***** 第一步, 选择入库单类型, 预处理 *****/
-			if(act.index == 0 || index == 0){
-				var select = null;
-				var type = Ext.query('input[name=\"radioStockOrderType\"]');
-				for(var i = 0; i < type.length; i++){
-					if(type[i].checked){
-						select = type[i].value;
-						break;
-					}
-				}
-				// 切换步骤
-				stockTaskNavWin.getLayout().setActiveItem(index);
-				
-				if(stockTaskNavWin.stockType == null || typeof stockTaskNavWin.stockType == 'undefined'){
-					if(select){
-						stockTaskNavWin.stockType = select;
-					}else{
-						Ext.example.msg('提示', '请选择一项入库单.');
-						return;
-					}
-				}else{
-					
-					if(select){
-						var ss = select.split(',');
-						var ws = stockTaskNavWin.stockType.split(',');
-		
-						for(var i = 0; i < ss.length; i++){
-							if(ss[i] != ws[i]){
-								//FIXME 暂不用确定是否改变
-								operateStockActionBasic({
-									otype : Ext.ux.otype['set']
-								});
-								stockTaskNavWin.stockType = select;
-	/*							Ext.Msg.confirm(
-									'提示',
-									'入库单类型已更改, 确定继续将清空原操作信息.',
-									function(e){
-										if(e == 'yes'){
-											// 更换类型后重置相关信息
-											operateStockActionBasic({
-												otype : Ext.ux.otype['set']
-											});
-											stockTaskNavWin.stockType = select;
-										}else{
-											for(var i = 0; i < type.length; i++){
-												var temp = type[i].value.split(',');
-												if(eval(temp[0] == ws[0]) && eval(temp[1] == ws[1]) && eval(temp[2] == ws[2])){
-													type[i].checked = true;
-												}
-											}											
-										}
-									},
-									this
-								);*/
-							}
-						}
-					}
-				}
-			}
-			if(index >= 1){
-				/***** 第二步, 根据用户选择入库单类型设置相关信息 *****/
-				
-				/** 处理导航按钮触发事件, 设置导航页面或提交操作 **/
-				if(index >= 0 && index <= 1 ){
-					// 切换步骤
-					stockTaskNavWin.getLayout().setActiveItem(index);
-					var smfos = Ext.getCmp('comboSelectMaterialForStockAction');
-					var stockActionDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
-					stockActionDate.clearInvalid();
-					
-					smfos.setValue();
-					smfos.clearInvalid();
-					smfos.store.load({
-						params : {
-							cateType : stockTaskNavWin.stockType.split(',')[1]
-						}
-					});
-					stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
-				}else{
-					if(index > 1){
-						// 完成时的操作
-						var id = Ext.getCmp('hideStockActionId');
-						var deptIn = Ext.getCmp('comboDeptInForStockActionBasic');
-						var supplier = Ext.getCmp('comboSupplierForStockActionBasic');
-						var deptOut = Ext.getCmp('comboDeptOutForStockActionBasic');
-						var oriStockId = Ext.getCmp('txtOriStockIdForStockActionBasic');
-						var oriStockDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
-						var comment = Ext.getCmp('txtCommentForStockActionBasic');
-						var actualPrice = Ext.getDom('txtActualPrice');
-						var stockTypeList = stockTaskNavWin.stockType.split(',');
-						var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
-						var detail = '';
-						if(!oriStockDate.getValue()){
-							if(oriStockDate.isValid()){
-							
-							}
-							return;
-						}
-						if(parseInt(Ext.getDom('txtActualPrice').value) > parseInt(Ext.getDom('txtTotalPrice').value)){
-							Ext.example.msg("错误", "实际金额不能大于总金额");
-							return;
-						}
-						
-						if(stockType == 1){
-							if(stockSubType == 1){
-								if(!deptIn.isValid() || !supplier.isValid()){
-									return;
-								}
-							}else if(stockSubType == 2){
-								if(!deptIn.isValid() || !deptOut.isValid()){
-									return;
-								}
-							}else if(stockSubType == 3){
-								if(!deptIn.isValid()){
-									return;
-								}
-							}
-						}else if(stockType == 2){
-							if(stockSubType == 4){
-								if(!supplier.isValid() || !deptOut.isValid()){
-									return;
-								}
-							}else if(stockSubType == 5){
-								if(!deptIn.isValid() || !deptOut.isValid()){
-									return;
-								}
-							}else if(stockSubType == 6){
-								if(!deptOut.isValid()){
-									return;
-								}
-							}
-						}
-						
-	//					if(secondStepPanelCenter.getStore().getCount() == 0){
-	//						Ext.example.msg('提示', '操作失败, 请选中货品信息.');
-	//						return;
-	//					}
-						//防止重复点击
-						btnNext.setDisabled(true);
-						
-						for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
-							var temp = secondStepPanelCenter.getStore().getAt(i);
-							if(i>0){
-								detail+='<sp>';
-							}
-							detail+=(temp.get('material.id')+'<spst>'+temp.get('price')+'<spst>'+temp.get('amount'));
-						}
-						Ext.Ajax.request({
-							url : '../../OperateStockAction.do',
-							params : {
-								'dataSource' : stockTaskNavWin.otype.toLowerCase(),
-								id : id.getValue(),
-								deptIn : deptIn.getValue(),
-								supplier : supplier.getValue(),
-								deptOut : deptOut.getValue(),
-								oriStockId : oriStockId.getValue(),
-								oriStockDate : oriStockDate.getValue().getTime(),// + 86000000
-								comment : comment.getValue(),
-								type : stockType,
-								cate : stockCate,
-								subType : stockSubType,
-								actualPrice : actualPrice.value,
-								detail : detail
-							},
-							success : function(res, opt){
-								btnNext.setDisabled(false);
-								var jr = Ext.decode(res.responseText);
-								if(jr.success){
-									Ext.example.msg(jr.title, jr.msg);
-									stockTaskNavWin.hide();
-									Ext.getCmp('comboSearchForStockType').setValue(stockType);
-									Ext.getCmp('comboSearchForStockType').fireEvent('select', Ext.getCmp('comboSearchForStockType'));
-									Ext.getCmp('sam_comboSearchForSubType').setValue(stockSubType);
-									Ext.getCmp('sam_comboSearchForCateType').setValue(stockCate);
-									
-									Ext.getCmp('btnSearchForStockBasicMsg').handler();
-									
-								}else{
-									Ext.ux.showMsg(jr);
-								}
-							},
-							failure : function(res, opt){
-								btnNext.setDisabled(false);
-								Ext.ux.showMsg(Ext.decode(res.responseText));
-							}
-						});
-					}
-				}			
-				
-				var deptInDom = Ext.getCmp('displayPanelForDeptIn');
-				var supplierDom = Ext.getCmp('displayPanelForSupplier');
-				var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
-				var priceDom = Ext.getCmp('numSelectPriceForStockAction'); 
-				var moneyPanel = Ext.getCmp('secondStepPanelSouth');
-				var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
-				var stockTypeList = stockTaskNavWin.stockType.split(',');
-				var stockType = stockTypeList[0], stockCate = stockTypeList[1], stockSubType = stockTypeList[2];
-				var diaplayTitle = '';
-				
-				//Ext.getDom('labActualPrice').style.display="block";
-				//置出库仓和入库仓可选状态
-				Ext.getCmp('comboDeptOutForStockActionBasic').setValue(null);
-				Ext.getCmp('comboDeptInForStockActionBasic').setValue(null);
-				Ext.getCmp('txtCommentForStockActionBasic').setValue('');
-				Ext.getCmp('comboSupplierForStockActionBasic').setValue('');
-				Ext.getCmp('comboSupplierForStockActionBasic').setDisabled(false);
-				Ext.getCmp('comboDeptOutForStockActionBasic').setDisabled(false);
-				Ext.getCmp('comboDeptInForStockActionBasic').setDisabled(false);
-				if(stockType == 1){
-					// 入库单
-					if(stockSubType == 1){
-						// 采购
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("入库 -- 商品采购单");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("入库 -- 原料采购单");
-						}
-						Ext.getDom('txtActualPrice').disabled = false;
 	
-						// 控制选择货仓
-						deptInDom.show();
-						supplierDom.show();
-						deptOutDom.hide();
-						if(document.getElementById('displayPanelForDeptIn')){
-							document.getElementById('displayPanelForDeptIn').style.display = 'block';
-						}
-						if(document.getElementById('displayPanelForSupplier')){
-							document.getElementById('displayPanelForSupplier').style.display = 'block';
-						}
-					}else if(stockSubType == 2){
-						// 领料
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("入库 -- 商品领料单");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("入库 -- 原料领料单");
-						}
-						// 控制选择货仓
-						deptInDom.show();
-						supplierDom.hide();
-						
-						deptOutDom.show();
-						//领料设置出库仓为总仓
-						Ext.getCmp('comboDeptOutForStockActionBasic').setValue(252);
-						Ext.getCmp('comboDeptOutForStockActionBasic').setDisabled(true);
-						
-						if(document.getElementById('displayPanelForDeptOut')){
-							document.getElementById('displayPanelForDeptOut').style.display = 'block';
-						}
-						
-						moneyPanel.setDisabled(true);
-						priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
-						column.setHidden(3, true);
-						column.setHidden(4, true);
-					}else if(stockSubType == 3){
-						// 其他入库
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("入库 -- 商品其它入库单");
-							
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("入库 -- 原料其它入库单");
-							
-						}
-						// 控制选择货仓
-						deptInDom.show();
-						supplierDom.hide();
-						deptOutDom.hide();
-						
-						priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
-						column.setRenderer(3,'');
-					}else if(stockSubType == 7){
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("入库 -- 商品盘盈");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("入库 -- 原料盘盈");
-						}
-						// 控制选择货仓
-						deptInDom.show();
-						supplierDom.hide();
-						deptOutDom.hide();
-					}
-				}else if(stockType == 2){
-					// 出库单
-					if(stockSubType == 4){
-						// 退货
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("出库 -- 商品退货单");
-							
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("出库 -- 原料退货单");
-							
-						}
-						Ext.getDom('txtActualPrice').disabled = false;
-						// 控制选择货仓
-						
-						deptOutDom.show();
-						deptInDom.hide();
-						supplierDom.show();
-						if(document.getElementById('displayPanelForDeptOut')){
-							document.getElementById('displayPanelForDeptOut').style.display = 'block';
-						}					
-						
-					}else if(stockSubType == 5){
-						Ext.getCmp('comboDeptInForStockActionBasic').setValue(252);
-						Ext.getCmp('comboDeptInForStockActionBasic').setDisabled(true);
-						// 退料
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("出库 -- 商品退料单");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("出库 -- 原料退料单");
-						}
-						// 控制选择货仓
-						deptInDom.show();
-						supplierDom.hide();
-						deptOutDom.show();
-						
-						if(document.getElementById('displayPanelForDeptOut')){
-							document.getElementById('displayPanelForDeptOut').style.display = 'block';
-						}		
-						
-						moneyPanel.setDisabled(true);
-						priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
-						column.setHidden(3, true);
-						column.setHidden(4, true);
-					}else if(stockSubType == 6){
-						// 报损
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("出库 -- 商品其他出库单");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("出库 -- 原料其他出库单");
-						}
-						// 控制选择货仓
-						deptInDom.hide();
-						supplierDom.hide();
-						deptOutDom.show();
-						
-						if(document.getElementById('displayPanelForDeptOut')){
-							document.getElementById('displayPanelForDeptOut').style.display = 'block';
-						}		
-						
-						priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
-						column.setRenderer(3, '');
-					}else if(stockSubType == 8){
-						// 报损
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("出库 -- 商品盘亏");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("出库 -- 原料盘亏");
-						}
-						// 控制选择货仓
-						deptInDom.hide();
-						supplierDom.hide();
-						deptOutDom.show();
-						if(document.getElementById('displayPanelForDeptOut')){
-							document.getElementById('displayPanelForDeptOut').style.display = 'block';
-						}		
-					}else if(stockSubType == 9){
-						// 报损
-						if(stockCate == 1){
-							// 商品
-							diaplayTitle = String.format("出库 -- 商品消耗");
-						}else if(stockCate == 2){
-							// 原料 
-							diaplayTitle = String.format("出库 -- 原料消耗");
-						}
-						// 控制选择货仓
-						deptInDom.hide();
-						supplierDom.hide();
-						deptOutDom.show();
-						if(document.getElementById('displayPanelForDeptOut')){
-							document.getElementById('displayPanelForDeptOut').style.display = 'block';
-						}		
-					}
-				}
-				//刷新组件
-				secondStepPanelNorth.doLayout();
-				
-				if(stockTaskNavWin.otype != Ext.ux.otype['insert']){
-					var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
-					document.getElementById('stockActionTitle').innerHTML = diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>';
-				}else{
-					document.getElementById('stockActionTitle').innerHTML = diaplayTitle;
-				}
-				document.getElementById('stockActionTitle').style.display = 'block';
-				document.getElementById('stockActionTotalPrice').style.display = 'block';
+	//库单录入功能
+	function insertStockAction(){
+		var type = Ext.query('input[name=\"radioStockOrderType\"]');
+		var select;
+		for(var i = 0; i < type.length; i++){
+			if(type[i].checked){
+				select = type[i].value;
+				break;
 			}
-			
-			// 设置导航按钮信息
-			if(index >= 1){
-				btnNext.setText('完成');
-			}else{
-				btnNext.setText('下一步');
-			}
-			if(index >= 1){
-				btnPrevious.setDisabled(false);
-			}else{
-				btnPrevious.setDisabled(true);
-			}
-			
-		}else{
-			Ext.Msg.show({
-				title : '错误',
-				msg : '操作失败, 系统参数错误, 请刷新页面后重试.'
-			});
 		}
+		
+		if(!select){
+			Ext.ux.showMsg({
+				title : '错误提示',
+				msg : '请选择库单类型',
+				code : '0000'
+			});
+			return;
+		}
+		var selectMes = select.split(',');
+		stockTaskNavWin.hide();
+		$('#stockTaskNavWin').remove();
+		var insertWin;
+		insertWin = Ext.stockDistributionAction.newInstance({
+			stockType : selectMes[0],
+			cateType : selectMes[1],
+			subType : parseInt(selectMes[2]),
+			isOnlyRestaurant : true,
+			expandBtns : [{
+		    	text : '导入库单',
+		    	iconCls : 'btn_edit',
+		    	handler : function(){
+		    		Ext.ux.importShowerWin({store : insertWin.gridPanel.store});
+		    	}
+		    }],
+		    callback : function(data){
+		    	if(data.subType == stockActionSubType.STOCK_IN.value || data.subType == stockActionSubType.STOCK_IN_TRANSFER.value || data.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || data.subType == stockActionSubType.DAMAGE.value){
+		    		if(!data.deptIn && typeof data.deptIn != 'number'){
+		    			Ext.ux.showMsg({
+		    				title : '错误提示',
+		    				msg : '请选择入库仓',
+		    				code : '0000'
+		    			});
+		    			return;
+		    		}
+		    	}
+		    	
+		    	if(data.subType == stockActionSubType.STOCK_OUT || data.subType == stockActionSubType.STOCK_IN_TRANSFER.value || data.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || data.subType == stockActionSubType.SPILL.value){
+		    		if(!data.deptOut && typeof data.deptIn != 'number'){
+		    			Ext.ux.showMsg({
+		    				title : '错误提示',
+		    				msg : '请选择出库仓'
+		    			});
+			    		return;
+		    		}
+		    	}
+		    	
+		    	if(data.subType == stockActionSubType.STOCK_IN.value || data.subType == stockActionSubType.STOCK_OUT.value){
+		    		if(!data.supplier){
+		    			Ext.ux.showMsg({
+		    				title : '错误提示',
+		    				msg : '请选择供应商'
+		    			});
+		    			return;
+		    		}
+		    	}
+		    	
+		    	if(!data.detail){
+		    		Ext.ux.showMsg({
+		    			title : '错误提示',
+		    			msg : '建立单不能为空单'
+		    		});
+		    		return;
+		    	}
+		    	
+		    	$.ajax({
+		    		url : '../../OperateStockAction.do',
+		    		type : 'post',
+		    		dataType : 'json',
+		    		data : {
+		    			dataSource : 'insert',
+		    			actualPrice : data.actualPrice,
+		    			cate : data.cateType,
+		    			comment : data.comment,
+		    			detail : data.detail,
+		    			stockActionId : data.stockActionId,
+		    			oriStockDate : data.oriDate.getTime(),
+		    			oriId : data.oriId,
+		    			subType : data.subType,
+		    			type : data.stockType,
+		    			deptOut : data.deptOut,
+		    			deptIn : data.deptIn,
+		    			supplier : data.supplier
+		    		},
+		    		success : function(res, status, req){
+		    			if(res.success){
+		    				Ext.example.msg('成功提示', res.msg);
+		    				insertWin.close();
+		    				Ext.getCmp('comboSearchForStockType').setValue(data.stockType);
+							Ext.getCmp('comboSearchForStockType').fireEvent('select', Ext.getCmp('comboSearchForStockType'));
+							Ext.getCmp('sam_comboSearchForSubType').setValue(data.subType);
+							Ext.getCmp('sam_comboSearchForCateType').setValue(data.cateType);
+							
+							Ext.getCmp('btnSearchForStockBasicMsg').handler();
+		    			}else{
+		    				Ext.ux.showMsg({
+		    					title : '错误提示',
+		    					msg : res.msg,
+		    					code : '0001'
+		    				});
+		    			}
+		    		},
+		    		error : function(res, status, err){
+		    			Ext.ux.showMsg({
+		    				title : '错误提示',
+		    				msg : res.msg,
+		    				code : '0001'
+		    			});
+		    		}
+		    	});
+		    }
+		}).open();
 	}
+	
+	
 	
 	/**
 	 * 处理数据
@@ -634,7 +328,7 @@ Ext.onReady(function(){
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					stockTaskNavWin.otype = Ext.ux.otype['insert'];
+//					stockTaskNavWin.otype = Ext.ux.otype['insert'];
 					stockTaskNavWin.center();
 					stockTaskNavWin.show();
 					stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
@@ -681,12 +375,10 @@ Ext.onReady(function(){
 		});
 	}
 	
-	
 	/**
 	 * 修改出入库单信息
 	 */
 	function updateStockActionHandler(c){
-		c = c || {};
 		var data = Ext.ux.getSelData(stockBasicGrid);
 		if(!data){
 			Ext.example.msg('提示', '操作失败, 请选中一条记录后再操作.');
@@ -699,60 +391,145 @@ Ext.onReady(function(){
 			dataType : 'json',
 			data : {
 				id : data.id,
-				containsDetails : true
+				containsDetails : true,
+				isWithOutSum : true
 			},
 			success : function(res, status, req){
 				if(res.success){
-					data = res.root[0];
-					stockTaskNavWin.center();
-					stockTaskNavWin.show();
-					Ext.getCmp('btnPrintStockAction').show();
-					Ext.getCmp('importStockActionForm').hide();
-			
-					if(data['statusValue'] == 1 || c.reAudit){
-						stockTaskNavWin.otype = Ext.ux.otype['update'];
-						if(c.reAudit){
-							stockTaskNavWin.otype = "reaudit";
+					var updateWin;
+					updateWin = Ext.stockDistributionAction.newInstance({
+						isOnlyShow : c.isOnlyShow ? true : false,
+						isOnlyRestaurant : true,
+						stockType : res.root[0].typeValue,
+						cateType : res.root[0].cateTypeValue,
+						subType : res.root[0].subTypeValue,
+						stockActionId : res.root[0].id,
+						details : res.root[0].stockDetails,
+						oriId : res.root[0].oriStockId,		
+						oriDate : res.root[0].oriStockDateFormat,
+						comment : res.root[0].comment,	
+						appover : res.root[0].approverName ? res.root[0].approverName : '',
+						appoverDate : res.root[0].approverId ? res.root[0].approverDateFormat : '',				
+						operator : res.root[0].operatorName,				
+						operateDate : res.root[0].birthDateFormat,
+						deptOut : res.root[0].deptOut.id,
+						deptIn : res.root[0].deptIn.id,
+						supplier : res.root[0].supplier.supplierID,
+						expandBtns : [{
+					    	text : '打印',
+					    	iconCls : 'icon_tb_print_detail',
+					    	handler : function(){
+					    		var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
+					    		updateWin.close();
+					    		if(sn){
+					    			$.ajax({
+					    				url : '../../QueryStockAction.do',
+					    				type : 'post',
+					    				data : {
+					    					id : sn.json.id,
+					    					containsDetails : true
+					    				},
+					    				dataType : 'json',
+					    				success : function(data){
+					    					if(data.success){
+					    						var cols = [{name : '货品名称', dataIndex : 'materialName'},
+					    						{name : '数量', dataIndex : 'amount'},
+					    						{name : '单价', dataIndex : 'price'},
+					    						{name : '总价', dataIndex : '', renderer : function(data){
+													return data.amount * data.price;			    						
+					    						}}];
+					    						Ext.ux.printContain(1, cols, data.root[0].stockDetails, sn);
+					    					}
+					    				}
+					    			
+					    			});
+					    		}
+					    	}
+						}],
+						callback : function(param){
+							
+							if(param.subType == stockActionSubType.STOCK_IN.value || param.subType == stockActionSubType.STOCK_IN_TRANSFER.value || param.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || param.subType == stockActionSubType.DAMAGE.value){
+				    			if(!param.deptIn && typeof param.deptIn != 'number'){
+					    			Ext.ux.showMsg({
+					    				title : '错误提示',
+					    				msg : '请选择入库仓',
+					    				code : '0000'
+					    			});
+					    			return;
+					    		}
+					    	}
+					    	
+					    	if(param.subType == stockActionSubType.STOCK_OUT || param.subType == stockActionSubType.STOCK_IN_TRANSFER.value || param.subType == stockActionSubType.STOCK_OUT_TRANSFER.value || param.subType == stockActionSubType.SPILL.value){
+					    		if(!param.deptOut && typeof param.deptIn != 'number'){
+					    			Ext.ux.showMsg({
+					    				title : '错误提示',
+					    				msg : '请选择出库仓'
+					    			});
+						    		return;
+					    		}
+					    	}
+					    	
+					    	if(param.subType == stockActionSubType.STOCK_IN.value || param.subType == stockActionSubType.STOCK_OUT.value){
+					    		if(!param.supplier){
+					    			Ext.ux.showMsg({
+					    				title : '错误提示',
+					    				msg : '请选择供应商'
+					    			});
+					    			return;
+					    		}
+					    	}
+							
+							$.ajax({
+								url : '../../OperateStockAction.do',
+								type : 'post',
+								dataType : 'json',
+								data : {
+									dataSource : c.reAudit ? 'reAudit' : 'update',
+									id : param.stockActionId,
+									actualPrice : param.actualPrice,
+					    			cate : param.cateType,
+					    			comment : param.comment,
+					    			detail : param.detail,
+					    			stockActionId : param.stockActionId,
+					    			oriStockDate : param.oriDate.getTime(),
+					    			oriId : param.oriId,
+					    			subType : param.subType,
+					    			type : param.stockType,
+					    			deptOut : param.deptOut,
+					    			deptIn : param.deptIn,
+					    			supplier : param.supplier
+								},
+								success : function(res, status, req){
+									if(res.success){
+										Ext.example.msg('成功提示', res.msg);
+										updateWin.close();
+										Ext.getCmp('comboSearchForStockType').setValue(param.stockType);
+										Ext.getCmp('comboSearchForStockType').fireEvent('select', Ext.getCmp('comboSearchForStockType'));
+										Ext.getCmp('sam_comboSearchForSubType').setValue(param.subType);
+										Ext.getCmp('sam_comboSearchForCateType').setValue(param.cateType);
+										
+										Ext.getCmp('btnSearchForStockBasicMsg').handler();
+									}else{
+										Ext.ux.showMsg({
+											title : '错误提示',
+											msg : res.msg,
+											code : '0000'
+										});									
+									}
+								},
+								error : function(res, status, err){
+									Ext.ux.showMsg({
+										title : '错误提示',
+										msg : err,
+										code : '0000'
+									});
+								}
+							});
 						}
-						stockTaskNavWin.setTitle('修改库存单信息');
-						operateStockActionBasic({
-							otype : Ext.ux.otype['set'],
-							data : data
-						});
-						Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
-						//货品添加可用
-						Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
-						if(data['subTypeValue'] == 1 || data['subTypeValue'] == 4){
-							Ext.getDom('txtActualPrice').disabled = false;
-						}
-						
-						if(data['subTypeValue'] == 9){
-							Ext.getCmp('btnNextForStockNav').setDisabled(true);
-							Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
-							Ext.getCmp('btnAuditStockAction').hide();
-						}else{
-							Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
-							Ext.getCmp('btnAuditStockAction').hide();
-						}
-					}else{
-						stockTaskNavWin.otype = Ext.ux.otype['select'];
-						stockTaskNavWin.setTitle('查看库存单信息');
-						operateStockActionBasic({
-							otype : Ext.ux.otype['set'],
-							data : data
-						});
-						Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
-						Ext.getCmp('btnNextForStockNav').setDisabled(true);
-						Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
-						//货品添加禁用
-						Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(true);
-						Ext.getDom('txtActualPrice').disabled = true;
-						Ext.getCmp('btnAuditStockAction').hide();
-						Ext.getCmp('datetOriStockDateForStockActionBasic').clearInvalid();
-					}
+					}).open();				
 				}
 			},
-			error : function(){
+			error : function(req, stauts, err){
 			
 			}
 		});
@@ -955,7 +732,6 @@ Ext.onReady(function(){
 	function stockOperateRenderer(v, m, r, ri, ci, s){
 		if(r.get('statusValue') == 1){
 			if(r.get('subTypeValue') == 9){
-	//			return '<a href="javascript:updateStockActionHandler();">查看</a>';
 				return '<a href="javascript:void(0);" data-type="showStockAction">查看</a>';
 			}else{
 				return ''
@@ -966,14 +742,6 @@ Ext.onReady(function(){
 				+ '<a href="javascript:void(0);" data-type="auditStockActionHandler">审核</a>'
 				+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 				+ '<a href="javascript:void(0)" data-type="deleteStockActionHandler">删除</a>';
-	//			return ''
-	//			+ '<a href="javascript:exportExcel();">导出</a>'
-	//			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-	//			+ '<a href="javascript:updateStockActionHandler();">修改</a>'
-	//			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-	//			+ '<a href="javascript:auditStockActionHandler();">审核</a>'
-	//			+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-	//			+ '<a href="javascript:deleteStockActionHandler();">删除</a>';
 			}
 		}else if(r.get('statusValue') == 4){
 			return ''
@@ -1420,7 +1188,7 @@ Ext.onReady(function(){
 			//Ext.getCmp('btnSearchForStockBasicMsg').handler();
 		});
 		stockBasicGrid.on('rowdblclick', function(){
-			updateStockActionHandler();		
+			updateStockActionHandler({isOnlyShow : true});		
 		});
 		stockBasicGrid.getStore().on('load', function(store, records, options){
 			var sumRow;
@@ -1460,184 +1228,6 @@ Ext.onReady(function(){
 			}
 			
 		});
-		if(!firstStepPanel){
-			firstStepPanel = new Ext.Panel({
-		    	mt : '操作货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
-		        index : 0,
-		        frame : true,
-		        items : [{
-		        	xtype : 'fieldset',
-		        	title : '入库单',
-		        	layout : 'column',
-		        	height : Ext.isIE ? 150 : 138,
-		        	items : [{
-		        		columnWidth : 0.2,
-		        		items : [{
-		        			html : '&nbsp;'
-		        		}, {
-		        			layout : 'form',
-		            		hidden : true,
-		            		items : [{
-		            			xtype : 'radio',
-		    	        		inputValue : [1,1,7],
-		    	        		name : 'radioStockOrderType',
-		    	        		hideLabel : true,
-		    	        		boxLabel : '商品盘盈'
-		            		}, {
-		            			xtype : 'radio',
-		    	        		inputValue : [2,1,8],
-		    	        		name : 'radioStockOrderType',
-		    	        		hideLabel : true,
-		    	        		boxLabel : '商品盘亏'
-		            		}, {
-		            			xtype : 'radio',
-		    	        		inputValue : [2,1,9],
-		    	        		name : 'radioStockOrderType',
-		    	        		hideLabel : true,
-		    	        		boxLabel : '商品消耗'
-		            		}, {
-		            			xtype : 'radio',
-		    	        		inputValue : [2,2,7],
-		    	        		name : 'radioStockOrderType',
-		    	        		hideLabel : true,
-		    	        		boxLabel : '原料盘盈'
-		            		}, {
-		            			xtype : 'radio',
-		    	        		inputValue : [2,2,8],
-		    	        		name : 'radioStockOrderType',
-		    	        		hideLabel : true,
-		    	        		boxLabel : '原料盘亏'
-		            		}, {
-		            			xtype : 'radio',
-		    	        		inputValue : [2,2,9],
-		    	        		name : 'radioStockOrderType',
-		    	        		hideLabel : true,
-		    	        		boxLabel : '原料消耗'
-		            		}]
-		        		}]
-		        	}, {
-			        	columnWidth : .15,
-			        	xtype : 'fieldset',
-			        	title : '商品入库',
-			        	height : Ext.isIE ? 100 : 115,
-			        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-			        	items : [{
-			        		id : 'radioStockOrderTypeGoodIn',
-			        		xtype : 'radio',
-			        		inputValue : [1,1,1],
-			        		name : 'radioStockOrderType',
-			        		checked : true,
-			        		hideLabel : true,
-			        		boxLabel : '商品采购'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [1,1,2],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '商品领料'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [1,1,3],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '商品其他入库'
-			        	}]
-			        }, {
-			        	columnWidth : .25,
-			        	html : '&nbsp;'
-			        }, {
-			        	columnWidth : .15,
-			        	xtype : 'fieldset',
-			        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-			        	title : '原料入库',
-			        	height : Ext.isIE ? 100 : 115,
-			        	items : [{
-			        		xtype : 'radio',
-			        		inputValue : [1,2,1],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '原料采购'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [1,2,2],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '原料领料'
-			        	}, {
-		//	        		hidden : true,
-		//	        		hideParent : true,
-			        		xtype : 'radio',
-			        		inputValue : [1,2,3],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '原料其他入库'
-			        	}]
-			        }]
-		        }, {
-		        	xtype : 'fieldset',
-		        	title : '出库单',
-		        	layout : 'column',
-		        	height : Ext.isIE ? 150 : 138,
-		        	items : [{
-		        		columnWidth : .2,
-		        		html : '&nbsp;'
-		        	}, {
-			        	columnWidth : .15,
-			        	xtype : 'fieldset',
-			        	title : '商品出库',
-			        	height : Ext.isIE ? 100 : 115,
-			        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-			        	items : [{
-			        		xtype : 'radio',
-			        		inputValue : [2,1,4],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '商品退货'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [2,1,5],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '商品退料'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [2,1,6],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '商品其他出库'
-			        	}]
-			        }, {
-		        		columnWidth : .25,
-		        		html : '&nbsp;'
-		        	}, {
-			        	columnWidth : .15,
-			        	xtype : 'fieldset',
-			        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-			        	title : '原料出库',
-			        	height : Ext.isIE ? 100 : 115,
-			        	items : [{
-			        		xtype : 'radio',
-			        		inputValue : [2,2,4],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '原料退货'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [2,2,5],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '原料退料'
-			        	}, {
-			        		xtype : 'radio',
-			        		inputValue : [2,2,6],
-			        		name : 'radioStockOrderType',
-			        		hideLabel : true,
-			        		boxLabel : '原料其他出库'
-			        	}]
-			        }]
-		        }]
-		    });
-		}
 		
 		if(!secondStepPanelNorth){
 			secondStepPanelNorth = new Ext.Panel({
@@ -2207,150 +1797,295 @@ Ext.onReady(function(){
 		        items : [secondStepPanelNorth, secondStepPanelCenter, secondStepPanelSouth]
 		    });
 		}
-		if(!stockTaskNavWin){
-			stockTaskNavWin = new Ext.Window({
-				id : 'stockTaskNavWin',
-				//title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
-				width : 900,
-				height : 500,
-				modal : true,
-				closable : false,
-				resizable : false,
-			    layout : 'card',
-			    activeItem : 0,
-			    defaults : {
-			        border:false
-			    },
-			    bbar: ['->',{ 
-			    	text : '导入库单',
-			    	iconCls : 'btn_edit',
-			    	id : 'importStockActionForm',
-			    	hidden : true,
-			    	handler : function(){
-			    		Ext.ux.importShowerWin({store : secondStepPanelCenter.getStore()});
-			    	}
-			    } ,
-				{
-			    	text : '打印',
-			    	id : 'btnPrintStockAction',
-			    	iconCls : 'icon_tb_print_detail',
-			    	hidden : true,
-			    	handler : function(){
-			    		var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
-			    		stockTaskNavWin.hide();
-			    		if(sn){
-			    			$.ajax({
-			    				url : '../../QueryStockAction.do',
-			    				type : 'post',
-			    				data : {
-			    					id : sn.json.id,
-			    					containsDetails : true
-			    				},
-			    				dataType : 'json',
-			    				success : function(data){
-			    					if(data.success){
-			    						var cols = [{name : '货品名称', dataIndex : 'materialName'},
-			    						{name : '数量', dataIndex : 'amount'},
-			    						{name : '单价', dataIndex : 'price'},
-			    						{name : '总价', dataIndex : '', renderer : function(data){
-											return data.amount * data.price;			    						
-			    						}}];
-			    						Ext.ux.printContain(1, cols, data.root[0].stockDetails, sn);
-			    					}
-			    				}
-			    			
-			    			});
-			    		}
-			    	}
-				},{
-			    	text : '上一步',
-			    	id : 'btnPreviousForStockNav',
-			    	iconCls : 'btn_previous',
-			    	change : -1,
-			    	disabled : true,
-			    	handler : function(e){
-			    		stockTaskNavHandler(e);
-			    		Ext.getCmp('importStockActionForm').hide();	
-			    	}
-			    }, {
-		    		text : '下一步',
-		    		id : 'btnNextForStockNav',
-		    		iconCls : 'btn_next',
-		    		change : 1,
-		    		handler : function(e){
-		    			stockTaskNavHandler(e);
-		    			Ext.getCmp('sam_secondStepPanelWest').setWidth(230);
-		    			Ext.getCmp('stock_secondStepPanel').doLayout();
-		    			if(Ext.getCmp('btnNextForStockNav').getText() == '完成' && !Ext.getCmp('btnNextForStockNav').disabled){
-							Ext.getCmp('importStockActionForm').show();		    			
-		    			}
-			    	}
-		    	}, {
-		    		text : '审核',
-		    		iconCls : 'btn_refresh',
-		    		id : 'btnAuditStockAction',
-		    		hidden : true,
-		    		handler : function(){
-		    			auditStockActionHandler();
-		    		}
-		    	}, {
-		    		text : '取消',
-		    		iconCls : 'btn_cancel',
-		    		handler : function(){
-		    			Ext.getCmp('numSelectPriceForStockAction').setDisabled(false);
-		    			Ext.getCmp('numSelectPriceForStockAction').getEl()?Ext.getCmp('numSelectPriceForStockAction').getEl().up('.x-form-item').setDisplayed(true) : ''; 
-						Ext.getCmp('secondStepPanelSouth').setDisabled(false);
-						var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
-						column.setHidden(3, false);
-						column.setHidden(4, false);
-		    			stockTaskNavWin.hide();
-		    		}
-		    	}],
-		    	keys : [{
-		    		key : Ext.EventObject.ESC,
-		    		scope : this,
-		    		fn : function(){
-		    			stockTaskNavWin.hide();
-		    		}
-		    	}],
-		    	items: [firstStepPanel, secondStepPanel],
-			    listeners : {
-			    	show : function(thiz){
-			    		Ext.getCmp('comboSupplierForStockActionBasic').store.load();
-			    		thiz.center();
-			    	},
-			    	hide : function(thiz){
-			    		/***** 重置操作导航 *****/
-			    		// 设置默认页
-			    		thiz.getLayout().setActiveItem(0);
-			    		// 恢复导航按钮
-			    		stockTaskNavWin.stockType = null;
-			    		var btnPrevious = Ext.getCmp('btnPreviousForStockNav');
-			    		var btnNext = Ext.getCmp('btnNextForStockNav');
-			    		btnPrevious.setDisabled(true);
-			    		btnNext.setDisabled(false);
-			    		btnNext.setText('下一步');
-			    		// 清空已入库单类型
-	//		    		var sot = Ext.query('input[name=radioStockOrderType]');
-	//		    		for(var i = 0; i < sot.length; i++){
-	//		    			sot[i].checked = false;
-	//		    		}
-	//		    		Ext.getCmp('radioStockOrderTypeGoodIn').setValue(true);
-			    		// 清空单据基础信息
-			    		operateStockActionBasic({
-			    			otype : Ext.ux.otype['set']
-			    		});
-			    		
-			    		Ext.getCmp('btnPrintStockAction').hide();
-			    		Ext.getCmp('importStockActionForm').hide();	
-			    	}
-			    }
-			});
-			
-		}
-		
 	}
 
+	function createStockActionWin(){
+		firstStepPanel = new Ext.Panel({
+	    	mt : '操作货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+	        index : 0,
+	        frame : true,
+	        items : [{
+	        	xtype : 'fieldset',
+	        	title : '入库单',
+	        	layout : 'column',
+	        	height : Ext.isIE ? 150 : 138,
+	        	items : [{
+	        		columnWidth : 0.2,
+	        		items : [{
+	        			html : '&nbsp;'
+	        		}, {
+	        			layout : 'form',
+	            		hidden : true,
+	            		items : [{
+	            			xtype : 'radio',
+	    	        		inputValue : [1,1,7],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '商品盘盈'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,1,8],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '商品盘亏'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,1,9],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '商品消耗'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,2,7],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '原料盘盈'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,2,8],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '原料盘亏'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,2,9],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '原料消耗'
+	            		}]
+	        		}]
+	        	}, {
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	title : '商品入库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	items : [{
+		        		id : 'radioStockOrderTypeGoodIn',
+		        		xtype : 'radio',
+		        		inputValue : [1,1,1],
+		        		name : 'radioStockOrderType',
+		        		checked : true,
+		        		hideLabel : true,
+		        		boxLabel : '商品采购'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [1,1,2],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品领料'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [1,1,3],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品其他入库'
+		        	}]
+		        }, {
+		        	columnWidth : .25,
+		        	html : '&nbsp;'
+		        }, {
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	title : '原料入库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [1,2,1],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料采购'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [1,2,2],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料领料'
+		        	}, {
+	//	        		hidden : true,
+	//	        		hideParent : true,
+		        		xtype : 'radio',
+		        		inputValue : [1,2,3],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料其他入库'
+		        	}]
+		        }]
+	        }, {
+	        	xtype : 'fieldset',
+	        	title : '出库单',
+	        	layout : 'column',
+	        	height : Ext.isIE ? 150 : 138,
+	        	items : [{
+	        		columnWidth : .2,
+	        		html : '&nbsp;'
+	        	}, {
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	title : '商品出库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [2,1,4],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品退货'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,1,5],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品退料'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,1,6],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品其他出库'
+		        	}]
+		        }, {
+	        		columnWidth : .25,
+	        		html : '&nbsp;'
+	        	}, {
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	title : '原料出库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [2,2,4],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料退货'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,2,5],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料退料'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,2,6],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料其他出库'
+		        	}]
+		        }]
+	        }]
+	    });
+		
+		
+		stockTaskNavWin = new Ext.Window({
+			id : 'stockTaskNavWin',
+			//title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+			width : 900,
+			height : 500,
+			modal : true,
+			closable : false,
+			resizable : false,
+		    layout : 'card',
+		    activeItem : 0,
+		    defaults : {
+		        border:false
+		    },
+		    bbar: ['->',{ 
+		    	text : '导入库单',
+		    	iconCls : 'btn_edit',
+		    	id : 'importStockActionForm',
+		    	hidden : true,
+		    	handler : function(){
+		    		Ext.ux.importShowerWin({store : secondStepPanelCenter.getStore()});
+		    	}
+		    } ,
+			{
+		    	text : '打印',
+		    	id : 'btnPrintStockAction',
+		    	iconCls : 'icon_tb_print_detail',
+		    	hidden : true,
+		    	handler : function(){
+		    		var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
+		    		stockTaskNavWin.hide();
+		    		if(sn){
+		    			$.ajax({
+		    				url : '../../QueryStockAction.do',
+		    				type : 'post',
+		    				data : {
+		    					id : sn.json.id,
+		    					containsDetails : true
+		    				},
+		    				dataType : 'json',
+		    				success : function(data){
+		    					if(data.success){
+		    						var cols = [{name : '货品名称', dataIndex : 'materialName'},
+		    						{name : '数量', dataIndex : 'amount'},
+		    						{name : '单价', dataIndex : 'price'},
+		    						{name : '总价', dataIndex : '', renderer : function(data){
+										return data.amount * data.price;			    						
+		    						}}];
+		    						Ext.ux.printContain(1, cols, data.root[0].stockDetails, sn);
+		    					}
+		    				}
+		    			
+		    			});
+		    		}
+		    	}
+			},{
+		    	text : '上一步',
+		    	id : 'btnPreviousForStockNav',
+		    	iconCls : 'btn_previous',
+		    	change : -1,
+		    	hidden : true,
+		    	disabled : true,
+		    	handler : function(e){
+//			    		stockTaskNavHandler(e);
+//			    		Ext.getCmp('importStockActionForm').hide();	
+		    	}
+		    }, {
+	    		text : '下一步',
+	    		id : 'btnNextForStockNav',
+	    		iconCls : 'btn_next',
+	    		change : 1,
+	    		handler : function(e){
+	    			insertStockAction();
+		    	}
+	    	}, {
+	    		text : '审核',
+	    		iconCls : 'btn_refresh',
+	    		id : 'btnAuditStockAction',
+	    		hidden : true,
+	    		handler : function(){
+	    			auditStockActionHandler();
+	    		}
+	    	}, {
+	    		text : '取消',
+	    		iconCls : 'btn_cancel',
+	    		handler : function(){
+	    			stockTaskNavWin.hide();
+					$('#stockTaskNavWin').remove();
+	    		}
+	    	}],
+	    	keys : [{
+	    		key : Ext.EventObject.ESC,
+	    		scope : this,
+	    		fn : function(){
+	    			stockTaskNavWin.hide();
+	    			$('#stockTaskNavWin').remove();
+	    		}
+	    	}],
+	    	items: [firstStepPanel],
+		    listeners : {
+		    	show : function(thiz){
+		    		Ext.getCmp('comboSupplierForStockActionBasic').store.load();
+		    		thiz.center();
+		    	}
+		    }
+		});
+				
+		stockTaskNavWin.render(document.body);
+	}
 	
 	
 	function showStockCountMenu(){
@@ -2490,6 +2225,7 @@ Ext.onReady(function(){
 		imgHeight : 50,
 		tooltip : '新建货单',
 		handler : function(btn){
+			createStockActionWin();
 			insertStockActionHandler();
 			getCurrentDay();
 		}
@@ -2534,25 +2270,6 @@ Ext.onReady(function(){
 		})
 	});
 	showCurrentMonth();
-	stockTaskNavWin.render(document.body);
-	
-	//处理部门默认值存在0
-//	Ext.Ajax.request({
-//		url: '../../OperateDept.do?',
-//		params : {
-//			dataSource : 'getByCond',
-//			inventory : true
-//		},
-//		success : function(res){
-//			var jr = Ext.decode(res.responseText);
-//			console.log(jr);
-//			var data = [[-1, '']];
-//			for(var i = 0; i < jr.root.length; i++){
-//				data.push([jr.root[i]['id'], jr.root[i]['name']]);
-//			}
-//			Ext.getCmp('comboDeptInForStockActionBasic').store.loadDate(data);
-//		}
-//	});
 	
 	Ext.getCmp('comboDeptInForStockActionBasic').store.load();
 	Ext.getCmp('comboDeptOutForStockActionBasic').store.load();
@@ -2580,7 +2297,7 @@ Ext.onReady(function(){
 		if(showStockActionArray.length > 0){
 			showStockActionArray.forEach(function(el, index){
 				el.onclick = function(){
-					updateStockActionHandler();
+					updateStockActionHandler({isOnlyShow : true});
 				}
 			});
 		}

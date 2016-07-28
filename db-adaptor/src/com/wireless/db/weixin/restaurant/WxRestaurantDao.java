@@ -18,7 +18,6 @@ import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
-import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 import com.wireless.util.StringHtml;
 
 public class WxRestaurantDao {
@@ -153,7 +152,6 @@ public class WxRestaurantDao {
 			  (builder.isWeixinSecretChanged() ? " ,app_secret = '" + wr.getWeixinAppSecret() + "'" : "") +
 			  (builder.isQrCodeUrlChanged() ? " ,qrcode_url = '" + wr.getQrCodeUrl() + "'" : "") +
 			  (builder.isQrCodeChanged() ? " ,qrcode = '" + wr.getQrCode() + "'" : "") +
-			  (builder.isQrCodeStatusChanged() ? " ,qrcode_status = " + wr.getQrCodeStatus().getVal() : "") +
 			  (builder.isNickNameChanged() ? " ,nick_name = '" + wr.getNickName() + "'" : "") +
 			  (builder.isHeadImgUrlChanged() ? " ,head_img_url = '" + wr.getHeadImgUrl() + "'" : "") +
 			  (builder.isRefreshTokenChanged() ? " ,refresh_token = '" + wr.getRefreshToken() + "'" : "") +
@@ -299,7 +297,6 @@ public class WxRestaurantDao {
 			wr.setWeixinAppSecret(dbCon.rs.getString("app_secret"));
 			wr.setQrCodeUrl(dbCon.rs.getString("qrcode_url"));
 			wr.setQrCode(dbCon.rs.getString("qrcode"));
-			wr.setQrCodeStatus(QrCodeStatus.valueOf(dbCon.rs.getInt("qrcode_status")));
 			wr.setHeadImgUrl(dbCon.rs.getString("head_img_url"));
 			wr.setRefreshToken(dbCon.rs.getString("refresh_token"));
 			wr.setNickName(dbCon.rs.getString("nick_name"));

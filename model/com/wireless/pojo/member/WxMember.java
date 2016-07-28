@@ -3,6 +3,53 @@ package com.wireless.pojo.member;
 
 public class WxMember {
 	
+	public static class InterestBuilder{
+		private final String weixinSerial;
+		private String nickName;
+		private String wxServer;
+		
+		public InterestBuilder(String weixinSerial){
+			this.weixinSerial = weixinSerial;
+		}
+		
+		public InterestBuilder setNickName(String nickName){
+			this.nickName = nickName;
+			return this;
+		}
+		
+		public InterestBuilder setWxServer(String wxServer){
+			this.wxServer = wxServer;
+			return this;
+		}
+		
+		public boolean hasNickName(){
+			return getNickName().length() > 0;
+		}
+		
+		public String getNickName(){
+			if(this.nickName == null){
+				return "";
+			}
+			return this.nickName;
+		}
+		
+		public boolean hasWxServer(){
+			return getWxServer().length() > 0;
+		}
+		
+		public String getWxServer(){
+			if(this.wxServer == null){
+				return "";
+			}
+			return this.wxServer;
+		}
+		
+		public String getWxSerial(){
+			return this.weixinSerial;
+		}
+		
+	}
+	
 	public static class BindBuilder{
 		private final String serial;
 		private final String mobile;

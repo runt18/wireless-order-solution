@@ -76,8 +76,8 @@ public class WxMemberDao {
 	 * Insert the weixin member to specific weixin serial.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param serial
-	 * 			the weixin serial
+	 * @param builder
+	 * 			the interest builder {@link WxMember#InterestBuilder}.
 	 * @return the member id associated with this weixin serial 
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
@@ -85,12 +85,12 @@ public class WxMemberDao {
 	 * 			throws if cases below
 	 * 			<li>failed to insert the member related to weixin serial
 	 */
-	public static int interest(Staff staff, String serial, String wxServerName) throws SQLException, BusinessException{
+	public static int interest(Staff staff, WxMember.InterestBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			int memberId = interest(dbCon, staff, serial, wxServerName);
+			int memberId = interest(dbCon, staff, builder);
 			dbCon.conn.commit();
 			return memberId;
 		}catch(SQLException | BusinessException e){
@@ -107,8 +107,8 @@ public class WxMemberDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param serial
-	 * 			the weixin serial
+	 * @param builder
+	 * 			the interest builder {@link WxMember#InterestBuilder}.
 	 * @return the member id associated with this weixin serial 
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
@@ -116,20 +116,20 @@ public class WxMemberDao {
 	 * 			throws if cases below
 	 * 			<li>failed to insert the member related to weixin serial
 	 */
-	public static int interest(DBCon dbCon, Staff staff, String weixinSerial, String wxServerName) throws SQLException, BusinessException{
+	public static int interest(DBCon dbCon, Staff staff, WxMember.InterestBuilder builder) throws SQLException, BusinessException{
 		
 		String sql;
 
 		final int weixinCard;
-		List<WxMember> weixinMembers = getByCond(dbCon, staff, new ExtraCond().setSerial(weixinSerial));
+		List<WxMember> weixinMembers = getByCond(dbCon, staff, new ExtraCond().setSerial(builder.getWxSerial()));
 
 		if(weixinMembers.isEmpty()){
 			//Insert the weixin member.
 			sql = " INSERT INTO " + Params.dbName + ".weixin_member " +
 				  " (`weixin_serial`, `weixin_serial_crc`, `restaurant_id`, `status`, `interest_date`) " +
 				  " VALUES(" +
-				  "'" + weixinSerial + "'," +
-				  " CRC32('" + weixinSerial + "')," +
+				  "'" + builder.getWxSerial() + "'," +
+				  " CRC32('" + builder.getWxSerial() + "')," +
 				  staff.getRestaurantId() + "," +
 				  WxMember.Status.INTERESTED.getVal() + "," +
 				  " NOW() " +
@@ -147,13 +147,13 @@ public class WxMemberDao {
 			weixinCard = weixinMembers.get(0).getCard();
 		}
 		
-		List<Member> associatedMembers = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(weixinSerial), null);
+		List<Member> associatedMembers = MemberDao.getByCond(dbCon, staff, new MemberDao.ExtraCond().setWeixinSerial(builder.getWxSerial()), null);
 		final int memberId;
 		if(associatedMembers.isEmpty()){
-			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
+			memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder(builder.hasNickName() ? builder.getNickName() + "(微信会员)" : "微信会员", MemberTypeDao.getWxMemberType(dbCon, staff)));
 			//Issue the coupon to this weixin member after subscribing.
 			for(Promotion promotion : PromotionDao.getByCond(staff, new PromotionDao.ExtraCond().addIssueRule(PromotionTrigger.IssueRule.WX_SUBSCRIBE))){
-				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId).setWxServer(wxServerName));
+				CouponDao.issue(dbCon, staff, Coupon.IssueBuilder.newInstance4WxSubscribe().addPromotion(promotion).addMember(memberId).setWxServer(builder.getWxServer()));
 			}
 		}else{
 			memberId = associatedMembers.get(0).getId();

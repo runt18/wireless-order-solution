@@ -40,7 +40,6 @@ import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.weixin.restaurant.WxRestaurant;
-import com.wireless.pojo.weixin.restaurant.WxRestaurant.QrCodeStatus;
 
 public class WxAuthAction extends Action {
 	
@@ -71,7 +70,6 @@ public class WxAuthAction extends Action {
 								   									   .setHeadImgUrl(authorizerInfo.getHeadImg())
 								   									   .setQrCodeUrl(authorizerInfo.getQrCodeUrl())
 								   									   .setQrCode(qrCode.getText())
-								   									   .setQrCodeStatus(QrCodeStatus.NORMAL)
 								   									   .setRefreshToken(authorizationInfo.getAuthorizerRefreshToken()));
 			
 			AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, authorizationInfo.getAuthorizerAppId(), authorizationInfo.getAuthorizerRefreshToken());

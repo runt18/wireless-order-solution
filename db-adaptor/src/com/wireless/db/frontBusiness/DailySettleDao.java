@@ -231,7 +231,7 @@ public class DailySettleDao {
 				sql = " SELECT " +
 				      " MAX(M.material_id) AS material_id, MAX(M.name) AS material, " +
 					  " SUM(OF.order_count * FM.consumption) AS consume_amount, " +
-					  " MAX(M.price) AS consume_price " +
+					  " MAX(IFNULL(OF.plan_price, IFNULL(OF.food_unit_price, OF.unit_price))) AS consume_price " +
 				      " FROM " + Params.dbName + ".order O " +
 					  " JOIN " + Params.dbName + ".order_food OF ON O.id = OF.order_id" +
 					  " JOIN " + Params.dbName + ".food_material FM ON OF.food_id = FM.food_id " +

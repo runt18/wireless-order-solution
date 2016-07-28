@@ -39,16 +39,18 @@ public class OperateMaterialAction extends DispatchAction {
 		final String cateId = request.getParameter("cateId");
 		final String price = request.getParameter("price");
 		final String alarmAmount = request.getParameter("alarmAmount");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		try{
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Material.InsertBuilder builder = new Material.InsertBuilder();
+			if(alarmAmount != null && !alarmAmount.isEmpty() && Integer.parseInt(alarmAmount) > 0){
+				builder.setAlarmAmount(Integer.parseInt(alarmAmount));
+			}
 			
-			MaterialDao.insert(staff, new Material.InsertBuilder()
-											      .setName(name)
-											      .setMaterialCate(MaterialCateDao.getById(staff, Integer.valueOf(cateId)))
-											      .setPrice(Float.valueOf(price))
-											      .setLastModStaff(staff.getName())
-											      .setAlarmAmount(Integer.valueOf(alarmAmount)));
+			MaterialDao.insert(staff, builder.setName(name)
+										     .setMaterialCate(MaterialCateDao.getById(staff, Integer.valueOf(cateId)))
+										     .setPrice(Float.valueOf(price))
+										     .setLastModStaff(staff.getName()));
 			
 			jObject.initTip(true, "操作成功, 已添加新原料信息.");
 		}catch(BusinessException | SQLException e){
@@ -93,7 +95,7 @@ public class OperateMaterialAction extends DispatchAction {
 				builder.setPrice(Float.valueOf(price));
 			}
 			
-			if(alarmAmount != null && !alarmAmount.isEmpty() && Integer.valueOf(alarmAmount) > 0){
+			if(alarmAmount != null && !alarmAmount.isEmpty()){
 				builder.setAlarmAmount(Integer.valueOf(alarmAmount));
 			}
 			

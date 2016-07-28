@@ -871,7 +871,7 @@
 		     <!-- 账单更多操作 -->
 			<div data-role="popup" id="wxPayPopup_div_tableSelect" data-theme="d">
 		        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-		            <li class="tempFoodKitchen" id="wx_li_payment""><a >二维码支付</a></li>
+		            <li class="tempFoodKitchen" id="wx_li_payment"><a >二维码支付</a></li>
 		            <li class="tempFoodKitchen" id="authCode_li_payment"><a >扫描枪支付</a></li>
 		        </ul>
 			</div>	

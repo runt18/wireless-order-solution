@@ -468,7 +468,8 @@ public class JobContentFactory {
 													  			   printer.getStyle()).setEnding(func.getComment())
 																					  .setMember(member)
 																					  .setWxPayUrl(wxPayUrl)
-																					  .setCouponUsage(couponUsage);
+																					  .setCouponUsage(couponUsage)
+																					  .setQrCode(PrintFunc.QrCodeType.valueOf(func.getExtra()), func.getExtraStr());
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType, content));
 					}
 				}
