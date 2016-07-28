@@ -129,6 +129,48 @@ Ext.onReady(function(){
 			}
 		});
 		
+		//部门选择
+		var dept_combo_gift = new Ext.form.ComboBox({
+			id : 'dept_combo_gift',
+			readOnly :false,
+			forceSelection : true,
+			width : 123,
+			listWidth : 120,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QueryDeptTree.do',
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.length; i++){
+								data.push([jr[i]['deptID'], jr[i]['text']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+							
+						},
+						fialure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});		
+				},
+				select : function(){
+					Ext.getCmp('giftStatistic_btnSearch').handler();
+				}				
+			}
+		});
+		
 		//门店选择
 		var branch_combo_gift = new Ext.form.ComboBox({
 			id : 'branch_combo_gift',
@@ -187,10 +229,34 @@ Ext.onReady(function(){
 						gift_combo_staffs.setDisabled(true);
 						gift_combo_staffs.setValue(-1);
 						
+						dept_combo_gift.setDisabled(true);
+						dept_combo_gift.setValue(-1);
+						
 						Ext.getCmp('giftStatistic_comboRegion').setDisabled(true);
 						Ext.getCmp('giftStatistic_comboRegion').setValue(-1);
 						
 					}else{
+						
+						//加载部门
+						var dept = [[-1, '全部']];
+						Ext.Ajax.request({
+							url : '../../OperateDept.do',
+							params : {
+								dataSource : 'getByCond',
+								branchId : branch_combo_gift.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								
+								for(var i = 0; i < jr.root.length; i++){
+									dept.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								dept_combo_gift.setDisabled(false);
+								dept_combo_gift.store.loadData(dept);
+								dept_combo_gift.setValue(-1);
+							}
+						});
+						
 						//加载赠送人
 						var staff = [[-1, '全部']];
 						Ext.Ajax.request({
@@ -283,8 +349,11 @@ Ext.onReady(function(){
 				text : '&nbsp;&nbsp;赠送人:'
 			},gift_combo_staffs, {
 				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;部门选择:'
+			}, dept_combo_gift,{
+				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;门店选择:'
-			},branch_combo_gift, '->', {
+			},branch_combo_gift,  '->', {
 				text : '搜索',
 				id : 'giftStatistic_btnSearch',
 				iconCls : 'btn_search',
@@ -304,6 +373,7 @@ Ext.onReady(function(){
 					gs.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
 					gs.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';
 					gs.baseParams['branchId'] = branch_combo_gift.getValue();
+					gs.baseParams['deptId'] = dept_combo_gift.getValue();
 					gs.load({
 						params : {
 							start : 0,
@@ -326,7 +396,8 @@ Ext.onReady(function(){
 						foodName : Ext.getCmp('gift_foodName').getValue(),
 						opening : businessHour.opening != '00:00' ? businessHour.opening : '',
 						ending : businessHour.ending != '00:00' ? businessHour.ending : '',
-						branchId : branch_combo_gift.getValue()
+						branchId : branch_combo_gift.getValue(),
+						deptId : dept_combo_gift.getValue()
 					};
 					gift_chartLoadMarsk.show();
 					Ext.Ajax.request({
