@@ -7,6 +7,7 @@ define(function(require, exports, module){
 		var _data = null;
 		var _self = null;
 		var _foodpaging = null;
+		var _activeButton = null;
 		
 		_saleOutPopup = new JqmPopupDiv({
 			loadUrl : './popup/limitSale/saleOut.html',
@@ -15,6 +16,7 @@ define(function(require, exports, module){
 				
 				//开售的点击
 				self.find('[id="sale_a_saleOut"]').click(function(){
+					_activeButton = self.find('[id="sale_a_saleOut"]');
 					self.find('a').attr('data-theme', 'b').removeClass('ui-btn-up-e').addClass('ui-btn-up-b');
 					self.find('[id="sale_a_saleOut"]').attr('data-theme', 'e').addClass('ui-btn-up-e');
 					$('#saleInput_input_saleOut').val('');
@@ -23,6 +25,7 @@ define(function(require, exports, module){
 				
 				//估清的点击
 				self.find('[id="saleOut_a_saleOut"]').click(function(){
+					_activeButton = self.find('[id="saleOut_a_saleOut"]');
 					self.find('a').attr('data-theme', 'b').removeClass('ui-btn-up-e').addClass('ui-btn-up-b');
 					self.find('[id="saleOut_a_saleOut"]').attr('data-theme', 'e').addClass('ui-btn-up-e');
 					$('#saleInput_input_saleOut').val('');
@@ -50,7 +53,8 @@ define(function(require, exports, module){
 					$('#saleInput_input_saleOut').trigger('input');
 				});
 				
-				self.find('[id="sale_a_saleOut"]').click();
+				thiz.reload();
+				
 				
 				self.find('[id="saleInput_input_saleOut"]').on("input", function(){
 					search(self.find('[id="saleInput_input_saleOut"]').val());
@@ -86,7 +90,12 @@ define(function(require, exports, module){
 		}
 		
 		this.reload = function(){
-			_self.find('[id="sale_a_saleOut"]').click();
+			if(_activeButton){
+				_activeButton.click();
+				
+			}else{
+				_self.find('[id="sale_a_saleOut"]').click();
+			}		
 		}
 		
 		function initFood(dataSource){
@@ -179,7 +188,7 @@ define(function(require, exports, module){
 								type : 'post',
 								data : {
 									dataSource : dataSource,
-									foodIds : item.id
+									foodIds : item.id	
 								},
 								success : function(data, status, xhr) {
 									Util.LM.hide();
