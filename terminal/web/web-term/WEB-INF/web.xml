@@ -23,7 +23,9 @@
 					/OperateBillboard.do,
 					/QueryBillboard.do,
 					/PrinterDiagnosis.do,
-		
+					/HanvonHandWriting.do,
+					
+					
 					/Login.html,
 					/LoginAdmin.html,
 					/PersonLoginTimeout.html,

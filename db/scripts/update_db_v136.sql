@@ -166,6 +166,26 @@ ADD COLUMN `extra` INT NULL DEFAULT NULL COMMENT '' AFTER `enabled`;
 ALTER TABLE `wireless_order_db`.`weixin_restaurant` 
 ADD COLUMN `prefect_member_status` INT NULL DEFAULT NULL AFTER `default_order_type`;
 
+-- -----------------------------------------------------
+-- Add the field 'extra_str' to table 'print_func'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`print_func` 
+ADD COLUMN `extra_str` VARCHAR(500) NULL DEFAULT NULL COMMENT '' AFTER `extra`;
+
+-- -----------------------------------------------------
+-- Update the '暂结' extra 
+-- -----------------------------------------------------
+UPDATE wireless_order_db.print_func PF
+JOIN wireless_order_db.printer P ON PF.printer_id = P.printer_id
+JOIN wireless_order_db.weixin_restaurant WR ON WR.restaurant_id = P.restaurant_id AND WR.qrcode_status = 1
+SET PF.extra = 2
+WHERE PF.type = 127;
+
+-- -----------------------------------------------------
+-- Add the field 'refund_template' to table 'weixin_restaurant'
+-- -----------------------------------------------------
+ALTER TABLE weixin_restaurant ADD COLUMN refund_template VARCHAR(100);
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
