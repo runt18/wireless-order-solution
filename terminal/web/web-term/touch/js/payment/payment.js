@@ -887,7 +887,6 @@ $(function(){
 		
 		//打开积分兑换
 		$('#point_a_payment').click(function(){
-			Util.LM.show();
 			seajs.use(['issueCoupon'], function(issuePopup){
 				var issueCouponPopup = issuePopup.newInstance({
 					title : '积分兑换',
@@ -895,7 +894,9 @@ $(function(){
 					issueMode : issuePopup.IssueMode.POINT,
 					issueTo : orderMsg.memberId,
 					isPoint : true,
+					issueAndUse : false,
 					confirm : function(self, promotions, point){
+						Util.LM.show();
 						$.ajax({
 							url : '../OperateMember.do',
 							type : 'post',
@@ -908,9 +909,11 @@ $(function(){
 								isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
 							},
 							success : function(jr){
+								Util.LM.hide();
 								if(jr.success){
 									issueCouponPopup.close(function(){
 										Util.msg.tip(jr.msg);
+										refreshOrderData();
 									});
 								}else{
 									Util.msg.tip(jr.msg);
@@ -920,9 +923,7 @@ $(function(){
 					
 					}
 				});
-				issueCouponPopup.open(function(){
-					Util.LM.hide();
-				});				
+				issueCouponPopup.open();				
 			});
 		});
 		

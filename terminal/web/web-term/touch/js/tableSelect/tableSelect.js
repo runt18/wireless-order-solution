@@ -733,6 +733,7 @@ $(function(){
 										issueMode : issuePopup.IssueMode.POINT,
 										issueTo : member.id,
 										isPoint : true,
+										issueAndUse : true,
 										confirm : function(self, promotions, point){
 											$.ajax({
 												url : '../OperateMember.do',

@@ -7,6 +7,7 @@ define(function(require, exports, module){
 			issueMode : null,    	//发送类型
 			issueTo : '',			//发送对象--memberId				
 			issueComment : '',   	//备注
+			issueAndUse : true,     //是否发送并使用
 			member: '',
 			confirm : function(){},  //确认的回调函数
 			isPoint : false,         //是否积分兑换
@@ -98,6 +99,12 @@ define(function(require, exports, module){
 										self.find('[memberPoint_font_issue]').text('0');
 									}else{
 										self.find('[id="pointExchange_table_issue"]').hide();
+									}
+									
+									if(param.issueAndUse){
+										self.find('[id="issueAndUse_div_issuePopup"]').show();
+									}else{
+										self.find('[id="issueAndUse_div_issuePopup"]').hide();									
 									}
 									
 									//更换标题
