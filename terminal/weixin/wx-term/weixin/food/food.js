@@ -40,20 +40,7 @@ function CreateFastOrderFood(param){
 					
 					//选好了
 					$('#confirm_div_fastOrderFood').click(function(){
-						var orderData = '';
-						
-						for(var i = 0;i < _orderData.length; i++){
-							//TODO
-							var each = _orderData[i].food.id + ',' + _orderData[i].count;
-							if(orderData.length > 0){
-								orderData += '&' + each;
-							}else{
-								orderData += each;
-							}
-							
-						}
-						
-						param.confirm(orderData);
+						param.confirm(_orderData);
 					});
 					
 				}else{
@@ -86,7 +73,7 @@ function CreateFastOrderFood(param){
 	function initKitchen(){
 		var ketchenHtml = [];
 		var kitchenList = $('#keptList_ul_fastOrderFood');
-		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="allnum">0</div>' +
+		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="kitchenNum_div_food" style="display:none;">0</div>' +
 				'<h4>{name}</h4></li>';
 		$.ajax({
 			url : '../../WxQueryDept.do', 
@@ -406,6 +393,26 @@ function CreateFastOrderFood(param){
 		}
 		$('#allnum').html(count);
 		$('#allprice').html(allPrice);
+	}
+	
+	function changeKitchenAmount(){
+		 var kitchen = $('#keptList_ul_fastOrderFood').find('[data-type="kitchenBox"]');
+		 for(var i = 0; i < kitchen.length; i++){
+			 var selectFoods = [];
+			 for(var j = 0; j < _orderData.length; j++){
+				 if($(kitchen[i]).attr('data-value') == _orderData[j].kitchenId){
+					 selectFoods.push(_orderData[j]);
+				 }
+			 }
+			 if(selectFoods.length > 0 ){
+				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').html('&nbsp' + selectFoods.length);
+				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').css({'visibility' : 'visible'});
+			 }else{
+				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').html('');
+				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').css({'visibility' : 'hidden'});
+			 }
+
+		 }
 	}
 	
 	//设置样式
