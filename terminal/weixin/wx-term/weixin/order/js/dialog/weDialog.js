@@ -19,7 +19,7 @@ function WeDialogPopup(param){
 	
 	
 	function _init(){
-		_dialogDiv = $('<div class="weui_dialog_confirm" id="dialog1" style="display: block;">'
+		_dialogDiv = $('<div class="weui_dialog_confirm" id="dialog1" style="z-index:600000;display: block;">'
 							+'<div class="weui_mask" id="weDialogMask_mask_weDialog"></div>'
 								+ '<div class="weui_dialog" id="dialogContainer_div_weDialog">'
 								+		'<div class="weui_dialog_hd"><strong class="weui_dialog_title" data-type="dialogTitle_div_dialogPopup"></strong></div>'
