@@ -1095,7 +1095,7 @@ public class StockAction implements Jsonable{
 					return sType;
 				}
 			}
-			throw new IllegalArgumentException("the stockIn suTtype(val = " + val + ") is invalid");
+			throw new IllegalArgumentException("the stockIn subType(val = " + val + ") is invalid");
 		}
 		
 		public int getVal(){
