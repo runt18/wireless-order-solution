@@ -35,6 +35,12 @@ public class StockReportDao {
 		private boolean isOnlyAmount;
 		private Integer start;
 		private Integer limit;
+		private List<StockAction.SubType> exceptSubTypes = new ArrayList<>();
+		
+		public ExtraCond addExceptSubTypes(StockAction.SubType subType){
+			this.exceptSubTypes.add(subType);
+			return this;
+		}
 		
 		public ExtraCond setStart(int start){
 			this.start = start;
@@ -119,6 +125,18 @@ public class StockReportDao {
 			}
 			if(supplierId != 0){
 				extraCond.append(" AND S.supplier_id = " + supplierId);
+			}
+			if(!exceptSubTypes.isEmpty()){
+				StringBuilder except = new StringBuilder();
+				for(StockAction.SubType subType : exceptSubTypes){
+					if(except.length() > 0){
+						except.append(",");
+					}
+					except.append(subType.getVal());
+				}
+				if(except.length() > 0){
+					extraCond.append(" AND S.sub_type NOT IN(" + except + ") ");
+				}
 			}
 			return extraCond.toString();
 		}
@@ -265,6 +283,7 @@ public class StockReportDao {
 				List<StockActionDetail> primeDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																						.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
 																						.setOriDate(null, maxDate)
+																						.addExceptSubTypes(StockAction.SubType.DISTRIBUTION_APPLY)
 																						.setMaterial(report.getMaterial())
 																						.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");
 				if(!primeDetail.isEmpty()){
@@ -300,6 +319,7 @@ public class StockReportDao {
 				 */
 				List<StockActionDetail> finalDetail = StockActionDetailDao.getByCond(dbCon, staff, new StockActionDetailDao.ExtraCond()
 																							.addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT)
+																							.addExceptSubTypes(StockAction.SubType.DISTRIBUTION_APPLY)
 																							.setOriDate(null, extraCond.range.getEndingFormat() + " 23:59:59 ")
 																							.setMaterial(report.getMaterial())
 																							.setDept(extraCond.deptId), " ORDER BY D.id DESC LIMIT 0, 1 ");

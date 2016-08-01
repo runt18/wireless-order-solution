@@ -45,6 +45,7 @@ public class QueryStockActionAction extends Action{
 		final String fuzzId = request.getParameter("fuzzId");
 		final String cateId = request.getParameter("cateId");
 		final String containsDetails = request.getParameter("containsDetails");
+		final String isDistribution = request.getParameter("isDistribution");
 		final JObject jObject = new JObject();
 		try{
 
@@ -52,6 +53,15 @@ public class QueryStockActionAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final StockActionDao.ExtraCond extraCond = new StockActionDao.ExtraCond();
+			
+			if(isDistribution == null || isDistribution.isEmpty()){
+				extraCond.addExceptSubType(StockAction.SubType.DISTRIBUTION_APPLY)
+						 .addExceptSubType(StockAction.SubType.DISTRIBUTION_SEND)
+						 .addExceptSubType(StockAction.SubType.DISTRIBUTION_RECEIVE)
+						 .addExceptSubType(StockAction.SubType.DISTRIBUTION_RETURN)
+						 .addExceptSubType(StockAction.SubType.DISTRIBUTION_RECOVERY);
+			}
+			
 //			long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
 //			String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
 			if(isHistory != null && !isHistory.isEmpty() && Boolean.parseBoolean(isHistory)){

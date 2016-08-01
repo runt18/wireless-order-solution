@@ -20,6 +20,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockReport;
 
 public class QueryReportAction extends Action {
@@ -41,7 +42,7 @@ public class QueryReportAction extends Action {
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final StockReportDao.ExtraCond extraCond = new StockReportDao.ExtraCond();
+			final StockReportDao.ExtraCond extraCond = new StockReportDao.ExtraCond().addExceptSubTypes(StockAction.SubType.DISTRIBUTION_APPLY);
 			
 			if(beginDate != null){
 				extraCond.setRange(beginDate);

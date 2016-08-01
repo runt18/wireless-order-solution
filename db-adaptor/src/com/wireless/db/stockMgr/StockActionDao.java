@@ -131,6 +131,12 @@ public class StockActionDao {
 			return this;
 		}
 		
+		public ExtraCond setSubType(StockAction.SubType subType){
+			this.subTypes.clear();
+			this.subTypes.add(subType);
+			return this;
+		}
+		
 		public ExtraCond addSubType(StockAction.SubType subType){
 			this.subTypes.add(subType);
 			return this;
@@ -347,7 +353,7 @@ public class StockActionDao {
 		dbCon.rs.close();
 		
 		//如果是消耗类型或初始化类型的单则不需要限定时间
-		if(stockAction.getSubType() != SubType.INIT && stockAction.getSubType() != SubType.CONSUMPTION && stockAction.getSubType() != SubType.MORE && stockAction.getSubType() != SubType.LESS){
+		if(stockAction.getSubType() != SubType.INIT && stockAction.getSubType() != SubType.CONSUMPTION && stockAction.getSubType() != SubType.MORE && stockAction.getSubType() != SubType.LESS && stockAction.getSubType() != SubType.DISTRIBUTION_APPLY){
 			//货单原始时间必须大于最后一次已审核盘点时间或月结,小于当前月最后一天
 			if(minDate != 0 && stockAction.getOriStockDate() < minDate){
 				throw new BusinessException(StockError.STOCKACTION_TIME_LATER);
@@ -357,7 +363,7 @@ public class StockActionDao {
 			}
 		}
 		//判断除了初始化, 消耗,盘盈,盘亏单外, 是否正在盘点中
-		if(stockAction.getSubType() != SubType.INIT && stockAction.getSubType() != SubType.CONSUMPTION && stockAction.getSubType() != SubType.LESS && stockAction.getSubType() != SubType.MORE){
+		if(stockAction.getSubType() != SubType.INIT && stockAction.getSubType() != SubType.CONSUMPTION && stockAction.getSubType() != SubType.LESS && stockAction.getSubType() != SubType.MORE && stockAction.getSubType() != SubType.DISTRIBUTION_APPLY){
 			checkStockTake(dbCon, staff);
 		}		
 
@@ -435,12 +441,13 @@ public class StockActionDao {
 				List<Material> orderMaterials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setAssociateId(detail.getMaterialId()));
 				if(orderMaterials.size() > 0){
 					material = orderMaterials.get(0);
-//					detail.setMaterialAssociateId(detail.getMaterialId());
+					detail.setMaterialAssociateId(detail.getMaterialId());
 					detail.setMaterialId(material.getId());
 				}else{
 					List<Material> materials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
 					if(materials.size() > 0){
 						material = materials.get(0);
+						detail.setMaterialAssociateId(material.getAssociateId() != 0 ? material.getAssociateId() : material.getId());
 					}
 				}
 				
@@ -455,12 +462,14 @@ public class StockActionDao {
 					List<Material> associateMaterials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(orderMaterials.get(0).getAssociateId()));
 					if(associateMaterials.size() > 0){
 						material = associateMaterials.get(0);
+						detail.setMaterialAssociateId(material.getAssociateId());
 						detail.setMaterialId(material.getId());
 					}
 				}else{
 					List<Material> materials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
 					if(materials.size() > 0){
 						material = materials.get(0);
+						detail.setMaterialAssociateId(material.getAssociateId() != 0 ? material.getAssociateId() : material.getId());
 						detail.setMaterialId(material.getId());
 					}
 				}
@@ -468,8 +477,31 @@ public class StockActionDao {
 				if(material == null){
 					throw new BusinessException(DistributionError.MATERIAL_NOT_MAP);
 				}
+			}else if(stockAction.getSubType() == SubType.DISTRIBUTION_SEND){
+				List<Material> orderMaterials = MaterialDao.getByCond(dbCon, StaffDao.getAdminByRestaurant(dbCon, stockAction.getStockInRestaurantId()), new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
+				//传入的可能是分店的物品编号
+				if(!orderMaterials.isEmpty()){
+					List<Material> associateMaterials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(orderMaterials.get(0).getAssociateId()));
+					if(associateMaterials.size() > 0){
+						material = associateMaterials.get(0);
+						detail.setMaterialAssociateId(material.getAssociateId());
+						detail.setMaterialId(material.getId());
+					}
+				}else{
+					List<Material> materials = MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setId(detail.getMaterialId()));
+					if(materials.size() > 0){
+						material = materials.get(0);
+						detail.setMaterialAssociateId(material.getAssociateId() != 0 ? material.getAssociateId() : material.getId());
+						detail.setMaterialId(material.getId());
+					}
+				}
+				
+				if(material == null){
+					throw new BusinessException(DistributionError.MATERIAL_GROUP_EXIST);
+				}
 			}else{
 				material = MaterialDao.getById(dbCon, staff, detail.getMaterialId());
+				detail.setMaterialAssociateId(material.getAssociateId() != 0 ? material.getAssociateId() : material.getId());
 			}
 			
 			if(stockAction.getSubType() == SubType.STOCK_IN || stockAction.getSubType() == SubType.SPILL || stockAction.getSubType() == SubType.MORE || stockAction.getSubType() == SubType.DISTRIBUTION_RECEIVE || stockAction.getSubType() == SubType.DISTRIBUTION_RECOVERY){
@@ -749,6 +781,13 @@ public class StockActionDao {
 			sDetail.setName(material.getName());
 			sDetail.setRemaining(material.getStock());
 			
+			if(stockAction.getSubType() == StockAction.SubType.DISTRIBUTION_APPLY || 
+			   stockAction.getSubType() == StockAction.SubType.DISTRIBUTION_SEND || 
+			   stockAction.getSubType() == StockAction.SubType.DISTRIBUTION_RECEIVE || 
+			   stockAction.getSubType() == StockAction.SubType.DISTRIBUTION_RETURN ||
+			   stockAction.getSubType() == StockAction.SubType.DISTRIBUTION_RECOVERY){
+				sDetail.setMaterialAssociateId(MaterialDao.getById(dbCon, staff, sDetail.getMaterialId()).getAssociateId());
+			}
 			StockActionDetailDao.insert(dbCon, staff, sDetail);
 		}
 		
@@ -858,7 +897,7 @@ public class StockActionDao {
 	public static void audit(DBCon dbCon, Staff staff, AuditBuilder builder) throws SQLException, BusinessException{
 		StockAction auditStockAction = getById(dbCon, staff, builder.getId());
 		//如果操作类型不是盘亏或盘盈,则需要判断是否在盘点中
-		if(auditStockAction.getSubType() != SubType.MORE && auditStockAction.getSubType() != SubType.LESS){
+		if(auditStockAction.getSubType() != SubType.MORE && auditStockAction.getSubType() != SubType.LESS && auditStockAction.getSubType() != SubType.DISTRIBUTION_APPLY){
 			isStockTakeChecking(dbCon, staff);
 		}
 		StockAction stockAction = builder.build();
@@ -964,6 +1003,8 @@ public class StockActionDao {
 						
 						//更新库存明细表
 						StockActionDetailDao.update(dbCon, stockDetail);
+					}else if(stock.getSubType() == SubType.DISTRIBUTION_APPLY){
+						
 					}else{
 						deptOutId = stock.getDeptOut().getId();
 						material = MaterialDao.getById(staff, stockDetail.getMaterialId());
@@ -1142,6 +1183,8 @@ public class StockActionDao {
 				
 				//更新库存明细表
 				StockActionDetailDao.update(dbCon, sActionDetail);
+			}else if(updateStockAction.getSubType() == SubType.DISTRIBUTION_APPLY){
+				
 			}else{
 				deptOutId = updateStockAction.getDeptOut().getId();
 				material = MaterialDao.getById(dbCon, staff, sActionDetail.getMaterialId());
@@ -1282,6 +1325,8 @@ public class StockActionDao {
 				
 				//更新库存明细表
 //				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}else if(updateStockAction.getSubType() == SubType.DISTRIBUTION_APPLY){
+				
 			}else{
 				deptOutId = updateStockAction.getDeptOut().getId();
 
@@ -1306,6 +1351,13 @@ public class StockActionDao {
 				
 				//更新库存明细表
 //				StockActionDetailDao.updateStockDetail(dbCon, sActionDetail);
+			}
+			if(updateStockAction.getSubType() == StockAction.SubType.DISTRIBUTION_APPLY || 
+			   updateStockAction.getSubType() == StockAction.SubType.DISTRIBUTION_SEND || 
+			   updateStockAction.getSubType() == StockAction.SubType.DISTRIBUTION_RECEIVE || 
+			   updateStockAction.getSubType() == StockAction.SubType.DISTRIBUTION_RETURN ||
+			   updateStockAction.getSubType() == StockAction.SubType.DISTRIBUTION_RECOVERY){
+				sActionDetail.setMaterialAssociateId(MaterialDao.getById(dbCon, staff, sActionDetail.getMaterialId()).getAssociateId());
 			}
 			StockActionDetailDao.insert(dbCon, staff, sActionDetail);
 		}			
