@@ -16,7 +16,6 @@ public class StockActionDetail implements Jsonable{
 	private float deptInRemaining;
 	private float deptOutRemaining;
 	
-	
 	public int getMaterialAssociateId() {
 		return materialAssociateId;
 	}

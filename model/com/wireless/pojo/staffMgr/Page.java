@@ -95,7 +95,8 @@ public class Page{
 		INIT_DISTIRBUTION("initStockDistribution", "配送初始化", "", "../../images/businessHour.png"),
 		SYNC_DISTRIBUTION("syncStockDistritbuion", "配送同步", "", "../../images/businessHour.png"),
 		STOCK_DISTRIBUTIONACTION("stockDistributionAction", "配送任务", "StockChainManagement_Module/StockDistributionAction.html", "../../images/supplierMgr.png"),
-		DISTRIBUTION_DETAIL_REPORT("distributionDetailReport", "配送明细", "StockChainManagement_Module/DistributionDetailReport.html", "../../images/stockDetailReport.png");
+		DISTRIBUTION_DETAIL_REPORT("distributionDetailReport", "配送明细", "StockChainManagement_Module/DistributionDetailReport.html", "../../images/stockDetailReport.png"),
+		DISTRIBUTION_DELTA("distributionDelta", "配送差异表", "StockChainManagement_Module/DistributionDelta.html", "../../images/deltaReport.png");
 		
 		private String mgrId;
 		private String desc;

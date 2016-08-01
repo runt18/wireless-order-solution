@@ -107,6 +107,7 @@ public class StockAction implements Jsonable{
 			builder.setType(Type.STOCK_OUT).setSubType(SubType.LESS).setDeptIn((short) -1).setStatus(Status.AUDIT);
 			return builder;
 		}
+		
 		//消耗
 		public static InsertBuilder newUseUp(int restaurantId, Department deptOut, MaterialCate.Type cateType){
 			InsertBuilder builder = new InsertBuilder(restaurantId);
@@ -116,6 +117,13 @@ public class StockAction implements Jsonable{
 			       .setOriStockDate(new Date().getTime())
 			       .setDeptIn((short) -1);
 
+			return builder;
+		}
+		
+		//配送申请
+		public static InsertBuilder newDistributionApply(){
+			InsertBuilder builder = new InsertBuilder().setType(Type.STOCK_APPLY)
+													   .setSubType(SubType.DISTRIBUTION_APPLY);
 			return builder;
 		}
 		
@@ -409,6 +417,12 @@ public class StockAction implements Jsonable{
 			return builder;
 		}
 		
+		//配送申请
+		public static UpdateBuilder newDistributionApply(int id){
+			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_APPLY)
+														 .setSubType(SubType.DISTRIBUTION_APPLY);
+			return builder;
+		}
 		//配送发货
 		public static UpdateBuilder newDistributionSend(int id){
 			UpdateBuilder builder = new UpdateBuilder(id).setType(Type.STOCK_OUT)
@@ -773,6 +787,13 @@ public class StockAction implements Jsonable{
 			return builder;
 		}
 		
+		//配送申请
+		public static ReAuditBuilder newDistributionApply(int id){
+			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_APPLY)
+														   .setSubType(SubType.DISTRIBUTION_APPLY);
+			return builder;
+		}
+		
 		//配送发货
 		public static ReAuditBuilder newDistributionSend(int id){
 			ReAuditBuilder builder = new ReAuditBuilder(id).setType(Type.STOCK_OUT)
@@ -1012,7 +1033,8 @@ public class StockAction implements Jsonable{
 	 */
 	public static enum Type{
 		STOCK_IN(1, "入库"),
-		STOCK_OUT(2, "出库");
+		STOCK_OUT(2, "出库"),
+		STOCK_APPLY(3, "申请");
 		
 		private final int val;
 		private final String desc;
@@ -1071,7 +1093,8 @@ public class StockAction implements Jsonable{
 		DISTRIBUTION_SEND(11, "配送发货"),
 		DISTRIBUTION_RECEIVE(12, "配送收货"),
 		DISTRIBUTION_RETURN(13, "配送退货"),
-		DISTRIBUTION_RECOVERY(14, "配送回收");
+		DISTRIBUTION_RECOVERY(14, "配送回收"),
+		DISTRIBUTION_APPLY(15, "配送申请");
 			
 		private final int val;
 		private final String text;
@@ -1463,7 +1486,7 @@ public class StockAction implements Jsonable{
 		setSubType(build.subType);
 		setStatus(build.status);
 		setComment(build.comment);
-		if(build.subType == SubType.STOCK_IN || build.subType == SubType.STOCK_OUT){
+		if(build.subType == SubType.STOCK_IN || build.subType == SubType.STOCK_OUT || build.subType == SubType.DISTRIBUTION_SEND || build.subType == SubType.DISTRIBUTION_RECEIVE || build.subType == SubType.DISTRIBUTION_RETURN || build.subType == SubType.DISTRIBUTION_RECOVERY){
 			setActualPrice(build.actualPrice);
 		}else{
 			setActualPrice(getTotalPrice());
@@ -1480,7 +1503,15 @@ public class StockAction implements Jsonable{
 	
 	public float getTotalPrice(){
 		float sum = 0;
-		if(this.subType == SubType.INIT || this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.CONSUMPTION){
+		if(this.subType == SubType.INIT || 
+		   this.subType == SubType.STOCK_IN ||
+		   this.subType == SubType.STOCK_OUT ||
+		   this.subType == SubType.CONSUMPTION ||
+		   this.subType == SubType.DISTRIBUTION_SEND || 
+		   this.subType == SubType.DISTRIBUTION_RECEIVE ||
+		   this.subType == SubType.DISTRIBUTION_RETURN || 
+		   this.subType == SubType.DISTRIBUTION_RECOVERY){
+			
 			for (StockActionDetail sDetail : this.stockDetails) {
 				sum += sDetail.getAmount() * sDetail.getPrice();
 			}
