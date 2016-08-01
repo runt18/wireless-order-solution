@@ -44,7 +44,7 @@ function CreateFastOrderFood(param){
 						
 						for(var i = 0;i < _orderData.length; i++){
 							//TODO
-							var each = _orderData.food.id + ',' + _orderData.count;
+							var each = _orderData[i].food.id + ',' + _orderData[i].count;
 							if(orderData.length > 0){
 								orderData += '&' + each;
 							}else{
