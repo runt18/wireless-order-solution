@@ -17,7 +17,7 @@ $(function(){
 		url : '../../WXOperateMember.do',
 		type : 'post',
 		data : {
-			dataSource : 'getUserMsg',
+			dataSource : 'getUserMsg',   
 			oid : Util.mp.oid,
 			fid : Util.mp.fid
 		},

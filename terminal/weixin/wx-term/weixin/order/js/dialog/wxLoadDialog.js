@@ -39,19 +39,22 @@ var wxLoadDialog = (function(){
 	
 	}
 	
-	function Success(){
+	function Success(text){
 		var _container = null;
 		
 		this.show = function(){
 			if(!_container){
-				_container = '<div id="toast" style="">'
+				text = text ? text : '成功';
+				
+				_container = '<div id="toast" style="z-index:6000;">'
 				                +'<div class="weui_mask_transparent"></div>'
 				                +'<div class="weui_toast">'
 				                    +'<i class="weui_icon_toast"></i>'
-				                    +'<p class="weui_toast_content">成功</p>'
+				                    +'<p data-type="text" class="weui_toast_content">'+ text +'</p>'
 				                +'</div>'
 			           		 +'</div>';
 			           		 
+			  
 			  $('body').append($(_container));
 				
 			}
@@ -80,9 +83,9 @@ var wxLoadDialog = (function(){
 			}
 			return instance;
 		},
-		success : function(){
+		success : function(text){
 			if(success == null){
-				success = new Success();
+				success = new Success(text);
 			}
 			return success;
 		}

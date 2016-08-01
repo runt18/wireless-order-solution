@@ -5,8 +5,9 @@ function CreateFastOrderFood(param){
 	var _orderData = [];   //已点食物
 	
 	param = param || {
-		confirm  : function(selectedFood, container){},
-		payType : null
+		confirm  : function(selectedFood, container){},     //选好了的回调事件
+		confirmText : null,                                 //选好了的文字
+		onCartChange : function(selectFood){}               //购物车变动的回调事件
 	}
 	
 	
@@ -33,9 +34,17 @@ function CreateFastOrderFood(param){
 					
 					//购物车点击
 					$(".ocartbox,.maskbox").click(function(){
-						updateCart();
-						$(".maskbox").fadeToggle(300);
-						$(".orderdetail").slideToggle(300);
+						if(_orderData.length == 0){
+							wxLoadDialog.success('购物车没有菜品').show();
+							setTimeout(function(){
+								wxLoadDialog.success().hide();
+							}, 800);
+						}else{
+							updateCart();
+							$(".maskbox").fadeToggle(300);
+							$(".orderdetail").slideToggle(300);
+						}
+						
 					});
 					
 					//选好了
@@ -73,7 +82,7 @@ function CreateFastOrderFood(param){
 	function initKitchen(){
 		var ketchenHtml = [];
 		var kitchenList = $('#keptList_ul_fastOrderFood');
-		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="kitchenNum_div_food" style="display:none;">0</div>' +
+		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="kitchenNum_div_food">0</div>' +
 				'<h4>{name}</h4></li>';
 		$.ajax({
 			url : '../../WxQueryDept.do', 
@@ -102,6 +111,8 @@ function CreateFastOrderFood(param){
 						});
 					}
 					kitchenList.html(ketchenHtml.join(''));
+					changeKitchenAmount();
+					
 					kitchenList.find('[data-type="kitchenBox"]').each(function(index, element){
 						element.onclick = function(){
 							filterFood(element);
@@ -139,7 +150,7 @@ function CreateFastOrderFood(param){
 	
 	//加载菜品
 	function initFood(keptId){
-		var foodBox = '<div class="clearfix ptb10 borderbf2 ogood"  data-type={foodId}>'
+		var foodBox = '<div class="clearfix ptb10 borderbf2 ogood" data-type="eachFood_div_food"  data-value={foodId}>'
 							+'<div class="col-xs-4 plr10" style="">'
 								+'<img src={image} alt="" class="pull-left img-responsive" style="width:74px;height:74px;">'
 							+'</div>'
@@ -147,7 +158,7 @@ function CreateFastOrderFood(param){
 								+'<div>'
 									+'<h4 class="font14 mt0" data-type="foodName">{name}</h4>'
 									+'<div class="text-muted font10"><font>{foodCnt}</font>人点过</div>'
-									+'<p class="text-dining font14 clearMargin">￥<span class="unitprice" data-type="unitprice">{unitPrice}</span><span class="text-muted">&nbsp;/份</span></p>	'
+									+'<p class="text-dining font14 clearMargin">￥<span class="unitprice" data-type="foodPrice">{unitPrice}</span></p>	'
 								+'</div>'			
 								+'<div class="opmbox clearfix">'
 									+'<div class="oplusbox pull-left ominu">'
@@ -159,9 +170,14 @@ function CreateFastOrderFood(param){
 									+'</div>'
 								+'</div>'
 							+'</div>'
+							+ '<div data-type="standard_div_food" style="width:100%;" class="box-horizontal">{unitPriceHtml}</div>'
 						+'</div>'
 		
-		
+		var unitPrice = '<div multiUnit-Id={multiId} class="unit_css_fastOrderFood" data-value={foodId} data-type="unitPrice" href="#">'
+						+ '<ul class="m-b-list" style="margin-top:10px;margin-left:-2px;font-size:12px;"><a data-type="unitPrice_a_food">{unitPrice}</a>&nbsp;/&nbsp;{unitName}</ul>'
+						+ '</div>';
+						
+						
 		var requestParams = {
 			fid : Util.mp.fid,
 			oid : Util.mp.oid,
@@ -204,6 +220,18 @@ function CreateFastOrderFood(param){
 						for(var i = 0; i < _foodData.length; i++){
 							count = getOrderFoodCount(_foodData[i].id);
 							
+							var multiUnit = [];	
+							if(_foodData[i].multiUnitPrice.length > 0){
+								_foodData[i].multiUnitPrice.forEach(function(e, index){
+									multiUnit.push(unitPrice.format({
+										multiId : e.id,
+										unitPrice : e.price,
+										unitName : e.unit,
+										foodId : _foodData[i].id
+									}));
+								});
+							}
+							
 							var noImage = 'noImage.jpg';
 							
 							foodHtml.push(foodBox.format({
@@ -212,24 +240,85 @@ function CreateFastOrderFood(param){
 								name : (_foodData[i].name.length > 9 ? _foodData[i].name.substring(0, 8) + "…" : _foodData[i].name),
 								unitPrice :  (_foodData[i].status & (1 << 4)) != 0 ? '时价' : _foodData[i].unitPrice,
 								foodCnt : parseInt(_foodData[i].foodCnt),
-								count : count
+								count : count,
+								unitPriceHtml : multiUnit.slice(0, 3).join('')
 							}));
 							
 						} 
 						
 						$('#foodList_div_fastOrderFood').html(foodHtml.join(''));
 						
+						
+						//多规格的点击事件
+						$('#foodList_div_fastOrderFood').find('[data-type="eachFood_div_food"]').each(function(index, element){
+							$(element).find('[data-type="unitPrice"]').each(function(index, unitPriceElement){
+								unitPriceElement.onclick = function(){
+									
+									if($(unitPriceElement).hasClass('selectUnitPrice_css_fastOrderFood')){
+										$(unitPriceElement).addClass('selectUnitPrice_css_fastOrderFood');
+									}else{
+										$(element).find('[data-type="unitPrice"]').removeClass('selectUnitPrice_css_fastOrderFood');
+										$(unitPriceElement).addClass('selectUnitPrice_css_fastOrderFood');
+										$(unitPriceElement).parent().parent().find('[data-type="foodPrice"]').html(parseInt($(unitPriceElement).find('[data-type="unitPrice_a_food"]').text()));
+									}
+									
+									if(_orderData.length > 0){
+										for(var i = 0; i < _orderData.length; i++){
+											if($(unitPriceElement).attr('data-value') == _orderData[i].food.id){
+												_orderData[i].food.unitPrice = parseInt($(unitPriceElement).find('[data-type="unitPrice_a_food"]').text());
+												
+												for(var k = 0; k < _orderData[i].food.multiUnitPrice.length; k++){
+													if($(unitPriceElement).attr('multiUnit-Id') == _orderData[i].food.multiUnitPrice[k].id){
+														_orderData[i].selectedUnitPrice = _orderData[i].food.multiUnitPrice[k];
+													}
+												}
+											}else{
+												for(var i = 0; i < _foodData.length; i++){
+													if($(unitPriceElement).attr('data-value') == _foodData[i].id){
+														_foodData[i].unitPrice = parseInt($(unitPriceElement).find('[data-type="unitPrice_a_food"]').text());
+													}
+												}
+											}
+										}
+									}else{
+										for(var i = 0; i < _foodData.length; i++){
+											if($(unitPriceElement).attr('data-value') == _foodData[i].id){
+												_foodData[i].unitPrice = parseInt($(unitPriceElement).find('[data-type="unitPrice_a_food"]').text());
+											}
+										}
+									}
+									
+									changeOrderAmount();
+								}
+							});
+						});
+
+						$('#foodList_div_fastOrderFood').find('[data-type="eachFood_div_food"]').find('[data-type="unitPrice"]:first').click();
+						
 						//加
 						$('#foodList_div_fastOrderFood').find('[data-type="plus"]').each(function(index, element){
 							element.onclick = function(){
-								foodPlus(element);						
+								var selectedUnitPrice = null;
+								$(element).parent().parent().parent().parent().find('[data-type="unitPrice"]').each(function(index, unitPriceElement){
+									if($(unitPriceElement).hasClass('selectUnitPrice_css_fastOrderFood')){
+										selectedUnitPrice = $(unitPriceElement).attr('multiUnit-Id')
+									}
+								});
+								
+								foodPlus(element, selectedUnitPrice);						
 							}
 						})
 						
 						//减
 						$('#foodList_div_fastOrderFood').find('[data-type="cut"]').each(function(index, element){
 							element.onclick = function(){
-								foodCut(element);
+								var selectedUnitPrice = null;
+								$(element).parent().parent().parent().parent().find('[data-type="unitPrice"]').each(function(index, unitPriceElement){
+									if($(unitPriceElement).hasClass('selectUnitPrice_css_fastOrderFood')){
+										selectedUnitPrice = $(unitPriceElement).attr('multiUnit-Id')
+									}
+								});
+								foodCut(element, selectedUnitPrice);
 							}						
 						});
 						
@@ -256,21 +345,22 @@ function CreateFastOrderFood(param){
 	}
 	
 	//菜品加
-	function foodPlus(e){
+	function foodPlus(e, selecedUnitPrice){
 		var _this = $(e);
 		var input = _this.parent().prev();
 		var foodId =  $(e).attr('data-value');
 		var amount = parseInt(input.val());
-		var unitPrice = $(e).parent().parent().parent().find('[data-type="unitprice"]').text();
-		var name = $(e).parent().parent().parent().find('[data-type="foodName"]').text();
+		var unitPriceId = 
+		
 		amount++;
 		input.val(amount);
-		operateFood(foodId, amount);
+		operateFood(foodId, amount, selecedUnitPrice);
 		changeOrderAmount();
+		changeKitchenAmount();
 	}
 	
 	//菜品减少
-	function foodCut(e){
+	function foodCut(e, selecedUnitPrice){
 		var _this = $(e);
 		var input = _this.parent().next();
 		var foodId =  $(e).attr('data-value');
@@ -283,8 +373,9 @@ function CreateFastOrderFood(param){
 			input.val(amount);
 		}
 		
-		operateFood(foodId, amount);
+		operateFood(foodId, amount, selecedUnitPrice);
 		changeOrderAmount();
+		changeKitchenAmount();
 	}
 	
 	function getOrderFoodCount(id){
@@ -313,9 +404,14 @@ function CreateFastOrderFood(param){
 			    
 			var html = [];
 		    for(var i = 0; i < _orderData.length; i++){
+		    	var unitPriceName = null;
+		    	if(_orderData[i].selectedUnitPrice){
+		    		unitPriceName = _orderData[i].selectedUnitPrice.price + '/' + _orderData[i].selectedUnitPrice.unit;
+		    	}
+		    	
 				html.push(cartFoodTemplate.format({
 					id : _orderData[i].food.id,
-					name : _orderData[i].food.name,
+					name : unitPriceName ? _orderData[i].food.name + '(' + unitPriceName + ')' : _orderData[i].food.name,
 					amount : _orderData[i].count,
 					totalPrice : _orderData[i].food.unitPrice * _orderData[i].count
 				}));	    
@@ -331,6 +427,7 @@ function CreateFastOrderFood(param){
 					input.text(amount);
 					operateFood($(element).attr('foodId'), amount);
 					changeOrderAmount();
+					changeKitchenAmount();
 					updateCart();
 		    	}
 		    });
@@ -343,8 +440,14 @@ function CreateFastOrderFood(param){
 					amount--;
 					input.text(amount);
 					operateFood($(element).attr('foodId'), amount);
-					changeOrderAmount();		
+					changeOrderAmount();
+					changeKitchenAmount();
 					updateCart();
+					if(_orderData.length == 0){
+						$(".maskbox").fadeToggle(300);
+						$(".orderdetail").slideToggle(300);
+					}
+					
 		    	}
 		    });
 		}else{
@@ -354,8 +457,9 @@ function CreateFastOrderFood(param){
 		
 	}
 	
-	function operateFood(id, num){
+	function operateFood(id, num, selecedUnitPrice){
 		var cartFood = null;
+		var unitPrice = null; 
 		for(var i = 0; i < _orderData.length; i++){
 			if(_orderData[i].food.id == id){
 				cartFood = _orderData[i];
@@ -363,11 +467,21 @@ function CreateFastOrderFood(param){
 			}
 		}
 		
+		for(var j = 0; j < _foodData.length; j++){
+			for(var k = 0; k < _foodData[j].multiUnitPrice.length; k++){
+				if(selecedUnitPrice == _foodData[j].multiUnitPrice[k].id){
+					unitPrice = _foodData[j].multiUnitPrice[k];
+				}
+			}
+		}
+		
+		
 		if(cartFood){
 			if(num == 0){
 				_orderData.splice(i, 1);
 			}else{
 				cartFood.count = num;
+				cartFood.selectedUnitPrice = unitPrice;
 			}
 			
 		}else{
@@ -375,12 +489,17 @@ function CreateFastOrderFood(param){
 				if(_foodData[i].id == id){
 					_orderData.push({
 						food : _foodData[i],
-						count : 1
+						count : 1,
+						selectedUnitPrice : unitPrice
 					});
 					break;
 				}
 			}
 		}
+		if(param.onCartChange){
+			param.onCartChange(_orderData);
+		}
+		
 	}
 	
 	
@@ -392,24 +511,26 @@ function CreateFastOrderFood(param){
 			allPrice += _orderData[i].food.unitPrice * _orderData[i].count;
 		}
 		$('#allnum').html(count);
-		$('#allprice').html(allPrice);
+		$('#allprice').html(allPrice.toFixed(2));
 	}
 	
 	function changeKitchenAmount(){
 		 var kitchen = $('#keptList_ul_fastOrderFood').find('[data-type="kitchenBox"]');
 		 for(var i = 0; i < kitchen.length; i++){
 			 var selectFoods = [];
+			  var allCount = 0;
 			 for(var j = 0; j < _orderData.length; j++){
-				 if($(kitchen[i]).attr('data-value') == _orderData[j].kitchenId){
+				 if($(kitchen[i]).attr('data-value') == _orderData[j].food.kitchen.id){
 					 selectFoods.push(_orderData[j]);
+					 allCount += _orderData[j].count;
 				 }
 			 }
 			 if(selectFoods.length > 0 ){
-				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').html('&nbsp' + selectFoods.length);
-				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').css({'visibility' : 'visible'});
+				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').html('&nbsp' + allCount);
+				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').show();
 			 }else{
 				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').html('');
-				 $(kitchen[i]).find('[id="kitchenNum_div_food"]').css({'visibility' : 'hidden'});
+			 	$(kitchen[i]).find('[id="kitchenNum_div_food"]').hide();
 			 }
 
 		 }
