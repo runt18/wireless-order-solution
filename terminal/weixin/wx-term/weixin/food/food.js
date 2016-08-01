@@ -15,7 +15,7 @@ function CreateFastOrderFood(param){
 //			_init(_loadedUrlCache[_o.loadUrl]);
 //			_open(afterOpen);
 //		}else{
-			$('<div/>').load('fastOrderFood.html', function(response, status, xhr){
+			$('<div/>').load('../order/fastOrderFood.html', function(response, status, xhr){
 //				_loadedUrlCache[_o.loadUrl] = response;
 				if(xhr.status == '200'){
 					var root = $(response);
