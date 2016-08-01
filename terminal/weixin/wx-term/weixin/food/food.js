@@ -40,7 +40,20 @@ function CreateFastOrderFood(param){
 					
 					//选好了
 					$('#confirm_div_fastOrderFood').click(function(){
-						param.confirm(_orderData);
+						var orderData = '';
+						
+						for(var i = 0;i < _orderData.length; i++){
+							//TODO
+							var each = _orderData.food.id + ',' + _orderData.count;
+							if(orderData.length > 0){
+								orderData += '&' + each;
+							}else{
+								orderData += each;
+							}
+							
+						}
+						
+						param.confirm(orderData);
 					});
 					
 				}else{
@@ -73,7 +86,8 @@ function CreateFastOrderFood(param){
 	function initKitchen(){
 		var ketchenHtml = [];
 		var kitchenList = $('#keptList_ul_fastOrderFood');
-		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><h4>{name}</h4><div class="allnum" id="allnum">0</div></li>';
+		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="allnum">0</div>' +
+				'<h4>{name}</h4></li>';
 		$.ajax({
 			url : '../../WxQueryDept.do', 
 			dataType : 'json',
