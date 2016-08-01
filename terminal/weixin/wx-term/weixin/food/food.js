@@ -49,7 +49,9 @@ function CreateFastOrderFood(param){
 					
 					//选好了
 					$('#confirm_div_fastOrderFood').click(function(){
-						param.confirm(_orderData);
+						if(param.confirm && typeof param.confirm == 'function'){
+							param.confirm(_orderData);
+						}
 					});
 					
 				}else{
