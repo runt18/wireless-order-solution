@@ -37,7 +37,7 @@ public class OperateMaterialCateAction extends DispatchAction {
 		final String type = request.getParameter("type");
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			final MaterialCate.InsertBuilder builder = new MaterialCate.InsertBuilder();
+			final MaterialCate.InsertBuilder builder = new MaterialCate.InsertBuilder().setCategory(MaterialCate.Category.NORMAL);
 			if(name != null && !name.isEmpty()){
 				builder.setName(name);
 			}

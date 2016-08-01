@@ -43,7 +43,7 @@ function initStock(){
 						if(jr.success){
 							isInit = true;
 							Ext.example.msg(jr.title, jr.msg);
-							Ext.getCmp('init_txtSearchForMaterialName').setValue();ok
+							Ext.getCmp('init_txtSearchForMaterialName').setValue();
 							Ext.getCmp('btnSearchInitMaterial').handler();
 							Ext.getCmp('btnClose_initMaterial').handler();
 						}else{

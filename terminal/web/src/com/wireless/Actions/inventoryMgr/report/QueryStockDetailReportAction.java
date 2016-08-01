@@ -28,6 +28,7 @@ public class QueryStockDetailReportAction extends Action{
 		
 		final String pin = (String)request.getAttribute("pin");
 		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
 		final String materialId = request.getParameter("materialId");
 		final String materialCateId = request.getParameter("materialCateId");
 		final String cateType = request.getParameter("cateType");
@@ -38,7 +39,6 @@ public class QueryStockDetailReportAction extends Action{
 		final String subType = request.getParameter("subType");
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
-		final String endDate = request.getParameter("endDate");
 		final String subTypes = request.getParameter("subTypes");
 		final String comment = request.getParameter("comment");
 		final String fuzzyId = request.getParameter("fuzzyId");
@@ -47,7 +47,13 @@ public class QueryStockDetailReportAction extends Action{
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond().addStatus(StockAction.Status.AUDIT).addStatus(StockAction.Status.RE_AUDIT);
+			final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond().addStatus(StockAction.Status.AUDIT)
+																								 .addStatus(StockAction.Status.RE_AUDIT)
+																								 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_APPLY)
+																								 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_SEND)
+																								 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_RECEIVE)
+																								 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_RETURN)
+																								 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_RECOVERY);
 			
 			if(endDate != null && !endDate.isEmpty()){
 				extraCond.setOriDate(beginDate, endDate);
