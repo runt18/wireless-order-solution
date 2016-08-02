@@ -6,7 +6,6 @@ $(function(){
 	
 	new CreateTabPanel([{
 		tab : '订单列表',
-		initTab : 0,
 		onActive : function(){
 			console.log(0 + '------active');
 		},
@@ -15,7 +14,6 @@ $(function(){
 		}
 	}, {
 		tab : '预订列表',
-		initTab : 1,
 		onActive : function(){
 			console.log(1 + '------active');	
 		},
