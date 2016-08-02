@@ -1,28 +1,28 @@
 $(function(){
 	
-	//»áÔ±ÉúÈÕÅĞ¶¨
-	//ÔÂ
+	//ä¼šå‘˜ç”Ÿæ—¥åˆ¤å®š
+	//æœˆ
 	$('#birthdayMonth_input_member').on('blur', function(){
 		var month = parseInt($('#birthdayMonth_input_member').val());
 		if(month < 1 || month > 12){
-			Util.dialog.show({title:'ÌáÊ¾', msg: 'ÔÂ·İÊäÈë´íÎó,ÇëÖØĞÂÊäÈë', btn : 'yes', callback : function(){
+			Util.dialog.show({title:'æç¤º', msg: 'æœˆä»½è¾“å…¥é”™è¯¯,è¯·é‡æ–°è¾“å…¥', btn : 'yes', callback : function(){
 				$('#birthdayMonth_input_member').val('');
 				$('#birthdayMonth_input_member').focus();
 			}});
 		}
 	});
-	//ÈÕ
+	//æ—¥
 	$('#birthdayDay_input_member').on('blur', function(){
 		var month = parseInt($('#birthdayDay_input_member').val());
 		if(month < 1 || month > 31){
-			Util.dialog.show({title:'ÌáÊ¾', msg: 'ÌìÊıÊäÈë´íÎó,ÇëÖØĞÂÊäÈë', btn : 'yes', callback : function(){
+			Util.dialog.show({title:'æç¤º', msg: 'å¤©æ•°è¾“å…¥é”™è¯¯,è¯·é‡æ–°è¾“å…¥', btn : 'yes', callback : function(){
 				$('#birthdayDay_input_member').val('');
 				$('#birthdayDay_input_member').focus();
 			}});
 		}
 	});
 	
-	//ĞÔ±ğµã»÷
+	//æ€§åˆ«ç‚¹å‡»
 	$('#bindMember_div_member').find('[data-type="personSex"]').each(function(index, element){
 		element.onclick = function(){
 			if($(element).hasClass('selectedRegion_css_book')){
@@ -49,15 +49,19 @@ $(function(){
 		success : function(data, status, xhr){
 			Util.lm.hide();
 			if(data.success){
-				//»áÔ±¿¨ºÅ
+				//ä¼šå‘˜å¡å·
 				$('#divWXMemberCard').html('No.' + data.other.weixinCard);
+				$('#fansAmount_span_member').html(data.other.member.fansAmount);
+				$('#totalCommission_span_member').html(data.other.member.totalCommission);
 				
 				if(data.other.status == 2){
-					//ÊÖ»úºÅÒÑ°ó¶¨×´Ì¬
+					//æ‰‹æœºå·å·²ç»‘å®šçŠ¶æ€
 					$('#phone_div_member').show();
 					$('#bind_div_member').hide();
+					
+					$('#divMemberRecommendHistory').css('display', 'block');
 				}else if(data.other.status == 1){
-					//ÊÖ»úºÅÂëÎ´°ó¶¨×´Ì¬
+					//æ‰‹æœºå·ç æœªç»‘å®šçŠ¶æ€
 					$('#bind_div_member').show();
 					$('#phone_div_member').hide();					
 				}
@@ -72,22 +76,52 @@ $(function(){
 					},
 					dataType : 'json',
 					success : function(data, status, xhr){
+						
 						if(data.other.nearByCharge >= 0){
 							$('#spanNearByCharge').html(data.other.nearByCharge);
 							$('#divMemberBalanceContent').css('display', 'block');
 						}
+						
 						if(data.other.nearByConsume >= 0){
 							$('#spanNearByCost').html(data.other.nearByConsume);
 							$('#divMemberPointContent').css('display', 'block');
 						}
-						if(data.other.couponConsume >= 0){
+						if(data.other.couponConsume >= 0){ 
 							$('#couponDetails_div_member').css('display', 'block');
 						}							
 					},
 					error : function(data, errotType, eeor){
-						Util.dialog.show({msg: '·şÎñÆ÷ÇëÇó³¬Ê±, ÇëË¢ĞÂ.'});
+						Util.dialog.show({msg: 'æœåŠ¡å™¨è¯·æ±‚è¶…æ—¶, è¯·åˆ·æ–°.'});
 					}
-				});					
+				});				
+				
+				$.ajax({
+					url : '../../WxOperateRestaurant.do',
+					data : {
+						dataSource : 'getByCond',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid,
+						sessionId : Util.mp.params.sessionId
+					},
+					type : 'post',
+					dataType : 'json',
+					success : function(data, status, req){
+						if(data.success){
+							$('#divMemberCard').css({
+								'background': 'url("' + data.root[0].wxCardImg.image + '")',
+								'background-size' : '100% 100%'
+							});
+						}else{
+							$('#divMemberCard').css({
+								'background': 'url("../images/member_vip.jpg")',
+								'background-size' : '100% 100%'
+							});
+						}
+					},
+					error : function(req, status, err){
+					
+					}
+				});
 				
 				$('#divMemberCard').css('display', 'block');
 				$('#divMemberContent').css('display', 'block');
@@ -110,19 +144,19 @@ $(function(){
 				member.restaurant = data.other.restaurant;
 				initMemberMsg({data:member});
 				
-				//Ìí¼Ó»áÔ±µÈ¼¶µ±Ç°Î»ÖÃ
-				currentMemberLevelData = {y : 0, memberTypeName : 'ÄúµÄ»ı·Ö', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
+				//æ·»åŠ ä¼šå‘˜ç­‰çº§å½“å‰ä½ç½®
+				currentMemberLevelData = {y : 0, memberTypeName : 'æ‚¨çš„ç§¯åˆ†', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
 				
-				//ÉèÖÃ»áÔ±ÅÅÃû
+				//è®¾ç½®ä¼šå‘˜æ’å
 				if(member.rank > 0){
 					$('#fontDefeatMemberCount').text(member.rank);
 					$('#span_currentMemberDefeat').show();
 				}
 				
 				var memberType = data.other.member.memberType;
-				$('#privilege_ul_member').append(memberType.discount.type != 2 ? '<li>'+ memberType.discount.name +'ÓÅ»İ</li>' : '');	
-				$('#privilege_ul_member').append(memberType.chargeRate >1 ? '<li>'+ memberType.chargeRate +'±¶³äÖµÓÅ»İ, ³ä 100 ÔªËÍ '+parseInt((memberType.chargeRate-1)*100)+' Ôª</li>':'');
-				$('#privilege_ul_member').append(memberType.exchangeRate >1 ? '<li>'+ memberType.exchangeRate +'±¶»ı·ÖÌØÈ¨, Ïû·Ñ 1 Ôª»ı '+memberType.exchangeRate+' ·Ö</li>':'');
+				$('#privilege_ul_member').append(memberType.discount.type != 2 ? '<li>'+ memberType.discount.name +'ä¼˜æƒ </li>' : '');	
+				$('#privilege_ul_member').append(memberType.chargeRate >1 ? '<li>'+ memberType.chargeRate +'å€å……å€¼ä¼˜æƒ , å…… 100 å…ƒé€ '+parseInt((memberType.chargeRate-1)*100)+' å…ƒ</li>':'');
+				$('#privilege_ul_member').append(memberType.exchangeRate >1 ? '<li>'+ memberType.exchangeRate +'å€ç§¯åˆ†ç‰¹æƒ, æ¶ˆè´¹ 1 å…ƒç§¯ '+memberType.exchangeRate+' åˆ†</li>':'');
 				$('#privilege_ul_member').append(typeof memberType.desc != 'undefined' && memberType.desc != '' ? '<li>'+ memberType.desc +'</li>':'');
 				
 				
@@ -133,12 +167,35 @@ $(function(){
 				}					
 					
 			}else{
-				Util.dialog.show({title:'ÌáÊ¾', msg: data.msg});
+				Util.dialog.show({title:'æç¤º', msg: data.msg});
 			}
 		},
 		error : function(data, errotType, err){
 			Util.lm.hide();
-			Util.dialog.show({title:'´íÎó', msg: '·şÎñÆ÷ÇëÇóÊ§°Ü, ÇëÉÔºòÔÙÊÔ.'});
+			Util.dialog.show({title:'é”™è¯¯', msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
+		}
+	});
+	
+	$.ajax({
+		url : '../../WxOperateRepresent.do',
+		data : {
+			dataSource : 'getByCond',
+			fid : Util.mp.fid
+		},
+		type : 'post',
+		dataType : 'json',
+		success : function(res, status, req){
+			if(res.success){
+				$('#spanMemberExtraBalanceDesc').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
+				if(!res.root[0].giftDesc){
+					$('#spanMemberExtraBalanceDesc_li_member').css('line-height', '0px');
+				}
+			}else{
+				Util.dialog.show({title:'é”™è¯¯', msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
+			}
+		},
+		error : function(req, status, err){
+			Util.dialog.show({title:'é”™è¯¯', msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
 		}
 	});
 	
@@ -155,12 +212,11 @@ $(function(){
 		var extraBalance = $('#spanMemberExtraBalance');
 		var typeName = $('#spanMemberTypeName');
 		var birthday = $('#memberBirthday_span_member');
-		var typeNameInCard = $('#divMemberTypeName');
 	//	var weixinMemberCard = $('#divWXMemberCard');
 		var defaultMemberDiscount = $('#fontMemberDiscount');
 		var memberTotalPoint = $('#fontMemberPoint');
 		var myCoupon = $('#myCoupon');
-		//ÄêÁä
+		//å¹´é¾„
 		$('#memberAge_select_member').val("3");
 		$.ajax({
 			url : '../../WxOperateCoupon.do',
@@ -168,7 +224,7 @@ $(function(){
 			data : {
 				dataSource : 'getByCond',
 				status : 'issued',
-				expired : false,
+				expired : 'true',
 				oid : Util.mp.oid,
 				fid : Util.mp.fid
 			},
@@ -178,9 +234,9 @@ $(function(){
 				if(data.success){
 					var couponAmount = 0;
 					if(data.root.length > 0){
-						myCoupon.html(data.root.length + 'ÕÅ');
+						myCoupon.html(data.root.length + 'å¼ ');
 					}else{
-						myCoupon.html('ÎŞÓÅ»İÈ¯');
+						myCoupon.html('æ— ä¼˜æƒ åˆ¸');
 					}
 				}
 			}
@@ -193,8 +249,7 @@ $(function(){
 		extraBalance.html(typeof data.extraBalance == 'undefined' ? '--' : checkDot(data.extraBalance)?parseFloat(data.extraBalance).toFixed(2) : data.extraBalance);
 		baseBalance.html(typeof data.baseBalance == 'undefined' ? '--' : checkDot(data.baseBalance)?parseFloat(data.baseBalance).toFixed(2) : data.baseBalance);
 		typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
-		typeNameInCard.html(typeof data.memberType.name == 'undefined' ? 'Î´¼¤»î' : data.memberType.name);
-	//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? 'Î´¼¤»î' : data.memberType.name);
+	//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? 'æœªæ¿€æ´»' : data.memberType.name);
 		defaultMemberDiscount.html(typeof data.memberType.discount != 'undefined' && data.memberType.discount.type != 2 ? data.memberType.discount.name : '');
 		memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
 		if(data.birthdayFormat){
@@ -205,7 +260,7 @@ $(function(){
 		
 	}
 	
-	//°ó¶¨»áÔ±	
+	//ç»‘å®šä¼šå‘˜	
 	$('#bind_div_member').toggle(
 		function(){
 			$('#bindMember_div_member').show();
@@ -216,12 +271,12 @@ $(function(){
 		}
 	);
 	
-	//'È·ÈÏ°ó¶¨'Click
+	//'ç¡®è®¤ç»‘å®š'Click
 	$('#bind_a_member').click(function(){
 		var mobile = $('#mobile_input_member').val().trim();
 		if(!/^1[3,5,8][0-9]{9}$/.test(mobile)){
 			Util.dialog.show({
-				msg: 'ÇëÊäÈë 11 Î»´¿Êı×ÖµÄÓĞĞ§ÊÖ»úºÅÂë',
+				msg: 'è¯·è¾“å…¥ 11 ä½çº¯æ•°å­—çš„æœ‰æ•ˆæ‰‹æœºå·ç ',
 				callback : function(){
 					$('#mobile_input_member').select();
 				}
@@ -229,10 +284,10 @@ $(function(){
 			return;
 		}
 		
-		var name = $('#name_input_member').val().trim();
-		if(!/^([^x00-xff]{2,16})|([a-zA-z][a-zA-z0-9]{3,17})$/.test(name)){
+		var name = $('#name_input_member').val();
+		if(name == ''){
 			Util.dialog.show({
-				msg: 'ÇëÊäÈëÖÁÉÙÁ½¸öÖĞÎÄ×Ö»ò×ÖÄ¸¿ªÍ·4ÖÁ18Î»µÄ»áÔ±Ãû³Æ',
+				msg: 'ä¼šå‘˜åç§°ä¸èƒ½ä¸ºç©º',
 				callback : function(){
 					$('#name_input_member').select();
 				}
@@ -244,7 +299,7 @@ $(function(){
 		var day = $('#birthdayDay_input_member').val();
 		if(month == '' || day == ''){
 			Util.dialog.show({
-				msg: 'ÉúÈÕ²»ÄÜÎª¿Õ',
+				msg: 'ç”Ÿæ—¥ä¸èƒ½ä¸ºç©º',
 				callback : function(){
 					$('#birthdayMonth_input_member').focus();
 				},
@@ -279,7 +334,7 @@ $(function(){
 			dataType : 'json',
 			success : function(data, status, xhr){
 				if(data.success){
-					Util.dialog.show({msg: '°ó¶¨³É¹¦', callback : function(){
+					Util.dialog.show({msg: 'ç»‘å®šæˆåŠŸ', callback : function(){
 						$('#bind_div_member').hide();
 						$('#bindMember_div_member').hide();
 						$('#phone_div_member').show();
@@ -296,7 +351,7 @@ $(function(){
 		
 	});
 	
-	//ÎÒµÄÓÅ»İÈ¯
+	//æˆ‘çš„ä¼˜æƒ åˆ¸
 	$('#myCoupon_li_member').click(function(){
 		var mainView = $('#coupons_div_member');
 		
@@ -309,7 +364,7 @@ $(function(){
 				data : {
 					dataSource : 'getByCond',
 					status : 'issued',
-					expired : false,
+					expired : 'true',
 					oid : Util.mp.oid,
 					fid : Util.mp.fid
 				},
@@ -321,7 +376,7 @@ $(function(){
 						if(data.root.length > 0){
 							var templet = '<div class="box" promotion-id="{promotionId}">' +
 											'<div class="box_in"><img src="{couponImg}"></div>' +
-											'<span>{name}</span><br><span>Ãæ¶î : {cPrice} Ôª</span><br><span>µ½ÆÚ : {expiredTime}</span><br><span>À´×Ô : {promotionName}</span>' +
+											'<span>{name}</span><br><span>é¢é¢ : {cPrice} å…ƒ</span><br><span>å¼€å§‹æ—¶é—´ : {beginExpired}</span><br><span>ç»“æŸæ—¶é—´ : {endExpired}</span><br><span>æ¥è‡ª : {promotionName}</span>' +
 			  							  '</div>';
 							var html = [];
 						
@@ -331,7 +386,8 @@ $(function(){
 									couponImg : coupon.couponType.ossImage ? coupon.couponType.ossImage.image : 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
 									name : coupon.couponType.name,
 									cPrice : coupon.couponType.price,
-									expiredTime : coupon.couponType.expiredFormat,
+									beginExpired : coupon.couponType.beginExpired != '' ? coupon.couponType.beginExpired : 'æ— ',
+									endExpired : coupon.couponType.endExpired != '' ? coupon.couponType.endExpired : 'æ— ',
 									promotionName : coupon.promotion.title,
 									promotionId : coupon.promotion.id
 								}));
@@ -339,7 +395,7 @@ $(function(){
 							}
 							mainView.html(html);
 							
-							//µã»÷ÓÅ»İÈ¯µÄ´¦ÀíÊÂ¼ş
+							//ç‚¹å‡»ä¼˜æƒ åˆ¸çš„å¤„ç†äº‹ä»¶
 							mainView.find('.box').each(function(index, element){
 								element.onclick = function(){
 									Util.jump('sales.html?pid=' + $(element).attr('promotion-id'));
@@ -347,7 +403,7 @@ $(function(){
 							});
 							
 						}else{
-							mainView.html('ÔİÎŞÓÅ»İÈ¯');
+							mainView.html('æš‚æ— ä¼˜æƒ åˆ¸');
 						}
 						member.couponCount = couponAmount;
 						
@@ -357,7 +413,7 @@ $(function(){
 				},
 				error : function(data, errotType, eeor){
 					Util.lm.hide();
-					Util.dialog.show({msg: '·şÎñÆ÷ÇëÇóÊ§°Ü, ÇëÉÔºòÔÙÊÔ.'});
+					Util.dialog.show({msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
 				}
 			});
 		};
@@ -372,12 +428,12 @@ $(function(){
 		});
 	});
 	
-	//ÓÅ»İÈ¯Ïû·Ñ¼ÇÂ¼
+	//ä¼˜æƒ åˆ¸æ¶ˆè´¹è®°å½•
 	$('#couponDetails_li_member').click(function(){
 		var mainView = $('#couponDetailItems_div_member');
 		var tbody = mainView.find('table > tbody');
 	
-		// ¼ÓÔØ½ü5ÌõÏû·Ñ¼ÇÂ¼
+		// åŠ è½½è¿‘5æ¡æ¶ˆè´¹è®°å½•
 		function showCouponDetails(){
 			Util.lm.show();
 			$.ajax({
@@ -406,12 +462,12 @@ $(function(){
 								html.push(template.format({
 									time : fnDateInChinese(temp.operateDate) + '</br><div style="font-size:13px;text-align:center;">' + temp.couponName +'</div>',
 									useMode : temp.operateText + '</br><font style="font-size:13px;">(' + temp.associateId + ')</font>',
-									couponMoney : (checkDot(temp.couponPrice) ? parseFloat(temp.couponPrice).toFixed(2) : temp.couponPrice) + 'Ôª'
+									couponMoney : (checkDot(temp.couponPrice) ? parseFloat(temp.couponPrice).toFixed(2) : temp.couponPrice) + 'å…ƒ'
 								}));
 							}
 							tbody.html(html);
 						}else{
-							tbody.html('ÔİÎŞÓÅ»İÈ¯Ê¹ÓÃ¼ÇÂ¼.');
+							tbody.html('æš‚æ— ä¼˜æƒ åˆ¸ä½¿ç”¨è®°å½•.');
 						}
 					}else{
 						Util.dialog.show({title: data.title, msg: data.msg});						
@@ -419,7 +475,7 @@ $(function(){
 				},
 				error : function(data, errotType, eeor){
 					Util.lm.hide();
-					Util.dialog.show({msg: '·şÎñÆ÷ÇëÇóÊ§°Ü, ÇëÉÔºòÔÙÊÔ.'});
+					Util.dialog.show({msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
 				}
 			});
 		};
@@ -434,14 +490,14 @@ $(function(){
 		});
 	});
 	
-	//Ïû·Ñ¼ÇÂ¼
+	//æ¶ˆè´¹è®°å½•
 	$('#consumeDetails_li_member').click(function(){
 		var mainView = $('#consumeDetails_div_member');
 		var tbody = mainView.find('table > tbody');
 		
 		function showConsumeDetails(){
 		
-			// ¼ÓÔØ½ü5ÌõÏû·Ñ¼ÇÂ¼
+			// åŠ è½½è¿‘5æ¡æ¶ˆè´¹è®°å½•
 			Util.lm.show();
 			$.ajax({
 				url : '../../WXQueryMemberOperation.do',
@@ -465,14 +521,14 @@ $(function(){
 							for(var i = 0; i < data.root.length; i++){
 								temp = data.root[i];
 								html.push(template.format({
-									date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">ÕËµ¥ºÅ:' + temp.orderId + '</font>',
-									balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + 'Ôª',
-									point : temp.deltaPoint.toFixed(0) + '·Ö'
+									date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">è´¦å•å·:' + temp.orderId + '</font>',
+									balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + 'å…ƒ',
+									point : temp.deltaPoint.toFixed(0) + 'åˆ†'
 								}));
 							}
 							tbody.html(html.join(''));
 						}else{
-							tbody.html('ÔİÎŞÏû·Ñ¼ÇÂ¼');
+							tbody.html('æš‚æ— æ¶ˆè´¹è®°å½•');
 						}
 					}else{
 						Util.dialog.show({title: data.title, msg: data.msg});						
@@ -480,7 +536,7 @@ $(function(){
 				},
 				error : function(data, errotType, eeor){
 					Util.lm.hide();
-					Util.dialog.show({msg: '·şÎñÆ÷ÇëÇóÊ§°Ü, ÇëÉÔºòÔÙÊÔ.'});
+					Util.dialog.show({msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
 				}
 			});
 		}
@@ -497,9 +553,117 @@ $(function(){
 	});
 	
 	
-	 //×ÔÖúµã²Í
-	  $('#pickOrderFood_a_member').click(function(){
-		  Util.jump('food.html');
-	  });
+	//ä»£è¨€è®°å½•
+	$('#recommendAmount_li_member').click(function(){
+		$('#recommendDetails_div_member').fadeToggle();
+		showRecommendDetail();
+	});
+	
+	//ä½£é‡‘è®°å½•
+	$('#totalCommission_li_member').click(function(){
+		$('#commissionDetail_div_member').fadeToggle();
+		showCommissionDetail();
+	});
+	
+	function showRecommendDetail(){
+		Util.lm.show();
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'recommendDetail',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			datatype : 'josn',
+			success : function(data, status, res){
+				Util.lm.hide();
+				if(data.success){
+
+					if(data.root.length > 0){
+						var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+						'<td style="width:39%;text-align: center;line-height:30px;">{subscribeDate}</td>' + 
+						'<td style="width:20%;text-align:center;line-height:30px;">{subscribeMember}</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{recommendMoney}å…ƒ</td>' +
+						'<td style="width:20%;text-align:center;line-height:30px;">{recommendPoint}åˆ†</td>' +
+						'</tr>';
+
+						var html = [], temp = null;
+						for(var i = 0; i < data.root.length; i++){
+							temp = data.root[i];
+							html.push(template.format({
+								subscribeDate : new Date(temp.subscribeDate).format('yyyy-MM-dd'),
+								subscribeMember : temp.subscribeMember,
+								recommendMoney : temp.recommendMoney,
+								recommendPoint : temp.recommendPoint
+							}));
+						}
+
+						$('#table_recommendDetails').find('tbody')[0].innerHTML = html.join('');
+					}
+				}else{
+					Util.dialog.show({msg : 'è¯»å–è®°å½•å¤±è´¥'});
+				}
+			},
+			error : function(req, status, error){
+				Util.lm.hide();
+				Util.dialog.show({msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
+			}
+		});
+	}
+	
+	function showCommissionDetail(){
+		var tobdy = $('#tableCommissionDetails_table_member').find('tbody')[0];
+		Util.lm.show();
+		$.ajax({
+			url : '../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'commissionDetail',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			datatype : 'json',
+			success : function(data, status, res){
+				Util.lm.hide();
+				if(data.success){
+					var template = '<tr style="color:#26A9D0;border-bottom:1px solid #999;">' + 
+					'<td style="width:39%;text-align: center;line-height:30px;">{operateDateFormat}</td>' + 
+					'<td style="width:30%;text-align:center;line-height:30px;">{consumeMemberName}</td>' +
+					'<td style="width:20%;text-align:center;line-height:30px;">{deltaTotalMoney}å…ƒ</td>' +
+					'</tr>';
+					
+					var html = [], temp = null;
+					for(var i = 0; i < data.root.length; i++){
+						temp = data.root[i];
+						html.push(template.format({
+							operateDateFormat : new Date(temp.operateDateFormat).format('yyyy-MM-dd'),
+							consumeMemberName : temp.member.name,
+							deltaTotalMoney : temp.deltaTotalMoney
+						}));
+					}
+					
+					tobdy.innerHTML = html.join('');
+				}
+			},
+			error : function(res, status, err){
+				Util.lm.hide();
+				Util.dialog.show({msg: 'æœåŠ¡å™¨è¯·æ±‚å¤±è´¥, è¯·ç¨å€™å†è¯•.'});
+			}
+		});
+	}
+	
+	
+	//è‡ªåŠ©ç‚¹é¤
+	$('#pickOrderFood_a_member').click(function(){
+//		Util.jump('food.html', typeof Util.mp.extra != 'undefined' ? Util.mp.extra : '');
+		window.location.href = 'food.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
+	$('#mbarMemberCenter').click(function(){
+		window.location.href = 'member.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
+	$('#jumpIndex_a_member').click(function(){
+		window.location.href = 'index.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+	});
 	
 });
