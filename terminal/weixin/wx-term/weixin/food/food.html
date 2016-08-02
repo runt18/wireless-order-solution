@@ -20,7 +20,76 @@
 <script type="text/javascript" src="../order/js/dialog/wxLoadDialog.js"></script>
 <script type="text/javascript" src="food.js"></script>
 <script type="text/javascript">
-var createFastOrderFood = new CreateFastOrderFood();
+var createFastOrderFood = new CreateFastOrderFood({
+	confirm : function(orderData){
+		var tableId = Util.mp.params.tableId;
+		var foods = '';
+		orderData.forEach(function(element, index){
+			if(index > 0){
+				foods += '&';
+			}
+			
+			if(element.selectedUnitPrice){
+				unitId = element.selectedUnitPrice.id;
+				
+			}else{
+				unitId = 0;
+			}
+				
+			foods += element.food.id + ',' + element.count + ',' + unitId;
+		});
+		
+		$.ajax({
+			url : '../../WxOperateOrder.do',
+			type : 'post',
+			dataType : 'json',
+			data : {
+				dataSource : 'insertOrder',
+				sessionId : Util.mp.params.sessionId,
+				foods : foods,
+				branchId : Util.mp.params.branchId,
+				print : true,
+				tableId : tableId
+			},
+			success : function(data, status, xhr){
+				Util.lm.hide();
+				if(data.success){
+					//提示框设置
+					var finishOrderDialog = new WeDialogPopup({
+						titleText : '温馨提示',
+						content : '<span style="display:block;text-align:center;">下单成功,等待服务员确认订单</span>',
+						leftText : '确认',
+						left : function(){
+							finishOrderDialog.close();								
+						},
+						afterClose : function(){
+							//关闭后回调
+							window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+						}
+					});
+					
+					finishOrderDialog.open();
+						
+				}else if(data.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(data.msg);
+				}
+					
+			},
+			
+			error : function(xhr, status, err){
+				Util.lm.hide();
+				if(err.code == '7546'){
+					sessionTimeout();
+				}else{
+					Util.showErrorMsg(err.msg);					
+				}
+			}
+		});
+	}
+	
+});
 createFastOrderFood.open();
 </script>
 </head>
