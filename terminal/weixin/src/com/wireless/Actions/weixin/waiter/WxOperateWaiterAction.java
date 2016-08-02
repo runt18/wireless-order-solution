@@ -33,6 +33,7 @@ import com.google.zxing.common.HybridBinarizer;
 import com.wireless.Actions.weixin.WxHandleMessage;
 import com.wireless.db.DBCon;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.regionMgr.TableDao;
@@ -49,6 +50,7 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.WxMember;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
@@ -196,7 +198,12 @@ public class WxOperateWaiterAction extends DispatchAction{
 				}else if(tableId != null && !tableId.isEmpty()){
 					Table table = TableDao.getById(dbCon, staff, Integer.parseInt(tableId));
 					if(table.isBusy()){
-						jObject.setRoot(PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(table.getOrderId())));
+						final Order order = PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(table.getOrderId()));
+						for(int i = 0; i < order.getOrderFoods().size(); i++){
+							final Food f = order.getOrderFoods().get(i).asFood();
+							f.copyFrom(FoodDao.getById(dbCon, staff, f.getFoodId()));
+						}
+						jObject.setRoot(order);
 					}else{
 						throw new BusinessException("餐桌为空闲状态");
 					}
