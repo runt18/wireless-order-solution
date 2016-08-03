@@ -74,7 +74,7 @@
 				$('body').append(_tabContainer);
 				
 				
-				//tab绑定click时间
+				//tab绑定click事件
 				$('body').find('[data-type="tab"]').each(function(index, element){
 					element.onclick = function(){
 						if($(element).hasClass('active solid')){
@@ -99,7 +99,6 @@
 					}
 				});
 				
-				//TODO
 				
 				//默认第一个tab选中状态
 				$('body').find('[data-type="tab"]')[0].click();

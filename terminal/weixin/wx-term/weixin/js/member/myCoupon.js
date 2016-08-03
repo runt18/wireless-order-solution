@@ -5,7 +5,7 @@ $(function(){
 		tab : '未使用',
 		onActive : function(container){
 			var coupons;
-			
+			wxLoadDialog.instance().show();
 			//查找自己拥有未使用的优惠券
 			$.ajax({
 				url : '../../../WxOperateCoupon.do',
@@ -19,13 +19,14 @@ $(function(){
 				},
 				dataType : 'json',
 				success : function(data, status, xhr){
+					wxLoadDialog.instance().hide();
 					if(data.success){
 						if(data.root.length > 0){
 							coupons = data.root;
 							
 							var coupon = '<div style="left:16px;top:12px;" class="stamp stamp02">'
 						  	    +'<div class="par"><p>{name}</p><sub class="sign">￥</sub><span>{price}</span><sub>优惠券</sub><p>{comment}</p></div>' 
-							    +'<div class="copy">副券<p>{begin}<br>{end}</p></div>' 
+							    +'<div class="copy">有效期<p>{begin}<br>{end}</p></div>' 
 					            +'<i></i>' 
 			   		            +'</div>';
 			   		            
@@ -65,7 +66,7 @@ $(function(){
 		tab : '已使用',
 		onActive : function(container){
 			var coupons;
-			
+			wxLoadDialog.instance().show();
 			//查找自己拥有未使用的优惠券
 			$.ajax({
 				url : '../../../WxOperateCoupon.do',
@@ -79,13 +80,14 @@ $(function(){
 				},
 				dataType : 'json',
 				success : function(data, status, xhr){
+					wxLoadDialog.instance().hide();
 					if(data.success){
 						if(data.root.length > 0){
 							coupons = data.root;
 							
 							var coupon = '<div style="left:16px;top:12px;" class="stamp stamp02">'
 						  	    +'<div class="par"><p>{name}</p><sub class="sign">￥</sub><span>{price}</span><sub>优惠券</sub><p>{comment}</p></div>' 
-							    +'<div class="copy">副券<p>{begin}<br>{end}</p></div>' 
+							    +'<div class="copy">有效期<p>{begin}<br>{end}</p></div>' 
 					            +'<i></i>' 
 			   		            +'</div>';
 			   		            
