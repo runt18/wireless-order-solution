@@ -200,6 +200,7 @@ a:focus, a:hover{ text-decoration : none}
     align-items: center;
     }
 .swiper-slide span{padding-bottom: 8px;}
+.active{background:#fff;border-left:3px solid #ff7d7c;color:#ff7d7c;}
 .activeborder{border-bottom:2px solid #ff7d7c;}
 .myotitle span{padding-bottom:8px;display: inline-block;}
 .myolist{background:#fff;margin-top:10px;}
