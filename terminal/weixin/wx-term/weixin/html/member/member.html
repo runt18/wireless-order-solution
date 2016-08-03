@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
+<title>会员中心</title>
+
+
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/member.css">
+<link rel="stylesheet" href="../../css/weui.css" type="text/css">
+<link type="text/css" rel="stylesheet" href="../../css/mbar.css">
+
+<script type="text/javascript" src="../../js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" ></script>
+<script type="text/javascript" src="../../js/dialog/weDialog.js"></script>
+<script type='text/javascript' src='../../js/highcharts.js'></script>
+<script type="text/javascript" src="../../js/Util.js"></script>
+<script type="text/javascript" src="../../js/dialog/dialog.js"></script>
+<script type="text/javascript" src="../../js/dialog/wxLoadDialog.js"></script>
+<script type="text/javascript" src="../../js/member/load.js"></script>
+
+</head>
+<body>
+<div id="WXCmp_div_member" >
+	<div id="divMemberCard" class="main-box" style="opacity:0.3;display:block;">
+		
+	</div>
+
+ 	<div id="memberHead_div_member" align="center" style="position:absolute;top:8%;left:40%;"> 
+ 		<div id="headImg_div_member" style=" border-style: solid;  border-width: 5px; border-color: white;z-index:100;width:80px;height:80px; border-radius:80px;"></div>
+ 		<div style="z-index:100; font-family: Tahoma, Verdana, Arial, Helvetica;"><font size = "3" id="userName_div_member">Mr.L</font></div>
+ 		<div style="z-index:1000;"><font id="memberMobile_font_member" color="black" size = "3"></font></div>
+ 	</div>
+ 	
+	
+	<div id="memberExtraBalanceDesc_div_member" style="display:none;" align="center"></div>
+
+	<div  style="height:50px;background-color:#FCFCF2;font-size:1.1em;">
+		<table width="100%" height="40px"> 
+			<tr width="100%">
+				<td style="BORDER-RIGHT: #DDD 1px solid;" width="25%" align="center">
+					<div style="color:#ff7d7c">基本余额 <br><font id="banlance_font_member">0</font></div>
+				</td>
+				<td style="BORDER-RIGHT: #DDD 1px solid;" width="25%" align="center">
+					<div style="color:#ff7d7c">赠送余额 <br><font id="extra_font_member">0</font></div>
+				</td>
+				<td style="BORDER-RIGHT: #DDD 1px solid;" width="25%" align="center">
+					<div style="color:#ff7d7c">优惠券 <br><font id="couponAmount_font_member">0</font></div>
+				</td>
+				<td width="25%" align="center">
+					<div style="color:#ff7d7c">积分 <br><font id="point_font_member">0</font></div>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div style="height:20px;"></div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="consume_div_member">
+		<div style="float:left;padding-left:10px;">消费记录 &nbsp;<font id="memberConsume_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="recomment_div_member">
+		<div style="float:left;padding-left:10px;">代言记录 &nbsp;<font id="memberFans_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="commission_div_member">
+		<div style="float:left;padding-left:10px;">佣金记录 &nbsp;<font id="memberCommission_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="recharge_div_member">
+		<div style="float:left;padding-left:10px;">充值记录&nbsp;<font id="newRecharge_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="couponUse_div_member">
+		<div style="float:left;padding-left:10px;">优惠券使用记录</div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="level_div_member">
+		<div style="float:left;padding-left:10px;">会员等级 &nbsp;<font id="memberLbelName_font_member" color="26A9D0"></font></div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div class="footer">&copy; 技术支持：志易科技</div>
+
+</div>
+
+</body>
+</html>
