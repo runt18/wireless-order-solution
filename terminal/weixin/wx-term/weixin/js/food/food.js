@@ -16,7 +16,7 @@ function CreateFastOrderFood(param){
 //			_init(_loadedUrlCache[_o.loadUrl]);
 //			_open(afterOpen);
 //		}else{
-			$('<div/>').load('../order/fastOrderFood.html', function(response, status, xhr){
+			$('<div/>').load('../../html/fastOrderFood/fastOrderFood.html', function(response, status, xhr){
 //				_loadedUrlCache[_o.loadUrl] = response;
 				if(xhr.status == '200'){
 					var root = $(response);
@@ -87,7 +87,7 @@ function CreateFastOrderFood(param){
 		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="kitchenNum_div_food">0</div>' +
 				'<h4>{name}</h4></li>';
 		$.ajax({
-			url : '../../WxQueryDept.do', 
+			url : '../../../WxQueryDept.do', 
 			dataType : 'json',
 			type : 'post',
 			data : {
@@ -207,7 +207,7 @@ function CreateFastOrderFood(param){
 		
 		wxLoadDialog.instance().show();
 		$.ajax({
-			url : '../../WxQueryFood.do',
+			url : '../../../WxQueryFood.do',
 			dataType : 'json',
 			type : 'post',
 			data : requestParams,
@@ -234,7 +234,7 @@ function CreateFastOrderFood(param){
 								});
 							}
 							
-							var noImage = 'noImage.jpg';
+							var noImage = '../../images/noImage.jpg';
 							
 							foodHtml.push(foodBox.format({
 								foodId : _foodData[i].id,
@@ -512,8 +512,8 @@ function CreateFastOrderFood(param){
 			count += _orderData[i].count;
 			allPrice += _orderData[i].food.unitPrice * _orderData[i].count;
 		}
-		$('#allnum').html(count);
-		$('#allprice').html(allPrice.toFixed(2));
+		$('#cartNum_div_fastOrderFood').html(count);
+		$('#allprice').html(allPrice.toFixed(2)); 
 	}
 	
 	function changeKitchenAmount(){

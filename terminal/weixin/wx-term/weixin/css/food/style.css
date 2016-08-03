@@ -1,6 +1,7 @@
 @charset "UTF-8";
 h1,h2,h3,h4,h5,h6,span,p,a,.btn,input,select,textarea,div{ font-weight: normal; font-family: "Microsoft YaHei",微软雅黑,"MicrosoftJhengHei",华文细黑,STHeiti,MingLiu ;}
 ul,li{list-style: none;margin:0;padding:0;}
+a:focus, a:hover{ text-decoration : none}
 .common_body{ background-color: #eff3f6;}
 .clearMargin{ margin: 0;}
 .clearPadding{ padding: 0;}
@@ -44,6 +45,7 @@ ul,li{list-style: none;margin:0;padding:0;}
 .font24{font-size:24px;}
 .font42{font-size:42px;}
 .font2m{font-size:2em;}
+.font09em{font-size:0.9em;}
 /*内外边距*/
 .pb8{padding-bottom:8px;}
 .pr5{padding-right: 5px;}
@@ -68,7 +70,6 @@ ul,li{list-style: none;margin:0;padding:0;}
 .sortlist li h4{font-size: 14px;padding: 15px 0;margin: 0;}
 .sortlist li .slchild{padding-left: 15px;}
 .sortlist{/*position: fixed;bottom:0px;*/background: #f1f1f1;/*top:43px;width:25%;*/}
-.active{background:#fff;border-left:3px solid #ff7d7c;color:#ff7d7c;}
 .opmbox{height:25px;position:absolute;bottom:5px;right:5px;}
 .oplusbox{width: 25px;height: 25px;text-align:center;border-radius: 50%;background: #fff;}
 .onum{width:20px;height:35px;line-height:25px;border:none;text-align: center;}
