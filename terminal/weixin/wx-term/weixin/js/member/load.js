@@ -689,7 +689,7 @@ $(function(){
 	
 	//优惠券使用记录
 	$('#couponUse_div_member').click(function(){
-		window.location.href = 'myCoupon.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
+		window.location.href = '../../html/myCoupon/myCoupon.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
 	});
 	
 	
