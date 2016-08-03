@@ -158,7 +158,12 @@ $(function(){
 				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
 				
 				if(member.name != ''){
-					$('#userName_div_member').text(member.name);
+					if(member.isRaw){
+						$('#userName_div_member').text(member.name + ' (未完善)');
+					}else{
+						$('#userName_div_member').text(member.name);
+					}
+					
 				}
 				
 				if(member.mobile != ''){
@@ -265,7 +270,7 @@ $(function(){
 									 
 					container.find('[id="dialogContent_div_dialogPopup"]').html(bindMember);
 					
-					container.find('[age_select_member]').val(3);
+					container.find('[id="age_select_member"]').val('3');
 				}else{
 					var table = '<table style="color:black">'
 									+'<tr align="left">' 
@@ -276,6 +281,10 @@ $(function(){
 										+'<td>年龄段 : '+ member.ageText + '</td>'
 										+'<td>生日 : '+ member.birthdayFormat + '</td>'
 									+'</tr>'
+									+'<tr align="left">' 
+									+'<td>会员卡 : '+ member.weixinCard + '</td>'
+									+'<td></td>'
+									+'</tr>'
 									+'<hr/>'
 									+'<tr height="5px"></tr>'
 									+'<tr>' 
@@ -284,6 +293,7 @@ $(function(){
 								+'</table>';
 					
 					container.find('[id="dialogContent_div_dialogPopup"]').html(table);
+					
 				}
 				
 				wxLoadDialog.instance().hide();
@@ -306,8 +316,9 @@ $(function(){
 					if(memberName == ''){
 						errorDialog.open();
 						return;
-						memberName.focus();
 					}
+					
+
 					var sex = container.find('[id="sex_select_member"]').val();
 					
 					var mobile = container.find('[id="mobile_input_member"]').val();
@@ -326,6 +337,7 @@ $(function(){
 							}
 						});
 						mobileDialog.open();
+						return;
 					}
 					
 					var birthday = container.find('[id="birthday_input_member"]').val();
@@ -479,9 +491,9 @@ $(function(){
 							
 							var tr = '<tr class="d-list-title">'
 								+'<td style="width:39%;text-align: center;">关注时间</td>'
-								+'<td style="width:20%;text-align:center;">粉丝名</td>'
-								+'<td style="width:20%;text-align:center">金额</td>'
-								+'<td style="width:20%;text-align:center">积分</td>'
+								+'<td style="width:27%;text-align:center;">粉丝名</td>'
+								+'<td style="width:18%;text-align:center">金额</td>'
+								+'<td style="width:15%;text-align:center">积分</td>'
 							 +'</tr>';
 							 
 							if(data.root.length > 0){
