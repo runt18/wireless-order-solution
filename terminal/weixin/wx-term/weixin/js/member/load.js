@@ -202,8 +202,10 @@ $(function(){
 			if(data.success){
 				if(data.root.length > 0){
 					$('#couponAmount_font_member').text(data.root.length);
+					$('#myCouponAmount_font_member').text("(优惠券 : " + data.root.length + "张)");
 				}else{
 					$('#couponAmount_font_member').text('0');
+					$('#myCouponAmount_font_member').text("(优惠券:0)");
 				}
 			}
 		}
@@ -223,7 +225,7 @@ $(function(){
 												+'<label class="weui_label">姓名:</label>'
 											+'</div>'
 											+'<div class="weui_cell_bd weui_cell_primary">' 
-												+'<input id="name_input_member" class="weui_input" pattern="[0-9]*" placeholder="请输入姓名"></input>'
+												+'<input id="name_input_member" class="weui_input" placeholder="请输入姓名"></input>'
 											+'</div>'
 										+'</div>'
 										
@@ -232,7 +234,7 @@ $(function(){
 												+'<label  class="weui_label">手机:</label>'
 											+'</div>'
 											+'<div class="weui_cell_bd weui_cell_primary">' 
-												+'<input id="mobile_input_member" style="border:0" class="weui_input" type="number" pattern="[0-9]*" placeholder="请输入手机号"></input>'
+												+'<input id="mobile_input_member" style="border:0" class="weui_input" type="number" placeholder="请输入手机号"></input>'
 											+'</div>'
 										+'</div>'
 										
@@ -244,7 +246,6 @@ $(function(){
 												+'<input id="birthday_input_member" style="border:0" class="weui_input" type="date" placeholder="请选择生日"></input>'
 											+'</div>'
 										+'</div>'
-										
 										 +'<div class="weui_cell weui_cell_select">' 
 									 	+' <div class="weui_cells_title" style="color:black;">性别:</div>'
 						                  +'<div class="weui_cell_bd weui_cell_primary">'  
@@ -284,7 +285,7 @@ $(function(){
 										+'<td>生日 : '+ member.birthdayFormat + '</td>'
 									+'</tr>'
 									+'<tr align="left">' 
-									+'<td>会员卡 : '+ member.weixinCard + '</td>'
+									+'<td>微信卡号: '+ member.weixinCard + '</td>'
 									+'<td></td>'
 									+'</tr>'
 									+'<hr/>'
@@ -418,8 +419,8 @@ $(function(){
 							
 							var tr = '<tr class="d-list-title">'
 										+'<td style="width:45%;text-align: center;">消费时间</td>'
-										+'<td style="width:30%;text-align:center;">消费人</td>'
-										+'<td style="width:20%;text-align:center;">佣金额</td>'
+										+'<td style="width:30%;text-align:center;">消费额</td>'
+										+'<td style="width:20%;text-align:center;">积分</td>'
 									 +'</tr>';
 							
 							if(data.root.length > 0){
@@ -699,11 +700,80 @@ $(function(){
 		rechargeDialog.open();
 	});
 	
-	//优惠券使用记录
-	$('#couponUse_div_member').click(function(){
+	//我的优惠券
+	$('#myCoupon_div_member').click(function(){
 		window.location.href = '../../html/myCoupon/myCoupon.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
 	});
 	
+	//优惠券使用记录
+	$('#myCouponUse_div_member').click(function(){
+		
+		var couponUseDialog;
+		couponUseDialog = new WeDialogPopup({
+			titleText : '优惠券使用记录',
+			contentCallback : function(container){
+				$.ajax({
+					url : '../../../WXQueryMemberOperation.do',
+					type : 'post',
+					type : 'post',
+					data : {
+						dataSource : 'couponConsumeDetails',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid
+					},
+					dataType : 'json',
+					beforeSend : function(){
+						wxLoadDialog.instance().show();
+					},
+					success : function(data, status, xhr){
+						if(data.success){
+							var content = $('<table/>');
+							content.addClass('d-list');		
+							
+							var tr = '<tr class="d-list-title">'
+										+'<td style="width:70%;text-align:center;">优惠券名称</td>'
+										+'<td style="width:20%;text-align:center;">金额</td>'
+									 +'</tr>';
+							
+							if(data.root.length > 0){
+								
+								var template = '<tr class="d-list-item-consume">' +
+												'<td style="text-align: center;">{couponName}</td>' +
+												'<td style="text-align: center;">{point}</td>' +
+											   '</tr>';
+											   
+								var html = [], temp = null;
+								for(var i = 0; i < data.root.length; i++){
+									temp = data.root[i];
+									html.push(template.format({
+										couponName : temp.couponName + '</br><font style="font-size:13px;">操作:' + temp.operateText + '</font>',
+										point : temp.couponPrice.toFixed(0)
+									}));
+								}
+								content.html(tr + html.join(''));
+							}else{
+								content.html('暂无消费记录');
+							}
+							
+							container.find('[id="dialogContent_div_dialogPopup"]').html(content);
+						}else{
+							container.find('[id="dialogContent_div_dialogPopup"]').html(data.msg);
+						}
+					},
+					error : function(data, errotType, eeor){
+						container.find('[id="dialogContent_div_dialogPopup"]').html('<font color="black">服务器请求失败, 请稍候再试.</font>');
+					},
+					complete : function(){
+						wxLoadDialog.instance().hide();
+					}
+				});
+				
+			}
+		});
+		couponUseDialog.open();
+		
+		
+	});
 	
 	//会员等级
 	$('#level_div_member').click(function(){
@@ -873,5 +943,14 @@ $(function(){
 		});
 		memberLevelDialog.open();
 		
-	})	
+	});	
+	
+	function fnDateInChinese(date){
+		var month = date.substring(5, 7);
+		var day = date.substring(8, 10);
+		var time = date.substring(11, date.length - 3);
+		
+		return month+ '月' +day + '日' + ' ' + time;
+		
+	}
 })
