@@ -231,12 +231,48 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward couponConsumeDetails(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().print(getData(3, request.getParameter("fid"), request.getParameter("oid")).toString());
+	public ActionForward couponConsumeDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		final JObject jObject = new JObject();
+		final String fid  = request.getParameter("fid");
+		final String oid = request.getParameter("oid");
+		
+		try{
+			final CouponOperationDao.ExtraCond extraCond = new CouponOperationDao.ExtraCond();
+			
+			final Staff staff = StaffDao.getAdminByRestaurant(WxRestaurantDao.getRestaurantIdByWeixin(fid));
+			
+			if(oid != null && !oid.isEmpty()){
+				extraCond.setMember(WxMemberDao.getBySerial(staff, oid).getMemberId());
+			}
+			
+			
+			//获取优惠券的操作记录
+			final List<CouponOperation> result = CouponOperationDao.getByCond(staff, extraCond.setOperateType(CouponOperation.OperateType.USE));
+
+			
+			if(result.size() > 5){
+				List<CouponOperation> returnList = new ArrayList<>();
+				for(CouponOperation co : result){
+					returnList.add(co);
+					if(returnList.size() == 5){
+						break;
+					}else{
+						continue;
+					}
+				}
+				jObject.setRoot(returnList);
+			}else{
+				jObject.setRoot(result);
+			}
+			
+		
+		}catch(BusinessException | SQLException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		
 		return null;
 	}
 	
