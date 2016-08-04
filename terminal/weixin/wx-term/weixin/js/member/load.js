@@ -729,28 +729,28 @@ $(function(){
 							content.addClass('d-list');		
 							
 							var tr = '<tr class="d-list-title">'
-										+'<td style="width:70%;text-align:center;">优惠券名称</td>'
-										+'<td style="width:20%;text-align:center;">金额</td>'
+										+'<td style="width:50%;text-align:center;">时间</td>'
+										+'<td style="width:50%;text-align:center;">类别</td>'
 									 +'</tr>';
 							
 							if(data.root.length > 0){
 								
 								var template = '<tr class="d-list-item-consume">' +
+												'<td style="text-align: center;">{date}</td>' +
 												'<td style="text-align: center;">{couponName}</td>' +
-												'<td style="text-align: center;">{point}</td>' +
 											   '</tr>';
 											   
 								var html = [], temp = null;
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(template.format({
-										couponName : temp.couponName + '</br><font style="font-size:13px;">操作:' + temp.operateText + '</font>',
-										point : temp.couponPrice.toFixed(0)
+										date : temp.operateDate,
+										couponName : temp.couponName + ',' + temp.couponPrice.toFixed(0) + '元</br><font style="font-size:13px;">操作:' + temp.operateText + '</font>',
 									}));
 								}
 								content.html(tr + html.join(''));
 							}else{
-								content.html('暂无消费记录');
+								content.html('暂无优惠券使用记录');
 							}
 							
 							container.find('[id="dialogContent_div_dialogPopup"]').html(content);
