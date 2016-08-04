@@ -206,6 +206,10 @@ public class FinanceWeixinAction extends Action {
 							} catch (IOException e) {
 								session.callback(new Msg4Text(msg, e.getMessage()));
 							}
+						}else if(msg.getEventKey().equals(CONTACT_US)){
+							session.callback(new Msg4Text(msg, "1倍投入，3倍回报，立即咨询，提高餐厅效益！\r\n" +
+															   "咨询电话： 400-9929-838\r\n" +
+															   "顾问热线：18026327276"));
 						}
 					}
 				}
@@ -861,6 +865,7 @@ public class FinanceWeixinAction extends Action {
 	private final static String LAST_WEEK_EVENT_KEY = "last_week";
 	private final static String THIS_MONTH_EVENT_KEY = "this_month";
 	private final static String LAST_MONTH_EVENT_KEY = "last_month";
+	private final static String CONTACT_US = "contact_us";
 	
 	public static void main(String[] args) throws IOException{
 		Token token = Token.newInstance(APP_ID, APP_SECRET);
@@ -869,13 +874,17 @@ public class FinanceWeixinAction extends Action {
 
 		Menu menu = new Menu();
 		
-		Button b1 = new Button.ClickBuilder("日报", "AAA")
-							.addChild(new Button.ClickBuilder("即时战报", TODAY_EVENT_KEY))
-							.addChild(new Button.ClickBuilder("最近日结", YESTERDAY_EVENT_KEY))
+		Button b1 = new Button.ClickBuilder("微信餐厅", "AAA")
+							.addChild(new Button.ViewBuilder("自助点餐", "http://mp.weixin.qq.com/s?__biz=MzI5NzM4MTYxMg==&mid=2247483726&idx=1&sn=e0417e22fa7f9e08edbf6b61a2764628&scene=23&srcid=0804YTU9URuGrSfxhxWX9jod#rd"))
+							.addChild(new Button.ViewBuilder("智慧餐厅", "http://mp.weixin.qq.com/s?__biz=MzA5OTEzODY1NA==&mid=2650687690&idx=1&sn=c487c090efaf178985c007d9c41af285&scene=23&srcid=0804fV9itTYnsEph4RKW7fH9#rd"))
+							.addChild(new Button.ViewBuilder("微信运营", "http://mp.weixin.qq.com/s?__biz=MzA5OTEzODY1NA==&mid=2650687689&idx=1&sn=0abcaf95d275f7cad4c422dfc1bcb350&scene=23&srcid=08040J4XONNh21tmxK9NRu1y#rd"))
+							.addChild(new Button.ClickBuilder("联系我们", CONTACT_US))
 							.build();
 		menu.set1stButton(b1);
 		
-		Button b2 = new Button.ClickBuilder("周报", "BBB")
+		Button b2 = new Button.ClickBuilder("日/周报", "BBB")
+							.addChild(new Button.ClickBuilder("即时战报", TODAY_EVENT_KEY))
+							.addChild(new Button.ClickBuilder("最近日结", YESTERDAY_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("本周报表", THIS_WEEK_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("上周报表", LAST_WEEK_EVENT_KEY))
 							.build();
