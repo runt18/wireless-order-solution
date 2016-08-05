@@ -46,28 +46,27 @@ function CreateFastOrderFood(param) {
 								$(".maskbox").fadeToggle(300);
 								$(".orderdetail").slideToggle(300);
 							}
-					});
+						});
 
 						// 选好了
 						$('#confirm_div_fastOrderFood').click(function(){
-							if (param.confirm && typeof param.confirm == 'function') {
-								if(_orderData.length == 0){
-									var sessionTimeoutPopup;
-									sessionTimeoutPopup = new WeDialogPopup({
-										titleText : '温磬提示',
-										content : ('<span style="display:block;text-align:center;">购物车没有菜品,不能下单</span>'),
-										leftText : '确认',
-										left : function(){
-											sessionTimeoutPopup.close();
-										},
-										afterClose : function(){
-											wx.closeWindow();
-										}
-									});
-									sessionTimeoutPopup.open();
-								}
+							if(_orderData.length == 0){
+								var sessionTimeoutPopup;
+								sessionTimeoutPopup = new WeDialogPopup({
+									titleText : '温磬提示',
+									content : ('<span style="display:block;text-align:center;">购物车没有菜品,不能下单</span>'),
+									leftText : '确认',
+									left : function(){
+										sessionTimeoutPopup.close();
+									}
+								});
+								sessionTimeoutPopup.open();
+							}else{
+								if (param.confirm && typeof param.confirm == 'function') {
 									param.confirm(_orderData);
+								}
 							}
+							
 						});
 
 					} else {
@@ -100,7 +99,7 @@ function CreateFastOrderFood(param) {
 	function initKitchen() {
 		var ketchenHtml = [];
 		var kitchenList = $('#keptList_ul_fastOrderFood');
-		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox"><div class="allnum" id="kitchenNum_div_food">0</div>'
+		var kitchenBox = '<li data-value="{id}" data-type="kitchenBox" style="background: #f1f1f1;"><div class="allnum" id="kitchenNum_div_food">0</div>'
 				+ '<h4>{name}</h4></li>';
 				
 		$.ajax({
@@ -139,8 +138,7 @@ function CreateFastOrderFood(param) {
 									filterFood(element);
 								}
 							});
-					kitchenList.find('[data-type="kitchenBox"]')[0]
-							.click();
+					kitchenList.find('[data-type="kitchenBox"]')[0].click();
 				} else if (data.code == '7546') {
 					sessionTimeout();
 				} else {
@@ -299,9 +297,6 @@ function CreateFastOrderFood(param) {
 
 		}
 		
-		
-		
-
 		$('#foodList_div_fastOrderFood').html(foodHtml.join(''));
 
 		// 多规格的点击事件
@@ -501,14 +496,34 @@ function CreateFastOrderFood(param) {
 				break;
 			}
 		}
-
-		for (var j = 0; j < _foodData.length; j++) {
-			for (var k = 0; k < _foodData[j].multiUnitPrice.length; k++) {
-				if (selecedUnitPrice == _foodData[j].multiUnitPrice[k].id) {
-					unitPrice = _foodData[j].multiUnitPrice[k];
+		
+		var kitchenId = null;
+		$('#keptList_ul_fastOrderFood').find('[data-type="kitchenBox"]').each(function(index, element){
+			if($(element).hasClass('active')){
+				kitchenId = $(element).attr('data-value');
+			}
+		})
+		
+		if(_loadedFoodCache[kitchenId]){
+			for (var j = 0; j < _loadedFoodCache[kitchenId].length; j++) {
+				for (var k = 0; k < _loadedFoodCache[kitchenId][j].multiUnitPrice.length; k++) {
+					if (selecedUnitPrice == _loadedFoodCache[kitchenId][j].multiUnitPrice[k].id) {
+						unitPrice = _loadedFoodCache[kitchenId][j].multiUnitPrice[k];
+					}
 				}
 			}
-		}
+		
+		}else{
+			for (var j = 0; j < _foodData.length; j++) {
+				for (var k = 0; k < _foodData[j].multiUnitPrice.length; k++) {
+					if (selecedUnitPrice == _foodData[j].multiUnitPrice[k].id) {
+						unitPrice = _foodData[j].multiUnitPrice[k];
+					}
+				}
+			}
+		}		
+		
+		
 
 		if (cartFood) {
 			if (num == 0) {
@@ -519,16 +534,32 @@ function CreateFastOrderFood(param) {
 			}
 
 		} else {
-			for (var i = 0; i < _foodData.length; i++) {
-				if (_foodData[i].id == id) {
-					_orderData.push({
-						food : _foodData[i],
-						count : 1,
-						selectedUnitPrice : unitPrice
-					});
-					break;
+			if(_loadedFoodCache[kitchenId]){
+				for (var i = 0; i < _loadedFoodCache[kitchenId].length; i++) {
+					if (_loadedFoodCache[kitchenId][i].id == id) {
+						_orderData.push({
+							food : _loadedFoodCache[kitchenId][i],
+							count : 1,
+							selectedUnitPrice : unitPrice
+						});
+						break;
+					}
+				}
+			
+			}else{
+				for (var i = 0; i < _foodData.length; i++) {
+					if (_foodData[i].id == id) {
+						_orderData.push({
+							food : _foodData[i],
+							count : 1,
+							selectedUnitPrice : unitPrice
+						});
+						break;
+					}
 				}
 			}
+			
+			
 		}
 		if (param.onCartChange) {
 			param.onCartChange(_orderData);

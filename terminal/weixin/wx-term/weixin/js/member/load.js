@@ -767,6 +767,10 @@ $(function(){
 					}
 				});
 				
+			},
+			leftText : '确认',
+			left : function(){
+				couponUseDialog.close();
 			}
 		});
 		couponUseDialog.open();
