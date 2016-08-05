@@ -1,0 +1,91 @@
+<head>
+<meta charset="UTF-8">
+</head>
+<html>
+<body>
+<div class="maskbox"></div>
+<div class="container">
+	<div class="row">
+		<div class="tabwrap clearfix">
+			<div class="tabcontent clearfix">
+				<div class="col-xs-12 clearPadding" id="allproduct">
+					<div class="col-xs-3 clearPadding" id='cate' style='position:fixed'>
+						<ul class="sortlist" id="keptList_ul_fastOrderFood">
+							<!-- 
+								<li class="active"><h4>全部菜</h4></li>
+								<li><h4>销量排行</h4></li>				
+								<li><h4>特色套餐</h4></li>				
+								<li>
+									<h4>菜品</h4>
+									<div class="slchild text-muted">
+										<div><h5>家常菜</h5></div>
+										<div><h5>特色菜</h5></div>
+										<div><h5>麻辣</h5></div>
+										<div><h5>酸辣</h5></div>
+									</div>
+								</li>
+								<li><h4>主食</h4></li>
+								<li><h4>饮料</h4></li>	
+								<li><h4>白酒</h4></li>
+								<li><h4>葡萄酒</h4></li>
+								<li><h4>主食</h4></li>
+								<li><h4>饮料</h4></li>				
+							 -->
+						</ul>
+					</div>
+					<div class="col-xs-9 clearPadding bg-white pull-right" id="foodList_div_fastOrderFood" style="overflow-y:auto">
+						<!--good start-->		
+						<!-- 
+							<div class="clearfix ptb10 borderbf2 ogood">
+								<div class="col-xs-4 plr10">
+									<img src="images/img3.jpg" alt="" class="pull-left img-responsive">
+								</div>
+								<div class="col-xs-8 clearPadding" style="position:relative;">
+									<div>
+										<h4 class="font14 mt0">黄焖鸡黄焖鸡</h4>
+										<div class="text-muted font10">月售1000</div>
+										<p class="text-dining font14 clearMargin">￥<span class="unitprice" unitprice>10</span><span class="text-muted">&nbsp;/份</span></p>	
+									</div>				
+									<div class="opmbox clearfix">
+										<div class="oplusbox pull-left ominu" onclick="min(this,1,'黄焖鸡黄焖鸡',10,100)">
+											<i class="icon iconfont text-dining" style="font-size:24px;position:relative;top:-2px;">&#xe608;</i>
+										</div>
+										<input type="text" class="onum pull-left font12" value="0" readonly="readonly" name="onum" pid='{$product.id}'>				
+										<div class="oplusbox pull-left oplus" onclick="plus(this,1,'黄焖鸡黄焖鸡',10,100)">
+											<i class="icon iconfont text-dining" style="font-size:24px;">&#xe605;</i>
+										</div>
+									</div>	
+								</div>
+							</div>
+						 -->
+						
+						<!--good end-->			
+					</div>
+				</div>
+				
+				<!--底部滑出 订单详情-->
+				<div class="col-xs-12 bg-white clearPadding bordertop orderdetail" id="orderdetail" style="position:absolute;bottom:55px;z-index:101;">
+				</div>
+				
+				<div class="bottoms obto bordertop clearfix" id="footer_div_fastOrderFood">
+					<div class="col-xs-3">
+						<div class="ocartbox" style="position:relative;">
+							<div class="ocart"><i class="icon iconfont text-white" style="vertical-align:middle;font-size:2em;">&#xe607;</i></div>
+							<div class="allnum" id="cartNum_div_fastOrderFood">0</div>
+						</div>
+					</div>
+					<div class="col-xs-5">
+						<p class="pt15"><span class="text-dining">￥</span>
+						<span class="text-dining font16" id="allprice">0</span>
+					</div>
+					<div class="col-xs-4 text-right clearPadding" id="confirm_div_fastOrderFood">
+						<button class="bg-yellow bordernone ptb15lr20 font18 btn-block text-white" type="submit">选好了</button>
+					</div>		
+				</div>
+			</div>
+		</div>						
+	</div>
+</div>
+
+</body>
+</html>

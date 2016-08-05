@@ -1,0 +1,393 @@
+body{
+	background-color: #f5f5f5;
+}
+
+/**************************************************/
+#divMemberCard, #divMemberContent, #divMemberTypeContent,#divCurrentMemberTypeDesc,#divMemberBalanceAndPiont,
+#divMemberPointContent, #divMemberBalanceContent, #divMemberCouponContent, #divMemberCouponConsume, #divMemberPrivilegeDetail,#span_currentMemberDefeat{
+	display: none;
+}
+
+#divMemberCard {
+	height: 192px;
+	background-image: url(../images/member_vip.jpg);
+	background-size: 100% 100%; 
+	text-align: right;
+}
+#divMemberCard > div[data-type=r]{
+	z-index: 0;
+	position: relative;
+	min-width: 30px;
+	color: #000;
+	float :left;
+	top: 155px;
+	font-size: 30px;
+	color : #156785;
+	font-weight: bold;
+}
+
+#divMemberCard > div[data-type=R]{
+	z-index: 0;
+	position: relative;
+	min-width: 30px;
+	color: #000;
+	float : right;
+	top: 10px;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+#divMemberCard > div[data-type=r] > div{
+	line-height: 25px; 
+}
+input[type=text]:FOCUS, input[type=number]:FOCUS{
+	background-color: #f9f9a0;
+}
+input[type=text], input[type=number]{
+	border: 1px solid #ddd;
+}
+
+
+/**************************************************/
+.txtVerifyMobile
+{
+	font-size: 25px;
+	padding: 3px 5px 3px 5px;
+	width: 170px;
+	//color: #26a9d0;
+	//border: 0;
+	//border-bottom: 1px solid #ddd;
+}
+
+.btnVerifyCode,.btnVerifyCodeByReset{
+	display: inline;
+	font-size: 16px;
+	padding: 0 10px 0 10px;
+	color: #000;
+	border: 0;
+	background: #fff;
+}
+.btnBindMemberByReset{
+	/* width: 200px; */
+	letter-spacing: 4px;
+	padding: 3px 5px 3px 5px;
+	font-size: 18px;
+	border: 1px solid #aaa;
+	margin-bottom: 10px;
+}
+
+.d-list{
+	width:100%; 
+	
+}
+.d-list-title td{
+	/* border-top: 1px solid #ddd;  */
+	border-bottom: 1px solid #f1f1f1; 
+	color: #595959;
+	text-align: right;
+	padding-right: 10px;
+}
+.d-list-item td{
+	color: #898989;
+	border-bottom: 1px solid #f1f1f1; 
+	padding-right: 10px;
+}
+
+.d-list-item > td:nth-child(1){
+	text-align: center;
+	color: black;
+}
+
+.d-list-item > td:nth-child(2), .d-list-item > td:nth-child(3){
+	text-align: right;
+	color: #26a9d0;
+}
+
+.d-list-item-consume td{
+	border-bottom: 1px solid #f1f1f1; 
+	padding-right: 10px;
+	line-height: 23px;
+	padding-bottom: 2px;
+}
+
+.d-list-item-consume,.d-list-item-coupon > td, .d-list-item-consume,.d-list-item-coupon > td:nth-child(3){
+	text-align: right;
+	color: #26a9d0;
+}
+
+
+.d-list-item-coupon td{
+	border-bottom: 1px solid #f1f1f1; 
+	padding-right: 10px;
+	line-height: 16px;
+	padding-bottom: 2px;
+}
+
+
+/*
+会员等级列表
+*/
+	#divMemberTypeDesc{
+	border:1px solid #e7e7e7;
+	padding:10px;
+	background-color:#f8f8f8;
+	}
+	.graph{
+	position:relative;
+	background-color:white;
+	border:1px solid #cccccc;
+	padding:2px;
+	font-size:13px;
+	font-weight:700;
+	
+	  -webkit-transform: translateZ(0); /* webkit flicker fix */
+	  text-align: center;
+	  line-height: 25px;
+	}
+	.graph span{
+	position:relative;
+	text-align:left;
+	
+	height:18px;
+	line-height:18px;
+	font-family:Arial;
+	display:block;
+	}
+	.graph .orange{background-color:#ff6600;}
+	.graph .green{background-color:#66CC33;}
+	
+	.memberLevelList{
+		height: 35px;background-color: silver;border-radius: 10px; line-height: 35px;margin-bottom: 5px;
+	}
+	.memberLevelHead{
+		width : 20%;height: 35px;background-color: dimgray;float: left;border-radius: 10px 0px 0px 10px;text-align: center;
+	}
+	.memberLevelHeadFont{
+		font-weight: bold;color : white;font-size: 12px;
+	}
+	.memberLevelDiscount{
+		font-weight: bolder;color : whitesomke;font-size: 6px;
+	}
+	.memberLevelBody{
+		float: left;width: 70%;padding-top: 5px; margin-left: 5%;
+	}
+	
+/*
+会员等级列表分数提示
+*/
+
+
+.graph .tooltip {
+	background: dimgray;
+	bottom: 100%;
+	color: #fff;
+	display: block;
+	width :26%;
+	margin-bottom: 10px;
+	opacity: 0.8;
+	pointer-events: none;
+	position: absolute;
+	border-radius: 5px;
+	-webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	   -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	    -ms-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	     -o-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	        
+	/* left: -22%; */
+}
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+.graph .tooltip:before {
+  bottom: -20px;
+  content: " ";
+  display: block;
+  height: 20px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+}  
+
+/* CSS Triangles - see Trevor's post */
+.graph .tooltip:after {
+  border-left: solid transparent 10px;
+  border-right: solid transparent 10px;
+  border-top: solid dimgray 10px;
+  bottom: -10px;
+  content: " ";
+  height: 0;
+  left: 50%;
+  margin-left: -10px;
+  position: absolute;
+ /*  width: 0; */
+}
+
+
+
+.box {
+	float :left;
+/* 	margin-left : 10px; */
+	margin-top : 5px;
+	line-height : 15px;
+	border:solid 5px #fff;
+	width:95%;
+	height:136px;
+	border:1px solid;
+	border-radius:8px;	
+	padding:2px;
+	color:#666;
+}
+.box_in {
+	float :left;
+	background:#fff;
+	border:solid 5px #fff;
+	width:100%;
+	height:115px;
+	border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+	padding:10px;
+	color:#666;
+}
+.box .box_in {
+	top:5px;
+	left:5px;
+	width:100px;
+	height:100px;
+	border-color:#593207;
+	box-shadow:none;
+}
+.box span{
+	margin-left: 5px;font-size: 15px;
+	font-family:microsoft yahei, Arial, Helvetica, sans-serif;
+	font-weight: bolder;
+	line-height: 27px;
+}
+
+.box_in img{
+	width : 100px;height : 100px;
+}
+
+/*直角阴影按钮start*/
+.a_demo_two {
+    background-color:#6fba26;
+    padding:5px 70px 5px;
+    position:relative;
+    font-family: 'Open Sans', sans-serif;
+    font-size:12px;
+    text-decoration:none;
+    color:#fff;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
+    border-radius: 5px;
+}
+ 
+.a_demo_two:active {
+    top:4px;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
+    color: #156785;
+    text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+    background: rgb(44,160,202);
+}
+.a_demo_two:before {
+    background-color:#072239 ;
+    content:"";
+    display:block; 
+    position:absolute;
+    width:100%;
+    height:100%;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:4px;
+    left:-2px;
+     z-index:-1;
+}
+
+.a_demo_twos {
+    background-color:#6fba26;
+    padding:5px 15px 5px;
+    position:relative;
+    font-family: 'Open Sans', sans-serif;
+    font-size:12px;
+    text-decoration:none;
+    color:#fff;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
+    border-radius: 5px;
+}
+ 
+.a_demo_twos:active {
+    top:4px;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
+    color: #156785;
+    text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+    background: rgb(44,160,202);
+}
+.a_demo_twos:before {
+    background-color:#072239 ;
+    content:"";
+    display:block; 
+    position:absolute;
+    width:100%;
+    height:100%;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:4px;
+    left:-2px;
+     z-index:-1;
+}
+/*end直角阴影按钮*/
+
+/*圆角无阴影按钮start*/
+.green {
+  background: #82cc5d;
+  background: -webkit-linear-gradient(to bottom, #82cc5d 0%,#53b73c 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#82cc5d', endColorstr='#53b73c',GradientType=0 );
+  border: 1px solid #429E34;
+}
+
+.button {
+  border-radius: 2px;
+  box-shadow: inset rgba(255,255,255,0.3) 1px 1px 0;
+}
+
+.button, .button-bevel {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  color: #fff;
+  text-decoration: none;
+  /* display: inline-block; */
+  text-align: center;
+  /* padding: 7px 20px 9px; */
+  margin: .5em .5em .5em 0;
+  cursor: pointer;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+  text-transform: capitalize;
+  transition: 0.1s linear;
+  padding: 5px 20px;
+}
+
+.rounded {
+  border-radius: 20px;
+}
+
+/*end 圆角无阴影按钮*/
+
+
+.ulMemberPrivilegeDetail{
+	margin-left: 25px;
+}
+
+.ulMemberPrivilegeDetail li{
+	list-style:disc !important;
+	font-family:  'Microsoft YaHei';
+	color : maroon ;
+	font-weight : bold;
+	font-size: 20px;
+	font-style: italic;
+}
+
+.memberTypeBaseDesc{
+	color:maroon;
+	font-size: 14px;
+}

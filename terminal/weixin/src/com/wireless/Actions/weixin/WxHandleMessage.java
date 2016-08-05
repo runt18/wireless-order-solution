@@ -246,17 +246,21 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		
 		final String root = "http://" + this.serverName + "/wx-term";
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
-		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=food.html";
+//		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=food.html";
+		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=../html/food/food.html";
 		this.WEIXIN_BOOK = root + "/weixin/order/branches.html?redirect_url=book.html";
 		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
 		this.WEIXIN_ABOUT = root + "/weixin/order/about.html";
-		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
+//		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
+		this.WEIXIN_MEMBER = root + "/weixin/html/member/member.html";
 		this.WEIXIN_COUPON = root + "/weixin/order/sales.html";
-		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
+//		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
+		this.WEIXIN_ORDER = root + "/weixin/html/orderList/orderList.html";
 		this.WEIXIN_DIANPING = root + "/weixin/order/dianping.html";
 		this.WEIXIN_SCANNING = root + "/weixin/order/scan.html";
 		this.WEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
-		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
+//		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
+		this.WEIXIN_WAITER = root + "/weixin/html/waiter/waiter.html";
 		this.WEIXIN_REPRESENT = root + "/weixin/order/representCard.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";

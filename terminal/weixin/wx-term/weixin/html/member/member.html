@@ -6,19 +6,19 @@
 <title>会员中心</title>
 
 
-<link rel="stylesheet" href="../order/css/base.css">
-<link rel="stylesheet" href="../order/css/member.css">
-<link rel="stylesheet" href="../order/css/weixinUi/weui.css" type="text/css">
-<link type="text/css" rel="stylesheet" href="../order/css/mbar.css">
+<link rel="stylesheet" href="../../css/base.css">
+<link rel="stylesheet" href="../../css/member.css">
+<link rel="stylesheet" href="../../css/weui.css" type="text/css">
+<link type="text/css" rel="stylesheet" href="../../css/mbar.css">
 
-<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="../../js/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js" ></script>
-<script type="text/javascript" src="../order/js/dialog/weDialog.js"></script>
-<script type='text/javascript' src='../../jquery/highcharts.js'></script>
-<script type="text/javascript" src="../order/js/Util.js"></script>
-<script type="text/javascript" src="../order/js/dialog/dialog.js"></script>
-<script type="text/javascript" src="../order/js/dialog/wxLoadDialog.js"></script>
-<script type="text/javascript" src="../order/js/member/load.js"></script>
+<script type="text/javascript" src="../../js/dialog/weDialog.js"></script>
+<script type='text/javascript' src='../../js/highcharts.js'></script>
+<script type="text/javascript" src="../../js/Util.js"></script>
+<script type="text/javascript" src="../../js/dialog/dialog.js"></script>
+<script type="text/javascript" src="../../js/dialog/wxLoadDialog.js"></script>
+<script type="text/javascript" src="../../js/member/load.js"></script>
 
 </head>
 <body>
@@ -27,8 +27,8 @@
 		
 	</div>
 
- 	<div id="memberHead_div_member" align="center" style="position:absolute;top:8%;left:40%;"> 
- 		<div id="headImg_div_member" style=" border-style: solid;  border-width: 5px; border-color: white;z-index:100;width:80px;height:80px; border-radius:80px;"></div>
+ 	<div id="memberHead_div_member" align="center" style="position:absolute;top:8%;display:block;width:100%;text-align:center;"> 
+ 		<div id="headImg_div_member" style=" border-style: solid;  border-width: 5px; border-color: white;z-index:100;width:80px;height:80px; border-radius:80px;display:inline-block;"></div>
  		<div style="z-index:100; font-family: Tahoma, Verdana, Arial, Helvetica;"><font size = "3" id="userName_div_member">Mr.L</font></div>
  		<div style="z-index:1000;"><font id="memberMobile_font_member" color="black" size = "3"></font></div>
  	</div>
@@ -77,8 +77,13 @@
 		<div style="float:right;padding-right:10px;">></div>
 	</div>
 	
-	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="couponUse_div_member">
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="myCouponUse_div_member">
 		<div style="float:left;padding-left:10px;">优惠券使用记录</div>
+		<div style="float:right;padding-right:10px;">></div>
+	</div>
+	
+	<div style="height:50px;background-color:#FCFCF2;line-height:50px;border-bottom:#DDD 1px solid;font-size:1.2em;" align="center" id="myCoupon_div_member">
+		<div style="float:left;padding-left:10px;">我的优惠券&nbsp;<font id="myCouponAmount_font_member" color="26A9D0"></font></div>
 		<div style="float:right;padding-right:10px;">></div>
 	</div>
 	
