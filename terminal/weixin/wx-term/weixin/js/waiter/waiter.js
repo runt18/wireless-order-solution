@@ -769,7 +769,7 @@ $(function(){
 				
 			foods += element.food.id + ',' + element.count + ',' + unitId;
 		});
-		
+		javascript:void(0)
 		
 		var payType = null;
 		$('[name=payType_input_waiter]').each(function(index, el){
@@ -793,7 +793,7 @@ $(function(){
 					if(data.success){
 						_calcOrderCost = data.root[0].actualPrice;
 						
-						Util.lm.show();
+						wxLoadDialog.instance().show();
 						$.ajax({
 							url : '../../../WxOperateOrder.do',
 							type : 'post',
@@ -807,7 +807,7 @@ $(function(){
 								tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
 							},
 							success : function(data, status, req){
-								Util.lm.hide();
+								wxLoadDialog.instance().hide();
 								if(data.success){
 									payParam = data.other;
 									if(typeof WeixinJSBridge == 'undefined'){
@@ -838,6 +838,7 @@ $(function(){
 								}
 							},
 							error : function(req, status, error){
+								wxLoadDialog.instance().hide();
 								var dialog = new WeDialogPopup({
 									content : data.msg,
 									titleText : '微信支付失败',
@@ -869,7 +870,7 @@ $(function(){
 			});
 		}else if(fastFoodWaiterData._orderType == orderType.CONFIRM_BY_STAFF){
 			//确认下单
-			Util.lm.show();
+			wxLoadDialog.instance().show();
 			$.ajax({
 				url : '../../../WxOperateOrder.do',
 				type : 'post',
@@ -888,7 +889,7 @@ $(function(){
 					print : true
 				},
 				success : function(data, status, xhr){
-					Util.lm.hide();
+					wxLoadDialog.instance().hide();
 					if(data.success){
 						//提示框设置
 						var finishOrderDialog = new WeDialogPopup({
@@ -925,7 +926,7 @@ $(function(){
 				},
 				
 				error : function(xhr, status, err){
-					Util.lm.hide();
+					wxLoadDialog.instance().hide();
 					if(err.code == '7546'){
 						sessionTimeout();
 					}else{
@@ -934,7 +935,7 @@ $(function(){
 				}
 			});
 		}else if(fastFoodWaiterData._orderType == orderType.DIRECT_ORDER){
-			Util.lm.show();
+			wxLoadDialog.instance().show();
 			//直接下单
 			$.ajax({
 				url : '../../../WxOperateOrder.do',
@@ -951,7 +952,7 @@ $(function(){
 				},
 				success : function(data, status, req){
 					if(data.success){
-						Util.lm.hide();
+						wxLoadDialog.instance().hide();
 						//提示框设置
 						var finishOrderDialog;
 						finishOrderDialog = new WeDialogPopup({
@@ -976,6 +977,7 @@ $(function(){
 					}
 				},
 				error : function(req, status, err){
+					wxLoadDialog.instance().hide();
 					if(err.code == '7546'){
 						sessionTimeout();
 					}else{

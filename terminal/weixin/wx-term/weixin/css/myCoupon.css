@@ -25,7 +25,7 @@ body{margin:0;font-family:"microsoft yahei";font-size:13px;line-height:1.5;backg
 }
 .stamp {
 	width: 327px;
-	height: 140px;
+	height: 125px;
 	padding: 0 10px;
 	margin-bottom: 10px;
 	position: relative;
@@ -41,17 +41,18 @@ body{margin:0;font-family:"microsoft yahei";font-size:13px;line-height:1.5;backg
 	z-index: -1;
 }
 .stamp i {
+	z-index : 1000;
 	position: absolute;
-	left: 20%;
+	left: -43%;
 	top: 45px;
 	height: 190px;
 	width: 390px;
 	background-color: rgba(255, 255, 255, .15);
-	transform: rotate(-30deg);
+	transform: rotate(30deg);
 }
 .stamp .par {
 	float: left;
-	padding: 16px 15px;
+	padding: 6px 15px;
 	width: 165px;
 	border-right:2px dashed rgba(255, 255, 255, .3);
 	text-align: left;
@@ -62,7 +63,7 @@ body{margin:0;font-family:"microsoft yahei";font-size:13px;line-height:1.5;backg
 	line-height: 21px;
 }
 .stamp .par span {
-	font-size: 30px;
+	font-size: 40px;
 	color:#fff;
 	margin-right: 5px;
 	line-height: 65px;
@@ -123,13 +124,13 @@ body{margin:0;font-family:"microsoft yahei";font-size:13px;line-height:1.5;backg
 	margin-bottom: 8px;
 }
 .stamp03 .copy a {
-	background-color:#fff;
-	color:#333;
-	font-size: 14px;
-	text-decoration:none;
-	padding:5px 10px;
-	border-radius:3px;
-	display: block;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    display: block;
 }
 .stamp04 {
 	width: 390px;

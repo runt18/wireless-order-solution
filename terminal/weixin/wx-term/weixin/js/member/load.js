@@ -226,7 +226,8 @@ $(function(){
 											+'</div>'
 											+'<div class="weui_cell_bd weui_cell_primary">' 
 												+'<input id="name_input_member" class="weui_input" placeholder="请输入姓名"></input>'
-											+'</div>'
+			
+												+'</div>'
 										+'</div>'
 										
 										+'<div class="weui_cell">'
