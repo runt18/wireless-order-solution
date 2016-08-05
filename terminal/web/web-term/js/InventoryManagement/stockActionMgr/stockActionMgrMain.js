@@ -354,7 +354,6 @@ Ext.onReady(function(){
 			url : '../../OperateStockAction.do',
 			params : {
 				'dataSource' : 'checkReAudit',
-				
 				stockActionId : data['id']
 			},
 			success : function(res, opt){
@@ -484,7 +483,7 @@ Ext.onReady(function(){
 								type : 'post',
 								dataType : 'json',
 								data : {
-									dataSource : c.reAudit ? 'reAudit' : 'update',
+									dataSource : c.reAudit ? 'reaudit' : 'update',
 									id : param.stockActionId,
 									actualPrice : param.actualPrice,
 					    			cate : param.cateType,
@@ -608,7 +607,7 @@ Ext.onReady(function(){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
-								stockTaskNavWin.hide();
+//								stockTaskNavWin.hide();
 								Ext.getCmp('btnSearchForStockBasicMsg').handler();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -2315,7 +2314,7 @@ Ext.onReady(function(){
 		if(updateStockAtionArray.length > 0){
 			updateStockAtionArray.forEach(function(el, index){
 				el.onclick = function(){
-					updateStockActionHandler();
+					updateStockActionHandler({isOnlyShow : false});
 				}
 			});
 		}
