@@ -723,7 +723,10 @@ Ext.onReady(function(){
 			data : {
 				id : selectCol.data.stockActionId,
 				containsDetails : true,
-				isWithOutSum : true
+				isWithOutSum : true,
+				isHistory : true,
+				beginDate : dateBegin.getValue(),
+				endDate : dateEnd.getValue()
 			},
 			success : function(res){
 				Ext.stockDistributionAction.newInstance({

@@ -168,10 +168,8 @@ $(function(){
 				
 				if(member.mobile != ''){
 					$('#memberMobile_font_member').text("手机号 : " + member.mobile);
-					$('#memberHead_div_member').css('left', '30%');
 				}else{
 					$('#memberMobile_font_member').text("微信卡号  : " + member.weixinCard);
-					$('#memberHead_div_member').css('left', '32%');
 				}
 				
 				$('#memberLbelName_font_member').text(member.memberType.name);
