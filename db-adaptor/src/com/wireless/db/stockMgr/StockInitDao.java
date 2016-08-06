@@ -8,8 +8,10 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -238,8 +240,9 @@ public class StockInitDao {
 	 * @param orderClause
 	 * @return
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static void initStock(Staff staff) throws SQLException{
+	public static void initStock(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -261,8 +264,13 @@ public class StockInitDao {
 	 * @param extraCond
 	 * @param orderClause
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static void initStock(DBCon dbCon, Staff staff) throws SQLException{
+	public static void initStock(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_INIT)){
+			throw new BusinessException(StockError.STOCKINIT_WITHOUT_PRIVILEGE);
+		}
+		
 		String sql;
 		//删除部门物料对应数据
 		sql = "DELETE FROM " + Params.dbName + ".material_dept WHERE restaurant_id = " + staff.getRestaurantId();
@@ -273,6 +281,7 @@ public class StockInitDao {
 				" JOIN " + Params.dbName + ".stock_action S ON S.id = SD.stock_action_id " +
 				" WHERE S.restaurant_id = " + staff.getRestaurantId() +
 				" AND S.sub_type NOT IN ( " + 
+				StockAction.SubType.DISTRIBUTION_APPLY.getVal() + ", " +
 				StockAction.SubType.DISTRIBUTION_SEND.getVal() + ", " +
 				StockAction.SubType.DISTRIBUTION_RECEIVE.getVal() + ", " +
 				StockAction.SubType.DISTRIBUTION_RETURN.getVal() + ", " +
@@ -283,6 +292,7 @@ public class StockInitDao {
 		sql = "DELETE FROM " + Params.dbName + ".stock_action " + 
 			  " WHERE restaurant_id = " + staff.getRestaurantId() + 
 			  " AND sub_type NOT IN ( " +
+			  StockAction.SubType.DISTRIBUTION_APPLY.getVal() + ", " +
 			  StockAction.SubType.DISTRIBUTION_SEND.getVal() + ", " +
 			  StockAction.SubType.DISTRIBUTION_RECEIVE.getVal() + ", " +
 			  StockAction.SubType.DISTRIBUTION_RETURN.getVal() + ", " +
@@ -414,5 +424,5 @@ public class StockInitDao {
 		
 		return initDate;
 	}
-
+	
 }

@@ -47,7 +47,7 @@ function initStock(){
 							Ext.getCmp('btnSearchInitMaterial').handler();
 							Ext.getCmp('btnClose_initMaterial').handler();
 						}else{
-							Ext.ux.showMsg({success:false, msg:'初始化失败,请联系客服'});
+							Ext.ux.showMsg({success:false, msg: jr.msg ? jr.msg : '初始化失败,请联系客服'});
 						}
 						
 					},

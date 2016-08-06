@@ -106,7 +106,7 @@ public class MaterialDao {
 		final List<Material> result = new ArrayList<Material>();
 		
 		String sql;
-		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.last_mod_staff, M.last_mod_date, M.alarm_amount, M.associate_id, " +
+		sql = " SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.last_mod_staff, M.last_mod_date, M.min_alarm_amount, M.max_alarm_amount, M.associate_id, " +
 			  " MC.cate_id, MC.name cate_name, MC.type cate_type " + 
 			  " FROM " + Params.dbName + ".material M " + 
 			  " JOIN " + Params.dbName + ".material_cate MC ON MC.restaurant_id = M.restaurant_id AND MC.cate_id = M.cate_id "	+
@@ -123,7 +123,8 @@ public class MaterialDao {
 			item.setName(dbCon.rs.getString("name"));
 			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
 			item.setLastModStaff(dbCon.rs.getString("last_mod_staff"));
-			item.setAlarmAmount(dbCon.rs.getInt("alarm_amount"));
+			item.setMinAlarmAmount(dbCon.rs.getFloat("min_alarm_amount"));
+			item.setMaxAlarmAmount(dbCon.rs.getFloat("max_alarm_amount"));
 			MaterialCate cate = new MaterialCate(dbCon.rs.getInt("cate_id"));
 			cate.setName(dbCon.rs.getString("cate_name"));
 			cate.setType(MaterialCate.Type.valueOf(dbCon.rs.getInt("cate_type")));
@@ -222,7 +223,7 @@ public class MaterialDao {
 		final Material material = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".material"
-			  + " (`restaurant_id`, `cate_id`, `price`, `stock`, `name`, `last_mod_staff`, `last_mod_date`, `alarm_amount`, `associate_id`) values("
+			  + " (`restaurant_id`, `cate_id`, `price`, `stock`, `name`, `last_mod_staff`, `last_mod_date`, `min_alarm_amount`, `max_alarm_amount`, `associate_id`) values("
 			  + staff.getRestaurantId()
 			  + ", " + material.getCate().getId()
 			  + ", " + material.getPrice()
@@ -230,7 +231,8 @@ public class MaterialDao {
 			  + ", '" + material.getName() + "'"
 			  + ", '" + material.getLastModStaff() + "'"
 			  + ", NOW()" 
-			  + ", " + (material.hasAlarm() ? (material.getAlarmAmount()) : 0)
+			  + ", " + material.getMinAlarmAmount()
+			  + ", " + material.getMaxAlarmAmount()
 			  + ", " + material.getAssociateId()
 			  + ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -291,7 +293,8 @@ public class MaterialDao {
 			  + (builder.hasPriceChanged() ? " ,price = " + material.getPrice() : "")
 			  + (builder.hasStockChanged() || builder.isStockOperation() ? " ,stock = " + material.getStock() : "")
 			  + (builder.hasNameChanged() ?" ,name = '" + material.getName() + "'" : "")
-			  + (builder.hasAlarmChanged() ? " ,alarm_amount = " + material.getAlarmAmount() : "")
+			  + (builder.hasMinAlarmChanged() ? " ,min_alarm_amount = " + material.getMinAlarmAmount() : "")
+			  + (builder.hasMaxAlarmChanged() ? " ,max_alarm_amount = " + material.getMaxAlarmAmount() : "")
 			  + " WHERE 1 = 1 "  
 			  + " AND material_id = " + material.getId()
 			  + " AND restaurant_id = " + staff.getRestaurantId();

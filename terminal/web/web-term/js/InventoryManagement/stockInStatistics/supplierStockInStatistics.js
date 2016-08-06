@@ -199,25 +199,37 @@ Ext.onReady(function(){
 					header : '采购次数',
 					dataIndex : 'stockInAmount'
 				},{
-					header : '采购金额',
+					header : '采购理论金额',
 					dataIndex : 'stockInMoney',
 					renderer : function(data){
-						return data.toFixed(2);
+						return data ? data.toFixed(2) : data;
+					}
+				}, {
+					header : '采购实际金额',
+					dataIndex : 'stockInActualMoney',
+					renderer : function(data){
+						return data ? data.toFixed(2) : data;
 					}
 				},{
 					header : '退货次数',
 					dataIndex : 'stockOutAmount'
-				},{
-					header : '退货金额',
+				}, {
+					header : '退货理论金额',
 					dataIndex : 'stockOutMoney',
 					renderer : function(data){
-						return data.toFixed(2);
+						return data ? data.toFixed(2) : data;
+					}
+				}, {
+					header : '退货实际金额',
+					dataIndex : 'stockOutActualMoney',
+					renderer : function(data){
+						return data ? data.toFixed(2) : data;
 					}
 				},{
 					header : '合计金额',
 					dataIndex : 'totalMoney',
 					renderer : function(data){
-						return data.toFixed(2);
+						return data ? data.toFixed(2) : data;
 					}
 				},{
 					header : '操作',
@@ -236,9 +248,13 @@ Ext.onReady(function(){
 		},{
 			name : 'stockInMoney'
 		},{
+			name : 'stockInActualMoney'
+		},{
 			name : 'stockOutAmount'
 		},{
 			name : 'stockOutMoney'
+		},{
+			name : 'stockOutActualMoney'
 		},{
 			name : 'totalMoney'
 		},{
@@ -338,7 +354,7 @@ Ext.onReady(function(){
 			}
 			
 			stockInPanel.getView().getCell(store.getCount() - 1 , 1).innerHTML = '汇总';
-			stockInPanel.getView().getCell(store.getCount() - 1, 7).innerHTML = '--';
+			stockInPanel.getView().getCell(store.getCount() - 1, 9).innerHTML = '--';
 		}
 	});
 	

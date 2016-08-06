@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.inventoryMgr.MaterialCate.Type;
 import com.wireless.pojo.staffMgr.Staff;
@@ -101,12 +103,17 @@ public class SupplierStockDao {
 		
 		final List<SupplierStock> supplierStocks = new ArrayList<>();
 		for(Supplier supplier : suppliers){
+			//按供应商寻找汇总表
 			final List<StockReport> stockReports = StockReportDao.getRangeStockByCond(dbCon, staff, extraCond4StockReport.setSupplier(supplier));
 			final SupplierStock supplierStock = new SupplierStock();
 			supplierStock.setSupplier(supplier);
+			//累加获取供应商的采购金额同退货金额
 			for(StockReport stockReport : stockReports){
-				supplierStock.setStockInMoney(supplierStock.getStockInMoney() + stockReport.getStockInMoney());
-				supplierStock.setStockOutMoney(supplierStock.getStockOutMoney() + stockReport.getStockOutMoney());
+				supplierStock.setStockInActualMoney(supplierStock.getStockInActualMoney() + stockReport.getStockInMoney());
+				supplierStock.setStockOutActualMoney(supplierStock.getStockOutActualMoney() + stockReport.getStockOutMoney());
+				final Material material = MaterialDao.getById(dbCon, staff, stockReport.getMaterial().getId()); 
+				supplierStock.setStockInMoney(supplierStock.getStockInMoney() + (stockReport.getStockInAmount() * material.getPrice()));
+				supplierStock.setStockOutMoney(supplierStock.getStockOutMoney() + (stockReport.getStockOutAmount() * material.getPrice()));
 			}
 			
 			final List<StockAction> stockActionStockIns = StockActionDao.getByCond(dbCon, staff, extraCond4StockAction.setSupplier(supplier).setType(StockAction.Type.STOCK_IN), null);
@@ -114,7 +121,7 @@ public class SupplierStockDao {
 			final List<StockAction> stockActionStockOuts = StockActionDao.getByCond(dbCon, staff, extraCond4StockAction.setSupplier(supplier).setType(StockAction.Type.STOCK_OUT), null);
 			supplierStock.setStockOutAmount(stockActionStockOuts.size());
 			
-			supplierStock.setTotalMoney(supplierStock.getStockInMoney() - supplierStock.getStockOutMoney());
+			supplierStock.setTotalMoney(supplierStock.getStockInActualMoney() - supplierStock.getStockOutActualMoney());
 			supplierStocks.add(supplierStock);
 		}
 		

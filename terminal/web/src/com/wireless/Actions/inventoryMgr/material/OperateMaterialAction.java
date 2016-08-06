@@ -38,13 +38,19 @@ public class OperateMaterialAction extends DispatchAction {
 		final String name = request.getParameter("name");
 		final String cateId = request.getParameter("cateId");
 		final String price = request.getParameter("price");
-		final String alarmAmount = request.getParameter("alarmAmount");
+//		final String alarmAmount = request.getParameter("alarmAmount");
+		final String minAlarmAmount = request.getParameter("minAlarmAmount");
+		final String maxAlarmAmount = request.getParameter("maxAlarmAmount");
 		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		try{
 			
 			final Material.InsertBuilder builder = new Material.InsertBuilder();
-			if(alarmAmount != null && !alarmAmount.isEmpty() && Integer.parseInt(alarmAmount) > 0){
-				builder.setAlarmAmount(Integer.parseInt(alarmAmount));
+			if(minAlarmAmount != null && !minAlarmAmount.isEmpty() && Integer.parseInt(minAlarmAmount) > 0){
+				builder.setMinAlarmAmount(Float.parseFloat(minAlarmAmount));
+			}
+			
+			if(maxAlarmAmount != null && !maxAlarmAmount.isEmpty() && Integer.parseInt(maxAlarmAmount) > 0){
+				builder.setMaxAlarmAmount(Float.parseFloat(maxAlarmAmount));
 			}
 			
 			MaterialDao.insert(staff, builder.setName(name)
@@ -78,7 +84,9 @@ public class OperateMaterialAction extends DispatchAction {
 		final String name = request.getParameter("name");
 		final String cateId = request.getParameter("cateId");
 		final String price = request.getParameter("price");
-		final String alarmAmount = request.getParameter("alarmAmount");
+//		final String alarmAmount = request.getParameter("alarmAmount");
+		final String minAlarmAmount = request.getParameter("minAlarmAmount");
+		final String maxAlarmAmount = request.getParameter("maxAlarmAmount");
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			final Material.UpdateBuilder builder = new Material.UpdateBuilder(Integer.valueOf(id)).setLastModStaff(staff.getName());
@@ -95,8 +103,12 @@ public class OperateMaterialAction extends DispatchAction {
 				builder.setPrice(Float.valueOf(price));
 			}
 			
-			if(alarmAmount != null && !alarmAmount.isEmpty()){
-				builder.setAlarmAmount(Integer.valueOf(alarmAmount));
+			if(minAlarmAmount != null && !minAlarmAmount.isEmpty()){
+				builder.setMinAlarmAmount(Float.valueOf(minAlarmAmount));
+			}
+			
+			if(maxAlarmAmount != null && !maxAlarmAmount.isEmpty()){
+				builder.setMaxAlarmAmount(Float.valueOf(maxAlarmAmount));
 			}
 			
 			MaterialDao.update(staff, builder);

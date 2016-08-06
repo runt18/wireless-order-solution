@@ -18,10 +18,21 @@ public class Material implements Jsonable {
 		private long lastModDate;
 		private String pinyin;
 		private boolean isGood = false;
-		private int alarmAmount;
 		private int associateId;
+		private Float minAlarmAmount;
+		private Float maxAlarmAmount;
 		
 		public InsertBuilder(){}
+		
+		public InsertBuilder setMinAlarmAmount(Float minAlarmAmount){
+			this.minAlarmAmount = minAlarmAmount;
+			return this;
+		}
+
+		public InsertBuilder setMaxAlarmAmount(Float maxAlarmAmount){
+			this.maxAlarmAmount = maxAlarmAmount;
+			return this;
+		}
 		
 		public InsertBuilder setMaterialCate(MaterialCate cate){
 			this.cate = cate;
@@ -78,11 +89,6 @@ public class Material implements Jsonable {
 			return this;
 		}
 		
-		public InsertBuilder setAlarmAmount(int alarmAmount){
-			this.alarmAmount = alarmAmount;
-			return this;
-		}
-		
 		public Material build(){
 			return new Material(this);
 		}
@@ -100,8 +106,19 @@ public class Material implements Jsonable {
 		private long lastModDate;
 		private String pinyin;
 		private boolean isGood = false;
-		private Integer alarmAmount;
 		private boolean isStockChanged = false;
+		private Float minAlarmAmount;
+		private Float MaxAlarmAmount;
+		
+		public UpdateBuilder setMinAlarmAmount(Float minAlarmAmount){
+			this.minAlarmAmount = minAlarmAmount;
+			return this;
+		}
+		
+		public UpdateBuilder setMaxAlarmAmount(Float maxAlarmAmount){
+			this.MaxAlarmAmount = maxAlarmAmount;
+			return this;
+		}
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -114,6 +131,14 @@ public class Material implements Jsonable {
 		public UpdateBuilder setIsStockOperation(boolean isStockChanged){
 			this.isStockChanged = isStockChanged;
 			return this;
+		}
+		
+		public boolean hasMinAlarmChanged(){
+			return this.minAlarmAmount != null;
+		}
+		
+		public boolean hasMaxAlarmChanged(){
+			return this.MaxAlarmAmount != null;
 		}
 		
 		public boolean hasNameChanged(){
@@ -130,10 +155,6 @@ public class Material implements Jsonable {
 		
 		public boolean hasStockChanged(){
 			return this.stock != 0;
-		}
-		
-		public boolean hasAlarmChanged(){
-			return this.alarmAmount != null;
 		}
 		
 		public UpdateBuilder setMaterialCate(MaterialCate cate){
@@ -181,11 +202,6 @@ public class Material implements Jsonable {
 			return this;
 		}
 		
-		public UpdateBuilder setAlarmAmount(int alarmAmount){
-			this.alarmAmount = alarmAmount;
-			return this;
-		}
-		
 		public Material build(){
 			return new Material(this);
 		}
@@ -203,8 +219,9 @@ public class Material implements Jsonable {
 	private long lastModDate;
 	private String pinyin;
 	private boolean isGood = false;
-	private int alarmAmount;
 	private int associateId;
+	private Float minAlarmAmount;
+	private Float maxAlarmAmount;
 	
 	public Material(){}
 
@@ -222,8 +239,9 @@ public class Material implements Jsonable {
 		this.lastModDate = builder.lastModDate;
 		this.pinyin = builder.pinyin;
 		this.isGood = builder.isGood;
-		this.alarmAmount = builder.alarmAmount;
 		this.associateId = builder.associateId;
+		this.minAlarmAmount = builder.minAlarmAmount;
+		this.maxAlarmAmount = builder.maxAlarmAmount;
 	}
 	
 	public Material(UpdateBuilder builder){
@@ -237,9 +255,8 @@ public class Material implements Jsonable {
 		this.lastModDate = builder.lastModDate;
 		this.pinyin = builder.pinyin;
 		this.isGood = builder.isGood;
-		if(builder.alarmAmount != null){
-			this.alarmAmount = builder.alarmAmount;
-		}
+		this.minAlarmAmount = builder.minAlarmAmount;
+		this.maxAlarmAmount = builder.MaxAlarmAmount;
 	}
 	
 	/**
@@ -274,6 +291,22 @@ public class Material implements Jsonable {
 		setRestaurantId(builder.restaurantId);
 	}
 	
+	public Float getMinAlarmAmount() {
+		return minAlarmAmount;
+	}
+
+	public void setMinAlarmAmount(Float minAlarmAmount) {
+		this.minAlarmAmount = minAlarmAmount;
+	}
+
+	public Float getMaxAlarmAmount() {
+		return maxAlarmAmount;
+	}
+
+	public void setMaxAlarmAmount(Float maxAlarmAmount) {
+		this.maxAlarmAmount = maxAlarmAmount;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -375,18 +408,6 @@ public class Material implements Jsonable {
 	
 	public void cutStock(float count){
 		this.stock = stock - count;
-	}
-	
-	public boolean hasAlarm(){
-		return this.alarmAmount != 0;
-	}
-	
-	public void setAlarmAmount(int alarmAmount){
-		this.alarmAmount = alarmAmount;
-	}
-	
-	public int getAlarmAmount() {
-		return this.alarmAmount;
 	}
 	
 	public boolean isGood() {
@@ -505,7 +526,12 @@ public class Material implements Jsonable {
 		jm.putLong("lastModDate", this.getLastModDate());
 		jm.putString("lastModDateFormat", DateUtil.format(this.getLastModDate()));
 		jm.putString("pinyin", this.pinyin);
-		jm.putInt("alarmAmount", this.alarmAmount);
+		if(this.minAlarmAmount != null){
+			jm.putFloat("minAlarmAmount", this.minAlarmAmount);
+		}
+		if(this.maxAlarmAmount != null){
+			jm.putFloat("maxAlarmAmount", this.maxAlarmAmount);
+		}
 		if(this.cate != null){
 			jm.putInt("cateId", this.getCate().getId());
 			jm.putString("cateName", this.getCate().getName());

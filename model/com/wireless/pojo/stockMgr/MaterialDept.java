@@ -143,7 +143,8 @@ public class MaterialDept implements Jsonable{
 			jm.putString("materialName", this.material.getName());
 			jm.putString("materialPinyin", this.material.getPinyin());
 		}
-		jm.putInt("alarmAmoaunt", this.material.getAlarmAmount());
+		jm.putFloat("minAlarmAmount", this.material.getMinAlarmAmount());
+		jm.putFloat("maxAlarmAmount", this.material.getMaxAlarmAmount());
 		return jm;
 	}
 	@Override

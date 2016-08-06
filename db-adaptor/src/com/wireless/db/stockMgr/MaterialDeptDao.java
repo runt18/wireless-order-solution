@@ -22,14 +22,14 @@ public class MaterialDeptDao {
 		private int materialId;
 		private int materialCateId;
 		private MaterialCate.Type materialCateType;
-		private String checkAlarm;
+		private Integer checkAlarm;
 		
 		public ExtraCond setDeptId(int deptId){
 			this.deptId = deptId;
 			return this;
 		}
 		
-		public ExtraCond setIsAlarm(String alarmOrder){
+		public ExtraCond setIsAlarm(Integer alarmOrder){
 			this.checkAlarm = alarmOrder;
 			return this;
 		}
@@ -75,10 +75,10 @@ public class MaterialDeptDao {
 				extraCond.append(" AND MC.type = " + materialCateType.getValue());
 			}
 			if(checkAlarm != null){
-				if(checkAlarm.equals("overAlarm")){
-					extraCond.append(" AND M.stock >= M.alarm_amount");
-				}else if(checkAlarm.equals("underAlarm")){
-					extraCond.append(" AND M.stock < M.alarm_amount");
+				if(checkAlarm == 1){
+					extraCond.append(" AND M.stock < M.min_alarm_amount");
+				}else if(checkAlarm == 2){
+					extraCond.append(" AND M.stock > M.max_alarm_amount");
 				}
 			}
 			return extraCond.toString();
@@ -284,7 +284,7 @@ public class MaterialDeptDao {
 	 */
 	public static List<MaterialDept> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
-		sql = " SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock AS m_stock, D.name AS d_name, M.alarm_amount " +
+		sql = " SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock AS m_stock, D.name AS d_name, M.min_alarm_amount, M.max_alarm_amount " +
 			  " FROM " + Params.dbName + ".material_dept AS MD " +
 			  " JOIN " + Params.dbName + ".material AS M ON MD.material_id = M.material_id " +
 			  " JOIN " + Params.dbName + ".material_cate AS MC ON M.cate_id = MC.cate_id " + 
@@ -303,7 +303,8 @@ public class MaterialDeptDao {
 			materialDept.getMaterial().setPrice(dbCon.rs.getFloat("price"));
 			materialDept.getMaterial().setStock(dbCon.rs.getFloat("m_stock"));
 			materialDept.getMaterial().setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")));
-			materialDept.getMaterial().setAlarmAmount(dbCon.rs.getInt("alarm_amount"));
+			materialDept.getMaterial().setMinAlarmAmount(dbCon.rs.getFloat("min_alarm_amount"));
+			materialDept.getMaterial().setMaxAlarmAmount(dbCon.rs.getFloat("max_alarm_amount"));
 			
 			materialDept.setDeptId(dbCon.rs.getInt("dept_id"));
 			materialDept.getDept().setName(dbCon.rs.getString("d_name"));

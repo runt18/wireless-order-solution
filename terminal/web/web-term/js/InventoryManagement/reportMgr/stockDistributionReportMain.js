@@ -40,7 +40,7 @@ Ext.onReady(function(){
 		
 	});
 	
-	var alarmData = [[-1, '全部'],['underAlarm', '低于'],['overAlarm', '高于']];
+	var alarmData = [[-1, '全部'],[1, '缺货'],[2, '堆积']];
 	var materialAlarmCombo;
 	materialAlarmCombo = new Ext.form.ComboBox({
 		id : 'alarmCombo_combo_stockDistribution',
@@ -193,8 +193,10 @@ Ext.onReady(function(){
 	
 	function renderAlarmAmount(data, cel, store){
 		
-		if(store.json.alarmAmount){
-			return data >= store.json.alarmAmount ? '<span style="font-weight: bold; color :green;font-size :14px;">' + data + '<span>' : '<span style="font-weight: bold; color :red;font-size :14px;">' + data + '<span>';
+		if(store.json.minAlarmAmount && data < store.json.minAlarmAmount){
+			return '<span style="font-weight: bold; color :red;font-size :14px;">' + data + '<span style="font-size:12px;">(缺货)</span><span>';
+		}else if(store.json.maxAlarmAmount && data > store.json.maxAlarmAmount){
+			return '<span style="font-weight: bold; color :red;font-size :14px;">' + data + '<span style="font-size:12px;">(堆积)</span><span>';
 		}else{
 			return '<span style="font-weight: bold; color :green;font-size :14px;">' + data + '<span>';
 		}
@@ -208,12 +210,14 @@ Ext.onReady(function(){
 	}
 	deptColumnModel.push({header:'成本单价', dataIndex:'price', align: 'right', renderer : Ext.ux.txtFormat.gridDou});
 	deptColumnModel.push({header:'数量合计', dataIndex:'stock', align: 'right', renderer : renderAlarmAmount});
-	deptColumnModel.push({header:'预警数量', dataIndex:'alarmAmount', align: 'right', renderer : function(data){return data ? data : ''}});
+	deptColumnModel.push({header:'预警下限', dataIndex:'minAlarmAmount', align: 'right', renderer : function(data){return data ? data : '无'}});
+	deptColumnModel.push({header:'预警上限', dataIndex:'maxAlarmAmount', align: 'right', renderer : function(data){return data ? data : '无'}});
 	deptColumnModel.push({header:'成本金额', dataIndex:'cost', align: 'right', renderer : Ext.ux.txtFormat.gridDou});
 	
 	dataStore.push({name : 'price'});
 	dataStore.push({name : 'stock'});
-	dataStore.push({name : 'alarmAmount'});
+	dataStore.push({name : 'minAlarmAmount'});
+	dataStore.push({name : 'maxAlarmAmount'});
 	dataStore.push({name : 'cost'});
 	
 /*	var stockDetail = new Ext.grid.ColumnModel([
@@ -374,6 +378,7 @@ Ext.onReady(function(){
 			}
 			stockDistributionGrid.getView().getCell(store.getCount()-1, index+2).innerHTML = '--';
 			stockDistributionGrid.getView().getCell(store.getCount()-1, index+4).innerHTML = '--';
+			stockDistributionGrid.getView().getCell(store.getCount()-1, index+5).innerHTML = '--';
 			
 			for(var i = 0; i < stockDistributionGrid.getColumnModel().getColumnCount(); i++){
 				var sumCell = stockDistributionGrid.getView().getCell(store.getCount() - 1, i);
@@ -394,5 +399,6 @@ Ext.onReady(function(){
 	});
 	
 	stockDistributionGrid.getStore().load({params:{start:0,limit:20}});
+	
 });
 

@@ -243,7 +243,13 @@
 			
 			var alarmAmount = new Ext.form.TextField({
 				id : 'alarmAmount_textfield_basicMgrMain',
-				fieldLabel : '预警数量',
+				fieldLabel : '预警下限',
+				allowBlank : true
+			});
+			
+			var maxAlarmAmount = new Ext.form.TextField({
+				id : 'maxAlarmAmount_text_field_inventory',
+				fieldLabel : '预警上限',
 				allowBlank : true
 			});
 			
@@ -279,7 +285,7 @@
 					defaults : {
 						width : 130
 					},
-					items : [materialId, materialName, materialPrice, alarmAmount, initMaterialCate]
+					items : [materialId, materialName, materialPrice, alarmAmount, maxAlarmAmount, initMaterialCate]
 				}],
 				keys : [{
 					key : Ext.EventObject.ESC,
@@ -307,6 +313,7 @@
 			    		var materialCate = Ext.getCmp('txtMaterialCate');
 			    		var materialPrice = Ext.getCmp('txtMaterialPrice');
 			    		var alarmAmount = Ext.getCmp('alarmAmount_textfield_basicMgrMain');
+			    		var maxAlarmAmountField = Ext.getCmp('maxAlarmAmount_text_field_inventory');
 			    		
 			    		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 	
@@ -318,7 +325,8 @@
 			    			materialName.setValue(data['name']);
 			    			materialPrice.setValue(data['price']);
 			    			materialCate.setValue(data['cateId']);	
-			    			alarmAmount.setValue(data['alarmAmount']);
+			    			alarmAmount.setValue(data['minAlarmAmount'] ? data['minAlarmAmount'] : '');
+			    			maxAlarmAmountField.setValue(data['maxAlarmAmount'] ? data['maxAlarmAmount'] : '');
 			    			
 			    			materialPrice.focus(true, 100);
 			    		}else{
@@ -327,7 +335,8 @@
 			    			materialName.setValue(data['name']);
 			    			materialCate.setValue(data['cateId']);	
 			    			materialPrice.setValue(data['price']);
-			    			alarmAmount.setValue(data['alarmAmount']);
+			    			alarmAmount.setValue(data['minAlarmAmount'] ? data['minAlarmAmount'] : '');
+			    			maxAlarmAmountField.setValue(data['maxAlarmAmount'] ? data['maxAlarmAmount'] : '');
 			    			
 			    			materialName.focus(true, 100);
 			    		}
@@ -348,6 +357,7 @@
 			    		var materialCate = Ext.getCmp('txtMaterialCate');
 			    		var materialPrice = Ext.getCmp('txtMaterialPrice');
 			    		var alarmAmount = Ext.getCmp('alarmAmount_textfield_basicMgrMain');
+			    		var maxAlarmAmountField = Ext.getCmp('maxAlarmAmount_text_field_inventory');
 			    		
 			    		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 	
@@ -359,14 +369,16 @@
 			    			materialName.setValue(data['name']);
 			    			materialPrice.setValue(data['price']);
 			    			materialCate.setValue(data['cateId']);	
-			    			alarmAmount.setValue(data['alarmAmount']);
+			    			alarmAmount.setValue(data['minAlarmAmount'] ? data['minAlarmAmount'] : '');
+			    			maxAlarmAmountField.setValue(data['maxAlarmAmount'] ? data['maxAlarmAmount'] : '');
 			    		}else{
 			    			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
 			    			materialId.setValue(data['id']);
 			    			materialName.setValue(data['name']);
 			    			materialCate.setValue(data['cateId']);	
 			    			materialPrice.setValue(data['price']);
-			    			alarmAmount.setValue(data['alarmAmount']);
+			    			alarmAmount.setValue(data['minAlarmAmount'] ? data['minAlarmAmount'] : '');
+			    			maxAlarmAmountField.setValue(data['maxAlarmAmount'] ? data['maxAlarmAmount'] : '');
 			    		}
 			    		
 			    		if(operateMaterialWin.otype == Ext.ux.otype['insert']){
@@ -405,7 +417,8 @@
 								id : materialId.getValue(),
 								price : materialPrice.getValue(),
 								name : materialName.getValue(),
-								alarmAmount : alarmAmount.getValue() ? alarmAmount.getValue() : 0, 
+								minAlarmAmount : alarmAmount.getValue() ? alarmAmount.getValue() : '',
+								maxAlarmAmount : maxAlarmAmount.getValue() ? maxAlarmAmount.getValue() : '',
 								cateId : initMaterialCate.getValue(),
 								cType : operateMaterialWin.cateType
 							},
@@ -427,6 +440,7 @@
 										Ext.getCmp('txtMaterialPrice').clearInvalid();
 										Ext.getCmp('txtMaterialName').clearInvalid();
 										Ext.getCmp('alarmAmount_textfield_basicMgrMain').clearInvalid();
+										Ext.getCmp('maxAlarmAmount_text_field_inventory').clearInvaild();
 									}
 									
 								}else{
@@ -460,6 +474,7 @@
 						Ext.getCmp('txtMaterialName').clearInvalid();
 						Ext.getCmp('txtMaterialPrice').clearInvalid();
 						Ext.getCmp('alarmAmount_textfield_basicMgrMain').clearInvalid();
+						Ext.getCmp('maxAlarmAmount_text_field_inventory').clearInvalid();
 						
 						Ext.getCmp('btnPreviousFoodMaterial').setDisabled(false);
 						Ext.getCmp('btnNextFoodMaterial').setDisabled(false);
@@ -486,6 +501,7 @@
 		var materialCate = Ext.getCmp('txtMaterialCate');
 		var materialPrice = Ext.getCmp('txtMaterialPrice');
 		var alarmAmount = Ext.getCmp('alarmAmount_textfield_basicMgrMain');
+		var maxAlarmAmount = Ext.getCmp('maxAlarmAmount_text_field_inventory');
 		
 		var btnPreviousFoodMaterial = Ext.getCmp('btnPreviousFoodMaterial');
 		var btnNextFoodMaterial = Ext.getCmp('btnNextFoodMaterial');
@@ -496,6 +512,7 @@
 			materialName.setValue();
 			materialCate.setValue();
 			alarmAmount.setValue();
+			maxAlarmAmount.setValue();
 			materialName.clearInvalid();
 			materialCate.clearInvalid();
 			materialCate.setDisabled(false);
@@ -537,7 +554,8 @@
 				materialId.setValue(data['id']);
 				materialName.setValue(data['name']);
 				materialPrice.setValue(data['price']);
-				alarmAmount.setValue(data['alarmAmount'] ? data['alarmAmount'] : '');
+				alarmAmount.setValue(data['minAlarmAmount'] ? data['minAlarmAmount'] : '');
+				maxAlarmAmount.setValue(data['maxAlarmAmount'] ? data['maxAlarmAmount'] : '');
 				materialCate.setValue(data['cateId']);	
 				
 				materialPrice.focus(true, 100);
@@ -546,7 +564,8 @@
 				materialId.setValue(data['id']);
 				materialName.setValue(data['name']);
 				materialCate.setValue(data['cateId']);
-				alarmAmount.setValue(data['alarmAmount'] ? data['alarmAmount'] : '');
+				alarmAmount.setValue(data['minAlarmAmount'] ? data['minAlarmAmount'] : '');
+				maxAlarmAmount.setValue(data['maxAlarmAmount'] ? data['maxAlarmAmount'] : '');
 				materialPrice.setValue(data['price']);
 				
 				materialName.focus(true, 100);
@@ -753,7 +772,10 @@
 				['对应菜品', 'belongFood', 220],
 				['总数量', 'stock',,'right'],
 				['单位成本', 'price',,'right'],
-				['预警数量', 'alarmAmount',,'center', function(data){
+				['预警下限', 'minAlarmAmount',,'center', function(data){
+					return data ? data : '无';
+				}],
+				['预警上限', 'maxAlarmAmount',,'center', function(data){
 					return data ? data : '无';
 				}],
 	//			['状态', 'statusText',,'center'],
@@ -765,9 +787,9 @@
 							+ '<a href="javascript:void(0);" data-type="deleteMaterial_a_inventory">删除</a>';
 				}]
 				],
-			['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'alarmAmount', 'statusText',
+			['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'minAlarmAmount', 'maxAlarmAmount', 'statusText',
 			 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'isGood'],
-			[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal']],
+			[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal'], ['isGetRelative', true]],
 			GRID_PADDING_LIMIT_25,
 			'',
 			materialBasicGridTbar

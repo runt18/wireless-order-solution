@@ -21,6 +21,7 @@ import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
@@ -298,9 +299,16 @@ public class StockActionDao {
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
 	public static int insert(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
-		
 		Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
 		StockAction stockAction = builder.build();
+		
+		if(stockAction.getSubType() != StockAction.SubType.CONSUMPTION && !staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_ACTION_INSERT)){
+			throw new BusinessException(StockError.STOCK_INSERT_WITHOUT_PRIVILEGE);
+		}
+		//是否有进行期初建账
+		if(stockAction.getSubType() != SubType.INIT && !hasInit(dbCon, staff)){
+			throw new BusinessException(StockError.STOCK_WITHOUT_INIT);
+		}
 		
 		//是否有库存模块授权&入库类型
 		if(!restaurant.hasModule(Module.Code.INVENTORY) && (stockAction.getSubType() != StockAction.SubType.CONSUMPTION)){
@@ -557,9 +565,13 @@ public class StockActionDao {
 	 * @param extraCond
 	 * @return
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
-		
+	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_ACTION_DELETE)){
+			throw new BusinessException(StockError.STOCK_DELETE_WITHOUT_PRIVILEGE);
+		}
+
 		String sql;
 		sql = " DELETE FROM " + Params.dbName + ".stock_action " +
 			  " WHERE 1 = 1 " + 
@@ -682,6 +694,9 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 */
 	public static void update(DBCon dbCon, Staff staff, UpdateBuilder updateBuilder) throws BusinessException, SQLException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_ACTION_UPDATE)){
+			throw new BusinessException(StockError.STOCK_UPDATE_WITHOUT_PRIVILEGE);
+		}
 		StockAction stockAction = updateBuilder.build();
 		//判断是否同个部门下进行调拨
 		if((stockAction.getSubType() == SubType.STOCK_IN_TRANSFER || stockAction.getSubType() == SubType.STOCK_OUT_TRANSFER) && stockAction.getDeptIn().getId() == stockAction.getDeptOut().getId()){
@@ -896,6 +911,10 @@ public class StockActionDao {
 	 */
 	public static void audit(DBCon dbCon, Staff staff, AuditBuilder builder) throws SQLException, BusinessException{
 		StockAction auditStockAction = getById(dbCon, staff, builder.getId());
+		
+		if(auditStockAction.getSubType() != StockAction.SubType.CONSUMPTION && !staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_ACTION_AUDIT)){
+			throw new BusinessException(StockError.STOCK_AUDIT_WITHOUT_PRIVILEGE);
+		}
 		//如果操作类型不是盘亏或盘盈,则需要判断是否在盘点中
 		if(auditStockAction.getSubType() != SubType.MORE && auditStockAction.getSubType() != SubType.LESS && auditStockAction.getSubType() != SubType.DISTRIBUTION_APPLY){
 			isStockTakeChecking(dbCon, staff);
@@ -1079,6 +1098,10 @@ public class StockActionDao {
 	 * @throws SQLException 
 	 */
 	public static void reAuditStockAction(DBCon dbCon, Staff staff, ReAuditBuilder builder) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_ACTION_REAUDIT)){
+			throw new BusinessException(StockError.STOCK_REAUDIT_WITHOUT_PRIVILEGE);
+		}
+		
 		StockAction stockAction = builder.build();
 		
 		//判断是否同个部门下进行调拨
@@ -1571,7 +1594,19 @@ public class StockActionDao {
 		}else{
 			minDay = 0;
 		}
+		dbCon.rs.close();
 		return minDay;		
 		
+	}
+	
+	/**
+	 * 检测是否建立过期初建账
+	 * @param dbCon
+	 * @param staff
+	 * @return
+	 * @throws SQLException
+	 */
+	public static boolean hasInit(DBCon dbCon, Staff staff) throws SQLException{
+		return getByCond(dbCon, staff, new ExtraCond().addSubType(StockAction.SubType.INIT), "").size() > 0;
 	}
 }

@@ -21,6 +21,11 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKACTION_CURRENTMONTH_UPDATE = build(7991, "操作失败, 月结失败, 还有未审核的库存单.");
 	public static final ErrorCode STOCKACTION_INSERT = build(7990, "操作失败, 添加失败, 正在盘点中,不能新增库单.");
 	public static final ErrorCode STOCK_ACTION_DETAIL_NOT_EXIST = build(7990, "操作失败, 此库存明细单不存在.");
+	public static final ErrorCode STOCK_AUDIT_WITHOUT_PRIVILEGE = build(7989, "操作失败, 职员没有库单审核权限");
+	public static final ErrorCode STOCK_REAUDIT_WITHOUT_PRIVILEGE = build(7988, "操作失败, 职员没有库单反审核权限");
+	public static final ErrorCode STOCK_INSERT_WITHOUT_PRIVILEGE = build(7987, "操作失败, 职员没有库单建立权限");
+	public static final ErrorCode STOCK_UPDATE_WITHOUT_PRIVILEGE = build(7987, "操作失败, 职员没有库单修改权限");
+	public static final ErrorCode STOCK_DELETE_WITHOUT_PRIVILEGE = build(7987, "操作失败, 职员没有库单删除权限");
 	/*stockTake 7850 - 7899*/
 	public static final ErrorCode STOCKTAKE_SELECT = build(7899, "操作失败, 查找失败, 此盘点单不存在.");
 	public static final ErrorCode STOCKTAKE_DELETE = build(7898, "操作失败, 删除失败, 此盘点单不存在.");
@@ -32,6 +37,10 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKTAKE_BEFORE_INSERT = build(7892, "操作失败, 添加失败, 工作时间不是当前时间, 不能盘点.");
 	public static final ErrorCode STOCKTAKE_CURRENTMONTH_UPDATE = build(7891, "操作失败, 月结失败, 还有未审核的盘点单.");
 	public static final ErrorCode STOCKTAKE_HAVE_EXIST = build(7890, "操作失败, 添加失败, 此部门同样类别的货品正在盘点,无需重复添加.");
+	public static final ErrorCode STOCKTAKE_AUDIT_WITHOUT_PRIVILEGE = build(7879, "操作失败, 职员没有盘点审核权限");
+	public static final ErrorCode STOCKTAKE_INSERT_WITHOUT_PRIVILEGE = build(7879, "操作失败, 职员没有盘点建立权限");
+	public static final ErrorCode STOCKTAKE_UPDATE_WITHOUT_PRIVILEGE = build(7879, "操作失败, 职员没有盘点修改权限");
+	public static final ErrorCode STOCKTAKE_DELETE_WITHOUT_PRIVILEGE = build(7879, "操作失败, 职员没有盘点删除权限");
 	/*stockTakeDetail 7800 - 7849*/
 	public static final ErrorCode STOCKTAKE_DETAIL_SELECT = build(7849, "操作失败, 查找失败, 此盘点明细单不存在.");
 	public static final ErrorCode STOCKTAKE_DETAIL_DELETE = build(7848, "操作失败, 删除失败, 此盘点明细单不存在.");
@@ -51,6 +60,9 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode MONTHLY_BALANCE_NOT_EXIST = build(7949, "操作失败, 查找失败, 无此月结记录");
 	public static final ErrorCode MONTHLY_BALANCE_ADD = build(7948, "操作失败, 添加失败, 数据库异常");
 	public static final ErrorCode NOT_MONTHLY_BALANCE = build(7947, "当前月份不能月结, 请于下月初进行操作");
+	/*stockInit 7950 - 7951*/
+	public static final ErrorCode STOCK_WITHOUT_INIT = build(7950, "操作失败, 没有进行期初建账..");
+	public static final ErrorCode STOCKINIT_WITHOUT_PRIVILEGE = build(7951, "操作失败, 职员没有初始化权限");
 	
 	private StockError(){
 		

@@ -431,7 +431,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}else if(privilege.getCode() == Code.INVENTORY){
+				}else if(privilege.getCode() == Code.INVENTORY_CHECK){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",expanded:false");

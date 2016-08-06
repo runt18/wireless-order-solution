@@ -65,8 +65,7 @@ public class TestMaterialDao {
 															   .setLastModStaff(lastModStaff)
 															   .setLastModDate(lastModDate)
 															   .setPinYin(pinyin)
-															   .setIsGood(isGood)
-															   .setAlarmAmount(alarmAmount);
+															   .setIsGood(isGood);
 			MaterialDao.update(staff, updateBuilder);
 			MaterialDao.update(staff, updateBuilder);
 			expected = updateBuilder.build();
@@ -90,7 +89,7 @@ public class TestMaterialDao {
 		Assert.assertEquals("lastModDate", expect.getLastModDate(), actual.getLastModDate());
 		Assert.assertEquals("pinyin", expect.getPinyin(), actual.getPinyin());
 		Assert.assertEquals("isGood", expect.isGood(), actual.isGood());
-		Assert.assertEquals("alarmAmount", expect.getAlarmAmount(), actual.getAlarmAmount());
+//		Assert.assertEquals("alarmAmount", expect.getAlarmAmount(), actual.getAlarmAmount());
 		Assert.assertEquals("cate", expect.getCate(), actual.getCate());
 	}
 	

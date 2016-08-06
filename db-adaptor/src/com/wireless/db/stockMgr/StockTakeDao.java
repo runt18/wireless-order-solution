@@ -20,6 +20,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
@@ -95,6 +96,9 @@ public class StockTakeDao {
 	 * 			if there has stockAction is not audit  
 	 */
 	public static int insertStockTake(DBCon dbCon, Staff staff, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_STOCK_TAKE_INSERT)){
+			throw new BusinessException(StockError.STOCKTAKE_INSERT_WITHOUT_PRIVILEGE);
+		}
 		//判断是否有未审核的库单
 		checkStockAction(staff);
 		//判断此部门的某个货品类型是否重复盘点
@@ -215,6 +219,9 @@ public class StockTakeDao {
 	 * 			if the StockTake is not exist
 	 */
 	public static void updateStockTake(DBCon dbCon, Staff staff, StockTake builder) throws SQLException, BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_STOCK_TAKE_UPDATE)){
+			throw new BusinessException(StockError.STOCKTAKE_UPDATE_WITHOUT_PRIVILEGE);
+		}
 		//判断盘点单是否已审核
 		StockTake stockTake = StockTakeDao.getStockTakeById(staff, builder.getId());
 		if(stockTake.getStatus() == Status.AUDIT){
@@ -808,6 +815,10 @@ public class StockTakeDao {
 	 */
 	
 	public static List<Integer> auditStockTake(DBCon dbCon, Staff staff, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+		if(!staff.getRole().hasPrivilege(Privilege.Code.INVENTORY_STOCK_TAKE_AUDIT)){
+			throw new BusinessException(StockError.STOCKTAKE_AUDIT_WITHOUT_PRIVILEGE);
+		}
+		
 		beforeAudit(staff, builder.getId());
 		String sql;
 		List<Integer> result;
@@ -951,8 +962,12 @@ public class StockTakeDao {
 	 * 			the extra condition
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static int deleteStockTake(DBCon dbCon, Staff term, String extraCond) throws SQLException{
+	public static int deleteStockTake(DBCon dbCon, Staff term, String extraCond) throws SQLException, BusinessException{
+		if(term.getRole().hasPrivilege(Privilege.Code.INVENTORY_STOCK_TAKE_DELETE)){
+			throw new BusinessException(StockError.STOCKTAKE_DELETE_WITHOUT_PRIVILEGE);
+		}
 		String sql;
 		sql = "DELETE FROM " + Params.dbName + ".stock_take" + 
 				" WHERE restaurant_id = " + term.getRestaurantId() +

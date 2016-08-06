@@ -135,7 +135,11 @@ public class Role implements Jsonable, Parcelable{
 			addPrivilege(Privilege.Code.DISCOUNT);
 			addPrivilege(Privilege.Code.GIFT);
 			addPrivilege(Privilege.Code.HISTORY);
-			addPrivilege(Privilege.Code.INVENTORY);
+			for(Privilege.Code code : Privilege.Code.values()){
+				if(code.getCate() == Privilege.Cate.INVENTORY){
+					addPrivilege(code);
+				}
+			}
 			addPrivilege(Privilege.Cate.MEMBER);
 			addPrivilege(Privilege.Code.SMS);
 			addPrivilege(Privilege.Code.WEIXIN);

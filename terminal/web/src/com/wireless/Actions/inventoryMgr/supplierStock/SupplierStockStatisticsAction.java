@@ -55,15 +55,14 @@ public class SupplierStockStatisticsAction extends Action{
 			SupplierStock sum = new SupplierStock();
 			sum.setSupplier(new Supplier());
 			
-			
 			/**
 			 * 汇总
 			 */
 			for(SupplierStock supplierStock : result){
 				sum.setStockInAmount(sum.getStockInAmount() + supplierStock.getStockInAmount());
-				sum.setStockInMoney(sum.getStockInMoney() + supplierStock.getStockInMoney());
+				sum.setStockInActualMoney(sum.getStockInActualMoney() + supplierStock.getStockInActualMoney());
 				sum.setStockOutAmount(sum.getStockOutAmount() + supplierStock.getStockOutAmount());
-				sum.setStockOutMoney(sum.getStockOutMoney() + supplierStock.getStockOutMoney());
+				sum.setStockOutActualMoney(sum.getStockOutActualMoney() + supplierStock.getStockOutActualMoney());
 				sum.setTotalMoney(sum.getTotalMoney() + supplierStock.getTotalMoney());
 			}
 			
