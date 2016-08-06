@@ -4,11 +4,18 @@ function CreateFastOrderFood(param) {
 	var _loadedFoodCache = [];
 	var _foodData = null;
 	var _orderData = []; // 已点食物
+	var _popup = null;
 
+	var _orderType = {
+		WX_PAY : 1,				//微信支付下单
+		CONFIRM_BY_STAFF : 2,	//确认下单
+		DIRECT_ORDER : 3		//直接下单
+	}
+	
 	param = param || {
 		confirm : function(selectedFood, container) {
 		}, // 选好了的回调事件
-		confirmText : null, // 选好了的文字
+		confirmText : function(){},
 		onCartChange : function(selectFood) {
 		} // 购物车变动的回调事件
 	}
@@ -23,6 +30,10 @@ function CreateFastOrderFood(param) {
 					// _loadedUrlCache[_o.loadUrl] = response;
 					if (xhr.status == '200') {
 						var root = $(response);
+						
+						_popup = root;
+						
+						
 						$('body').append(root);
 
 						root.trigger('create').trigger('refresh');
@@ -68,7 +79,13 @@ function CreateFastOrderFood(param) {
 							}
 							
 						});
-
+						
+						//选好了的文字
+						if(param.confirmText){
+							param.confirmText($('#confirm_div_fastOrderFood'));
+							
+						}
+		
 					} else {
 						// alert('无法打开页面\r\n' + 'url : ' + _o.loadUrl + '
 						// ,status : ' + xhr.status + ' ,statusText : ' +
@@ -84,7 +101,8 @@ function CreateFastOrderFood(param) {
 	}
 
 	this.close = function(afterClose, timeout) {
-
+		_popup.remove();
+		
 		if (afterClose && typeof afterClose == 'function') {
 			if (timeout) {
 				setTimeout(afterClose, timeout);
@@ -92,6 +110,8 @@ function CreateFastOrderFood(param) {
 				afterClose();
 			}
 		}
+		
+		_popup = null;
 
 	}
 
@@ -614,6 +634,8 @@ function CreateFastOrderFood(param) {
 		}
 	}
 
+	
+	
 	// 设置样式
 	function setView() {
 		var width = document.documentElement.clientWidth;
@@ -626,10 +648,6 @@ function CreateFastOrderFood(param) {
 
 		$(".orderdetail").hide();
 		
-		//选好了的文字
-		if(param.confirmText){
-			$('#confirm_div_fastOrderFood').html(param.confirmText);
-		}
 	}
 
 	// 超时提醒
