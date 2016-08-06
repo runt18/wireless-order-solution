@@ -4,7 +4,7 @@ function CreateFastOrderFood(param) {
 	var _loadedFoodCache = [];
 	var _foodData = null;
 	var _orderData = []; // 已点食物
-	var _popupId = null;
+	var _popup = null;
 
 	var _orderType = {
 		WX_PAY : 1,				//微信支付下单
@@ -31,11 +31,7 @@ function CreateFastOrderFood(param) {
 					if (xhr.status == '200') {
 						var root = $(response);
 						
-						if(!root.attr('id')){
-							root.attr('id', 'fastOrderFood-' + new Date().getTime());
-						}
-						
-						_popupId = root.attr('id');
+						_popup = root;
 						
 						
 						$('body').append(root);
@@ -105,7 +101,7 @@ function CreateFastOrderFood(param) {
 	}
 
 	this.close = function(afterClose, timeout) {
-		$('#' + _popupId).remove();
+		_popup.remove();
 		
 		if (afterClose && typeof afterClose == 'function') {
 			if (timeout) {
@@ -115,7 +111,7 @@ function CreateFastOrderFood(param) {
 			}
 		}
 		
-		_popupId = null;
+		_popup = null;
 
 	}
 
