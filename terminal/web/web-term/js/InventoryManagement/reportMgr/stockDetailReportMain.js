@@ -725,8 +725,8 @@ Ext.onReady(function(){
 				containsDetails : true,
 				isWithOutSum : true,
 				isHistory : true,
-				beginDate : dateBegin.getValue(),
-				endDate : dateEnd.getValue()
+				beginDate : dateBegin.getValue().format('Y-m-d'),
+				endDate : dateEnd.getValue().format('Y-m-d')
 			},
 			success : function(res){
 				Ext.stockDistributionAction.newInstance({
