@@ -142,7 +142,8 @@ public class Page{
 		ERASE_STATISTICS("eraseStatistics", "抹数统计", "History_Module/EraseStatistic.html", "../../images/giftStatistics.png"),
 //		MEMBE_RPRICE_STATISTICS("memberPriceStatistics", "会员价统计 ", "History_Module/memberPriceStatictics.html", "../../images/giftStatistics.png"),
 //		PASSENGERFLOWSTATISTICS("passengerFlowStatistics", "History_Module/PassengerFliwStatistics.html", "../../images/giftStatistics.png");
-		PASSENGERFLOW_STATISTICS("passengerFlowStatistics", "客流统计", "History_Module/PassengerFlowStatistics.html", "../../images/giftStatistics.png");
+		PASSENGERFLOW_STATISTICS("passengerFlowStatistics", "客流统计", "History_Module/PassengerFlowStatistics.html", "../../images/giftStatistics.png"),
+		COMBO_STATISTICS("comboStatistics", "套餐统计", "History_Module/comboStatistics.html", "../../images/giftStatistics.png");
 		
 		
 		

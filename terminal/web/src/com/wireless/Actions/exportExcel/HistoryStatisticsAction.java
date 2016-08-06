@@ -28,6 +28,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
+import com.wireless.db.billStatistics.CalcComboStatisticsDao;
 import com.wireless.db.billStatistics.CalcCommissionStatisticsDao;
 import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
 import com.wireless.db.billStatistics.CalcEraseStatisticsDao;
@@ -62,6 +63,7 @@ import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.IncomeByPay.PaymentIncome;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.billStatistics.combo.ComboIncome;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.billStatistics.gift.GiftDetail;
 import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
@@ -382,6 +384,137 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(sm.getRemainingPoint());
 			cell.setCellStyle(numStyle);
+		}
+		
+		OutputStream os = response.getOutputStream();
+        wb.write(os);
+        os.flush();
+        os.close();
+		return null;
+		
+	}
+	
+	public ActionForward comboDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		response.setContentType("application/vnd.ms-excel;");
+		response.addHeader("Content-Disposition","attachment;filename=" + new String("套餐统计.xls".getBytes("GBK"), "ISO8859_1"));
+		
+		final String pin = (String)request.getAttribute("pin");
+		final String onDuty = request.getParameter("onDuty");
+		final String offDuty = request.getParameter("offDuty");
+		final String subFoodName = request.getParameter("subFoodName");
+		final String deptId = request.getParameter("deptId");
+		final String branchId = request.getParameter("branchId");
+		final String opening = request.getParameter("opening");
+		final String ending = request.getParameter("ending");
+		
+		final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+				.setDutyRange(new DutyRange(onDuty, offDuty))
+				.setCalcByDuty(true);
+
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		if(branchId != null && !branchId.isEmpty()){
+			staff = StaffDao.getAdminByRestaurant(Integer.parseInt(branchId));
+		}
+		
+		if(subFoodName != null && !subFoodName.isEmpty()){
+			extraCond.setFoodName(subFoodName);
+		}
+		
+		if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+			extraCond.setDept(DeptId.valueOf(Integer.parseInt(deptId)));
+		}
+		
+		if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
+			extraCond.setHourRange(new HourRange(opening, ending));
+		}
+		
+		List<ComboIncome> result = CalcComboStatisticsDao.calcCombo(staff, extraCond);
+		
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("套餐统计");
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 8000);
+		sheet.setColumnWidth(1, 4000);
+		sheet.setColumnWidth(2, 3500);
+		sheet.setColumnWidth(3, 4500);
+		
+		// 报表头
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 10));
+		
+		
+		//冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		cell = row.createCell(0);
+		cell.setCellValue("套餐统计(" + RestaurantDao.getById(staff.getRestaurantId()).getName() + ")");
+		cell.setCellStyle(titleStyle);
+		
+		// 摘要
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty + "         共: " + result.size() + " 条");
+		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+				
+		// 导出操作相关信息
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		cell = row.createCell(0);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " + staff.getName());
+		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 10));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+				
+		cell = row.createCell(0);
+		cell.setCellValue("套餐名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("子菜名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("数量");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("总额");
+		cell.setCellStyle(headerStyle);
+		
+		if(result != null && result.size() > 0){
+			for(ComboIncome item : result){
+				row = sheet.createRow(sheet.getLastRowNum() + 1);
+				row.setHeight((short) 350);
+				
+				cell = row.createCell(0);
+				cell.setCellValue(item.getComboFoodName());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getSubFoodName());
+				cell.setCellStyle(headerStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getAmount());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell((int)row.getLastCellNum());
+				cell.setCellValue(item.getTotalPrice());
+				cell.setCellStyle(numStyle);
+			}
 		}
 		
 		OutputStream os = response.getOutputStream();
