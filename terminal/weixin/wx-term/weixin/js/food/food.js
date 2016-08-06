@@ -1,6 +1,7 @@
 $(function(){
 	var _orderType = null;      //下单方式
 	var _prefectMemberStauts = null   //是否显示完善会员资料
+	var _confirmText = '';
 	
 	var orderType = {
 		WX_PAY : 1,				//微信支付下单
@@ -55,6 +56,15 @@ $(function(){
 		success : function(data, status, xhr){
 			if(data.success){
 				_orderType = data.root[0].defaultOrderType;
+				
+				//选好了文字
+				if(_orderType == orderType.WX_PAY){//微信支付
+					_confirmText = '微信支付';
+				}else if(_orderType == orderType.CONFIRM_BY_STAFF){//确认下单
+					_confirmText = '确认下单';
+				}else if(_orderType == orderType.DIRECT_ORDER){//直接下单
+					_confirmText = '直接下单';
+				}
 			}else if(data.code == '7546'){
 				sessionTimeout();
 			}else{
@@ -71,18 +81,9 @@ $(function(){
 		}
 	});
 	
-	//选好了文字
-	var confirmText = '';
-	if(_orderType == orderType.WX_PAY){//微信支付
-		confirmText = '微信支付';
-	}else if(_orderType == orderType.CONFIRM_BY_STAFF){//确认下单
-		confirmText = '确认下单';
-	}else if(_orderType == orderType.DIRECT_ORDER){//直接下单
-		confirmText = '直接下单';
-	}
 	
 	var createFastOrderFood = new CreateFastOrderFood({
-		confirmText : confirmText,
+		confirmText : _confirmText,
 		confirm : function(orderData){
 			//TODO 未绑定会员出现绑定会员			
 			var foods = '';
@@ -119,7 +120,7 @@ $(function(){
 						if(data.success){
 							var calcOrderCost = data.root[0].actualPrice;
 							
-							Util.lm.show();
+							wxLoadDialog.instance().show();
 							$.ajax({
 								url : '../../../WxOperateOrder.do',
 								type : 'post',
@@ -131,7 +132,7 @@ $(function(){
 									cost : calcOrderCost
 								},
 								success : function(data, status, req){
-									Util.lm.hide();
+									wxLoadDialog.instance().hide();
 									if(data.success){
 										payParam = data.other;
 										if(typeof WeixinJSBridge == 'undefined'){
@@ -162,6 +163,7 @@ $(function(){
 									}
 								},
 								error : function(req, status, error){
+									wxLoadDialog.instance().hide();
 									var dialog = new WeDialogPopup({
 										content : data.msg,
 										titleText : '微信支付失败',
@@ -192,7 +194,7 @@ $(function(){
 				});
 			}else if(_orderType == orderType.CONFIRM_BY_STAFF){
 				//确认下单
-				Util.lm.show();
+				wxLoadDialog.instance().show();
 				$.ajax({
 					url : '../../../WxOperateOrder.do',
 					type : 'post',
@@ -205,7 +207,7 @@ $(function(){
 						print : true
 					},
 					success : function(data, status, xhr){
-						Util.lm.hide();
+						wxLoadDialog.instance().hide();
 						if(data.success){
 							//提示框设置
 							var finishOrderDialog = new WeDialogPopup({
@@ -230,7 +232,7 @@ $(function(){
 						
 					},
 					error : function(xhr, status, err){
-						Util.lm.hide();
+						wxLoadDialog.instance().hide();
 						if(err.code == '7546'){
 							sessionTimeout();
 						}else{
@@ -240,7 +242,7 @@ $(function(){
 				});
 				 
 			}else if(_orderType == orderType.DIRECT_ORDER){
-				Util.lm.show();
+				wxLoadDialog.instance().show();
 				//直接下单
 				$.ajax({
 					url : '../../../WxOperateOrder.do',
@@ -254,7 +256,7 @@ $(function(){
 					},
 					success : function(data, status, req){
 						if(data.success){
-							Util.lm.hide();
+							wxLoadDialog.instance().hide();
 							//提示框设置
 							var finishOrderDialog;
 							finishOrderDialog = new WeDialogPopup({
@@ -279,6 +281,7 @@ $(function(){
 						}
 					},
 					error : function(req, status, err){
+						wxLoadDialog.instance().hide();
 						if(err.code == '7546'){
 							sessionTimeout();
 						}else{
