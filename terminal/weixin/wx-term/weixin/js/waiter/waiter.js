@@ -1,5 +1,4 @@
 $(function(){
-	
 	var fastFoodWaiterData = {
 		_tableAlias : null,				//餐桌号
 		_orderData : null,				//点菜资料
@@ -11,11 +10,32 @@ $(function(){
 		_wxOrderFoods : null,
 		_prefectMemberStauts : null 	//是否显示完善会员资料
 	};
-	
 	var orderType = {
 		WX_PAY : 1,				//微信支付下单
 		CONFIRM_BY_STAFF : 2,	//确认下单
 		DIRECT_ORDER : 3		//直接下单
+	}
+	
+	var _orderType = {
+		values : {
+			WX_PAY : {val : 1, desc : '微信支付'},
+			CONFIRM_BY_STAFF : {val : 2, desc : '确认下单'},
+			DIRECT_ORDER : {val : 3, desc : '直接下单'}
+		},
+		valueOf : function(orderTypeValue){
+			var type;
+			for(var key in _orderType.values){
+				if(orderTypeValue == _orderType.values[key]['val']){
+					type = _orderType.values[key];
+				}
+			}
+			if(type){
+				return type;
+			}else{
+				console.log('输入的下单方式参数有误');
+				return null;
+			}
+		}
 	}
 	
 	var prefectMemberStauts = {
@@ -479,7 +499,7 @@ $(function(){
 		var isProcessing = false;
 		
 		var createFastOrderFood = new CreateFastOrderFood({
-			payType : fastFoodWaiterData._orderType,
+			confirmText : _orderType.valueOf(fastFoodWaiterData._orderType) ? _orderType.valueOf(fastFoodWaiterData._orderType).desc : '',
 			confirm : function(_orderData){
 				console.log(_orderData);
 				if(!isProcessing){
@@ -488,7 +508,6 @@ $(function(){
 						isProcessing = false;
 					},2000);
 					fastFoodWaiterData._orderData = _orderData;
-//					fastFoodWaiterData._commentData = _commentData;
 					//读取公众号会员数据
 					if(fastFoodWaiterData._prefectMemberStauts == prefectMemberStauts.SHOW_PREFECMEMBER){//显示完善会员资料
 						$.ajax({
@@ -539,83 +558,6 @@ $(function(){
 			$('#weixinWaiter_div_waiter').hide();
 			$('#bottom_div_waiter').hide();
 		});
-		//建立popup
-//		orderFoodPopup = new PickFoodComponent({
-//			payType : fastFoodWaiterData._orderType,
-//			bottomId : 'fastFoodBottom_div_waiter',
-//			//下单键回调  能调用的三个参数_orderData, _commentData, _container
-//			confirm : function(_orderData, _commentData, _container, _calcOrderCost){
-//				if(!isProcessing){
-//					isProcessing = true;
-//					setTimeout(function(){
-//						isProcessing = false;
-//					},2000);
-//					fastFoodWaiterData._orderData = _orderData;
-//					fastFoodWaiterData._commentData = _commentData;
-//					//读取公众号会员数据
-//					
-//					if(fastFoodWaiterData._prefectMemberStauts == prefectMemberStauts.SHOW_PREFECMEMBER){//显示完善会员资料
-//						$.ajax({
-//							url : '../../WXOperateMember.do',
-//							type : 'post',
-//							dataType : 'json',
-//							data : {
-//								dataSource : 'getByCond',
-//								sessionId : Util.mp.params.sessionId
-//							},
-//	
-//							success : function(data, status, xhr){
-//								if(data.success){
-//									//判断会员的信息是否补全
-//									if(data.root[0].isRaw){
-//										var completeMemberMsgDialog = new CompleteMemberMsg({
-//											sessionId : Util.mp.params.sessionId,
-//											completeFinish : function(){ commit(_calcOrderCost); }
-//										});
-//										completeMemberMsgDialog.open();
-//										
-//									}else{
-//										commit(_calcOrderCost);
-//									}
-//								}else if(data.code == '7546'){
-//									sessionTimeout();	
-//								}else{
-//									Util.showErrorMsg(data.msg);
-//								}
-//							},
-//						
-//							error : function(xhr, status, err){
-//								if(err.code == '7546'){
-//									sessionTimeout();
-//								}else{
-//									Util.showErrorMsg(err.msg);					
-//								}
-//							}
-//						});
-//					
-//					}else{
-//						commit(_calcOrderCost);
-//					}
-//				}
-//			},
-//			onCartChange : function(_orderData){
-//				var foodTypeCount = _orderData.length;
-//				if(foodTypeCount > 0){
-//					$('#shoppingCart_i_waiter').html('<span style="color:red;font-weight:bold;">' + foodTypeCount +'</span>');
-//			
-//				}else{
-//					$('#shoppingCart_i_waiter').html('');
-//				}
-//			}
-//		});
-		
-		
-		//弹出所建立的popup
-//		orderFoodPopup.open(function(){
-//			$('#weixinWaiter_div_waiter').hide();
-//			$('#bottom_div_waiter').hide();
-//			$('#fastFoodBottom_div_waiter').show();
-//		});
 	});
 	
 	//返回按钮
@@ -749,9 +691,8 @@ $(function(){
 		callPayDialog.open();
 	});
 	
-	//TODO
 	//下单功能数据传递
-	function commit(calcOrderCost){
+	function commit(){
 		var foods = '';
 		var unitId = 0; 
 		
@@ -769,7 +710,6 @@ $(function(){
 				
 			foods += element.food.id + ',' + element.count + ',' + unitId;
 		});
-		javascript:void(0)
 		
 		var payType = null;
 		$('[name=payType_input_waiter]').each(function(index, el){
@@ -777,6 +717,7 @@ $(function(){
 				payType = el.getAttribute('data-type');
 			}
 		});
+		
 		//微信支付下单
 		if(fastFoodWaiterData._orderType == orderType.WX_PAY){
 			$.ajax({
@@ -802,7 +743,7 @@ $(function(){
 								dataSource : 'wxPayOrder',
 								sessionId : Util.mp.params.sessionId,
 								foods : foods,
-								cost : calcOrderCost,
+								cost : _calcOrderCost,
 								tableAlias : fastFoodWaiterData._tableAlias,
 								tableId : Util.mp.params.tableId ? Util.mp.params.tableId : ''
 							},
@@ -831,7 +772,8 @@ $(function(){
 											dialog.close();
 										},
 										afterClose : function(){
-											window.location.reload();
+//											window.location.reload();
+											reload();
 										}
 									})
 									dialog.open();
@@ -847,7 +789,8 @@ $(function(){
 										dialog.close();
 									},
 									afterClose : function(){
-										window.location.reload();
+//										window.location.reload();
+										reload();
 									}
 								})
 								dialog.open();
@@ -908,7 +851,8 @@ $(function(){
 //								if(Util.mp.params.tableId){
 //									window.location.href = 'orderList.html?sessionId=' + Util.mp.params.sessionId + "&m=" + Util.mp.oid + "&r=" + Util.mp.fid;
 //								}else{
-									window.location.reload();
+//									window.location.reload();
+								reload();
 //									$('#waiterTab_div_waiter').find('[data-type=waiterTab]').click();
 //								}
 								
@@ -964,7 +908,8 @@ $(function(){
 							},
 							afterClose : function(){
 								//关闭后回调
-								window.location.reload();
+//								window.location.reload();
+								reload();
 							},
 							dismissable : true
 						});
@@ -1079,7 +1024,7 @@ $(function(){
 							}
 							
 							setTimeout(function(){
-								window.location.reload();
+								reload();
 							}, 2000);
 						}
 					});
@@ -1126,6 +1071,11 @@ $(function(){
 //	}
 	
 	initTableMsg();
+	
+	function reload(){
+		var reloadHref = window.location.href;
+		window.location.href = reloadHref;
+	}
 	
 	function sessionTimeout(){
 		var sessionTimeoutPopup;
