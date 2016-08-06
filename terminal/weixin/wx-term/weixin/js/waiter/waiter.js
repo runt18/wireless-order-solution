@@ -51,6 +51,9 @@ $(function(){
 	
 	//加载店小二账单信息
 	initWaiterOrder();
+	//加载桌面信息
+	initTableMsg();
+	
 	
 	var tableStatus = {
 		IDLE : { val : 0, desc : '空闲'},
@@ -293,7 +296,7 @@ $(function(){
 				}));
 				
 			});
-			var orderMainBox = '<div style="background-color: #fff;background-color: #fff;border: 1px solid #E4E3E3;border-radius: 5px;margin: 5px;padding: 4px;font-size: 1.1em;padding-bottom:0;">';
+			var orderMainBox = '<div style="background-color: #fff;border: 1px solid #E4E3E3;border-radius: 5px;margin: 5px;padding: 4px;font-size: 1.1em;padding-bottom:0;">';
 			$('#foodList_div_waiter').html(orderMainBox + html.join('') + '</div>');
 			$('#foodList_div_waiter').children().css('min-height', $('#foodList_div_waiter').height() - 10);
 		}else{
@@ -398,7 +401,6 @@ $(function(){
 	
 	window.onresize = setView;
 	window.onresize();
-		
 	
 	//店小二自助点餐功能弹出按钮
 	$('#orderBySelf_a_waiter').click(function(){
@@ -888,15 +890,26 @@ $(function(){
 		}
 	}
 	
-	initTableMsg();
+	//更新数据
+	function updateMsg(){
+		$('#foodList_div_waiter').html('');
+		$('#orderList_div_waiter').html('');
+		//加载店小二账单信息
+		initWaiterOrder();
+		//加载桌面信息
+		initTableMsg();
+	}
 	
 	function reload(container){
-		container.close(function(){
-			$('#weixinWaiter_div_waiter').show();
-			$('#bottom_div_waiter').show();
+		container.close();
+		$('#weixinWaiter_div_waiter').show();
+		$('#bottom_div_waiter').show();
+		setTimeout(function(){
+			updateMsg();
 		});
-		var reloadHref = window.location.href;
-		window.location.href = reloadHref;
+//		var reloadHref = window.location.href;
+//		window.location.href = reloadHref;
+//		window.location.reload();
 	}
 	
 	function sessionTimeout(){
