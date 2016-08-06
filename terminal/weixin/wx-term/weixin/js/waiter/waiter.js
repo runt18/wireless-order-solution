@@ -487,6 +487,13 @@ $(function(){
 		orderFoodPopup.openShopping();
 	});
 	
+	//刷新
+	$('#waiterRefresh_waiter').click(function(){
+		$('#foodList_div_waiter').html('');
+		$('#orderList_div_waiter').html('');
+		updateMsg();
+	});
+	
 	//为我评价功能
 	$('#reviewService_a_waiter').click(function(){
 		var remindDialog = new WeDialogPopup({
