@@ -247,8 +247,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		final String root = "http://" + this.serverName + "/wx-term";
 		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
 //		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=food.html";
-		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=../html/food/food.html";
-		this.WEIXIN_BOOK = root + "/weixin/order/branches.html?redirect_url=book.html";
+		this.WEIXIN_FOOD = root + "/weixin/html/branches/branches.html?redirect_url=../../html/food/food.html";
+		this.WEIXIN_BOOK = root + "/weixin/html/branches/branches.html?redirect_url=../../weixin/order/book.html";
 		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
 		this.WEIXIN_ABOUT = root + "/weixin/order/about.html";
 //		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
