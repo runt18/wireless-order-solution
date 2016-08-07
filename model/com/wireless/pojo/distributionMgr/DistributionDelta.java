@@ -15,10 +15,10 @@ public class DistributionDelta implements Jsonable{
 	private float distributionReceiveAmount;
 	private float distributionReturnAmount;
 	private float distributionRecoveryAmount;
-	private List<StockDistribution> distributionSends = new ArrayList<>(); 
-	private List<StockDistribution> distributionReceives = new ArrayList<>();
-	private List<StockDistribution> distributionReturns = new ArrayList<>();
-	private List<StockDistribution> distributionRecoverys = new ArrayList<>();
+	private List<StockDistribution> distributionSends = new ArrayList<StockDistribution>(); 
+	private List<StockDistribution> distributionReceives = new ArrayList<StockDistribution>();
+	private List<StockDistribution> distributionReturns = new ArrayList<StockDistribution>();
+	private List<StockDistribution> distributionRecoverys = new ArrayList<StockDistribution>();
 	
 	public int getSendId() {
 		return sendId;
