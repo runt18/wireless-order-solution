@@ -67,6 +67,7 @@ $(function(){
 			id : 'orderFoodStatPanelDeptTree',
 			region : 'west',
 			rootVisible : true,
+			autoScroll : true,
 			frame : true,
 			width : 150,	
 			animate : true,
