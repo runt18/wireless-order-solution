@@ -845,7 +845,7 @@ public class CalcBillStatisticsDao {
 		return serviceIncome;
 	}
 	
-	private static String makeSql4CalcFood(Staff staff, ExtraCond extraCond){
+	static String makeSql4CalcFood(Staff staff, ExtraCond extraCond){
 		
 		return (
 			   " SELECT " +

@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/QueryComboStatistics"
+			type="com.wireless.Actions.billStatistics.QueryComboStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
 		<action path="/QueryDistributionDelta"
 			type="com.wireless.Actions.distributionMgr.QueryDistributionDeltaAction"
 			scope="request" parameter="dataSource">

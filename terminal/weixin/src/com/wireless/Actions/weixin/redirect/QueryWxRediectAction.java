@@ -41,15 +41,15 @@ public class QueryWxRediectAction extends DispatchAction {
 			final String url;
 			final String path1 = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + wxRestaurant.getWeixinAppId() + "&redirect_uri="; 
 			final String path2 = "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
-			final String encoderUrl = "http://" + serverName + "/wx-term/weixin/order/redirect.html?fid=" + wxRestaurant.getWeixinSerial();
+			final String encoderUrl = "http://" + serverName + "/wx-term/weixin/html/redirect/redirect.html?fid=" + wxRestaurant.getWeixinSerial();
 			if(WxHandleMessage.EventKey.SELF_ORDER_EVENT_KEY.getKey().equals(key)){
-				url = path1 + URLEncoder.encode(encoderUrl + "&href=../html/food/food.html", "utf-8") + path2;
+				url = path1 + URLEncoder.encode(encoderUrl + "&href=../branches/food.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.SELF_BOOK_EVENT_KEY.getKey().equals(key)){
 				url = path1 + URLEncoder.encode(encoderUrl + "&href=book.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.MEMBER_EVENT_KEY.getKey().equals(key)){
-				url = path1 + URLEncoder.encode(encoderUrl + "&href=../html/member/member.html", "utf-8") + path2;
+				url = path1 + URLEncoder.encode(encoderUrl + "&href=../member/member.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.ORDER_EVENT_KEY.getKey().equals(key)){
-				url = path1 + URLEncoder.encode(encoderUrl + "&href=../html/orderList/orderList.html", "utf-8") + path2;
+				url = path1 + URLEncoder.encode(encoderUrl + "&href=../orderList/orderList.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.PROMOTION_EVENT_KEY.getKey().equals(key)){
 				url = path1 + URLEncoder.encode(encoderUrl + "&href=sales.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.I_WANT_REPRESENT.getKey().equals(key)){
