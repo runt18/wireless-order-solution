@@ -261,7 +261,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		this.WEIXIN_SCANNING_RESULT = root + "/weixin/order/scanResult.html";
 //		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
 		this.WEIXIN_WAITER = root + "/weixin/html/waiter/waiter.html";
-		this.WEIXIN_REPRESENT = root + "/weixin/order/representCard.html";
+		this.WEIXIN_REPRESENT = root + "/weixin/html/representCard/representCard.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_BOOK_ICON = root + "/weixin/order/images/icon_book.jpg";
