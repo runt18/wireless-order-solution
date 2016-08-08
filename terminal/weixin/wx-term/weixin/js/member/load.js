@@ -12,203 +12,208 @@ $(function(){
 		
 	}
 	
-	//获取用户头像
-	$.ajax({
-		url : '../../../WXOperateMember.do',
-		type : 'post',
-		data : {
-			dataSource : 'getUserMsg',   
-			oid : Util.mp.oid,
-			fid : Util.mp.fid
-		},
-		dataType : 'json',
-		success : function(data){
-			if(data.success){
-				$('#headImg_div_member').css({
-					'background': 'url("' + data.root[0].headimgurl + '")',
-					'background-size' : '100% 100%'
-				});
-				
-				$('#userName_div_member').text(data.root[0].nickName);
-				
-			}else{
+	var member;
+	var currentMemberLevelData;
+
+	function refresh(){
+		//获取用户头像
+		$.ajax({
+			url : '../../../WXOperateMember.do',
+			type : 'post',
+			data : {
+				dataSource : 'getUserMsg',   
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data){
+				if(data.success){
+					$('#headImg_div_member').css({
+						'background': 'url("' + data.root[0].headimgurl + '")',
+						'background-size' : '100% 100%'
+					});
+					
+					$('#userName_div_member').text(data.root[0].nickName);
+					
+				}else{
+					$('#headImg_div_member').css({
+						'background': 'url("../../images/userHead.jpg")',
+						'background-size' : '100% 100%'
+					});
+				}		
+			},
+			error : function(){
 				$('#headImg_div_member').css({
 					'background': 'url("../../images/userHead.jpg")',
 					'background-size' : '100% 100%'
 				});
-			}		
-		},
-		error : function(){
-			$('#headImg_div_member').css({
-				'background': 'url("../../images/userHead.jpg")',
-				'background-size' : '100% 100%'
-			});
-		}
-	});
-	
-	//获取餐厅图片
-	$.ajax({
-		url : '../../../WxOperateRestaurant.do',
-		data : {
-			dataSource : 'getByCond',
-			oid : Util.mp.oid,
-			fid : Util.mp.fid,
-			sessionId : Util.mp.params.sessionId
-		},
-		type : 'post',
-		dataType : 'json',
-		success : function(data, status, req){
-			if(data.success){
-				if(data.root[0].wxCardImg){
-					$('#divMemberCard').css({
-						'background': 'url("' + data.root[0].wxCardImg.image + '")',
-						'background-size' : '100% 100%'
-					});
+			}
+		});
+		
+		//获取餐厅图片
+		$.ajax({
+			url : '../../../WxOperateRestaurant.do',
+			data : {
+				dataSource : 'getByCond',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid,
+				sessionId : Util.mp.params.sessionId
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(data, status, req){
+				if(data.success){
+					if(data.root[0].wxCardImg){
+						$('#divMemberCard').css({
+							'background': 'url("' + data.root[0].wxCardImg.image + '")',
+							'background-size' : '100% 100%'
+						});
+					}else{
+						$('#divMemberCard').css({
+							'background': 'url("../../images/VIP.jpg")',
+							'background-size' : '100% 100%'
+						});
+					}
+					
 				}else{
 					$('#divMemberCard').css({
 						'background': 'url("../../images/VIP.jpg")',
 						'background-size' : '100% 100%'
 					});
 				}
-				
-			}else{
+			},
+			error : function(req, status, err){
 				$('#divMemberCard').css({
 					'background': 'url("../../images/VIP.jpg")',
 					'background-size' : '100% 100%'
 				});
 			}
-		},
-		error : function(req, status, err){
-			$('#divMemberCard').css({
-				'background': 'url("../../images/VIP.jpg")',
-				'background-size' : '100% 100%'
-			});
-		}
-	});
-	
-	//获取赠送余额说明
-	$.ajax({
-		url : '../../../WxOperateRepresent.do',
-		data : {
-			dataSource : 'getByCond',
-			fid : Util.mp.fid
-		},
-		type : 'post',
-		dataType : 'json',
-		success : function(res, status, req){
-			if(res.success){
-				$('#memberExtraBalanceDesc_div_member').show();
-				$('#memberExtraBalanceDesc_div_member').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
-				if(!res.root[0].giftDesc){
+		});
+		
+		//获取赠送余额说明
+		$.ajax({
+			url : '../../../WxOperateRepresent.do',
+			data : {
+				dataSource : 'getByCond',
+				fid : Util.mp.fid
+			},
+			type : 'post',
+			dataType : 'json',
+			success : function(res, status, req){
+				if(res.success){
+					$('#memberExtraBalanceDesc_div_member').show();
+					$('#memberExtraBalanceDesc_div_member').html(res.root[0].giftDesc ? res.root[0].giftDesc : '');
+					if(!res.root[0].giftDesc){
+						$('#memberExtraBalanceDesc_div_member').hide();		
+					}
+				}else{
 					$('#memberExtraBalanceDesc_div_member').hide();		
 				}
-			}else{
+			},
+			error : function(req, status, err){
 				$('#memberExtraBalanceDesc_div_member').hide();		
 			}
-		},
-		error : function(req, status, err){
-			$('#memberExtraBalanceDesc_div_member').hide();		
-		}
-	});
-	
-	//获取用户最近消费和最近充值
-	$.ajax({
-		url : '../../../WXQueryMemberOperation.do',
-		type : 'post',
-		data : {
-			dataSource : 'recent',
-			oid : Util.mp.oid,
-			fid : Util.mp.fid
-		},
-		dataType : 'json',
-		success : function(data, status, xhr){
-			
-			if(data.other.nearByCharge >= 0){
-				$('#newRecharge_font_member').text("(最近充值 : " + data.other.nearByCharge + "元)");
-			}
-			
-			if(data.other.nearByConsume >= 0){
-				$('#memberConsume_font_member').html("(最新消费 : " + data.other.nearByConsume + "元)");
-			}
-			
-			
-		},
-		error : function(data, errotType, eeor){
-			Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
-		}
-	});	
-	
-	//获取用户信息
-	var member;
-	var currentMemberLevelData;
-	$.ajax({
-		url : '../../../WXOperateMember.do',
-		type : 'post',
-		data : {
-			dataSource : 'getInfo',
-			oid : Util.mp.oid,
-			fid : Util.mp.fid
-		},
-		dataType : 'json',
-		success : function(data, status, xhr){
-			if(data.success){
-				member = data.other.member;
-				member.restaurant = data.other.restaurant;
-				//添加会员等级当前位置
-				currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
+		});
+		
+		//获取用户最近消费和最近充值
+		$.ajax({
+			url : '../../../WXQueryMemberOperation.do',
+			type : 'post',
+			data : {
+				dataSource : 'recent',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
 				
-				if(member.name != ''){
-					if(member.isRaw){
-						$('#userName_div_member').text(member.name + ' (未完善)');
-					}else{
-						$('#userName_div_member').text(member.name);
+				if(data.other.nearByCharge >= 0){
+					$('#newRecharge_font_member').text("(最近充值 : " + data.other.nearByCharge + "元)");
+				}
+				
+				if(data.other.nearByConsume >= 0){
+					$('#memberConsume_font_member').html("(最新消费 : " + data.other.nearByConsume + "元)");
+				}
+				
+				
+			},
+			error : function(data, errotType, eeor){
+				Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
+			}
+		});	
+		
+		//获取用户信息
+		$.ajax({
+			url : '../../../WXOperateMember.do',
+			type : 'post',
+			data : {
+				dataSource : 'getInfo',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				if(data.success){
+					member = data.other.member;
+					member.restaurant = data.other.restaurant;
+					//添加会员等级当前位置
+					currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.totalPoint, pointThreshold:member.totalPoint, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
+					
+					if(member.name != ''){
+						if(member.isRaw){
+							$('#userName_div_member').text(member.name + ' (未完善)');
+						}else{
+							$('#userName_div_member').text(member.name);
+						}
+						
 					}
 					
-				}
-				
-				if(member.mobile != ''){
-					$('#memberMobile_font_member').text("手机号 : " + member.mobile);
-				}else{
-					$('#memberMobile_font_member').text("微信卡号  : " + member.weixinCard);
-				}
-				
-				$('#memberLbelName_font_member').text(member.memberType.name);
-				$('#banlance_font_member').text(member.baseBalance);
-				$('#extra_font_member').text(member.extraBalance);
-				$('#memberCommission_font_member').text("(总佣金 : " + member.totalCommission +"元)")
-				$('#memberFans_font_member').html("(粉丝数 : " + member.fansAmount + ")");
-				
-				
-				$('#point_font_member').text(member.point);
-			}
-		}
-	});
-	
-	//获取用户的优惠券张数
-	$.ajax({
-		url : '../../../WxOperateCoupon.do',
-		type : 'post',
-		data : {
-			dataSource : 'getByCond',
-			status : 'issued',
-			filter : '1',
-			oid : Util.mp.oid,
-			fid : Util.mp.fid
-		},
-		dataType : 'json',
-		success : function(data, status, xhr){
-			if(data.success){
-				if(data.root.length > 0){
-					$('#couponAmount_font_member').text(data.root.length);
-					$('#myCouponAmount_font_member').text("(优惠券 : " + data.root.length + "张)");
-				}else{
-					$('#couponAmount_font_member').text('0');
-					$('#myCouponAmount_font_member').text("(优惠券:0)");
+					if(member.mobile != ''){
+						$('#memberMobile_font_member').text("手机号 : " + member.mobile);
+					}else{
+						$('#memberMobile_font_member').text("微信卡号  : " + member.weixinCard);
+					}
+					
+					$('#memberLbelName_font_member').text(member.memberType.name);
+					$('#banlance_font_member').text(member.baseBalance);
+					$('#extra_font_member').text(member.extraBalance);
+					$('#memberCommission_font_member').text("(总佣金 : " + member.totalCommission +"元)")
+					$('#memberFans_font_member').html("(粉丝数 : " + member.fansAmount + ")");
+					
+					
+					$('#point_font_member').text(member.point);
 				}
 			}
-		}
-	});
+		});
 		
+		//获取用户的优惠券张数
+		$.ajax({
+			url : '../../../WxOperateCoupon.do',
+			type : 'post',
+			data : {
+				dataSource : 'getByCond',
+				status : 'issued',
+				filter : '1',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				if(data.success){
+					if(data.root.length > 0){
+						$('#couponAmount_font_member').text(data.root.length);
+						$('#myCouponAmount_font_member').text("(优惠券 : " + data.root.length + "张)");
+					}else{
+						$('#couponAmount_font_member').text('0');
+						$('#myCouponAmount_font_member').text("(优惠券:0)");
+					}
+				}
+			}
+		});
+	}
+	
+	refresh();
+	
 	//点击头像事件
 	$('#headImg_div_member').click(function(){
 		var memberMsgDialog;
@@ -366,10 +371,12 @@ $(function(){
 						success : function(data, status, xhr){
 							if(data.success){
 								wxLoadDialog.success().show();
-								setTimeout(function(){
-									window.location.reload();
-								}, 200);
 								
+								setTimeout(function(){
+									wxLoadDialog.success().hide();
+									memberMsgDialog.close();
+									refresh();
+								}, 200);
 							}else{
 								var bindErrorDialog;
 								bindErrorDialog = new WeDialogPopup({
