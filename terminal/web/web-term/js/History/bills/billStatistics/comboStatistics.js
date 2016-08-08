@@ -28,8 +28,51 @@ Ext.onReady(function(){
 		}
 	});
 	
-	var dept_combo_combo = new Ext.form.ComboBox({
-		id : 'dept_combo_combo',
+	//套菜部门选择
+	var comboDept_combo_combo = new Ext.form.ComboBox({
+		id : 'comboDept_combo_combo',
+		readOnly : false,
+		forceSelection : true,
+		width : 123,
+		listWidth :120,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../QueryDeptTree.do',
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.length; i++){
+							data.push([jr[i]['deptID'], jr[i]['text']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});				
+			},
+			select : function(){
+				Ext.getCmp('combo_btnSearch').handler();
+			}
+		}
+	});
+	
+	
+	//子菜部门选择
+	var subDept_combo_combo = new Ext.form.ComboBox({
+		id : 'subDept_combo_combo',
 		readOnly : false,
 		forceSelection : true,
 		width : 123,
@@ -156,9 +199,14 @@ Ext.onReady(function(){
 							dept.push([jr.root[i]['id'], jr.root[i]['name']]);
 						}
 						
-						dept_combo_combo.setDisabled(false);
-						dept_combo_combo.store.loadData(dept);
-						dept_combo_combo.setValue(-1);
+						subDept_combo_combo.setDisabled(false);
+						subDept_combo_combo.store.loadData(dept);
+						subDept_combo_combo.setValue(-1);
+						
+						
+						comboDept_combo_combo.setDisabled(false);
+						comboDept_combo_combo.store.loadData(dept);
+						comboDept_combo_combo.setValue(-1);
 					}
 				});
 				Ext.getCmp('combo_btnSearch').handler();
@@ -183,8 +231,14 @@ Ext.onReady(function(){
 		width : 10
 	}, {
 		xtype : 'tbtext',
-		text : '部门选择'
-	}, dept_combo_combo,{
+		text : '套菜部门选择'
+	}, comboDept_combo_combo, {
+		xtype : 'tbtext',
+		width : 10
+	}, {
+		xtype : 'tbtext',
+		text : '子菜部门选择'
+	}, subDept_combo_combo,{
 		xtype : 'tbtext',
 		width : 10
 	}, {
@@ -208,7 +262,8 @@ Ext.onReady(function(){
 			store.baseParams['opening'] = businessHour.opening != '00:00' ? businessHour.opening : '';
 			store.baseParams['ending'] = businessHour.ending != '00:00' ? businessHour.ending : '';
 			store.baseParams['branchId'] = Ext.getCmp('branch_combo_combo').getValue();
-			store.baseParams['deptId'] = Ext.getCmp('dept_combo_combo').getValue();
+			store.baseParams['subDeptId'] = Ext.getCmp('subDept_combo_combo').getValue();
+			store.baseParams['comboDeptId'] = Ext.getCmp('comboDept_combo_combo').getValue();
 			store.baseParams['subFoodName'] = Ext.getCmp('foodName_textfield').getValue();
 			
 			store.load({
@@ -222,7 +277,7 @@ Ext.onReady(function(){
 		text : '导出',
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
-			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&opening={4}&ending={5}&branchId={6}&deptId={7}&subFoodName={8}';
+			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&opening={4}&ending={5}&branchId={6}&subDeptId={7}&subFoodName={8}&comboDeptId={9}';
 			url = String.format(
 				url,
 				'ExportHistoryStatisticsToExecl.do',
@@ -232,8 +287,9 @@ Ext.onReady(function(){
 				businessHour.opening != '00:00' ? businessHour.opening : '',
 				businessHour.ending != '00:00' ? businessHour.ending : '',
 				Ext.getCmp('branch_combo_combo').getValue(),
-				Ext.getCmp('dept_combo_combo').getValue(),
-				Ext.getCmp('foodName_textfield').getValue()
+				Ext.getCmp('subDept_combo_combo').getValue(),
+				Ext.getCmp('foodName_textfield').getValue(),
+				Ext.getCmp('comboDept_combo_combo').getValue()
 			);
 			window.location = url;
 		}

@@ -402,14 +402,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		final String onDuty = request.getParameter("onDuty");
 		final String offDuty = request.getParameter("offDuty");
 		final String subFoodName = request.getParameter("subFoodName");
-		final String deptId = request.getParameter("deptId");
+		final String subDeptId = request.getParameter("subDeptId");
+		final String comboDeptId = request.getParameter("comboDeptId");
 		final String branchId = request.getParameter("branchId");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
 		
-		final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
-				.setDutyRange(new DutyRange(onDuty, offDuty))
-				.setCalcByDuty(true);
+		final CalcComboStatisticsDao.ExtraCond extraCond = new CalcComboStatisticsDao.ExtraCond(DateType.HISTORY)
+															.setDutyRange(new DutyRange(onDuty, offDuty))
+															.setCalcByDuty(true);
 
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
@@ -421,8 +422,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setFoodName(subFoodName);
 		}
 		
-		if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-			extraCond.setDept(DeptId.valueOf(Integer.parseInt(deptId)));
+		if(subDeptId != null && !subDeptId.isEmpty() && !subDeptId.equals("-1")){
+			extraCond.setSubDept(DeptId.valueOf(Integer.parseInt(subDeptId)));
+		}
+		
+		if(comboDeptId != null && !comboDeptId.isEmpty() && !comboDeptId.equals("-1")){
+			extraCond.setComboDept(DeptId.valueOf(Integer.parseInt(comboDeptId)));
 		}
 		
 		if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){

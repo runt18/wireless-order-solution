@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcComboStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
@@ -31,7 +30,8 @@ public class QueryComboStatisticsAction extends DispatchAction{
 		final String start = request.getParameter("start");
 		final String limit = request.getParameter("limit");
 		final String subFoodName = request.getParameter("subFoodName");
-		final String deptId = request.getParameter("deptId");
+		final String subDeptId = request.getParameter("subDeptId");
+		final String comboDeptId = request.getParameter("comboDeptId");
 		final String branchId = request.getParameter("branchId");
 		final String opening = request.getParameter("opening");
 		final String ending = request.getParameter("ending");
@@ -39,9 +39,10 @@ public class QueryComboStatisticsAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		
 		try{
-			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+			final CalcComboStatisticsDao.ExtraCond extraCond = new CalcComboStatisticsDao.ExtraCond(DateType.HISTORY)
 																		.setDutyRange(new DutyRange(onDuty, offDuty))
 																		.setCalcByDuty(true);
+			
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -53,8 +54,12 @@ public class QueryComboStatisticsAction extends DispatchAction{
 				extraCond.setFoodName(subFoodName);
 			}
 			
-			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-				extraCond.setDept(DeptId.valueOf(Integer.parseInt(deptId)));
+			if(subDeptId != null && !subDeptId.isEmpty() && !subDeptId.equals("-1")){
+				extraCond.setSubDept(DeptId.valueOf(Integer.parseInt(subDeptId)));
+			}
+			
+			if(comboDeptId != null && !comboDeptId.isEmpty() && !comboDeptId.equals("-1")){
+				extraCond.setComboDept(DeptId.valueOf(Integer.parseInt(comboDeptId)));
 			}
 			
 			if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
