@@ -976,20 +976,28 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		final String pin = (String)request.getAttribute("pin");
 		final String beginDate = request.getParameter("beginDate");
+		final String endDate = request.getParameter("endDate");
 		final String materialId = request.getParameter("materialId");
 		final String materialCateId = request.getParameter("materialCateId");
 		final String cateType = request.getParameter("cateType");
 		final String deptOut = request.getParameter("deptOut");
 		final String deptIn = request.getParameter("deptIn");
 		final String supplier = request.getParameter("supplier");
-		//String stockType = request.getParameter("stockType");
 		final String subType = request.getParameter("subType");
+		final String comment = request.getParameter("comment");
+		final String fuzzyId = request.getParameter("fuzzyId");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond();
+		final StockActionDetailDao.ExtraCond extraCond = new StockActionDetailDao.ExtraCond().addStatus(StockAction.Status.AUDIT)
+																							 .addStatus(StockAction.Status.RE_AUDIT)
+																							 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_APPLY)
+																							 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_SEND)
+																							 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_RECEIVE)
+																							 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_RETURN)
+																							 .addExceptSubTypes(StockAction.SubType.DISTRIBUTION_RECOVERY);
 		
-		extraCond.setOriDate(beginDate + "-01", beginDate + "-31");
+		extraCond.setOriDate(beginDate, endDate);
 		
 		if(materialId != null && !materialId.isEmpty()){
 			extraCond.setMaterial(Integer.parseInt(materialId));
@@ -1019,6 +1027,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setDeptOut(Integer.parseInt(deptOut));
 		}
 		
+		if(comment != null && !comment.isEmpty()){
+			extraCond.setComment(comment);
+		}
+		
+		if(fuzzyId != null && !fuzzyId.isEmpty()){
+			extraCond.setFuzzyId(fuzzyId);
+		}
+		
 		List<StockDetailReport> stockDetailReports = StockDetailReportDao.getByCond(staff, extraCond, null);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -1030,7 +1046,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		sheet.setColumnWidth(0, 5000);
 		sheet.setColumnWidth(1, 4000);
-		sheet.setColumnWidth(2, 5500);
+		sheet.setColumnWidth(2, 4000);
 		sheet.setColumnWidth(3, 3000);
 		sheet.setColumnWidth(4, 3000);
 		sheet.setColumnWidth(5, 3000);
@@ -1040,9 +1056,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(9, 3000);
 		sheet.setColumnWidth(10, 3000);
 		sheet.setColumnWidth(11, 3000);
+		sheet.setColumnWidth(12, 3000);
+		sheet.setColumnWidth(13, 3000);
+		sheet.setColumnWidth(14, 3000);
+		sheet.setColumnWidth(15, 8000);
 		
 		// 报表头
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 11));
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 15));
 		// 冻结行
 		sheet.createFreezePane(0, 5, 0, 5);
 		
@@ -1056,7 +1076,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("统计时间: " + beginDate + "         共: " + stockDetailReports.size() + " 条");
+		cell.setCellValue("统计时间: " + beginDate + " 到 " + endDate + "         共: " + stockDetailReports.size() + " 条");
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 11));
 		
@@ -1080,7 +1100,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
-		cell.setCellValue("单号");
+		cell.setCellValue("库单号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("原始单号");
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
@@ -1129,7 +1153,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("操作人");
-		cell.setCellStyle(headerStyle);		
+		cell.setCellStyle(headerStyle);	
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);	
 		
 		for(StockDetailReport item : stockDetailReports){
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1138,6 +1166,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 			// 日期
 			cell = row.createCell(0);
 			cell.setCellValue(DateUtil.format(item.getStockAction().getOriStockDate(), DateUtil.Pattern.DATE));
+			cell.setCellStyle(strStyle);
+			
+			// 库单号
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(item.getStockAction().getId());
 			cell.setCellStyle(strStyle);
 			
 			// 原始单号
@@ -1248,6 +1281,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 			//操作人
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(item.getStockAction().getApprover());
+			cell.setCellStyle(strStyle);
+			
+			//备注
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(item.getStockAction().getComment());
 			cell.setCellStyle(strStyle);
 		}
 		

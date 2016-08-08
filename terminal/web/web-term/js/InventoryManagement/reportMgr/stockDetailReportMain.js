@@ -494,7 +494,6 @@ Ext.onReady(function(){
 				store.baseParams['supplier'] = Ext.getCmp('comboSearchSupplierForDetail').getValue();
 				store.baseParams['fuzzyId'] = Ext.getCmp('oriStockId_stockDetail').getValue();
 				store.baseParams['comment'] = Ext.getCmp('comment_stockDetail').getValue();
-				//TODO
 				
 				stockDetailReportGrid.getStore().load({
 					params : {
@@ -508,12 +507,13 @@ Ext.onReady(function(){
 			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(){
 //				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
-				var url = "../../{0}?dataSource={1}&beginDate={2}&deptIn={3}&deptOut={4}&materialId={5}&materialCateId={6}&cateType={7}&stockType={8}&subType={9}&supplier={10}";
+				var url = "../../{0}?dataSource={1}&beginDate={2}&endDate={3}&deptIn={4}&deptOut={5}&materialId={6}&materialCateId={7}&cateType={8}&stockType={9}&subType={10}&supplier={11}&fuzzyId={12}&comment={13}";
 				url = String.format(
 					url,
 					'ExportHistoryStatisticsToExecl.do',
 					'stockActionDetail',
-					Ext.getCmp('sdr_beginDate').getValue().format('Y-m'),
+					Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d'),
+					Ext.getCmp('sdr_endDate').getValue().format('Y-m-d'),
 					Ext.getCmp('stockOutDeptComb_comboBox_stockDetailPeport').getValue(),
 					Ext.getCmp('stockInDeptComb_comboBox_stockDetailPeport').getValue(),
 					Ext.getCmp('materialId_stockDetail').getValue(),
@@ -521,7 +521,9 @@ Ext.onReady(function(){
 					Ext.getCmp('materialType').getValue(),
 					Ext.getCmp('sdr_comboSearchForStockType').getValue(),
 					Ext.getCmp('sdr_comboSearchForSubType').getValue(),
-					Ext.getCmp('comboSearchSupplierForDetail').getValue()
+					Ext.getCmp('comboSearchSupplierForDetail').getValue(),
+					Ext.getCmp('oriStockId_stockDetail').getValue(),
+					Ext.getCmp('comment_stockDetail').getValue()
 				);
 				window.location = url;
 			}

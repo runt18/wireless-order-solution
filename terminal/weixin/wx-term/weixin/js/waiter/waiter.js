@@ -561,7 +561,7 @@ $(function(){
 							payType = $(element).attr('data-value');
 						}
 					});
-					
+					wxLoadDialog.instance().show();
 					$.ajax({
 						url : '../../../WxOperateWaiter.do',
 						data : {
@@ -599,6 +599,9 @@ $(function(){
 									callFailure.open();
 								}, 200);
 							}
+						},
+						complete : function(){
+							wxLoadDialog.instance().hide();
 						}
 					});
 				}
