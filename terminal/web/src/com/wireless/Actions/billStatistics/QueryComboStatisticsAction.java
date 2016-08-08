@@ -39,9 +39,10 @@ public class QueryComboStatisticsAction extends DispatchAction{
 		final JObject jobject = new JObject();
 		
 		try{
-			final CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)
+			final CalcComboStatisticsDao.ExtraCond extraCond = new CalcComboStatisticsDao.ExtraCond(DateType.HISTORY)
 																		.setDutyRange(new DutyRange(onDuty, offDuty))
 																		.setCalcByDuty(true);
+			
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -54,7 +55,7 @@ public class QueryComboStatisticsAction extends DispatchAction{
 			}
 			
 			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
-				extraCond.setDept(DeptId.valueOf(Integer.parseInt(deptId)));
+				extraCond.setSubDept(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
 			
 			if(opening != null && !opening.isEmpty() && ending != null && !ending.isEmpty()){
