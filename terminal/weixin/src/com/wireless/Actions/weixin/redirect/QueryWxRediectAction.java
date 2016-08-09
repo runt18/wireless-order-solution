@@ -30,7 +30,9 @@ public class QueryWxRediectAction extends DispatchAction {
 		final String callback = request.getParameter("callback");
 		final JObject jObject = new JObject();
 		try {
-			
+			if(wxRestaurant.getWeixinAppSecret().isEmpty()){
+				throw new BusinessException("你的公众号app secret还没有上传，不能生成链接");
+			}
 //			https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx49b3278a8728ff76&redirect_uri=http%3a%2f%2fwx.e-tones.net%2fwx-term%2fweixin%2forder%2fredirect.html%3ffid%3dgh_6a79ab99c6b9%26href%3dmember.html&response_type=code&scope=snsapi_base&state=123#wechat_redirect
 			final String serverName;
 			if(getServlet().getInitParameter("wxServer") != null){
