@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,12 +23,16 @@ import android.widget.Toast;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.CommitOrderTask;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodUnit;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.FoodDetailActivity;
 
@@ -146,11 +151,7 @@ public class ThumbnailItemFragment extends ListFragment {
 
 		private final List<ListItem> mItems = new ArrayList<ListItem>();
 
-		private final Context mContext;
-		
 		FoodAdapter(Context context, List<Food> leftList, List<Food> rightList){
-			
-			mContext = context;
 			
 			for(int i = 0; i < leftList.size(); i++){
 				if(i >= rightList.size()){
@@ -201,40 +202,14 @@ public class ThumbnailItemFragment extends ListFragment {
 				}
 				
 				// 点菜按钮
-				Button addBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add1);
-				addBtn.setOnClickListener(new OnClickListener(){
+				((Button)layout.findViewById(R.id.button_thumbnailFgm_item_add1)).setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
+						//TODO
 						final OrderFood of = new OrderFood(leftFood);
 						of.setCount(1f);
+						showDialog(of, layout);
 						
-						if(leftFood.hasFoodUnit()){
-							List<String> items = new ArrayList<String>();
-							for(FoodUnit unit : leftFood.getFoodUnits()){
-								items.add(unit.toString());
-							}
-							new AlertDialog.Builder(getActivity()).setTitle(of.getName())
-							   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									try {
-										of.setFoodUnit(leftFood.getFoodUnits().get(which));
-										ShoppingCart.instance().addFood(of);
-										refreshDisplay(leftFood, layout, true);
-									} catch (BusinessException e) {
-										Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-									}
-								}
-							}).setNegativeButton("返回", null).show();
-							
-						}else{
-							try {
-								ShoppingCart.instance().addFood(of);
-								refreshDisplay(leftFood, layout, true);
-							} catch (BusinessException e) {
-								Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
-							}
-						}
 					}
 				});
 				
@@ -272,18 +247,13 @@ public class ThumbnailItemFragment extends ListFragment {
 				}
 				
 				// 点菜按钮
-				Button rightAddBtn = (Button) layout.findViewById(R.id.button_thumbnailFgm_item_add2);
-				rightAddBtn.setOnClickListener(new OnClickListener(){
+				((Button)layout.findViewById(R.id.button_thumbnailFgm_item_add2)).setOnClickListener(new OnClickListener(){
 					@Override
 					public void onClick(View v) {
+						//TODO
 						OrderFood of = new OrderFood(rightFood);
 						of.setCount(1f);
-						try {
-							ShoppingCart.instance().addFood(of);
-							refreshDisplay(rightFood, layout, false);
-						} catch (BusinessException e) {
-							Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
-						}
+						showDialog(of, layout);
 					}
 				});
 
@@ -312,6 +282,83 @@ public class ThumbnailItemFragment extends ListFragment {
 
 		public List<ListItem> getItems() {
 			return this.mItems;
+		}
+		
+		private void showDialog(final OrderFood of, final View layout){
+			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity())
+				.setTitle(of.getName())   
+	            .setNegativeButton("直接下单", new DialogInterface.OnClickListener() {   
+	                @Override   
+	                public void onClick(DialogInterface dialog, int which) {
+	                	try {
+	                		if(!ShoppingCart.instance().hasTable()){
+	                			throw new BusinessException("您还未设置餐台，暂时不能提交");
+	                		}else if(!ShoppingCart.instance().hasStaff()){
+	                			throw new BusinessException("您还未设置服务员，暂时不能提交");
+	                		}
+	                		
+	                		new CommitOrderTask(ShoppingCart.instance().getStaff() 
+	                							,new Order.InsertBuilder(new Table.Builder(ShoppingCart.instance().getDestTable().getId()))
+	                									  .add(of, ShoppingCart.instance().getStaff())
+	                									  .setCustomNum(ShoppingCart.instance().getDestTable().getCustomNum())
+	                									  .setForce(true)
+	                							,PrintOption.DO_PRINT) {
+								
+	                			private ProgressDialog mProgressDialog;
+	                			
+	                			@Override
+	                			protected void onPreExecute(){
+	                				mProgressDialog = ProgressDialog.show(getActivity(), "", "正在执行下单...请稍候");
+	                			}	
+	                			
+								@Override
+								protected void onSuccess(Order order) {
+									mProgressDialog.dismiss();		
+									Toast.makeText(getActivity(), "直接下单成功", Toast.LENGTH_SHORT).show();
+								}
+								
+								@Override
+								protected void onFail(BusinessException e, Order order) {
+									mProgressDialog.dismiss();
+									Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+								}
+							}.execute();
+	                		
+						} catch (BusinessException e) {
+							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+	                }   
+	            })  
+	            .setNeutralButton("加入购物车", new DialogInterface.OnClickListener() {   
+	                @Override   
+	                public void onClick(DialogInterface dialog, int which) {   
+						try {
+							ShoppingCart.instance().addFood(of);
+							refreshDisplay(of.asFood(), layout, true);
+							
+						} catch (BusinessException e) {
+							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+	                }   
+	            })
+	            .setPositiveButton("取消", null);
+			
+			if(of.asFood().hasFoodUnit()){
+				final List<String> items = new ArrayList<String>();
+				for(FoodUnit unit : of.asFood().getFoodUnits()){
+					items.add(unit.toString());
+				}
+				of.setFoodUnit(of.asFood().getFoodUnits().get(0));
+				
+				dialogBuilder.setSingleChoiceItems(items.toArray(new String[items.size()]), 0, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						of.setFoodUnit(of.asFood().getFoodUnits().get(which));
+					}
+				});
+			}
+			
+			dialogBuilder.show();
 		}
 	}
 

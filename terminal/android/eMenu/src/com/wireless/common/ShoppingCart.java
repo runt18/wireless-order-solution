@@ -153,41 +153,27 @@ public final class ShoppingCart {
 	 * 			if NOT be valid to commit order
 	 */
 	public void commit(OnCommitListener commitListener) throws BusinessException{
-		if(mOriOrder != null){
-			checkCommitValid();
-			new CommitOrderTask(new Order.UpdateBuilder(mOriOrder)
-										 .addOri(mOriOrder.getOrderFoods())
-										 .addNew(getNewFoods(), WirelessOrder.loginStaff)
-										 .setCustomNum(mDestTable.getCustomNum()), 
-								commitListener).execute();
-			
-		}else{
-			checkCommitValid();
-			new CommitOrderTask(new Order.InsertBuilder(new Table.Builder(mDestTable.getId()))
-										 .setCustomNum(mDestTable.getCustomNum())
-										 .addAll(getNewFoods(), WirelessOrder.loginStaff), 
-								commitListener).execute();
-		}
+		checkCommitValid();
+		new CommitOrderTask(new Order.InsertBuilder(new Table.Builder(mDestTable.getId()))
+									 .setCustomNum(mDestTable.getCustomNum())
+									 .addAll(getNewFoods(), WirelessOrder.loginStaff)
+									 .setForce(true), 
+							commitListener).execute();
 	}
 	
-	/**
-	 * Commit the order with both original and extra foods.
-	 * This method is used to update order.
-	 * @param oriOrder
-	 * 			the original order
-	 * @param commitListener
-	 * 			the commit listener
-	 * @throws BsinessException
-	 * 			throws if NOT valid to commit order
-	 */
-	public void commit(Order oriOrder, OnCommitListener commitListener) throws BusinessException{
-		if(oriOrder != null){
-			mOriOrder = oriOrder;
-			commit(commitListener);			
-		}else{
-			throw new IllegalArgumentException("The original order can NOT be null.");
-		}
-	}
+//	public void commit(OrderFood of, OnCommitListener commitListener) throws BusinessException{
+//		if(mDestTable == null){
+//			throw new BusinessException("您还未设置餐台，暂时不能提交");
+//		}else if(mStaff == null){
+//			throw new BusinessException("您还未设置服务员，暂时不能提交");
+//		}
+//		new CommitOrderTask(new Order.InsertBuilder(new Table.Builder(mDestTable.getId()))
+//									 .setCustomNum(mDestTable.getCustomNum())
+//									 .add(of, WirelessOrder.loginStaff)
+//									 .setForce(true), 
+//							commitListener).execute();
+//	}
+	
 	/**
 	 * Check to see whether the commit parameters are valid.
 	 * @throws BusinessException

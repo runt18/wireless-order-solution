@@ -44,7 +44,7 @@ public class Page{
 	
 	
 	public static enum Stock{
-		INIT_MATERIAL("initMaterialPanel", "库存初始化", "InventoryManagement_Module/InitMaterialMgr.html", "../../images/businessHour.png"),
+		INIT_MATERIAL("initMaterialPanel", "期初建账", "InventoryManagement_Module/InitMaterialMgr.html", "../../images/businessHour.png"),
 		SUPPLIER("supplierMgr", "供应商管理", "InventoryManagement_Module/SupplierManagement.html", "../../images/supplierMgr.png"),
 		INVENTORY("inventoryBasicMgr", "原料管理", "InventoryManagement_Module/InventoryBasicManagement.html", "../../images/inventoryBasicMgr.png"),
 		FOOD_MATERIAL("foodMaterial", "菜品配料", "InventoryManagement_Module/FoodMaterialManagement.html", "../../images/foodMaterialMgr.png"),

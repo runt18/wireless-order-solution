@@ -54,7 +54,7 @@ public class TestMaterialDao {
 			final long lastModDate = new Date().getTime();
 			final String pinyin = "test";
 			final boolean isGood = false;
-			final int alarmAmount = 10;
+//			/final int alarmAmount = 10;
 			
 			Material.UpdateBuilder updateBuilder = new Material.UpdateBuilder(id)
 															   .setMaterialCate(cate)
