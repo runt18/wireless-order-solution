@@ -192,23 +192,28 @@ public class WxOperateWaiterAction extends DispatchAction{
 				final Staff staff = StaffDao.getAdminByRestaurant(dbCon, Integer.parseInt(branchId));
 				//jObject.setRoot(OrderDao.getById(staff, Integer.parseInt(orderId), DateType.TODAY));
 				
+				final Order order;
+				
 				if(orderId != null && !orderId.isEmpty()){
-					jObject.setRoot(PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId))));
+					order = PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(Integer.parseInt(orderId)));
 					
 				}else if(tableId != null && !tableId.isEmpty()){
 					Table table = TableDao.getById(dbCon, staff, Integer.parseInt(tableId));
 					if(table.isBusy()){
-						final Order order = PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(table.getOrderId()));
-						for(int i = 0; i < order.getOrderFoods().size(); i++){
-							final Food f = order.getOrderFoods().get(i).asFood();
-							f.copyFrom(FoodDao.getById(dbCon, staff, f.getFoodId()));
-						}
-						jObject.setRoot(order);
+						order = PayOrder.calc(dbCon, staff, Order.PayBuilder.build4Normal(table.getOrderId()));
 					}else{
 						throw new BusinessException("餐桌为空闲状态");
 					}
 				}else{
 					throw new BusinessException("入口不对,不存在账单号或餐桌号");
+				}
+				
+				if(order != null){
+					for(int i = 0; i < order.getOrderFoods().size(); i++){
+						final Food f = order.getOrderFoods().get(i).asFood();
+						f.copyFrom(FoodDao.getById(dbCon, staff, f.getFoodId()));
+					}
+					jObject.setRoot(order);
 				}
 				
 			}else{
