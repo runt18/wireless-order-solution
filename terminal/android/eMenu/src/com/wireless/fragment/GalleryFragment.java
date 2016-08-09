@@ -6,8 +6,38 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.wireless.common.ShoppingCart;
+import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.CommitOrderTask;
+import com.wireless.lib.task.QuerySellOutTask;
+import com.wireless.ordermenu.R;
+import com.wireless.parcel.DepartmentTreeParcel;
+import com.wireless.parcel.FoodParcel;
+import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
+import com.wireless.pojo.menuMgr.DepartmentTree;
+import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodUnit;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.ComboFoodActivity;
+import com.wireless.ui.FoodDetailActivity;
+import com.wireless.ui.FullScreenActivity;
+import com.wireless.ui.MainActivity;
+import com.wireless.util.ExhibitPopupWindow;
+import com.wireless.util.ExhibitPopupWindow.OnExhibitOperateListener;
+import com.wireless.util.SearchFoodHandler;
+import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
+import com.wireless.util.imgFetcher.ImageCache;
+import com.wireless.util.imgFetcher.ImageFetcher;
+
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,31 +63,6 @@ import android.widget.ImageView.ScaleType;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.wireless.common.ShoppingCart;
-import com.wireless.common.WirelessOrder;
-import com.wireless.exception.BusinessException;
-import com.wireless.lib.task.QuerySellOutTask;
-import com.wireless.ordermenu.R;
-import com.wireless.parcel.DepartmentTreeParcel;
-import com.wireless.parcel.FoodParcel;
-import com.wireless.parcel.OrderFoodParcel;
-import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.DepartmentTree;
-import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.menuMgr.FoodUnit;
-import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.util.NumericUtil;
-import com.wireless.ui.ComboFoodActivity;
-import com.wireless.ui.FoodDetailActivity;
-import com.wireless.ui.FullScreenActivity;
-import com.wireless.ui.MainActivity;
-import com.wireless.util.ExhibitPopupWindow;
-import com.wireless.util.ExhibitPopupWindow.OnExhibitOperateListener;
-import com.wireless.util.SearchFoodHandler;
-import com.wireless.util.SearchFoodHandler.OnSearchItemClickListener;
-import com.wireless.util.imgFetcher.ImageCache;
-import com.wireless.util.imgFetcher.ImageFetcher;
 
 public class GalleryFragment extends Fragment implements OnSearchItemClickListener, OnExhibitOperateListener {
 	
@@ -343,44 +348,102 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
 		((ImageView) view.findViewById(R.id.imageButton_add_galleryFgm)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				try{
-					final OrderFood of = new OrderFood(mCurFood);
-					of.setCount(1f);
-					
-					if(mCurFood.hasFoodUnit()){
-						List<String> items = new ArrayList<String>();
-						for(FoodUnit unit : mCurFood.getFoodUnits()){
-							items.add(unit.toString());
-						}
-						new AlertDialog.Builder(getActivity()).setTitle(of.getName())
-						   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								try {
-									of.setFoodUnit(mCurFood.getFoodUnits().get(which));
-									ShoppingCart.instance().addFood(of);
-									mHandler.sendEmptyMessage(0);
-								} catch (BusinessException e) {
+				final OrderFood of = new OrderFood(mCurFood);
+				of.setCount(1f);
+				
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity())
+				.setTitle(of.getName())   
+	            .setNegativeButton("直接下单", new DialogInterface.OnClickListener() {   
+	                @Override   
+	                public void onClick(DialogInterface dialog, int which) {
+	                	try {
+	                		if(!ShoppingCart.instance().hasTable()){
+	                			throw new BusinessException("您还未设置餐台，暂时不能提交");
+	                		}else if(!ShoppingCart.instance().hasStaff()){
+	                			throw new BusinessException("您还未设置服务员，暂时不能提交");
+	                		}
+	                		
+	                		new CommitOrderTask(ShoppingCart.instance().getStaff() 
+	                							,new Order.InsertBuilder(new Table.Builder(ShoppingCart.instance().getDestTable().getId()))
+	                									  .add(of, ShoppingCart.instance().getStaff())
+	                									  .setCustomNum(ShoppingCart.instance().getDestTable().getCustomNum())
+	                									  .setForce(true)
+	                							,PrintOption.DO_PRINT) {
+								
+	                			private ProgressDialog mProgressDialog;
+	                			
+	                			@Override
+	                			protected void onPreExecute(){
+	                				mProgressDialog = ProgressDialog.show(getActivity(), "", "正在执行下单...请稍候");
+	                			}	
+	                			
+								@Override
+								protected void onSuccess(Order order) {
+									mProgressDialog.dismiss();		
+									Toast.makeText(getActivity(), "直接下单成功", Toast.LENGTH_SHORT).show();
+								}
+								
+								@Override
+								protected void onFail(BusinessException e, Order order) {
+									mProgressDialog.dismiss();
 									Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 								}
-							}
-						}).setNegativeButton("返回", null).show();
-						
-					}else{
-
-						ShoppingCart.instance().addFood(of);
-	
-						mHandler.sendEmptyMessage(0);
-						
-						//Perform to show the associated foods
-						if(!mComboPopup.isShowing()){
-							getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
+							}.execute();
+	                		
+						} catch (BusinessException e) {
+							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 						}
+	                }   
+	            })  
+	            .setNeutralButton("加入购物车", new DialogInterface.OnClickListener() {   
+	                @Override   
+	                public void onClick(DialogInterface dialog, int which) {   
+						try {
+							ShoppingCart.instance().addFood(of);
+							mHandler.sendEmptyMessage(0);
+							
+							//Perform to show the associated foods
+							if(!mComboPopup.isShowing()){
+								getView().findViewById(R.id.button_galleryFgm_ComboFood).performClick();
+							}
+						} catch (BusinessException e) {
+							Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
+	                }   
+	            })
+	            .setPositiveButton("取消", null);
+            
+				if(mCurFood.hasFoodUnit()){
+					final List<String> items = new ArrayList<String>();
+					for(FoodUnit unit : mCurFood.getFoodUnits()){
+						items.add(unit.toString());
 					}
+					of.setFoodUnit(mCurFood.getFoodUnits().get(0));
 					
-				}catch(BusinessException e){
-					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+					dialogBuilder.setSingleChoiceItems(items.toArray(new String[items.size()]), 0, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							of.setFoodUnit(mCurFood.getFoodUnits().get(which));
+						}
+					});
+					
+//					new AlertDialog.Builder(getActivity()).setTitle(of.getName())
+//					   .setItems(items.toArray(new String[items.size()]), new DialogInterface.OnClickListener(){
+//						@Override
+//						public void onClick(DialogInterface dialog, int which) {
+//							try {
+//								of.setFoodUnit(mCurFood.getFoodUnits().get(which));
+//								ShoppingCart.instance().addFood(of);
+//								mHandler.sendEmptyMessage(0);
+//							} catch (BusinessException e) {
+//								Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+//							}
+//						}
+//					}).setNegativeButton("返回", null).show();
+					
 				}
+				
+				dialogBuilder.show();
 			}
 		});
 		
