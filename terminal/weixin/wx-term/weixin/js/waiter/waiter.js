@@ -188,7 +188,7 @@ $(function(){
 					for(var i = (res.root.length - 1); i >= 0; i--){
 						initFoodList(res.root[i], true);
 					}
-				}else if(data.code == '7546'){
+				}else if(res.code == '7546'){
 					sessionTimeout();
 				}else{
 					Util.showErrorMsg(data.msg);
