@@ -306,7 +306,7 @@ public class StockActionDao {
 			throw new BusinessException(StockError.STOCK_INSERT_WITHOUT_PRIVILEGE);
 		}
 		//是否有进行期初建账
-		if(stockAction.getSubType() != SubType.INIT && !hasInit(dbCon, staff)){
+		if(stockAction.getSubType() != StockAction.SubType.CONSUMPTION && stockAction.getSubType() != SubType.INIT && !hasInit(dbCon, staff)){
 			throw new BusinessException(StockError.STOCK_WITHOUT_INIT);
 		}
 		
