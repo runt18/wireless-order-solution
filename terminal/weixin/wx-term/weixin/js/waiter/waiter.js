@@ -49,6 +49,7 @@ $(function(){
 	var orderFoodPopup;			//点菜container
 	var _hasFoods = false;      // 账单是否有菜品
 	
+	
 	//加载店小二账单信息
 	initWaiterOrder();
 	//加载桌面信息
@@ -62,6 +63,7 @@ $(function(){
 	
 	//加载店小二账单信息
 	function initTableMsg(){
+		var isComplete = 0;
 		//获取餐桌信息
 		$.ajax({
 			url : '../../../WxOperateWaiter.do',
@@ -71,9 +73,12 @@ $(function(){
 				orderId : Util.mp.params.orderId,
 				tableId : Util.mp.params.tableId
 			},
-			async : false,
+			async : true,
 			type : 'post',
 			dataType : 'json',
+			beforeSend : function(){
+				wxLoadDialog.instance().show();
+			},
 			success : function(data, status, xhr){
 				if(data.success){
 					
@@ -159,17 +164,18 @@ $(function(){
 			},
 			error : function(req, status, err){
 				Util.showErrorMsg(err.msg);
+			},
+			complete : function(){
+				isComplete ++;
 			}
 		});	 
-		
-		
 		
 		//获取【待确认】的菜品信息
 		$.ajax({
 			url : '../../../WxOperateOrder.do',
 			type : 'post',
 			datatype : 'json',
-			async : false,
+			async : true,
 			data : {
 				dataSource : 'getByCond',
 				sessionId : Util.mp.params.sessionId, 
@@ -194,12 +200,21 @@ $(function(){
 				}else{
 					Util.showErrorMsg(err.msg);					
 				}
+			},
+			complete : function(){
+				isComplete ++;
 			}
 		});
-		
-		if(!fastFoodWaiterData._orderFoods && !fastFoodWaiterData._wxOrderFoods){
-			$('#orderBySelf_a_waiter').click();
-		}
+		(function(){
+			if(isComplete == 2){
+				wxLoadDialog.instance().hide();
+				if(!fastFoodWaiterData._orderFoods && !fastFoodWaiterData._wxOrderFoods){
+					$('#orderBySelf_a_waiter').click();
+				}			
+			}else{
+				setTimeout(arguments.callee,200);
+			}
+		})();
 	}
 	
 	function initWaiterOrder(){
