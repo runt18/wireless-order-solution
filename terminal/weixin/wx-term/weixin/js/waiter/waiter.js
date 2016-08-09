@@ -914,8 +914,10 @@ $(function(){
 		container.close();
 		$('#weixinWaiter_div_waiter').show();
 		$('#bottom_div_waiter').show();
+		wxLoadDialog.instance().show();
 		setTimeout(function(){
 			updateMsg();
+			wxLoadDialog.instance().hide();
 		});
 //		var reloadHref = window.location.href;
 //		window.location.href = reloadHref;
