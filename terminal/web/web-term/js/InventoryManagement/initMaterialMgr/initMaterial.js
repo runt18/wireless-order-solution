@@ -250,7 +250,7 @@ function initMaterialControl(){
 
 			}
 		}, {
-			text : '保存设置',
+			text : '保存期初数',
 			id : 'btnSaveInitMaterial',
 			iconCls : 'btn_save',
 			handler : function(){
@@ -298,7 +298,7 @@ function initMaterialControl(){
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;&nbsp;&nbsp;'
 		}, {
-			text : '初始化库存',
+			text : '清空库单',
 			id : 'btnInitMaterial',
 			iconCls : 'btn_delete',
 			handler : function(){
