@@ -9,6 +9,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.DBTbl;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -68,14 +69,15 @@ public class MemberOperationDao {
 		private String name;
 		private String fuzzy;		//会员模糊查找
 		private List<MemberOperation.OperationType> operationTypes = new ArrayList<MemberOperation.OperationType>();
-		private DutyRange operationDate;
+		private DutyRange operationDate;	//日期区间
 		private int payTypeId;
 		private int chargeTypeId;
 		private boolean containsCoupon;
 		private int branchId;
 		private Float minChargeAmount;
 		private Float maxChargeAmount;
-		private boolean isOnlyAmount;
+		private boolean isOnlyAmount;	//是否只计算条数
+		private boolean calcByDuty;		//是否按日结区间计算
 		
 		private Staff operateStaff;
 		
@@ -259,6 +261,11 @@ public class MemberOperationDao {
 			return this;
 		}
 		
+		public ExtraCond setCalcByDuty(boolean onOff){
+			this.calcByDuty = onOff;
+			return this;
+		}
+		
 		public ExtraCond setOperateDate(DutyRange range){
 			this.operationDate = range;
 			return this;
@@ -344,7 +351,7 @@ public class MemberOperationDao {
 				}
 			}
 			
-			StringBuilder memberCond = new StringBuilder();
+			final StringBuilder memberCond = new StringBuilder();
 			for(Integer memberId : this.members){
 				if(memberCond.length() != 0){
 					memberCond.append(",").append(memberId.intValue());
@@ -361,7 +368,8 @@ public class MemberOperationDao {
 			if(orderId != 0){
 				extraCond.append(" AND MO.order_id = " + orderId);
 			}
-			StringBuilder operateTypeCond = new StringBuilder();
+			
+			final StringBuilder operateTypeCond = new StringBuilder();
 			for(MemberOperation.OperationType type : operationTypes){
 				if(operateTypeCond.length() == 0){
 					operateTypeCond.append(type.getValue());
@@ -372,9 +380,23 @@ public class MemberOperationDao {
 			if(operateTypeCond.length() != 0){
 				extraCond.append(" AND MO.operate_type IN (" + operateTypeCond.toString() + ")");
 			}
+			
+			//日期区间
 			if(operationDate != null){
-				extraCond.append(" AND MO.operate_date BETWEEN '" + operationDate.getOnDutyFormat() + "' AND '" + operationDate.getOffDutyFormat() + "'");
+				DutyRange range;
+				if(this.calcByDuty){
+					try {
+						range = DutyRangeDao.exec(this.operateStaff, operationDate);
+					} catch (SQLException e) {
+						e.printStackTrace();
+						range = operationDate;
+					}
+				}else{
+					range = operationDate;
+				}
+				extraCond.append(" AND MO.operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
 			}
+			
 			if(mobile != null){
 				extraCond.append(" AND MO.member_mobile LIKE '%" + mobile.trim() + "%'");
 			}

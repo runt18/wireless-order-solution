@@ -276,7 +276,7 @@ public class CalcMemberStatisticsDao {
 		String sql;
 		sql = " SELECT TMP.member_id, MAX(TMP.member_name) AS member_name, MAX(TMP.member_mobile) AS member_mobile, MAX(TMP.member_card) AS member_card " +
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CHARGE.getValue() + " ,TMP.delta_base_money, 0)) AS charge_actual " +
-			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CHARGE.getValue() + " ,TMP.delta_extra_money, 0)) AS charge_money " +
+			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CHARGE.getValue() + " ,TMP.delta_base_money + TMP.delta_extra_money, 0)) AS charge_money " +
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.REFUND.getValue() + " ,TMP.delta_base_money, 0)) AS refund_actual " +
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.REFUND.getValue() + " ,TMP.delta_extra_money, 0)) AS refund_money " +
 			  " ,SUM(IF(TMP.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " OR TMP.operate_type = " + MemberOperation.OperationType.RE_CONSUME.getValue() + " ,TMP.delta_base_money, 0)) AS consume_base " +
@@ -300,7 +300,7 @@ public class CalcMemberStatisticsDao {
 			//充值实收
 			summary.setChargeActual(dbCon.rs.getFloat("charge_actual"));
 			//充值实充
-			summary.setChargeMoney(dbCon.rs.getFloat("charge_money") + dbCon.rs.getFloat("charge_actual"));
+			summary.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			//取款实退
 			summary.setRefundActual(dbCon.rs.getFloat("refund_actual"));
 			//取款实扣
