@@ -22,6 +22,7 @@ Ext.onReady(function(){
 				dataSource :'refundStatistics',
 				dateBegin : dateBegin,
 				dateEnd : dateEnd + " 23:59:59",
+				calcByDuty : true,
 				branchId : Ext.getCmp('branch_combo_memberRefund').getValue()
 			},
 			async : false,
@@ -448,6 +449,7 @@ Ext.onReady(function(){
 		gs.baseParams['chargeType'] = Ext.getCmp('memberRefund_comboPayType').getValue();
 		gs.baseParams['onDuty'] = onDuty;
 		gs.baseParams['offDuty'] = offDuty;
+		gs.baseParams['calcByDuty'] = true;
 		gs.baseParams['total'] = true;
 		gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberRefund').getValue();
 		

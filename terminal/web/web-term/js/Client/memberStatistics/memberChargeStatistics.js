@@ -22,6 +22,7 @@ Ext.onReady(function(){
 				dataSource :'chargeStatistics',
 				dateBegin : dateBegin,
 				dateEnd : dateEnd + " 23:59:59",
+				calcByDuty : true,
 				branchId : Ext.getCmp('branch_combo_memberCharge').getValue() 
 			},
 			async : false,
@@ -714,6 +715,7 @@ Ext.onReady(function(){
 		gs.baseParams['chargeType'] = Ext.getCmp('memberRecharge_comboPayType').getValue();
 		gs.baseParams['onDuty'] = onDuty;
 		gs.baseParams['offDuty'] = offDuty;
+		gs.baseParams['calcByDuty'] = true;
 		gs.baseParams['total'] = true;
 		gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberCharge').getValue();
 		gs.baseParams['minDeltaCharge'] = Ext.getCmp('minDeltaCharge_numberField_memberCharge').getValue() != null ? Ext.getCmp('minDeltaCharge_numberField_memberCharge').getValue() : '';

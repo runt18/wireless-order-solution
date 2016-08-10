@@ -21,6 +21,7 @@ Ext.onReady(function(){
 				dataSource :'consumeStatistics',
 				dateBegin : dateBegin,
 				dateEnd : dateEnd + " 23:59:59",
+				calcByDuty : true,
 				branchId : Ext.getCmp('branch_combo_memberConsume').getValue()
 			},
 			async : false,
@@ -474,6 +475,7 @@ Ext.onReady(function(){
 		gs.baseParams['payType'] = Ext.getCmp('memberConsume_comboPayType').getValue();
 		gs.baseParams['onDuty'] = onDuty;
 		gs.baseParams['offDuty'] = offDuty;
+		gs.baseParams['calcByDuty'] = true;
 		gs.baseParams['total'] = true;
 		gs.baseParams['branchId'] = Ext.getCmp('branch_combo_memberConsume').getValue();
 		gs.load({
