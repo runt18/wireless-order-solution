@@ -72,6 +72,15 @@ public class OperateMemberOperationAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 会员汇总
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward getMemberSummary(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		final String pin = (String)request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
@@ -83,11 +92,10 @@ public class OperateMemberOperationAction extends DispatchAction{
 		final String limit = request.getParameter("limit");
 		final JObject jObject = new JObject();
 		
-		Staff staff;
 		try {
-			staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);;
+			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY).setCalcByDuty(true);
 			
 			if(branchId != null && !branchId.isEmpty() && !branchId.equals("-1")){
 				extraCond.setBranch(Integer.parseInt(branchId));

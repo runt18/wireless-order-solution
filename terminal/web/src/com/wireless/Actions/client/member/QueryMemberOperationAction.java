@@ -60,14 +60,16 @@ public class QueryMemberOperationAction extends Action{
 		final String minChargeRate = request.getParameter("minChargeRate");
 		final String maxChargeRate = request.getParameter("maxChargeRate");
 		
-		//basemoney
+		//base money
 		final String minDeltaBaseMoney = request.getParameter("minDeltaBase");
 		final String maxDeltaBaseMoney = request.getParameter("maxDeltaBase");
 		
-		//totaoMoney
+		//total Money
 		final String minDeltaTotalMoney = request.getParameter("minDeltaTotal");
 		final String maxDeltaToTalMoney = request.getParameter("maxDeltaTotal");
 		
+		//是否按日结区间计算
+		final String calcByDuty = request.getParameter("calcByDuty");
 		
 		try{
 			
@@ -90,6 +92,10 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}else{
 				extraCond = new MemberOperationDao.ExtraCond(dateType);
+			}
+			
+			if(calcByDuty != null && !calcByDuty.isEmpty() && Boolean.parseBoolean(calcByDuty)){
+				extraCond.setCalcByDuty(true);
 			}
 			
 			if(pointChanged != null && !pointChanged.isEmpty()){

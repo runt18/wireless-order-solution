@@ -44,12 +44,18 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final String branchId = request.getParameter("branchId");
 		final String dateBegin = request.getParameter("dateBegin");
 		final String dateEnd = request.getParameter("dateEnd");
+		final String calcByDuty = request.getParameter("calcByDuty");
 		final JObject jObject = new JObject();
 		try{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			
+			//是否按日结区间计算
+			if(calcByDuty != null && !calcByDuty.isEmpty() && Boolean.parseBoolean(calcByDuty)){
+				extraCond.setCalcByDuty(true);
+			}
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));
@@ -111,13 +117,18 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final String branchId = request.getParameter("branchId");
 		final String dateBegin = request.getParameter("dateBegin");
 		final String dateEnd = request.getParameter("dateEnd");
-		
+		final String calcByDuty = request.getParameter("calcByDuty");
 		final JObject jObject = new JObject();
 		try{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			
+			//是否按日结区间计算
+			if(calcByDuty != null && !calcByDuty.isEmpty() && Boolean.parseBoolean(calcByDuty)){
+				extraCond.setCalcByDuty(true);
+			}
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));
@@ -177,13 +188,19 @@ public class QueryMemberStatisticsAction extends DispatchAction {
 		final String pin = (String) request.getAttribute("pin");
 		final String branchId = request.getParameter("branchId");
 		final String dateBegin = request.getParameter("dateBegin");
-		final String dateEnd = request.getParameter("dateEnd");		
+		final String dateEnd = request.getParameter("dateEnd");	
+		final String calcByDuty = request.getParameter("calcByDuty");
 		final JObject jObject = new JObject();
 		try{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			final MemberOperationDao.ExtraCond extraCond = new MemberOperationDao.ExtraCond(DateType.HISTORY);
+			
+			//是否按日结区间计算
+			if(calcByDuty != null && !calcByDuty.isEmpty() && Boolean.parseBoolean(calcByDuty)){
+				extraCond.setCalcByDuty(true);
+			}
 			
 			if(branchId != null && !branchId.isEmpty()){
 				extraCond.setBranch(Integer.parseInt(branchId));
