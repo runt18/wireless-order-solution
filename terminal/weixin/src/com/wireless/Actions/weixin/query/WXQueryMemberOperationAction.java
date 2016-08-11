@@ -2,6 +2,8 @@ package com.wireless.Actions.weixin.query;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,25 +140,39 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			if(oid != null && !oid.isEmpty()){
 				int recommendFuzzyId = WxMemberDao.getBySerial(staff, oid).getMemberId();
-				extraCond.setRecommendFuzzy(MemberDao.getById(staff, recommendFuzzyId).getName());
+				extraCond.setReferrer(MemberDao.getById(staff, recommendFuzzyId));
 			}
 			
-			List<RepresentChain> representChainList = RepresentChainDao.getByCond(staff, extraCond.setIsSort(true));
+			final List<RepresentChain> representChainList = RepresentChainDao.getByCond(staff, extraCond);
+			final List<RepresentChain> result = new ArrayList<>();
 			
 			if(representChainList.size() > 5){
-				List<RepresentChain> returnList = new ArrayList<>();
 				for(RepresentChain chain : representChainList){
-					returnList.add(chain);
-					if(returnList.size() == 5){
+					result.add(chain);
+					if(result.size() == 5){
 						break;
 					}else{
 						continue;
 					}
 				}
-				jObject.setRoot(returnList);
 			}else{
-				jObject.setRoot(representChainList);
+				result.addAll(representChainList);
 			}
+			
+			Collections.sort(result, new Comparator<RepresentChain>() {
+				@Override
+				public int compare(RepresentChain arg0, RepresentChain arg1) {
+					if(arg0.getSubscribeDate() > arg1.getSubscribeDate()){
+						return -1;
+					}else if(arg0.getSubscribeDate() < arg1.getSubscribeDate()){
+						return 1;
+					}else{
+						return 0;
+					}
+				}
+			});
+			
+			jObject.setRoot(result);
 			
 		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
