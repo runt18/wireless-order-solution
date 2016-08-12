@@ -37,6 +37,7 @@ var uo = {
  * @param {object} c  
  */
 uo.entry = function(c){
+	uo.table = c.table;
 	location.href = '#orderFoodListMgr';
 	//加载退菜原因
 	if(uo.reasons.length <= 0){
@@ -54,8 +55,6 @@ uo.entry = function(c){
 	
 	//异步刷新账单
 	initOrderData({table : c.table});
-	uo.table = c.table;
-	
 	
 };
 	
