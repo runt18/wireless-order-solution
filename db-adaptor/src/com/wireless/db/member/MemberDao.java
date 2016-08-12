@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import org.marker.weixin.api.BaseAPI;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.lock.LockDao;
 import com.wireless.db.member.represent.RepresentChainDao;
 import com.wireless.db.member.represent.RepresentDao;
 import com.wireless.db.promotion.CouponDao;
@@ -41,6 +43,7 @@ import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PayType;
+import com.wireless.pojo.lock.Lock;
 import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberCond;
 import com.wireless.pojo.member.MemberLevel;
@@ -2041,44 +2044,53 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType, String comment) throws BusinessException, SQLException{
-		if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHARGE) && chargeType != ChargeType.COMMISSION){
-			throw new BusinessException(StaffError.MEMBER_CHARGE_NOT_ALLOW);
-		}
+	public static MemberOperation charge(final DBCon dbCon, final Staff staff, final int memberId, final float chargeMoney, final float accountMoney, final ChargeType chargeType, final String comment) throws BusinessException, SQLException{
 		
-		if(chargeMoney < 0){
-			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
-		}
-		
-		Member member = getById(dbCon, staff, memberId);
-		
-		//Perform the charge operation and get the related member operation.
-		MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
-		if(comment != null){
-			if(chargeType == ChargeType.COMMISSION){
-				List<MemberOperation> mo4Consume = MemberOperationDao.getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY)
-																		  .setOrder(Integer.parseInt(comment))
-																		  .setOperationType(MemberOperation.OperationType.CONSUME), null);
-				mo.setComment("账单号:" + comment + ",消费人:" + (mo4Consume.isEmpty() ? "---" : mo4Consume.get(0).getMemberName()));
-			}else{
-				mo.setComment(comment);
+		return LockDao.lock(new Lock.InsertBulder4Charge(memberId), new Callable<MemberOperation>(){
+
+			@Override
+			public MemberOperation call() throws Exception {
+				if(!staff.getRole().hasPrivilege(Privilege.Code.MEMBER_CHARGE) && chargeType != ChargeType.COMMISSION){
+					throw new BusinessException(StaffError.MEMBER_CHARGE_NOT_ALLOW);
+				}
+				
+				if(chargeMoney < 0){
+					throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
+				}
+				
+				Member member = getById(dbCon, staff, memberId);
+				
+				//Perform the charge operation and get the related member operation.
+				MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
+				if(comment != null){
+					if(chargeType == ChargeType.COMMISSION){
+						List<MemberOperation> mo4Consume = MemberOperationDao.getByCond(dbCon, staff, new MemberOperationDao.ExtraCond(DateType.TODAY)
+																				  .setOrder(Integer.parseInt(comment))
+																				  .setOperationType(MemberOperation.OperationType.CONSUME), null);
+						mo.setComment("账单号:" + comment + ",消费人:" + (mo4Consume.isEmpty() ? "---" : mo4Consume.get(0).getMemberName()));
+					}else{
+						mo.setComment(comment);
+					}
+				}
+				
+				//Insert the member operation to this charge operation.
+				MemberOperationDao.insert(dbCon, staff, mo);
+				
+				//Update the base & extra balance and point.
+				String sql = " UPDATE " + Params.dbName + ".member SET" +
+							 " member_id = member_id " +
+							 " ,base_balance = " + member.getBaseBalance() + 
+							 " ,extra_balance = " + member.getExtraBalance()  + 
+							 " ,total_charge = " + member.getTotalCharge() + 
+							 (chargeType == ChargeType.COMMISSION ? " ,total_commission = " + member.getTotalCommission() : "") +
+							 " WHERE member_id = " + memberId;
+				dbCon.stmt.executeUpdate(sql);
+				
+				return mo;
 			}
-		}
-		
-		//Insert the member operation to this charge operation.
-		MemberOperationDao.insert(dbCon, staff, mo);
-		
-		//Update the base & extra balance and point.
-		String sql = " UPDATE " + Params.dbName + ".member SET" +
-					 " member_id = member_id " +
-					 " ,base_balance = " + member.getBaseBalance() + 
-					 " ,extra_balance = " + member.getExtraBalance()  + 
-					 " ,total_charge = " + member.getTotalCharge() + 
-					 (chargeType == ChargeType.COMMISSION ? " ,total_commission = " + member.getTotalCommission() : "") +
-					 " WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
-		
-		return mo;
+			
+		});
+
 	}
 	
 	/**
@@ -2101,7 +2113,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(final Staff staff, final int memberId, final float chargeMoney, final float accountMoney, final ChargeType chargeType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -2116,6 +2128,28 @@ public class MemberDao {
 		}finally{
 			dbCon.disconnect();
 		}
+		
+//		return LockDao.lock(new Lock.InsertBulder4Charge(memberId), new Callable<MemberOperation>(){
+//
+//			@Override
+//			public MemberOperation call() throws Exception {
+//				DBCon dbCon = new DBCon();
+//				try{
+//					dbCon.connect();
+//					dbCon.conn.setAutoCommit(false);
+//					MemberOperation mo = MemberDao.charge(dbCon, staff, memberId, chargeMoney, accountMoney, chargeType);
+//					dbCon.conn.commit();
+//					return mo;
+//					
+//				}catch(BusinessException | SQLException e){
+//					dbCon.conn.rollback();
+//					throw e;	
+//				}finally{
+//					dbCon.disconnect();
+//				}
+//			}
+//			
+//		});
 	}
 	
 	/**
