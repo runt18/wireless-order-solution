@@ -890,7 +890,7 @@ $(function(){
 			$('#scanUsePopupMore_a_payment').popup('close');
 			setTimeout(function(){
 				seajs.use('scanUseCoupon', function(scan){
-					scan.newInstance({
+					var scanPopup = scan.newInstance({
 						confirm : function(couponId, self){
 							$.ajax({
 								url : '../QueryCoupon.do',
@@ -908,6 +908,7 @@ $(function(){
 										}, function(response, status,xhr){
 											if(response.success){
 												Util.msg.tip('使用成功!');
+												scanPopup.close();
 												refreshOrderData();
 											}else{
 												Util.msg.tip(response.msg);
@@ -918,7 +919,8 @@ $(function(){
 								}
 							});
 						}
-					}).open();
+					});
+					scanPopup.open();
 				});	
 			}, 300);
 		});
