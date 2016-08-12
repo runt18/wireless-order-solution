@@ -908,12 +908,12 @@ $(function(){
 										}, function(response, status,xhr){
 											if(response.success){
 												Util.msg.tip('使用成功!');
-												self.find('[id="scan_input_scanUseCoupon"]').val('');
-												self.find('[id="scan_input_scanUseCoupon"]').focus();
 												refreshOrderData();
 											}else{
 												Util.msg.tip(response.msg);
 											}
+											self.find('[id="scan_input_scanUseCoupon"]').val('');
+											self.find('[id="scan_input_scanUseCoupon"]').focus();
 									}, 'json');
 								}
 							});
