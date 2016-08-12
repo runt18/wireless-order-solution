@@ -305,6 +305,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("基本账户剩余金额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
+		cell.setCellValue("赠送账户剩余金额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell((int)row.getLastCellNum());
 		cell.setCellValue("剩余金额");
 		cell.setCellStyle(headerStyle);
 		
@@ -369,6 +377,17 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell = row.createCell((int)row.getLastCellNum());
 			cell.setCellValue(sm.getConsumeTotal());
 			cell.setCellStyle(numStyle);
+			
+			//基本剩余金额
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(sm.getDeltaBase());
+			cell.setCellStyle(numStyle);
+			
+			//赠送剩余金额
+			cell = row.createCell((int)row.getLastCellNum());
+			cell.setCellValue(sm.getDeltaExtra());
+			cell.setCellStyle(numStyle);
+			
 			
 			//剩余金额
 			cell = row.createCell((int)row.getLastCellNum());
