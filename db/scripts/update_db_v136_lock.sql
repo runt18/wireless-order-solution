@@ -7,21 +7,16 @@ SET NAMES utf8;
 USE wireless_order_db;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`promotion_use_time`
+-- Table `wireless_order_db`.`lock`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`promotion_use_time` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`lock` ;
 
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`promotion_use_time` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `restaurant_id` INT(11) NOT NULL,
-  `promotion_id` INT(11) NOT NULL,
-  `week` INT NOT NULL,
-  `start` TIME NOT NULL,
-  `end` TIME NOT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `ix_restaurant_id` (`restaurant_id` ASC),
-  INDEX `ix_promotion_id` (`promotion_id` ASC))
-ENGINE = InnoDB
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`lock` (
+  `operation_id` INT NOT NULL COMMENT '',
+  `associated_id` INT NOT NULL COMMENT '',
+  `birth_date` DATETIME NULL COMMENT '',
+  PRIMARY KEY (`operation_id`, `associated_id`)  COMMENT '')
+ENGINE = MEMORY
 DEFAULT CHARACTER SET = utf8;
 
 SET SQL_MODE=@OLD_SQL_MODE;
