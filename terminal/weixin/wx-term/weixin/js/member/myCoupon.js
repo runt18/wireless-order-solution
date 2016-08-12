@@ -1,4 +1,4 @@
-$(function(){
+ $(function(){
 	var refreshTimeoutId = null;	
 	
 	function init(){
@@ -51,12 +51,14 @@ $(function(){
 	   		            	var date = '';
 			   		        if(coupons[i].couponType.expiredType == '1'){
 			   		        	//开始结束时间
-			   		        	if(coupons[i].couponType.beginExpired != '' && cuopons[i].couponType.endExpired != ''){
-			   		        		date = cuopons[i].couponType.beginExpired + '<br>' + coupons[i].couponType.endExpired;
+			   		        	if(coupons[i].couponType.beginExpired != '' && coupons[i].couponType.endExpired != ''){
+			   		        		date = cuopons[i].couponType.beginExpired + '开始<br>' + coupons[i].couponType.endExpired + '结束';
 			   		        	}else if(coupons[i].couponType.beginExpired != '' && coupons[i].couponType.endExpired == ''){
-			   		        		date = coupons[i].couponType.beginExpired;
+			   		        		date = coupons[i].couponType.beginExpired + '开始<br>无结束时间';
 			   		        	}else if(coupons[i].couponType.beginExpired == '' && coupons[i].couponType.endExpired != ''){
-			   		        		date = coupons[i].couponType.endExpired;
+			   		        		date = coupons[i].couponType.endExpired + '结束';
+			   		        	}else if(coupons[i].couponType.beginExpired == '' && coupons[i].couponType.endExpired == ''){
+			   		        		date = '无使用期限';
 			   		        	}
 			   		        	
 			   		        }else if(coupons[i].couponType.expiredType == '2'){
@@ -95,11 +97,15 @@ $(function(){
 										var table = '<table style="color:black">'
 											+'<tr align="left">' 
 												+'<td>券名 : '+  $(element).attr('couponName') + '</td>'
-												+'<td>面额 : '+ $(element).attr('couponPrice') + '</td>'
 											+'</tr>'
 											+'<tr align="left">' 
-												+'<td>领取时间 : '+ $(element).attr('birthday') + '</td>'
-												+'<td>优惠券号 : '+ $(element).attr('data-value') + '</td>'
+												+'<td  colspan="2">面额 : '+ $(element).attr('couponPrice') + '</td>'
+											+'</tr>'
+											+'<tr align="left">' 
+												+'<td  colspan="2">领取时间 : '+ $(element).attr('birthday') + '</td>'
+											+'</tr>'
+											+'<tr align="left">' 
+												+'<td  colspan="2">优惠券号 : '+ $(element).attr('data-value') + '</td>'
 											+'</tr>'
 											+'<hr/>'
 											+'<tr height="5px"></tr>'
