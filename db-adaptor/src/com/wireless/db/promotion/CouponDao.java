@@ -390,6 +390,10 @@ public class CouponDao {
 				throw new BusinessException("【不在使用时段】的优惠券不可使用", PromotionError.COUPON_USE_NOT_ALLOW);
 			}
 			
+			if(coupon.getStatus() == Coupon.Status.USED){
+				throw new BusinessException("优惠券【$(promotionName)】不能再次使用".replace("$(promotionName)", coupon.getName()), PromotionError.COUPON_USE_NOT_ALLOW);
+			}
+			
 			String sql;
 			sql = " UPDATE " + Params.dbName + ".coupon " +
 				  " SET coupon_id = " + couponId +
@@ -636,7 +640,7 @@ public class CouponDao {
 			  (extraCond.isOnlyAmount ? 
 			  " COUNT(*) " : 
 			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.status, " +
-			  " C.coupon_type_id, CT.name, CT.price, CT.begin_expired, CT.end_expired, CT.limit_amount, CT.oss_image_id, " +
+			  " C.coupon_type_id, CT.name, CT.price, CT.begin_expired, CT.end_expired, CT.limit_amount, CT.expired_type, CT.expired_duration, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title, P.rule, P.start_date, P.finish_date ") +
 			  " FROM " + Params.dbName + ".coupon C " +
@@ -679,6 +683,10 @@ public class CouponDao {
 				if(dbCon.rs.getInt("oss_image_id") != 0){
 					ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
 				}
+				
+				ct.setExpiredType(CouponType.ExpiredType.valueOf(dbCon.rs.getInt("expired_type")));
+				ct.setExpiredDuration(dbCon.rs.getInt("expired_duration"));
+				
 				ct.setLimitAmount(dbCon.rs.getInt("limit_amount"));
 				
 				coupon.setCouponType(ct);

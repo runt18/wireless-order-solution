@@ -26,12 +26,6 @@ public class RepresentChainDao {
 		private String offDuty;
 		private Staff staff;
 		private boolean isOnlyAmount;
-		private boolean isSort;
-		
-		public ExtraCond setIsSort(boolean onOff){
-			this.isSort = onOff;
-			return this;
-		}
 		
 		public ExtraCond setOnlyAmount(boolean onOff){
 			this.isOnlyAmount = onOff;
@@ -192,8 +186,7 @@ public class RepresentChainDao {
 			  " FROM " + Params.dbName + ".represent_chain " +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + (staff.isBranch() ? staff.getGroupId() : staff.getRestaurantId()) +
-			  (extraCond != null ? extraCond.setStaff(staff).toString() : "") + 
-			  (extraCond.isSort ? " ORDER BY subscribe_date DESC " : "");
+			  (extraCond != null ? extraCond.setStaff(staff).toString() : ""); 
 		
 		final List<RepresentChain> result;
 		

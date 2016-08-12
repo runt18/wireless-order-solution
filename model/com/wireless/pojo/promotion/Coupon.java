@@ -426,7 +426,12 @@ public class Coupon implements Jsonable{
 	}
 	
 	public boolean isExpired(){
-		return this.couponType.isExpired();
+		if(this.couponType.getExpiredType() == CouponType.ExpiredType.EXPIRED_DATE){
+			return this.couponType.isExpired();
+		}else if(this.couponType.getExpiredType() == CouponType.ExpiredType.DURANTION){
+			return (System.currentTimeMillis() - this.birthDate) > (long)this.couponType.getExpiredDuration() * (long)(24 * 60 * 60 * 1000);
+		}
+		return true;
 	}
 	
 	public float getPrice(){

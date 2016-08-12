@@ -564,12 +564,6 @@ public class PromotionDao {
 							if(order.calcTotalPrice() > promotion.getIssueTrigger().getExtra()){
 								result.add(promotion);
 							}
-						}else if(issueRule.rule.isPointExchange()){
-							//积分兑换
-							Member member = MemberDao.getById(dbCon, staff, (Integer)issueRule.extra);
-							if(member.getPoint() >= promotion.getIssueTrigger().getExtra()){
-								result.add(promotion);
-							}
 						}else{
 							result.add(promotion);
 						}

@@ -492,9 +492,8 @@
 			type="com.wireless.Actions.dishesOrder.QueryCommissionTotalAction"
 			scope="request">
 		</action>
-
-		<action path="/QueryCouponType"
-			type="com.wireless.Actions.couponMgr.QueryCouponTypeAction" scope="request"
+		<action path="/QueryCoupon"
+			type="com.wireless.Actions.couponMgr.QueryCouponAction" scope="request"
 			parameter="dataSource">
 		</action>
 		<action path="/OperateCoupon"

@@ -187,9 +187,7 @@ $(function(){
 			$('#memberBalance_a_payment').buttonMarkup('refresh');
 			
 			//显示结账发券和用券按钮
-			$('#issueCoupon_a_orderFood').show();
-			$('#useCoupon_a_orderFood').show();
-			$('#point_a_payment').show();
+			$('#couponMore_a_payment').show();
 			
 			$.post('../QueryMember.do', {dataSource : 'normal', id : orderMsg.memberId, forDetail : true}, function(result){
 				if(result.success){
@@ -238,9 +236,7 @@ $(function(){
 			$('#memberBalance_a_payment').buttonMarkup('refresh');	
 			
 			//隐藏结账发券和用券按钮
-			$('#issueCoupon_a_orderFood').hide();
-			$('#useCoupon_a_orderFood').hide();
-			$('#point_a_payment').hide();
+			$('#couponMore_a_payment').hide();
 		}
 		
 		//查看微信订单详情
@@ -871,88 +867,136 @@ $(function(){
 		
 		//打开发送优惠券
 		$('#issueCoupon_a_orderFood').click(function(){
-			//初始化发送优惠券
-			seajs.use('issueCoupon', function(issued){
-				var issuedPopup = null;
-				issuedPopup = issued.newInstance({
-					title : '发送优惠券',
-					member : orderMsg.member, 
-					issueMode : issued.IssueMode.ORDER,
-					orderId : orderMsg.id,
-					issueTo : orderMsg.memberId
-				});
-				issuedPopup.open();
+			$('#scanUsePopupMore_a_payment').popup('close');
+			setTimeout(function(){
+				//初始化发送优惠券
+				seajs.use('issueCoupon', function(issued){
+					var issuedPopup = null;
+					issuedPopup = issued.newInstance({
+						title : '发送优惠券',
+						member : orderMsg.member, 
+						issueMode : issued.IssueMode.ORDER,
+						orderId : orderMsg.id,
+						issueTo : orderMsg.memberId
+					});
+					issuedPopup.open();
+				})
+			}, 300);
+			
+		});
+		
+		//打开扫码销卷
+		$('#scanUseCoupon_a_payment').click(function(){
+			$('#scanUsePopupMore_a_payment').popup('close');
+			setTimeout(function(){
+			
+			}, 300);
+			seajs.use('scanUseCoupon', function(scan){
+				scan.newInstance({
+					confirm : function(couponId, self){
+						$.ajax({
+							url : '../QueryCoupon.do',
+							dataType : 'json',
+							type : 'post',
+							data : {
+								dataSource : 'byId',
+								couponId : couponId
+							},
+							success : function(data){
+								$.post('../OperateOrderFood.do', {
+										dataSource : 'scanUseCoupon', 
+										couponId : couponId, 
+										orderId : orderMsg.id
+									}, function(response, status,xhr){
+										if(response.success){
+											Util.msg.tip('使用成功!');
+											self.find('[id="scan_input_scanUseCoupon"]').val('');
+											self.find('[id="scan_input_scanUseCoupon"]').focus();
+											refreshOrderData();
+										}else{
+											Util.msg.tip(response.msg);
+										}
+								}, 'json');
+							}
+						});
+					}
+				}).open();
 			})
 		});
 		
 		//打开积分兑换
 		$('#point_a_payment').click(function(){
-			seajs.use(['issueCoupon'], function(issuePopup){
-				var issueCouponPopup = issuePopup.newInstance({
-					title : '积分兑换',
-					member : orderMsg.member,
-					issueMode : issuePopup.IssueMode.POINT,
-					issueTo : orderMsg.memberId,
-					isPoint : true,
-					issueAndUse : false,
-					confirm : function(self, promotions, point){
-						Util.LM.show();
-						$.ajax({
-							url : '../OperateMember.do',
-							type : 'post',
-							dataType : 'json',
-							data : {
-								dataSource : 'consumePoint',
-								memberId : orderMsg.member.id,
-								comment : self.find('[id="pointExchange_input_issue"]').val(),
-								promotions : promotions.join(";"),
-								isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
-							},
-							success : function(jr){
-								Util.LM.hide();
-								if(jr.success){
-									issueCouponPopup.close(function(){
+			$('#scanUsePopupMore_a_payment').popup('close');
+			setTimeout(function(){
+				seajs.use(['issueCoupon'], function(issuePopup){
+					var issueCouponPopup = issuePopup.newInstance({
+						title : '积分兑换',
+						member : orderMsg.member,
+						issueMode : issuePopup.IssueMode.POINT,
+						issueTo : orderMsg.memberId,
+						isPoint : true,
+						issueAndUse : false,
+						confirm : function(self, promotions, point){
+							Util.LM.show();
+							$.ajax({
+								url : '../OperateMember.do',
+								type : 'post',
+								dataType : 'json',
+								data : {
+									dataSource : 'consumePoint',
+									memberId : orderMsg.member.id,
+									comment : self.find('[id="pointExchange_input_issue"]').val(),
+									promotions : promotions.join(";"),
+									isIssueAndUse : self.find('[id=pointExchange_check_issue]').attr('checked') ? true : false
+								},
+								success : function(jr){
+									Util.LM.hide();
+									if(jr.success){
+										issueCouponPopup.close(function(){
+											Util.msg.tip(jr.msg);
+											refreshOrderData();
+										});
+									}else{
 										Util.msg.tip(jr.msg);
-										refreshOrderData();
-									});
-								}else{
-									Util.msg.tip(jr.msg);
+									}
 								}
-							}
-						})
-					
-					}
+							})
+						
+						}
+					});
+					issueCouponPopup.open();				
 				});
-				issueCouponPopup.open();				
-			});
+			}, 300);
 		});
 		
 		//打开用券
 		$('#useCoupon_a_orderFood').click(function(){
-			seajs.use('useCoupon', function(usedCoupon){
-				var usedCouponPopup = null;
-				usedCouponPopup = usedCoupon.newInstance({
-					title : '使用优惠券',
-					useTo : orderMsg.memberId,
-					orderId :  orderMsg.id,
-					memberName : orderMsg.member.name,
-					useCuoponMethod : function(coupons){
-						$.post('../OperateOrderFood.do', {dataSource : 'coupon', orderId : orderMsg.id, coupons : coupons.join(',')}, function(response, status, xhr){
-							if(response.success){
-								Util.msg.tip('使用成功!');
-								usedCouponPopup.close();
-								refreshOrderData();
-							}else{
-								Util.msg.tip(response.msg);
-							}
-						}, 'json');
-						
-					}
+			$('#scanUsePopupMore_a_payment').popup('close');
+			setTimeout(function(){
+				seajs.use('useCoupon', function(usedCoupon){
+					var usedCouponPopup = null;
+					usedCouponPopup = usedCoupon.newInstance({
+						title : '使用优惠券',
+						useTo : orderMsg.memberId,
+						orderId :  orderMsg.id,
+						memberName : orderMsg.member.name,
+						useCuoponMethod : function(coupons){
+							$.post('../OperateOrderFood.do', {dataSource : 'coupon', orderId : orderMsg.id, coupons : coupons.join(',')}, function(response, status, xhr){
+								if(response.success){
+									Util.msg.tip('使用成功!');
+									usedCouponPopup.close();
+									refreshOrderData();
+								}else{
+									Util.msg.tip(response.msg);
+								}
+							}, 'json');
+							
+						}
+					});
+					usedCouponPopup.open();
+					
 				});
-				usedCouponPopup.open();
-				
-			});
-			
+			}, 300);
 		});
 		
 		//会员

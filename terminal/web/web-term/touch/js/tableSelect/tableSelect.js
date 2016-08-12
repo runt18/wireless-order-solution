@@ -719,7 +719,7 @@ $(function(){
 		
 		//积分兑换
 		$('#pointConsume_li_tableSelect').click(function(){
-			$('#frontPageMemberOperation').popup('close');
+			$('#frontPageCouponOperation').popup('close');
 			setTimeout(function(){
 				seajs.use(['readMember', 'issueCoupon'], function(readPopup, issuePopup){
 					var fastIssuePopup = null;
@@ -774,7 +774,7 @@ $(function(){
 		
 		//快速发券
 		$('#fastIssue_a_tableSelect').click(function(){
-			$('#frontPageMemberOperation').popup('close');
+			$('#frontPageCouponOperation').popup('close');
 			setTimeout(function(){
 				seajs.use(['readMember', 'issueCoupon'], function(readPopup, issuePopup){
 					var fastIssuePopup = null;
@@ -803,7 +803,7 @@ $(function(){
 		
 		//快速用券
 		$('#fastUse_a_tableSelect').click(function(){
-			$('#frontPageMemberOperation').popup('close');
+			$('#frontPageCouponOperation').popup('close');
 			setTimeout(function(){
 				seajs.use(['readMember','useCoupon'], function(readPopup, usePopup){
 					var fastUsePopup = null;
@@ -1018,7 +1018,46 @@ $(function(){
 			},300);
 		});
 	
+		//扫码销券
+		$('#scanUseCoupon_a_tableSelect').click(function(){
+			$('#frontPageCouponOperation').popup('close');
+			setTimeout(function(){
+				seajs.use('scanUseCoupon', function(scan){
+					scan.newInstance({
+						confirm : function(couponId, self){
+							$.ajax({
+								url : '../QueryCoupon.do',
+								dataType : 'json',
+								type : 'post',
+								data : {
+									dataSource : 'byId',
+									couponId : couponId
+								},
+								success : function(data){
+									$.post('../OperateCoupon.do', {
+											dataSource : 'scanUseCoupon', 
+											couponId : couponId, 
+											memberId : data.root[0].member.id, 
+											useMode : 20 
+										}, function(response, status,xhr){
+											if(response.success){
+												Util.msg.tip('使用成功!');
+											}else{
+												Util.msg.tip(response.msg);
+											}
+											
+											self.find('[id="scan_input_scanUseCoupon"]').val('');
+											self.find('[id="scan_input_scanUseCoupon"]').focus();
+									}, 'json');
+								}
+							});
+						}
+					}).open();
+				})
+			}, 300);
+		});
 		
+		//积分兑换
 		$('#ajustPoint_a_tableSelect').click(function(){
 			$('#frontPageMemberOperation').popup('close');
 			setTimeout(function(){

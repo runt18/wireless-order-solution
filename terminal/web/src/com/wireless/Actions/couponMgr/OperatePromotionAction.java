@@ -54,6 +54,8 @@ public class OperatePromotionAction extends DispatchAction{
 		final String issueSingleMoney = request.getParameter("singleMoney");
 		final String useRule = request.getParameter("useRule");
 		final String useSingleMoney = request.getParameter("useSingleMoney");
+		final String expiredType = request.getParameter("expiredType");
+		final String expiredDuration = request.getParameter("expiredDuration");
 		
 		final String pin = (String) request.getAttribute("pin");
 		final JObject jobject = new JObject();
@@ -62,6 +64,8 @@ public class OperatePromotionAction extends DispatchAction{
 			final CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price))
 																	.setLimitAmount(Integer.parseInt(limitAmount))
 																	.setExpired(beginExpired, endExpired)
+																	.setExpiredType(CouponType.ExpiredType.valueOf(Integer.parseInt(expiredType)))
+																	.setExpiredDuration(Integer.parseInt(expiredDuration))
 																	.setComment("活动优惠劵");
 			if(image != null && !image.isEmpty()){
 				typeInsertBuilder.setImage(Integer.parseInt(image));
@@ -153,6 +157,8 @@ public class OperatePromotionAction extends DispatchAction{
 		final String useRule = request.getParameter("useRule");
 		final String useSingleMoney = request.getParameter("useSingleMoney");
 		final String useTimes = request.getParameter("useTimes");
+		final String expiredType = request.getParameter("expiredType");
+		final String expiredDuration = request.getParameter("expiredDuration");
 		
 		
 		//String orientedId = request.getParameter("oriented");
@@ -182,6 +188,15 @@ public class OperatePromotionAction extends DispatchAction{
 				if(image != null && !image.isEmpty()){
 					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
 				}
+				
+				if(expiredType != null && !expiredType.isEmpty()){
+					typeUpdateBuilder.setExpiredType(CouponType.ExpiredType.valueOf(Integer.parseInt(expiredType)));
+				}
+				
+				if(expiredDuration != null && !expiredDuration.isEmpty()){
+					typeUpdateBuilder.setExpiredDuration(Integer.parseInt(expiredDuration));
+				}
+				
 				promotionUpdateBuilder.setCouponTypeBuilder(typeUpdateBuilder);
 			}
 			

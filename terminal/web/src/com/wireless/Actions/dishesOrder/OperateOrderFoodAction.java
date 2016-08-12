@@ -67,6 +67,28 @@ public class OperateOrderFoodAction extends DispatchAction{
 		return null;
 	}
 	
+	public ActionForward scanUseCoupon(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		final String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String orderId = request.getParameter("orderId");
+		final String couponId = request.getParameter("couponId");
+		
+		JObject jobject = new JObject();
+		try{
+			Order.CouponBuilder builder = new Order.CouponBuilder(Integer.parseInt(orderId));
+			builder.addCoupon(Integer.parseInt(couponId));
+			OrderDao.coupon(staff, builder);
+			
+		}catch(BusinessException | SQLException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	
 	/**
 	 * 转菜
 	 * @param mapping

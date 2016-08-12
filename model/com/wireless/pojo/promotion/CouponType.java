@@ -6,7 +6,41 @@ import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.util.DateUtil;
 
 public class CouponType implements Jsonable{
-
+	public static enum ExpiredType{
+		EXPIRED_DATE(1, "开始结束时间"),
+		DURANTION(2, "有效期");
+		
+		private final int val;
+		private final String desc;
+		
+		ExpiredType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static ExpiredType valueOf(int val){
+			for(ExpiredType expiredType : values()){
+				if(expiredType.val == val){
+					return expiredType;
+				}
+			}
+			throw new IllegalArgumentException("The expiredType(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	public static class InsertBuilder{
 		private final String name;
 		private final float price;
@@ -14,6 +48,9 @@ public class CouponType implements Jsonable{
 		private long beginExpired;
 		private String comment;
 		private int limitAmount;
+		private int expiredDuration;
+		private ExpiredType expiredType;
+		
 		
 		private OssImage ossImage;
 		
@@ -24,6 +61,16 @@ public class CouponType implements Jsonable{
 		
 		public InsertBuilder setLimitAmount(int limit){
 			this.limitAmount = limit;
+			return this;
+		}
+		
+		public InsertBuilder setExpiredDuration(int duration){
+			this.expiredDuration = duration;
+			return this;
+		}
+		
+		public InsertBuilder setExpiredType(ExpiredType expiredType){
+			this.expiredType = expiredType;
 			return this;
 		}
 		
@@ -76,6 +123,8 @@ public class CouponType implements Jsonable{
 		private float price = -1;
 		private OssImage ossImage;
 		private int limitAmount = -1;
+		private int expiredDuration;
+		private ExpiredType expiredType;
 		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
@@ -126,6 +175,24 @@ public class CouponType implements Jsonable{
 			return this.comment != null;
 		}
 		
+		public boolean isExpiredDurationChanged(){
+			return this.expiredDuration >=0;
+		}
+		
+		public boolean isExpiredTypeChanged(){
+			return this.expiredType != null;
+		}
+		
+		public UpdateBuilder setExpiredDuration(int duration){
+			this.expiredDuration = duration;
+			return this;
+		}
+		
+		public UpdateBuilder setExpiredType(ExpiredType expiredType){
+			this.expiredType = expiredType;
+			return this;
+		}
+		
 		public UpdateBuilder setComment(String comment){
 			this.comment = comment;
 			return this;
@@ -168,6 +235,8 @@ public class CouponType implements Jsonable{
 	private String comment;
 	private OssImage image;
 	private int limitAmout;
+	private int expiredDuration;
+	private ExpiredType expiredType;
 	
 	private CouponType(UpdateBuilder builder){
 		setId(builder.id);
@@ -178,6 +247,8 @@ public class CouponType implements Jsonable{
 		setPrice(builder.price);
 		setImage(builder.ossImage);
 		setLimitAmount(builder.limitAmount);
+		setExpiredDuration(builder.expiredDuration);
+		setExpiredType(builder.expiredType);
 	}
 	
 	private CouponType(InsertBuilder builder){
@@ -188,6 +259,8 @@ public class CouponType implements Jsonable{
 		setComment(builder.comment);
 		setImage(builder.ossImage);
 		setLimitAmount(builder.limitAmount);
+		setExpiredDuration(builder.expiredDuration);
+		setExpiredType(builder.expiredType);
 	}
 	
 	public CouponType(int id){
@@ -205,6 +278,8 @@ public class CouponType implements Jsonable{
 			setComment(src.getComment());
 			setImage(src.getImage());
 			setLimitAmount(src.limitAmout);
+			setExpiredDuration(src.getExpiredDuration());
+			setExpiredType(src.getExpiredType());
 		}
 	}
 	
@@ -247,6 +322,23 @@ public class CouponType implements Jsonable{
 		return this.limitAmout > 0;
 	}
 	
+	
+	public int getExpiredDuration() {
+		return expiredDuration;
+	}
+
+	public void setExpiredDuration(int expiredDuration) {
+		this.expiredDuration = expiredDuration;
+	}
+
+	public ExpiredType getExpiredType() {
+		return expiredType;
+	}
+
+	public void setExpiredType(ExpiredType expiredType) {
+		this.expiredType = expiredType;
+	}
+
 	public int getLimitAmount(){
 		return limitAmout;
 	}
@@ -279,6 +371,10 @@ public class CouponType implements Jsonable{
 		return this.beginExpired != 0;
 	}
 	
+	public boolean hasExpiredDuration(){
+		return this.expiredDuration != 0;
+	}
+	
 	public boolean isBeforeBegin(){
 		if(beginExpired == 0){
 			return false;
@@ -299,7 +395,7 @@ public class CouponType implements Jsonable{
 		return !isBeforeBegin() && !isAfterEnd();
 	}
 	
-	public boolean isExpired(){
+	boolean isExpired(){
 		return isBeforeBegin() || isAfterEnd();
 	}
 	
@@ -364,6 +460,8 @@ public class CouponType implements Jsonable{
 			}
 		}
 		jm.putInt("limitAmount", this.limitAmout);
+		jm.putInt("expiredDuration", this.expiredDuration);
+		jm.putInt("expiredType", this.expiredType != null ? this.expiredType.val : 1);
 		return jm;
 	}
 
@@ -371,7 +469,4 @@ public class CouponType implements Jsonable{
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
 	}
-	
-	
-	
 }

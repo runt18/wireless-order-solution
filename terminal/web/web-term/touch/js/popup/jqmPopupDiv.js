@@ -64,7 +64,6 @@
 		
 		
 		this.open = function(afterOpen){
-			
 			if(_o.loadUrl){
 				if(_loadedUrlCache[_o.loadUrl]){
 					_init(_loadedUrlCache[_o.loadUrl]);

@@ -520,6 +520,36 @@ public class OperateCouponAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	public ActionForward scanUseCoupon(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		final String useMode = request.getParameter("useMode");
+		final String memberId = request.getParameter("memberId");
+		//final String useAssociateId = request.getParameter("useAssociateId");
+		final String couponId = request.getParameter("couponId");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			if(CouponOperation.Operate.valueOf(Integer.parseInt(useMode)) == CouponOperation.Operate.FAST_USE){
+				Coupon.UseBuilder builder = Coupon.UseBuilder.newInstance4Fast(Integer.parseInt(memberId));
+				builder.addCoupon(Integer.parseInt(couponId));
+				CouponDao.use(staff, builder);
+
+			}else{
+				throw new BusinessException("优惠券使用方法必须是快速使用");
+			}
+			
+			
+		}catch(BusinessException | SQLException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 
 	/**
 	 * 优惠券使用情况

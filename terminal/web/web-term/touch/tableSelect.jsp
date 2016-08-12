@@ -4,7 +4,7 @@
 	response.setHeader("Pragma","No-cache"); 
 	response.setHeader("Cache-Control","no-cache"); 
 	response.setDateHeader("Expires", 0);  
-%>
+%>	
 <!DOCTYPE html>
 <html>
 <head>
@@ -76,7 +76,8 @@
 			'ajustPoint' : './js/popup/member/ajustPointPopup',
 			'limitSale' : './js/popup/limitSale/limitSale',
 			'setLimit' : './js/popup/limitSale/setLimit',
-			'saleOut' : './js/popup/limitSale/saleOut'
+			'saleOut' : './js/popup/limitSale/saleOut',
+			'scanUseCoupon' : './js/popup/scanUseCoupon/scanUseCoupon'
 		}
 	});
 </script>
@@ -154,6 +155,7 @@
 		 	<!-- ts.displayPrintConnection() -->
 		 	<a id="diagPrinter_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont" >打印机诊断</a>
 		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageMemberOperation">会员</a>
+		 	<a data-role="button" data-inline="true" class="topBtnFont"  data-rel="popup" data-transtion="pop" href="#frontPageCouponOperation">优惠券</a>
 		 	<a id="todayBill_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">账单</a>
 		 	<a id="personSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交款</a>
 			<a id="phraseSettle_a_tableSelect" data-role="button" data-inline="true" class="topBtnFont">交班</a>
@@ -167,15 +169,22 @@
 			<li class="popupButtonList" id="searchMember_a_tableSelect"><a>会员查询</a></li>
 			<li class="popupButtonList" id="addMember_a_tableSelect"><a>添加会员</a></li>
 			<li class="popupButtonList" id="memberRecharge_a_tableSelect"><a >会员充值</a></li>
-			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分兑换</a></li>
 			<li class="popupButtonList" id="consumeDetail_a_tableSelect"><a >消费明细</a></li>
 			<li class="popupButtonList" id="patchCard_a_tableSelect"><a>补发实体卡</a></li>
 			<li class="popupButtonList" id="patchWxCard_a_tableSelect"><a>补发电子卡</a></li>
 			<li class="popupButtonList" id="memberWxBind_li_tableSelect"><a>微信会员绑定</a></li>
-			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
-			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
 			<li class="popupButtonList" id="ajustPoint_a_tableSelect"><a>积分调整</a></li>
 			<li class="popupButtonList" id="takeMoney_a_tableSelect"><a>会员取款</a></li>
+	
+		</ul>
+	</div>	
+	
+	<div data-role="popup" id="frontPageCouponOperation" data-theme="d" class="payment_searchMemberType">
+		<ul id="charge_searchMemberTypeCmp" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+			<li class="popupButtonList" id="pointConsume_li_tableSelect"><a >积分兑换</a></li>
+			<li class="popupButtonList" id="fastIssue_a_tableSelect"><a >快速发券</a></li>
+			<li class="popupButtonList" id="fastUse_a_tableSelect"><a >快速用券</a></li>
+			<li class="popupButtonList" id="scanUseCoupon_a_tableSelect"><a>扫码销券</a></li>
 		</ul>
 	</div>	
 	
@@ -941,9 +950,7 @@
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" href="#tableSelectMgr" >返回</a>
 		 <a data-role="button" data-inline="true" class="bottomBtnFont" onclick="refreshOrderData({calc:true})" >刷新</a>
 		 <div data-role="controlgroup" class="ui-btn-right " data-type="horizontal">
-		 	<a data-role="button" data-inline="true" class="bottomBtnFont" id="issueCoupon_a_orderFood">发券</a>
-			<a data-role="button" data-inline="true" class="bottomBtnFont" id="useCoupon_a_orderFood">用券</a>
-			<a id="point_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">积分兑换</a>
+			<a data-role="button" id="couponMore_a_payment" data-inline="true" class="bottomBtnFont" data-rel="popup"  data-transition="pop" href="#scanUsePopupMore_a_payment">优惠券</a>
 			<a data-role="button" data-theme="e" data-inline="true" style="width:150px;" class="bottomBtnFont" id="cashReceives_a_payment">现金找零</a>
 		 	<a id="tempPay_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">暂结(-)</a>
 		 	<a id="updateOrder_a_payment" data-role="button" data-inline="true" class="bottomBtnFont">改单</a>
@@ -955,9 +962,21 @@
 		 </div>
 	</div>	
 	
+	<div data-role="popup" id="scanUsePopupMore_a_payment" data-theme="d" >
+        <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
+       		 <li data-icon="false" class="tempFoodKitchen" id="issueCoupon_a_orderFood"><a>发券</a></li>
+       		 <li data-icon="false" class="tempFoodKitchen" id="useCoupon_a_orderFood"><a>用券</a></li>
+       		 <li data-icon="false" class="tempFoodKitchen" id="point_a_payment"><a>积分兑换</a></li>
+       		 <li data-icon="false" class="tempFoodKitchen" id="scanUseCoupon_a_payment"><a>扫码销券</a></li>
+       		 
+		</ul>
+	</div>	
+	
 	<div data-role="popup" id="discount_div_payment" data-theme="d" >
         <ul id="discount_ul_payment" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
 	</div>	
+	
+	
 	<div data-role="popup" id="servicePlan_div_payment" data-theme="d" >
         <ul id="servicePlan_ul_payment" data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b"></ul>
 	</div>	

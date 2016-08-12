@@ -29,6 +29,27 @@ Ext.onReady(function(){
 		couponName.focus();
 	}
 	
+	//选择优惠券时间设置
+	function changeCouponExpired(type){
+		var beginExpired = Ext.getCmp('beginExpiredCheck_check_group');
+		var endExpired = Ext.getCmp('endExpiredCheck_check_group');
+		var expiredDuration = Ext.getCmp('expiredDuration_text_active');
+		
+		if(type == 1){
+			//开始结束时间
+			beginExpired.show();
+			endExpired.show();
+			expiredDuration.hide();
+		}else if(type == 2){
+			//有效期
+			beginExpired.hide();
+			endExpired.hide();
+			expiredDuration.show();
+		}
+		//TODO
+		
+	}
+	
 	//生成优惠活动头部内容
     function buildPromotionHeader(title, endDate){
 		var head = [];
@@ -225,7 +246,8 @@ Ext.onReady(function(){
 		var price = Ext.getCmp('guide_2nd_couponPrice');
 		var beginExpired = Ext.getCmp('beginDate_date_couponExpired');
 		var endExpired = Ext.getCmp('endDate_date_couponExpired');
-	
+		var expiredDuration = Ext.getCmp('duration_textfield_active');
+		
 		var params = {};
 		if(createActiveWin.otype == 'insert'){
 			params.dataSource = 'insert';
@@ -241,23 +263,36 @@ Ext.onReady(function(){
 		params.couponName = couponName.getValue();
 		params.price = price.getValue();
 		
-		if(Ext.getCmp('beginExpired_radio_active').getValue()){
-			params.beginExpired = beginExpired.getValue().format('Y-m-d');
-		}else{
-			params.beginExpired = '';
-		}
-		
-		if(Ext.getCmp('endExpired_radio_active').getValue()){
-			params.endExpired = endExpired.getValue().format('Y-m-d');
-		}else{
-			params.endExpired = '';
-		}
 		
 		if(Ext.getCmp('limitAmount_checkbox_active').getValue()){
 			params.limitAmount = Ext.getCmp('limitAmount_text_active').getValue();
 		}else{
 			params.limitAmount = 0;
 		}
+		
+		
+		
+		if(Ext.getCmp('expiredDuration_radio_active').getValue()){
+			params.expiredType = 2;
+			
+			params.expiredDuration = expiredDuration.getValue();
+		}else if(Ext.getCmp('expiredDate_radio_active').getValue()){
+			params.expiredType = 1;
+			
+			if(Ext.getCmp('beginExpired_radio_active').getValue()){
+				params.beginExpired = beginExpired.getValue().format('Y-m-d');
+			}else{
+				params.beginExpired = '';
+			}
+			
+			if(Ext.getCmp('endExpired_radio_active').getValue()){
+				params.endExpired = endExpired.getValue().format('Y-m-d');
+			}else{
+				params.endExpired = '';
+			}
+		}
+		
+		
 		
 		params.title = title.getValue();
 		
@@ -568,6 +603,7 @@ Ext.onReady(function(){
 		                                },
 		                                check : function(e){
 		                                    if(e.getValue()){
+		                                    	changeCouponModel(2);
 		                                    }
 		                                }
 		                            }
@@ -623,11 +659,49 @@ Ext.onReady(function(){
 		                            allowBlank : false
 		                        }]
 		                    },{
+		                    	xtype : 'radiogroup',
+		                        items : [{
+		                            xtype : 'radio',
+		                            name : 'dateRadio',
+		                            style : "margin-left:15px;",
+		                            id : 'expiredDuration_radio_active',
+		                            inputValue : 2,
+		                            hideLabel : true,
+		                            boxLabel : '有效期',
+		                            listeners : {
+		                                check : function(e){
+		                                    if(e.getValue()){
+		                                       changeCouponExpired(2);
+		                                    }
+		                                }
+		                            }
+		                        }, {
+		                            xtype : 'radio',
+		                            name : 'dateRadio',
+		                            id : 'expiredDate_radio_active',
+		                            inputValue : 1,
+		                            hideLabel : true,
+		                            boxLabel : '开始结束时间',
+		                            listeners : {
+		                                check : function(e){
+		                                    if(e.getValue()){
+		                                         changeCouponExpired(1);
+		                                    }
+		                                },
+		                                focus : function(e){
+											if(Ext.getCmp('expiredDate_radio_active').checked){
+												 changeCouponExpired(1);
+											}
+										}
+		                            }
+		                        }]
+		                    }, {
 								xtype : 'checkboxgroup',
-								columns : 3,
+								id : "beginExpiredCheck_check_group",
 								items : [{
 									boxLabel : '开始时间',
 									inputValue : 2,
+									style : "margin-left : 15px;",
 									id : 'beginExpired_radio_active',
 									name : 'time',
 									listeners : {
@@ -646,13 +720,9 @@ Ext.onReady(function(){
 											}
 										}
 									}
-								}]
-							}, {
-		                        items : [{
+								}, {
 		                            id : 'beginDate_date_couponExpired',
 		                            xtype : 'datefield',
-		                            width : 130,
-		                            fieldLabel : '&nbsp;&nbsp;&nbsp;开始时间',
 		                            format : 'Y-m-d',
 		                            readOnly : false,
 		                            minValue : new Date(),
@@ -663,12 +733,13 @@ Ext.onReady(function(){
 		                                }
 		                            }
 		                        }]
-		                    },{
+							},{
 								xtype : 'checkboxgroup',
-								columns : 3,
+								id : 'endExpiredCheck_check_group',
 								items : [{
 									boxLabel : '结束时间',
 									inputValue : 2,
+									style : "margin-left : 15px;",
 									id : 'endExpired_radio_active',
 									name : 'time',
 									listeners : {
@@ -687,13 +758,10 @@ Ext.onReady(function(){
 											}
 										}
 									}
-								}]
-		                    }, {
-		                        items : [{
+								}, {
 		                            id : 'endDate_date_couponExpired',
 		                            xtype : 'datefield',
 		                            width : 130,
-		                            fieldLabel : '&nbsp;&nbsp;&nbsp;结束时间',
 		                            format : 'Y-m-d',
 		                            readOnly : false,
 		                            minValue : new Date(),
@@ -703,6 +771,15 @@ Ext.onReady(function(){
 		                                    thiz.clearInvalid();
 		                                }
 		                            }
+		                        }]
+		                    }, {
+		                    	id : "expiredDuration_text_active",
+		                        items : [{
+		                            xtype : 'textfield',
+		                            id : 'duration_textfield_active', 
+		                            value : 0,
+		                            fieldLabel : '有效期',
+		                            allowBlank : false
 		                        }]
 		                    }]
 		                }]
@@ -893,6 +970,11 @@ Ext.onReady(function(){
 						
 						Ext.getDom('radioDefaultCoupon').checked = true; 
 						Ext.getCmp('radioDefaultCoupon').fireEvent('check', Ext.getCmp('radioDefaultCoupon'), true);
+						
+						Ext.getCmp('expiredDate_radio_active').setValue(true);
+						Ext.getCmp('expiredDate_radio_active').fireEvent('focus', Ext.getCmp('expiredDate_radio_active'), true);
+						
+						
 						Ext.getCmp('couponTypeBox').setImg();
 						
 						Ext.getCmp('secondStepEastBody').body.update('');
@@ -907,20 +989,33 @@ Ext.onReady(function(){
 						Ext.getCmp('guide_2nd_couponName').setValue(thiz.promotion.coupon.name);
 						Ext.getCmp('guide_2nd_couponPrice').setValue(thiz.promotion.coupon.price);
 						
-						if(thiz.promotion.coupon.beginExpired != ''){
-							Ext.getCmp('beginDate_date_couponExpired').setValue(thiz.promotion.coupon.beginExpired);
-							Ext.getCmp('beginExpired_radio_active').setValue(true); 
+						if(thiz.promotion.coupon.expiredType == '1'){
+							//开始结束时间
+							Ext.getCmp('expiredDate_radio_active').setValue(true);
+							Ext.getCmp('expiredDate_radio_active').fireEvent('focus', Ext.getCmp('expiredDate_radio_active'), true);
 							
-						}else{
-							Ext.getCmp('beginExpired_radio_active').setValue(false); 
-						}
-						
-						
-						if(thiz.promotion.coupon.endExpired != ''){
-							Ext.getCmp('endDate_date_couponExpired').setValue(thiz.promotion.coupon.endExpired);
-							Ext.getCmp('endExpired_radio_active').setValue(true); 
-						}else{
-							Ext.getCmp('endExpired_radio_active').setValue(false); 
+							if(thiz.promotion.coupon.beginExpired != ''){
+								Ext.getCmp('beginDate_date_couponExpired').setValue(thiz.promotion.coupon.beginExpired);
+								Ext.getCmp('beginExpired_radio_active').setValue(true); 
+								
+							}else{
+								Ext.getCmp('beginExpired_radio_active').setValue(false); 
+							}
+							
+							
+							if(thiz.promotion.coupon.endExpired != ''){
+								Ext.getCmp('endDate_date_couponExpired').setValue(thiz.promotion.coupon.endExpired);
+								Ext.getCmp('endExpired_radio_active').setValue(true); 
+							}else{
+								Ext.getCmp('endExpired_radio_active').setValue(false); 
+							}
+							
+						}else if(thiz.promotion.coupon.expiredType == '2'){
+							//有效期
+							Ext.getCmp('expiredDuration_radio_active').setValue(true);
+							Ext.getCmp('expiredDuration_radio_active').fireEvent('focus', Ext.getCmp('expiredDuration_radio_active'), true);
+							
+							Ext.getCmp('duration_textfield_active').setValue(thiz.promotion.coupon.expiredDuration);
 						}
 						
 						if(thiz.promotion.coupon.limitAmount > 0){
