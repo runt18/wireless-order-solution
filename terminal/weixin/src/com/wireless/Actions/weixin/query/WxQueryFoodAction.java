@@ -1,6 +1,7 @@
 package com.wireless.Actions.weixin.query;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -62,7 +63,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			}
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			List<Food> result = FoodDao.getByCond(staff, new FoodDao.ExtraCond().setSellout(false).setRecomment(true).setContainsImage(true), " ORDER BY FOOD.food_alias");
+			List<Food> result = FoodDao.getByCond(staff, new FoodDao.ExtraCond().setSellout(true).setRecomment(true).setContainsImage(true), " ORDER BY FOOD.food_alias");
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
 				result = DataPaging.getPagingData(result, true, Integer.parseInt(start), Integer.parseInt(limit));
 			}
@@ -122,6 +123,15 @@ public class WxQueryFoodAction extends DispatchAction{
 			
 			for(Food food : result){
 				food.copyFrom(FoodDao.getById(staff, food.getFoodId()));
+			}
+			
+			//过滤停售菜品
+			Iterator<Food> iter = result.iterator();
+			while(iter.hasNext()){
+				Food f = iter.next();
+				if(f.isSellOut()){
+					iter.remove();
+				}
 			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
@@ -184,6 +194,15 @@ public class WxQueryFoodAction extends DispatchAction{
 			
 			for(Food food : result){
 				food.copyFrom(FoodDao.getById(staff, food.getFoodId()));
+			}
+
+			//过滤停售菜品
+			Iterator<Food> iter = result.iterator();
+			while(iter.hasNext()){
+				Food f = iter.next();
+				if(f.isSellOut()){
+					iter.remove();
+				}
 			}
 			
 			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){

@@ -889,39 +889,38 @@ $(function(){
 		$('#scanUseCoupon_a_payment').click(function(){
 			$('#scanUsePopupMore_a_payment').popup('close');
 			setTimeout(function(){
-			
+				seajs.use('scanUseCoupon', function(scan){
+					scan.newInstance({
+						confirm : function(couponId, self){
+							$.ajax({
+								url : '../QueryCoupon.do',
+								dataType : 'json',
+								type : 'post',
+								data : {
+									dataSource : 'byId',
+									couponId : couponId
+								},
+								success : function(data){
+									$.post('../OperateOrderFood.do', {
+											dataSource : 'scanUseCoupon', 
+											couponId : couponId, 
+											orderId : orderMsg.id
+										}, function(response, status,xhr){
+											if(response.success){
+												Util.msg.tip('使用成功!');
+												self.find('[id="scan_input_scanUseCoupon"]').val('');
+												self.find('[id="scan_input_scanUseCoupon"]').focus();
+												refreshOrderData();
+											}else{
+												Util.msg.tip(response.msg);
+											}
+									}, 'json');
+								}
+							});
+						}
+					}).open();
+				});	
 			}, 300);
-			seajs.use('scanUseCoupon', function(scan){
-				scan.newInstance({
-					confirm : function(couponId, self){
-						$.ajax({
-							url : '../QueryCoupon.do',
-							dataType : 'json',
-							type : 'post',
-							data : {
-								dataSource : 'byId',
-								couponId : couponId
-							},
-							success : function(data){
-								$.post('../OperateOrderFood.do', {
-										dataSource : 'scanUseCoupon', 
-										couponId : couponId, 
-										orderId : orderMsg.id
-									}, function(response, status,xhr){
-										if(response.success){
-											Util.msg.tip('使用成功!');
-											self.find('[id="scan_input_scanUseCoupon"]').val('');
-											self.find('[id="scan_input_scanUseCoupon"]').focus();
-											refreshOrderData();
-										}else{
-											Util.msg.tip(response.msg);
-										}
-								}, 'json');
-							}
-						});
-					}
-				}).open();
-			})
 		});
 		
 		//打开积分兑换
