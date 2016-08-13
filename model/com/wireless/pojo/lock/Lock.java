@@ -28,7 +28,7 @@ public class Lock {
 			return new Lock(operation, associatedId);
 		}
 	}
-	
+	 
 	public static enum Operation{
 		MEMBER_CHARGE(1, "会员充值");
 		
