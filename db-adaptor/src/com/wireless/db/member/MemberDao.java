@@ -2128,28 +2128,6 @@ public class MemberDao {
 		}finally{
 			dbCon.disconnect();
 		}
-		
-//		return LockDao.lock(new Lock.InsertBulder4Charge(memberId), new Callable<MemberOperation>(){
-//
-//			@Override
-//			public MemberOperation call() throws Exception {
-//				DBCon dbCon = new DBCon();
-//				try{
-//					dbCon.connect();
-//					dbCon.conn.setAutoCommit(false);
-//					MemberOperation mo = MemberDao.charge(dbCon, staff, memberId, chargeMoney, accountMoney, chargeType);
-//					dbCon.conn.commit();
-//					return mo;
-//					
-//				}catch(BusinessException | SQLException e){
-//					dbCon.conn.rollback();
-//					throw e;	
-//				}finally{
-//					dbCon.disconnect();
-//				}
-//			}
-//			
-//		});
 	}
 	
 	/**

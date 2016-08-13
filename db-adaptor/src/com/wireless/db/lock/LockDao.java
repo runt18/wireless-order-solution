@@ -36,7 +36,7 @@ public class LockDao {
 			  " AND associated_id = " + lock.getAssociatedId();
 		dbCon.stmt.executeUpdate(sql);
 	}
-	
+	 
 	public static <T> T lock(Lock.InsertBuilder builder, Callable<T> lockAction) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		boolean acquired = false;
