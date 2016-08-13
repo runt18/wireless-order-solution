@@ -667,7 +667,7 @@ Ext.onReady(function(){
 		                            id : 'expiredDuration_radio_active',
 		                            inputValue : 2,
 		                            hideLabel : true,
-		                            boxLabel : '有效期',
+		                            boxLabel : '领取后多少日结束',
 		                            listeners : {
 		                                check : function(e){
 		                                    if(e.getValue()){
@@ -778,7 +778,7 @@ Ext.onReady(function(){
 		                            xtype : 'textfield',
 		                            id : 'duration_textfield_active', 
 		                            value : 0,
-		                            fieldLabel : '有效期',
+		                            fieldLabel : '日数',
 		                            allowBlank : false
 		                        }]
 		                    }]

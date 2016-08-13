@@ -39,7 +39,6 @@
 						
 						var coupon = '<div style="left:14px;top:8px;" class="stamp stamp03" >'
 					  	    +'<div data-type="promotion" data-value={promotionid} class="par"><p>' + restaurantName + '</p><sub class="sign">￥</sub><span>{price}</span><sub>优惠券</sub><p>{comment}</p></div>' 
-					  	     +'<i></i>' 
 						    +'<div class="copy" style="z-index: 6000;"><p>{date}</p><a data-type="useCoupon_a_myCoupon" birthDay={birthday}  couponPrice={price} couponName={comment} memebrId={memberId} data-value={couponId}>扫码销券</a></div>' 
 		   		            +'</div>'
 		   		            + '<div style="height:7px;"></div>' ;

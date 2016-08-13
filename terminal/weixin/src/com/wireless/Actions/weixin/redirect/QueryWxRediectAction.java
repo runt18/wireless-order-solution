@@ -56,6 +56,10 @@ public class QueryWxRediectAction extends DispatchAction {
 				url = path1 + URLEncoder.encode(encoderUrl + "&href=sales.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.I_WANT_REPRESENT.getKey().equals(key)){
 				url = path1 + URLEncoder.encode(encoderUrl + "&href=../representCard/representCard.html", "utf-8") + path2;
+			}else if(WxHandleMessage.EventKey.POINT_CONSUME.getKey().equals(key)){
+				url = path1 + URLEncoder.encode(encoderUrl + "&href=../pointConsume/pointConsume.html", "utf-8") + path2;
+			}else if(WxHandleMessage.EventKey.MY_COUPON.getKey().equals(key)){
+				url = path1 + URLEncoder.encode(encoderUrl + "&href=../myCoupon/myCoupon.html", "utf-8") + path2;
 			}else{
 				throw new BusinessException("该功能不支持直接跳转..");
 			}
