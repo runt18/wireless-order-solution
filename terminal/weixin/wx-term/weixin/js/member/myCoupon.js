@@ -51,7 +51,7 @@
 			   		        if(coupons[i].couponType.expiredType == '1'){
 			   		        	//开始结束时间
 			   		        	if(coupons[i].couponType.beginExpired != '' && coupons[i].couponType.endExpired != ''){
-			   		        		date = cuopons[i].couponType.beginExpired + '开始<br>' + coupons[i].couponType.endExpired + '结束';
+			   		        		date = coupons[i].couponType.beginExpired + '开始<br>' + coupons[i].couponType.endExpired + '结束';
 			   		        	}else if(coupons[i].couponType.beginExpired != '' && coupons[i].couponType.endExpired == ''){
 			   		        		date = coupons[i].couponType.beginExpired + '开始<br>无结束时间';
 			   		        	}else if(coupons[i].couponType.beginExpired == '' && coupons[i].couponType.endExpired != ''){
