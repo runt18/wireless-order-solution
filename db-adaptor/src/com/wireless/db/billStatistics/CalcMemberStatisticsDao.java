@@ -3,9 +3,9 @@ package com.wireless.db.billStatistics;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +26,7 @@ import com.wireless.pojo.member.MemberOperation.OperationType;
 import com.wireless.pojo.member.SummaryByEachMember;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class CalcMemberStatisticsDao {
 
@@ -286,7 +287,12 @@ public class CalcMemberStatisticsDao {
 			  " FROM ( " + MemberOperationDao.makeSql(staff, extraCond, null) + " ) AS TMP " +
 			  " GROUP BY TMP.member_id "; 
 		
-		final List<SummaryByEachMember> result = new ArrayList<>();
+		final List<SummaryByEachMember> result = SortedList.newInstance(new Comparator<SummaryByEachMember>() {
+			@Override
+			public int compare(SummaryByEachMember o1, SummaryByEachMember o2) {
+				return o1.getMember().compareTo(o2.getMember());
+			}
+		});
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -316,21 +322,45 @@ public class CalcMemberStatisticsDao {
 			result.add(summary);
 		}
 		
-		for(SummaryByEachMember summary : result){
-			sql = MemberOperationDao.makeSql(staff, ((MemberOperationDao.ExtraCond)extraCond.clone()).addMember(summary.getMember()), " ORDER BY MO.id DESC LIMIT 1 ");
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
+		sql = " SELECT * FROM " + Params.dbName + "." + extraCond.dbTbl.moTbl + " WHERE id IN ( " +
+				" SELECT MAX(TMP.id) AS last_member_operation " +
+				" FROM ( " + MemberOperationDao.makeSql(staff, extraCond, null) + " ) AS TMP " +
+				" GROUP BY TMP.member_id " +
+			  " ) ";
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			SummaryByEachMember summary = new SummaryByEachMember();
+			summary.setMember(new Member(dbCon.rs.getInt("member_id")));
+			int index = result.indexOf(summary);
+			if(index >= 0){
 				//剩余金额
-				summary.setRemainingBalance(dbCon.rs.getFloat("remaining_base_money") + dbCon.rs.getFloat("remaining_extra_money"));
+				result.get(index).setRemainingBalance(dbCon.rs.getFloat("remaining_base_money") + dbCon.rs.getFloat("remaining_extra_money"));
 				//基础剩余余额
-				summary.setDeltaBase(dbCon.rs.getFloat("remaining_base_money"));
+				result.get(index).setDeltaBase(dbCon.rs.getFloat("remaining_base_money"));
 				//赠送剩余余额
-				summary.setDeltaExtra(dbCon.rs.getFloat("remaining_extra_money"));
+				result.get(index).setDeltaExtra(dbCon.rs.getFloat("remaining_extra_money"));
 				//剩余积分
-				summary.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
+				result.get(index).setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			}
-			dbCon.rs.close();
 		}
+		dbCon.rs.close();
+		
+//		for(SummaryByEachMember summary : result){
+//			sql = MemberOperationDao.makeSql(staff, ((MemberOperationDao.ExtraCond)extraCond.clone()).addMember(summary.getMember()), " ORDER BY MO.id DESC LIMIT 1 ");
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			if(dbCon.rs.next()){
+//				//剩余金额
+//				summary.setRemainingBalance(dbCon.rs.getFloat("remaining_base_money") + dbCon.rs.getFloat("remaining_extra_money"));
+//				//基础剩余余额
+//				summary.setDeltaBase(dbCon.rs.getFloat("remaining_base_money"));
+//				//赠送剩余余额
+//				summary.setDeltaExtra(dbCon.rs.getFloat("remaining_extra_money"));
+//				//剩余积分
+//				summary.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
+//			}
+//			dbCon.rs.close();
+//		}
 		
 		return result;
 	}
