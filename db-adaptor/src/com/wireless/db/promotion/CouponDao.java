@@ -1,19 +1,27 @@
 package com.wireless.db.promotion;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.marker.weixin.api.BaseAPI;
 
-import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.member.MemberDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.restaurant.WxRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
@@ -26,7 +34,9 @@ import com.wireless.pojo.promotion.CouponOperation;
 import com.wireless.pojo.promotion.CouponOperation.OperateType;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.StringHtml;
 
 public class CouponDao {
@@ -280,7 +290,7 @@ public class CouponDao {
 							  memberId + "," +
 							  Coupon.Status.ISSUED.getVal() + 
 							  ")";
-						dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+						dbCon.stmt.executeUpdate(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
 						dbCon.rs = dbCon.stmt.getGeneratedKeys();
 						int couponId = 0;
 						if(dbCon.rs.next()){
@@ -758,6 +768,104 @@ public class CouponDao {
 			}
 		}
 		return amount;
+	}
+	
+	/**
+	 * the result of coupons which is expired soon
+	 * @param dbCon
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException 
+	 */
+	public static void getExpiredCoupon(DBCon dbCon, String wxServer) throws SQLException, BusinessException{
+		final List<Coupon> coupons = new ArrayList<>();
+		for(Restaurant restaurant : RestaurantDao.getByCond(dbCon, null, null)){
+			final Staff staff = StaffDao.getAdminByRestaurant(dbCon, restaurant.getId());
+			//判定是否存在模板
+			if(WxRestaurantDao.get(dbCon, staff).hasExpiredTemplate()){
+				coupons.addAll(getByCond(dbCon, staff, null, null));
+			}
+		}
+		final int alarmBeforeDays = -5;
+		Iterator<Coupon> iter = coupons.iterator();
+		while(iter.hasNext()){
+			final Coupon coupon = iter.next();
+			final Calendar endDay = Calendar.getInstance();
+			final Calendar nowDay = Calendar.getInstance();
+			//有效期的coupon
+			if(coupon.getCouponType().getExpiredType() == CouponType.ExpiredType.DURANTION){
+				Calendar calcDate = Calendar.getInstance();
+				calcDate.setTimeInMillis(coupon.getBirthDate());
+				calcDate.add(Calendar.DATE, coupon.getCouponType().getExpiredDuration());
+				endDay.setTimeInMillis(DateUtil.parseDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date(calcDate.getTimeInMillis()))));
+			//使用时段的coupon
+			}else{
+				endDay.setTimeInMillis(coupon.getCouponType().getEndExpired());
+			}
+			endDay.add(Calendar.DATE, alarmBeforeDays);
+			nowDay.setTimeInMillis(DateUtil.parseDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date())));
+			//获取刚好到预警天数的优惠券
+			if(endDay.compareTo(nowDay) != 0){
+				iter.remove();
+			}
+		}
+		
+		final Map<Member, List<Coupon>> tipsMap = new HashMap<>();
+		for(Coupon coupon : coupons){
+			final Member member = coupon.getMember();
+			if(tipsMap.containsKey(member)){
+				tipsMap.get(member).add(coupon);
+			}else{
+				final ArrayList<Coupon> couponList = new ArrayList<>();
+				couponList.add(coupon);
+				tipsMap.put(member, couponList);
+			}
+		}
+		
+		//隔2S发送一次  防止微信服务器因操作过于频发 报错
+		if(wxServer != null && !wxServer.isEmpty()){
+			final ScheduledThreadPoolExecutor schedule = new ScheduledThreadPoolExecutor(1);
+			schedule.schedule(new Runnable(){
+				@Override
+				public void run() {
+					Iterator<Member> iter = tipsMap.keySet().iterator();
+					while(iter.hasNext()){
+						Member member = iter.next();
+						String expireDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date(tipsMap.get(member).get(0).getCouponType().getEndExpired()));
+					
+						try {
+							BaseAPI.doPost(("http://wx.e-tones.net/wx-term/WxNotifyMember.do?dataSource=expired&restaurantId=$(restaurantId)"+ 
+									   "&memberId=$(memberId)&expiredDate=$(expiredDate)&amount=$(amount)").replace("$(restaurantId)", "" + member.getRestaurantId())
+																							 			.replace("$(memberId)", "" + member.getId())
+																							 			.replace("$(expiredDate)", expireDate)
+																							 			.replace("$(amount)", "" + tipsMap.get(member).size()), "");
+							Thread.sleep(2000);
+						} catch (Exception ignored) {
+							ignored.printStackTrace();
+						}
+					}
+					
+					schedule.shutdown();
+				}
+				
+			}, 1, TimeUnit.SECONDS);
+		}
+	}
+	
+	/**
+	 * the result of coupons which is expired soon
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static void getExpiredCoupon(String wxServer) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try {
+			dbCon.connect();
+			getExpiredCoupon(dbCon, wxServer);
+		} finally {
+			dbCon.disconnect();
+		}
 	}
 	
 }

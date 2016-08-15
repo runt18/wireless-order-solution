@@ -25,6 +25,7 @@ import com.wireless.db.misc.DbArchiveDao;
 import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.printScheme.PrintLossDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.system.BillBoardDao;
@@ -32,6 +33,7 @@ import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.db.token.TokenDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.server.WirelessSocketServer;
 
 /**
  * 
@@ -145,6 +147,9 @@ public class DailySettlementTask extends SchedulerTask{
 			//Notify wx-term to send the liveness & expired. 
 			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=expired", "");
 			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=liveness", "");
+			
+			//Notify wx-term to send the message of expired coupon
+			CouponDao.getExpiredCoupon(WirelessSocketServer.wxServer);
 			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);

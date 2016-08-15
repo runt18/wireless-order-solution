@@ -194,6 +194,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_SCANNING_RESULT;
 	private final String WEIXIN_WAITER;
 	private final String WEIXIN_REPRESENT;
+	private final String WEIXIN_POINTCONSUME;
+	private final String WEIXIN_MYCOUPON;
 	
 	private final String WEIXIN_FOOD_ICON;
 	private final String WEIXIN_BOOK_ICON;
@@ -217,7 +219,9 @@ public class WxHandleMessage extends HandleMessageAdapter {
 		ORDER_EVENT_KEY("order_event_key", "我的订单"),
 		MY_QRCODE_EVENT_KEY("my_qrcode_event_key", "我的二维码"),
 		SCAN_EVENT_KEY("scan_event_key", "扫一扫"),
-		I_WANT_REPRESENT("i_want_represent", "我要代言");
+		I_WANT_REPRESENT("i_want_represent", "我要代言"),
+		POINT_CONSUME("point_consume", "积分兑换"),
+		MY_COUPON("my_coupon", "我的优惠券");
 		
 		EventKey(String val, String desc){
 			this.val = val;
@@ -262,6 +266,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 //		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
 		this.WEIXIN_WAITER = root + "/weixin/html/waiter/waiter.html";
 		this.WEIXIN_REPRESENT = root + "/weixin/html/representCard/representCard.html";
+		this.WEIXIN_POINTCONSUME = root + "/weixin/html/pointConsume/pointConsume.html";
+		this.WEIXIN_MYCOUPON = root + "/weixin/html/myCoupon/myCoupon.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
 		this.WEIXIN_BOOK_ICON = root + "/weixin/order/images/icon_book.jpg";
@@ -629,6 +635,12 @@ public class WxHandleMessage extends HandleMessageAdapter {
 						session.callback(new Msg4ImageText(msg).addItem(new Data4Item("代言活动尚未开始", "敬请留意商家公告", "", "")));
 					}
 					
+				}else if(msg.getEventKey().equals(EventKey.POINT_CONSUME.val)){
+					//积分兑换
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("积分兑换", "点击去积分兑换", picUrl, createUrl(msg, WEIXIN_POINTCONSUME))));
+				}else if(msg.getEventKey().equals(EventKey.MY_COUPON.val)){
+					//我的优惠券
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("我的优惠券", "点击去我的优惠券", picUrl, createUrl(msg, WEIXIN_MYCOUPON))));
 				}else{
 					
 					Msg msg4Action = new WxMenuAction.MsgProxy(msg.getHead(), WxMenuActionDao.getById(staff, Integer.parseInt(msg.getEventKey()))).toMsg();

@@ -27,6 +27,16 @@ public class WxRestaurant implements Jsonable{
 		private PayType defaultOrderType;
 		private PrefectMember prefectMemberStatus;
 		private String refundTemplate;
+		private String expiredTemplate;
+		
+		public boolean isExpiredTemplateChange(){
+			return this.expiredTemplate != null;
+		}
+		
+		public UpdateBuilder setExpiredTemplate(String expiredTemplate){
+			this.expiredTemplate = expiredTemplate;
+			return this;
+		}
 		
 		public boolean isRefundTemplate(){
 			return this.refundTemplate != null;
@@ -329,6 +339,7 @@ public class WxRestaurant implements Jsonable{
 	private String refundTemplate;
 	private OssImage wxCardImg;
 	private String chargeTemplate;
+	private String expiredTemplate;
 	private PayType defaultOrderType = PayType.CONFIRM_BY_STAFF;
 	private PrefectMember prefectMemberStatus = PrefectMember.SHOW_PREFECMEMBER;
 	
@@ -354,10 +365,23 @@ public class WxRestaurant implements Jsonable{
 			this.wxCardImg = new OssImage(builder.wxCardImgId);
 		}
 		this.refundTemplate = builder.refundTemplate;
+		this.expiredTemplate = builder.expiredTemplate;
 	}
 	
 	public WxRestaurant(int restaurantId){
 		this.restaurantId = restaurantId;
+	}
+	
+	public String getExpiredTemplate() {
+		return expiredTemplate;
+	}
+
+	public void setExpiredTemplate(String expiredTemplate) {
+		this.expiredTemplate = expiredTemplate;
+	}
+
+	public boolean hasExpiredTemplate(){
+		return expiredTemplate != null;
 	}
 	
 	public boolean hasRefundTemplate(){

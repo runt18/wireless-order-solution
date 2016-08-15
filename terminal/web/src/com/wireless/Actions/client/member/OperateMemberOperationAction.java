@@ -115,34 +115,30 @@ public class OperateMemberOperationAction extends DispatchAction{
 			
 			final List<SummaryByEachMember> list = CalcMemberStatisticsDao.calcByEachMember(staff, extraCond);
 			
-			if(!list.isEmpty()){
-				if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
-					jObject.setTotalProperty(CalcMemberStatisticsDao.calcByEachMember(staff, extraCond).size());
-					
-					SummaryByEachMember sm = new SummaryByEachMember();
-					for(SummaryByEachMember s : list){
-						sm.setChargeActual(sm.getChargeActual() + s.getChargeActual());
-						sm.setChargeMoney(sm.getChargeMoney() + s.getChargeMoney());
-						sm.setRefundActual(sm.getRefundActual() + s.getRefundActual());
-						sm.setRefundMoney(sm.getRefundMoney() + s.getRefundMoney());
-						sm.setConsumeBase(sm.getConsumeBase() + s.getConsumeBase());
-						sm.setConsumeExtra(sm.getConsumeExtra() + s.getConsumeExtra());
-						sm.setConsumeTotal(sm.getConsumeTotal() + s.getConsumeTotal());
-						sm.setRemainingBalance(sm.getRemainingBalance() + s.getRemainingBalance());
-						sm.setChangedPoint(sm.getChangedPoint() + s.getChangedPoint());
-						sm.setRemainingPoint(sm.getRemainingPoint() + s.getRemainingPoint());
-						sm.setDeltaBase(sm.getDeltaBase() + s.getDeltaBase());
-						sm.setDeltaExtra(sm.getDeltaExtra() + s.getDeltaExtra());
-						sm.setMember(new Member(0));
-					}
-					
-					List<SummaryByEachMember> limitResult = DataPaging.getPagingData(list, true, start, limit);
-					limitResult.add(sm);
-					
-					jObject.setRoot(limitResult);
-				}else{
-					jObject.setRoot(list);
+			if(start != null && !start.isEmpty() && limit != null && !limit.isEmpty()){
+				jObject.setTotalProperty(list.size());
+				
+				SummaryByEachMember sm = new SummaryByEachMember();
+				for(SummaryByEachMember s : list){
+					sm.setChargeActual(sm.getChargeActual() + s.getChargeActual());
+					sm.setChargeMoney(sm.getChargeMoney() + s.getChargeMoney());
+					sm.setRefundActual(sm.getRefundActual() + s.getRefundActual());
+					sm.setRefundMoney(sm.getRefundMoney() + s.getRefundMoney());
+					sm.setConsumeBase(sm.getConsumeBase() + s.getConsumeBase());
+					sm.setConsumeExtra(sm.getConsumeExtra() + s.getConsumeExtra());
+					sm.setConsumeTotal(sm.getConsumeTotal() + s.getConsumeTotal());
+					sm.setRemainingBalance(sm.getRemainingBalance() + s.getRemainingBalance());
+					sm.setChangedPoint(sm.getChangedPoint() + s.getChangedPoint());
+					sm.setRemainingPoint(sm.getRemainingPoint() + s.getRemainingPoint());
+					sm.setDeltaBase(sm.getDeltaBase() + s.getDeltaBase());
+					sm.setDeltaExtra(sm.getDeltaExtra() + s.getDeltaExtra());
+					sm.setMember(new Member(0));
 				}
+				
+				List<SummaryByEachMember> limitResult = DataPaging.getPagingData(list, true, start, limit);
+				limitResult.add(sm);
+				
+				jObject.setRoot(limitResult);
 			}else{
 				jObject.setRoot(list);
 			}

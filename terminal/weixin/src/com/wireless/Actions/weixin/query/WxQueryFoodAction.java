@@ -1,6 +1,7 @@
 package com.wireless.Actions.weixin.query;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -119,7 +120,7 @@ public class WxQueryFoodAction extends DispatchAction{
 			}			
 			final Staff staff = StaffDao.getAdminByRestaurant(rid);
 			
-			List<Food> result = MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getFavorFoods();
+			List<Food> result = new ArrayList<>(MemberDao.getById(staff, WxMemberDao.getBySerial(staff, oid).getMemberId()).getFavorFoods());
 			
 			for(Food food : result){
 				food.copyFrom(FoodDao.getById(staff, food.getFoodId()));

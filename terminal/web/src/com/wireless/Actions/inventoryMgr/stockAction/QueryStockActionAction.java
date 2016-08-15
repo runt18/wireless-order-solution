@@ -36,6 +36,7 @@ public class QueryStockActionAction extends Action{
 		final String subType = request.getParameter("subType");
 		final String beginDate = request.getParameter("beginDate");
 		final String endDate = request.getParameter("endDate");
+		final String oriStockDate = request.getParameter("oriStockDate");
 		final String isHistory = request.getParameter("isHistory");
 		final String isPaging = request.getParameter("isPaging");
 		final String start = request.getParameter("start");
@@ -69,13 +70,15 @@ public class QueryStockActionAction extends Action{
 				if(beginDate != null && !beginDate.trim().isEmpty() && endDate != null && !endDate.isEmpty()){
 					//extraCond += (" AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date < '" + endDate + "'");
 					extraCond.setOriDate(beginDate, endDate);
+				}else if(oriStockDate != null && !oriStockDate.isEmpty()){
+					extraCond.setOriDate(oriStockDate + " 00:00:00", oriStockDate + " 23:59:59");
 				}
 			}else{
 				// 只能查询当前会计月份数据
 				//extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
 				extraCond.setCurrentMonth(true);
 			}
-
+			
 			if(id != null && !id.trim().isEmpty()){
 				//extraCond += (" AND S.id = " + id);
 				extraCond.setId(Integer.parseInt(id));

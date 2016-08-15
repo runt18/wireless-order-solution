@@ -23,6 +23,7 @@ import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponOperationDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WxMemberDao;
 import com.wireless.db.weixin.restaurant.WxRestaurantDao;
@@ -286,6 +287,49 @@ public class WxNotifyMemberAction extends DispatchAction{
 		}
 
 		
+		return null;
+	}
+	
+	/**
+	 * 发送优惠券到期提醒
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward expired(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)throws Exception{
+		final String restaurantId = request.getParameter("restaurantId");
+		final String memberId = request.getParameter("memeberId");
+		final String expiredAmount = request.getParameter("amount");
+		final String expiredDate = request.getParameter("expiredDate");
+		try {
+			final Staff staff = StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId));
+			final WxRestaurant wxRestaurant = WxRestaurantDao.get(staff);
+			
+			if(wxRestaurant.hasExpiredTemplate()){
+				final WxMember wxMember = WxMemberDao.getByMember(staff, Integer.parseInt(memberId));
+				final AuthorizerToken authorizerToken = AuthorizerToken.newInstance(AuthParam.COMPONENT_ACCESS_TOKEN, wxRestaurant.getWeixinAppId(), wxRestaurant.getRefreshToken());
+				final Token token = Token.newInstance(authorizerToken);
+				
+	//			{{first.DATA}}
+	//
+	//			您的{{name.DATA}}有效期至{{expDate.DATA}}
+	//			{{remark.DATA}}
+				
+				
+				Template.send(token, new Template.Builder()
+						.setToUser(wxMember.getSerial())
+						.setTemplateId(wxRestaurant.getExpiredTemplate())
+						.addKeyword(new Keyword("first", ("你好，亲爱的【" + RestaurantDao.getById(staff.getRestaurantId()).getName() + "】会员" + MemberDao.getById(staff, Integer.parseInt(memberId)).getName() + "，请注意。")))
+						.addKeyword(new Keyword("name", (expiredAmount + "张优惠券")))
+						.addKeyword(new Keyword("expDate", expiredDate))
+						.addKeyword(new Keyword("remark", "请注意时间，防止过期失效")));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
 		return null;
 	}
 }
