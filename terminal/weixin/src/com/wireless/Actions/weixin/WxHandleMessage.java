@@ -253,11 +253,11 @@ public class WxHandleMessage extends HandleMessageAdapter {
 //		this.WEIXIN_FOOD = root + "/weixin/order/branches.html?redirect_url=food.html";
 		this.WEIXIN_FOOD = root + "/weixin/html/branches/branches.html?redirect_url=../../html/food/food.html";
 		this.WEIXIN_BOOK = root + "/weixin/html/branches/branches.html?redirect_url=../../weixin/order/book.html";
-		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
-		this.WEIXIN_ABOUT = root + "/weixin/order/about.html";
+		this.WEIXIN_RFOOD = root + "/weixin/html/rfood/rfood.html";
+		this.WEIXIN_ABOUT = root + "/weixin/html/about/about.html";
 //		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
 		this.WEIXIN_MEMBER = root + "/weixin/html/member/member.html";
-		this.WEIXIN_COUPON = root + "/weixin/order/sales.html";
+		this.WEIXIN_COUPON = root + "/weixin/html/sales/sales.html";
 //		this.WEIXIN_ORDER = root + "/weixin/order/orderList.html";
 		this.WEIXIN_ORDER = root + "/weixin/html/orderList/orderList.html";
 		this.WEIXIN_DIANPING = root + "/weixin/order/dianping.html";

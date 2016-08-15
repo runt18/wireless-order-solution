@@ -54,6 +54,7 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String maxFansAmount = request.getParameter("maxFansAmount");
 		final String minCommissionAmount = request.getParameter("minCommissionAmount");
 		final String maxCommissionAmount = request.getParameter("maxCommissionAmount");
+		final String recentlyBirthday = request.getParameter("recentlyBirthday");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -65,6 +66,11 @@ public class OperateMemberCondAction extends DispatchAction{
 				rangeType = RangeType.valueOf(Integer.parseInt(memberCondDateRegion));
 			}else{
 				rangeType = MemberCond.RangeType.LAST_1_MONTH;
+			}
+			
+			//设置距离生日天数
+			if(recentlyBirthday != null && !recentlyBirthday.isEmpty()){
+				builder.setRecentlyBirthday(Integer.parseInt(recentlyBirthday));
 			}
 			
 			//设置时间段
@@ -178,6 +184,7 @@ public class OperateMemberCondAction extends DispatchAction{
 		final String maxFansAmount = request.getParameter("maxFansAmount");
 		final String minCommissionAmount = request.getParameter("minCommissionAmount");
 		final String maxCommissionAmount = request.getParameter("maxCommissionAmount");
+		final String recentlyBirthday = request.getParameter("recentlyBirthday");
 		final JObject jObject = new JObject(); 
 		
 		try{
@@ -195,6 +202,11 @@ public class OperateMemberCondAction extends DispatchAction{
 				}
 			}else{
 				builder.setRangeType(null);
+			}
+			
+			//设置距离生日天数
+			if(recentlyBirthday != null && !recentlyBirthday.isEmpty()){
+				builder.setRecentlyBirthday(Integer.parseInt(recentlyBirthday));
 			}
 			
 			if(minFansAmount != null && !minFansAmount.isEmpty() && maxFansAmount != null && !maxFansAmount.isEmpty()){

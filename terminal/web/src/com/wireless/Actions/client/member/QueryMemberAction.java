@@ -504,6 +504,7 @@ public class QueryMemberAction extends DispatchAction {
 		final String memberCondMaxFansAmount =request.getParameter("memberCondMaxFansAmount");
 		final String memberCondMinCommission = request.getParameter("memberCondMinCommission");
 		final String memebrCondMaxCommission = request.getParameter("memberCondMaxCommission");
+		final String recentlyBirthday = request.getParameter("recentlyBirthday");
 		
 		try{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -547,6 +548,11 @@ public class QueryMemberAction extends DispatchAction {
 				memberCond.setMinBalance(minBalance);
 				memberCond.setMinConsumeAmount(minAmount);
 				memberCond.setMinConsumeMoney(minConsume);
+				
+				//距离生日天数
+				if(recentlyBirthday != null && !recentlyBirthday.isEmpty()){
+					memberCond.setRecentlyBirthday(Integer.parseInt(recentlyBirthday));
+				}
 				
 				//粉丝数
 				if(memberCondMinFansAmount != null && !memberCondMinFansAmount.isEmpty()){
