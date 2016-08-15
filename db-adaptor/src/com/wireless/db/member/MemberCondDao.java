@@ -76,7 +76,7 @@ public class MemberCondDao {
 		sql = " INSERT INTO " + Params.dbName + ".member_cond" +
 			  " ( restaurant_id, name, member_type_id, range_type, begin_date, end_date" +
 			  " ,min_consume_money, max_consume_money, min_consume_amount, max_consume_amount, min_balance, max_balance, min_last_consumption, max_last_consumption " +
-			  " ,min_charge, max_charge, sex, age, raw, min_fans_amount, max_fans_amount, min_commission_amount, max_commission_amount " + 
+			  " ,min_charge, max_charge, sex, age, raw, min_fans_amount, max_fans_amount, min_commission_amount, max_commission_amount, recently_birthday " + 
 			  " ) VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + cond.getName() + "'" + "," +
@@ -100,7 +100,8 @@ public class MemberCondDao {
 			  cond.getMinFansAmount() + "," + 
 			  cond.getMaxFansAmount() + "," + 
 			  cond.getMinCommissionAmount() + "," +
-			  cond.getMaxCommissionAmount() +
+			  cond.getMaxCommissionAmount() + "," +
+			  cond.getRecentlyBirthday() +
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -172,6 +173,7 @@ public class MemberCondDao {
 			  (builder.isFansChanged() ? " ,max_fans_amount = " + cond.getMaxFansAmount() : "") +
 			  (builder.isCommissionChanged() ? ",min_commission_amount = " + cond.getMinCommissionAmount() : "") +
 			  (builder.isCommissionChanged() ? ",max_commission_amount = " + cond.getMaxCommissionAmount() : "") +
+			  (builder.isBirthdayChange() ? ",recently_birthday = " + cond.getRecentlyBirthday() : "") +
 			  " WHERE id = " + cond.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -319,6 +321,7 @@ public class MemberCondDao {
 			if(dbCon.rs.getInt("cond_raw") >= 0){
 				memberCond.setRaw(dbCon.rs.getBoolean("raw"));
 			}
+			memberCond.setRecentlyBirthday(dbCon.rs.getInt("recently_birthday"));
 			result.add(memberCond);
 		}
 		dbCon.rs.close();

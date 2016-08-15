@@ -103,6 +103,9 @@
 		gs.baseParams['memberCondMinCommission'] = Ext.getCmp('showCommissionMin_numberfield_memberCond').getValue();
 		gs.baseParams['memberCondMaxCommission'] = Ext.getCmp('showCommissionMax_numberfield_memberCond').getValue();
 			
+		gs.baseParams['recentlyBirthday']  = Ext.getCmp('recentlyBirthday_field_memberCond').getValue();
+		//TODO
+		
 		if(c && c.searchByCond){
 			memberCondId = c.searchByCond;
 			gs.baseParams['memberCondId'] = c.searchByCond;
@@ -432,6 +435,9 @@
 					Ext.getDom('isBind_tbtext_memberCond').innerHTML = '无设定';
 					Ext.getDom('memeberAge_tbtext_memberCond').innerHTML = '无设定';
 					Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '无设定';
+					Ext.getDom('recentliBirthday_tbtext_memberCond').innerHTML = '无设定';
+					
+					
 					memberCondTree.getRootNode().reload();
 				}
 			}]
@@ -553,6 +559,12 @@
 		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = jr.root[0].sexText;
 		    		    		}else{
 		    		    			Ext.getDom('memeberSex_tbtext_memberCond').innerHTML = '无设定';
+		    		    		}
+		    		    		
+		    		    		if(jr.root[0].birthday){
+		    		    			Ext.getDom('recentliBirthday_tbtext_memberCond').innerHTML = jr.root[0].birthday;
+		    		    		}else{
+		    		    			Ext.getDom('recentliBirthday_tbtext_memberCond').innerHTML = '无设定';
 		    		    		}
 		    		    		
 		    		    		
@@ -1190,6 +1202,9 @@
 						xtype : 'numberfield',
 						width : 50,
 						disabled : true
+					},{xtype : 'tbtext', text : '&nbsp;&nbsp;'},{
+						xtype : 'tbtext',
+						text : String.format(Ext.ux.txtFormat.longerTypeName, '距离生日天数', 'recentliBirthday_tbtext_memberCond', '----')
 					}]
 		});	
 		
@@ -1317,6 +1332,8 @@
 				Ext.getCmp('isBind_checkbox_memberCond').setValue(0);
 			}
 		}
+		
+		Ext.getCmp('recentlyBirthday_field_memberCond').setValue(data.birthday > 0 ? data.birthday : 0);
 			
 		if(data.name){
 			//修改
@@ -1374,6 +1391,7 @@
 				//余额无设定
 				Ext.getCmp('comboBalance4CondWin').setValue(0);
 			}
+			
 			refreshBalance();
 			
 		}else{
@@ -2008,6 +2026,18 @@
 			columnWidth : 1,
 			style :'margin-bottom:5px;',
 			border : false		
+		}, {
+			columnWidth : 0.3,
+			xtype : 'label',
+			text : '距离生日天数:'
+		}, {
+			columnWidth : 0.3,
+			xtype : 'numberfield',
+			id : 'recentlyBirthday_field_memberCond'
+		}, {
+			columnWidth : 0.1,
+			xtype : 'label',
+			text : '天'
 		}],
 		bbar : ['->',{
 			text : '保存',
@@ -2174,6 +2204,8 @@
 					isRaw = bindValve;
 				}
 				
+				var recentiybirthday = Ext.getCmp('recentlyBirthday_field_memberCond').getValue();
+				
 				Ext.Ajax.request({
 					url : '../../OperateMemberCond.do',
 					params : {
@@ -2200,7 +2232,8 @@
 						minFansAmount : fansMinData,
 						maxFansAmount : fansMaxData,
 						minCommissionAmount : minCommission,
-						maxCommissionAmount : maxCommission
+						maxCommissionAmount : maxCommission,
+						recentlyBirthday : recentiybirthday
 					},
 					success : function(response, options) {
 						var jr = Ext.util.JSON.decode(response.responseText);

@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.weixin.order.WxOrderDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ErrorEnum;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
@@ -165,7 +166,7 @@ public class InsertOrder {
 				throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 是否继续提交?", FrontBusinessError.ORDER_EXPIRED);
 			}			
 		}else{
-			throw new BusinessException("Unknown error occourred while inserting order.", ProtocolError.UNKNOWN);
+			throw new BusinessException("Unknown error occourred while inserting order.", ErrorEnum.UNKNOWN);
 		}
 		
 	}

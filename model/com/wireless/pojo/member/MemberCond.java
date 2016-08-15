@@ -33,6 +33,8 @@ public class MemberCond implements Jsonable{
 		private int maxFansAmount;
 		private float minCommissionAmount;
 		private float maxCommissionAmount;
+		private int recentlyBirthday;
+		
 		
 		public InsertBuilder(String name){
 			this.name = name;
@@ -79,6 +81,14 @@ public class MemberCond implements Jsonable{
 		
 		public InsertBuilder setRaw(boolean onOff){
 			this.isRaw = onOff;
+			return this;
+		}
+		
+		public InsertBuilder setRecentlyBirthday(int birthday){
+			if(birthday <= 0){
+				throw new IllegalArgumentException("距离生日不能小于0");
+			}
+			this.recentlyBirthday = birthday;
 			return this;
 		}
 		
@@ -167,9 +177,22 @@ public class MemberCond implements Jsonable{
 		private Integer maxFansAmount;
 		private Float minCommissionAmount;
 		private Float maxCommissionAmount;
+		private int recentlyBirthday = -1;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
+		}
+		
+		public UpdateBuilder setRecentlyBirthday(int birthday){
+			if(birthday <= 0){
+				throw new IllegalArgumentException("距离生日不能小于0");
+			}
+			this.recentlyBirthday = birthday;
+			return this;
+		}
+		
+		public boolean isBirthdayChange(){
+			return this.recentlyBirthday > 0;
 		}
 		
 		public UpdateBuilder setCommissionRange(float min, float max){
@@ -406,6 +429,7 @@ public class MemberCond implements Jsonable{
 	private float minCommissionAmount;
 	private float maxCommissionAmount;
 	private Boolean isRaw;
+	private int recentlyBirthday;
 	
 	private MemberCond(UpdateBuilder builder){
 		setId(builder.id);
@@ -432,6 +456,7 @@ public class MemberCond implements Jsonable{
 		if(builder.isRaw != null){
 			setRaw(builder.isRaw);
 		}
+		setRecentlyBirthday(builder.recentlyBirthday);
 	}
 	
 	private MemberCond(InsertBuilder builder){
@@ -456,12 +481,22 @@ public class MemberCond implements Jsonable{
 		setMaxFansAmount(builder.maxFansAmount);
 		setMinCommissionAmount(builder.minCommissionAmount);
 		setMaxCommissionAmount(builder.maxCommissionAmount);
+		setRecentlyBirthday(builder.recentlyBirthday);
 	}
 	
 	public MemberCond(int id){
 		this.id = id;
 	}
 	
+	
+	public int getRecentlyBirthday() {
+		return recentlyBirthday;
+	}
+
+	public void setRecentlyBirthday(int birthday) {
+		this.recentlyBirthday = birthday;
+	}
+
 	public void setMaxCommissionAmount(float max){
 		this.maxCommissionAmount = max;
 	}
@@ -737,6 +772,7 @@ public class MemberCond implements Jsonable{
 		
 		jm.putFloat("minCommissionAmount", this.minCommissionAmount);
 		jm.putFloat("maxCommissionAmount", this.maxCommissionAmount);
+		jm.putFloat("birthday", this.recentlyBirthday);
 		return jm;
 	}
 

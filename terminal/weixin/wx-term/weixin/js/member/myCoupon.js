@@ -38,7 +38,7 @@
 						coupons = data.root;
 						
 						var coupon = '<div style="left:14px;top:8px;" class="stamp stamp03" >'
-					  	    +'<div data-type="promotion" data-value={promotionid} class="par"><p>' + restaurantName + '</p><sub class="sign">￥</sub><span>{price}</span><sub>优惠券</sub><p>{comment}</p></div>' 
+					  	    +'<div data-type="promotion" data-value={promotionId} class="par"><p>' + restaurantName + '</p><sub class="sign">￥</sub><span>{price}</span><sub>优惠券</sub><p>{comment}</p></div>' 
 						    +'<div class="copy" style="z-index: 6000;" data-type="useCoupon_a_myCoupon" birthDay={birthday}  couponPrice={price} couponName={comment} memebrId={memberId} data-value={couponId}><p>{date}</p><a >扫码销券</a></div>' 
 		   		            +'</div>'
 		   		            + '<div style="height:7px;"></div>' ;
@@ -82,7 +82,7 @@
 						
 						$('body').find('[data-type="promotion"]').each(function(index, element){
 							element.onclick = function(){
-								Util.jump('../../order/sales.html?pid=' + $(element).attr('data-value'));
+								Util.jump('../../html/couponAbout/couponAbout.html?pid=' + $(element).attr('data-value')) + 'r=' + Util.mp.fid + 'm=' + Util.mp.oid;
 							}
 						})
 						

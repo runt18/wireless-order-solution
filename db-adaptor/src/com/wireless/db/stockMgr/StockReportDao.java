@@ -302,13 +302,6 @@ public class StockReportDao {
 					report.setPrimeAmount(primeAmount);
 					
 					
-					//TODO
-	//				List<MonthlyBalance> monthlyBalance = MonthlyBalanceDao.getMonthlyBalance(staff, new MonthlyBalanceDao.ExtraCond().setRange(extraCond.range.getOpeningFormat()), " ORDER BY month DESC");
-	//				
-	//				if(monthlyBalance.size() > 0){
-	////					monthlyBalance.get(0);
-	//				}
-					
 					//期初金额
 					report.setPrimeMoney(primeAmount * report.getFinalPrice());
 				}

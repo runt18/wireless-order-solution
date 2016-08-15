@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+	<link type="text/css" rel="stylesheet" href="../../css/common.css">
+	<link type="text/css" rel="stylesheet" href="../../css/mbar.css">
+	<link type="text/css" rel="stylesheet" href="../../css/general_foundicons.css">
+	<script type="text/javascript" src="../../js/jquery-1.8.2.min.js"></script>
+	
+	<script type="text/javascript" src="../../js/Util.js"></script>
+	<script type="text/javascript">
+	$(function(){
+		//Util.lbar('', function(html){ $(document.body).append(html);  });
+		$.ajax({
+			url : '../../../WXQueryInfo.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'initData',
+				fid : Util.mp.fid
+			},
+			success : function(data, statuc, xhr){
+				Util.getDom('imgRestaurantHeader').src = data.other.logo;
+				var rInfo = data.other.rInfo;
+				
+ 				if(rInfo.tele1 || rInfo.address){
+					$('#divRestaurantInfo').show();
+					if(rInfo.tele1){
+						$('#spanRestaurantPhone1').parent().show();
+						$('#spanRestaurantPhone1').text(rInfo.tele1);	
+						$('#callRestaurant').attr("href", "tel:"+rInfo.tele1);
+					}
+					if(rInfo.address){
+						$('#spanRestaurantAdress').parent().show();
+						$('#spanRestaurantAdress').text(rInfo.address);					
+					}
+					$('#spanRestaurantName').text(rInfo.name);
+				}
+ 
+				
+			},
+			error : function(xhr, errorType, error){
+				alert('加载店铺形象失败.');
+			}
+		});
+		
+		
+		
+	});
+	
+	</script>
+</head>
+<body>
+
+<div class="moveleft">
+	<div class="mlwarp">
+		<i class="mlgomr"></i>
+	</div>
+	<!-- banner -->
+	<div class="bgstyle banner">
+		<div> 
+			<img id="imgRestaurantHeader" src="" />
+		</div>
+	</div>
+	<!-- banner END -->
+	<!-- 公告 
+	<div class="bgstyle indexnotice p_re">
+		<strong>公告：</strong>最新公告信息。
+	</div>-->
+	<!-- 公告 END -->
+	<!-- 栏目 -->
+	<div class="bgstyle indexsub">
+		<ul>
+			<li class="s1 bg5">
+				<div class="subtype" onclick="Util.jump('../../html/food/food.html')">
+					<em class="foundicon-website fontsize1"></em> <span></span> <del>自助点餐</del>
+				</div>
+			</li>
+			<li class="s2 bg2">
+				<div class="subtype" onclick="Util.jump('../../html/sales/sales.html')">
+					<em class="foundicon-offsale fontsize1"> </em> <del>优惠信息</del>
+				</div>	
+			</li>
+			<li class="s3 bg3">
+				<div class="subtype" onclick="Util.jump('../../html/member/member.html')">
+					<em class="foundicon-user fontsize1"></em> <span></span> <del>会员中心</del>
+				</div>
+			</li>
+			<li class="s4 bg4">
+				<div class="subtype" onclick="Util.jump('../../html/rfood/rfood.html')">
+					<em class="foundicon-heart fontsize1"></em> <span></span> <del>特色菜品</del>
+				</div>
+			</li>
+			<li class="s5 bg5">
+				<div class="subtype" onclick="Util.jump('../../html/about/about.html')">
+					<em class="foundicon-quote fontsize1"></em> <span></span> <del>店铺简介</del>
+				</div>
+			</li>
+			<li class="s6 bg6">
+				<div class="subtype" >
+					<a id="callRestaurant">
+						<em class="foundicon-phone fontsize1"></em> <span></span> <del>一键拨号</del>
+					</a>
+				</div>
+<!-- 				<div class="subtype" onclick="Util.jump('food.html', 3)">
+					<em class="foundicon-website fontsize1"></em> <span></span> <del>外卖点餐</del>
+				</div>	 -->			
+			</li>
+		</ul>
+	</div>
+	<!-- 栏目 END -->
+	<div id="divRestaurantInfo" class="bgstyle">
+		<div class="clearfix merchant moreindex moreshow">
+			<div class="userinfo p_re embox">
+				<strong id="spanRestaurantName">利雅园酒家</strong> 
+				<div class="em_mobile">
+					<font>电话:</font>
+					<span id="spanRestaurantPhone1" ></span><span id="spanRestaurantPhone2" ></span>
+				</div>
+				<div class="em_mobile">
+					<font>地址：</font><span id="spanRestaurantAdress"></span>
+				</div>				
+			</div>
+		</div>
+	</div>
+	<div id="footer" class="clear">
+		<div class="footerwarp">
+			<div class="clear copy">&copy; 技术支持：志易科技</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

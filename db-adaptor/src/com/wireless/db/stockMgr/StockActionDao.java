@@ -209,12 +209,20 @@ public class StockActionDao {
 			}
 			
 			if(this.isHistory){
-				try {
-					long monthly = MonthlyBalanceDao.getCurrentMonthTime(staff);
-					String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
-					extraCond.append(" AND S.ori_stock_date < '" + curmonth + "'");
-				} catch (SQLException | BusinessException ignored) {
-					ignored.printStackTrace();
+				if(minOriDate != null && maxOriDate != null){
+					extraCond.append(" AND S.ori_stock_date BETWEEN '" + minOriDate + "' AND '" + maxOriDate + "'");
+				}else if(minOriDate != null && maxOriDate == null){
+					extraCond.append(" AND S.ori_stock_date >= '" + minOriDate + "'");
+				}else if(minOriDate == null && maxOriDate != null){
+					extraCond.append(" AND S.ori_stock_date <= '" + maxOriDate + "'");
+				}else{
+					try {
+						long monthly = MonthlyBalanceDao.getCurrentMonthTime(staff);
+						String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
+						extraCond.append(" AND S.ori_stock_date < '" + curmonth + "'");
+					} catch (SQLException | BusinessException ignored) {
+						ignored.printStackTrace();
+					}
 				}
 			}
 			
@@ -228,13 +236,6 @@ public class StockActionDao {
 				}
 			}
 			
-			if(minOriDate != null && maxOriDate != null){
-				extraCond.append(" AND S.ori_stock_date BETWEEN '" + minOriDate + "' AND '" + maxOriDate + "'");
-			}else if(minOriDate != null && maxOriDate == null){
-				extraCond.append(" AND S.ori_stock_date >= '" + minOriDate + "'");
-			}else if(minOriDate == null && maxOriDate != null){
-				extraCond.append(" AND S.ori_stock_date <= '" + maxOriDate + "'");
-			}
 			
 			if(this.type != null){
 				extraCond.append(" AND S.type = " + type.getVal());
