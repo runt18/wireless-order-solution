@@ -57,7 +57,7 @@ public class QueryWxRediectAction extends DispatchAction {
 			}else if(WxHandleMessage.EventKey.I_WANT_REPRESENT.getKey().equals(key)){
 				url = path1 + URLEncoder.encode(encoderUrl + "&href=../representCard/representCard.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.INTRO_EVENT_KEY.getKey().equals(key)){
-				url = path1 + URLEncoder.encode(encoderUrl + "&href=../index/index.html", "utf-8") + path2;
+				url = path1 + URLEncoder.encode(encoderUrl + "&href=../intro/intro.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.POINT_CONSUME.getKey().equals(key)){
 				url = path1 + URLEncoder.encode(encoderUrl + "&href=../pointConsume/pointConsume.html", "utf-8") + path2;
 			}else if(WxHandleMessage.EventKey.MY_COUPON.getKey().equals(key)){
