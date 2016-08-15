@@ -964,8 +964,8 @@
 	
 	<div data-role="popup" id="scanUsePopupMore_a_payment" data-theme="d" >
         <ul data-role="listview" data-inset="true" style="min-width:150px;" data-theme="b">
-       		 <li data-icon="false" class="tempFoodKitchen" id="issueCoupon_a_orderFood"><a>发券</a></li>
-       		 <li data-icon="false" class="tempFoodKitchen" id="useCoupon_a_orderFood"><a>用券</a></li>
+       		 <li data-icon="false" class="tempFoodKitchen" id="issueCoupon_a_orderFood"><a>账单发券</a></li>
+       		 <li data-icon="false" class="tempFoodKitchen" id="useCoupon_a_orderFood"><a>账单用券</a></li>
        		 <li data-icon="false" class="tempFoodKitchen" id="point_a_payment"><a>积分兑换</a></li>
        		 <li data-icon="false" class="tempFoodKitchen" id="scanUseCoupon_a_payment"><a>扫码销券</a></li>
        		 
