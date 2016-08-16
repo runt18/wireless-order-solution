@@ -777,7 +777,7 @@ public class CouponDao {
 	 * @throws SQLException
 	 * @throws BusinessException 
 	 */
-	public static void getExpiredCoupon(DBCon dbCon, String wxServer) throws SQLException, BusinessException{
+	public static void calcExpiredCoupon(DBCon dbCon, String wxServer) throws SQLException, BusinessException{
 		final List<Coupon> coupons = new ArrayList<>();
 		for(Restaurant restaurant : RestaurantDao.getByCond(dbCon, null, null)){
 			final Staff staff = StaffDao.getAdminByRestaurant(dbCon, restaurant.getId());
@@ -858,11 +858,11 @@ public class CouponDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static void getExpiredCoupon(String wxServer) throws SQLException, BusinessException{
+	public static void calcExpiredCoupon(String wxServer) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try {
 			dbCon.connect();
-			getExpiredCoupon(dbCon, wxServer);
+			calcExpiredCoupon(dbCon, wxServer);
 		} finally {
 			dbCon.disconnect();
 		}
