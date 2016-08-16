@@ -37,7 +37,10 @@ var uo = {
  * @param {object} c  
  */
 uo.entry = function(c){
+	console.log(c.table);
 	uo.table = c.table;
+	uo.order = null;
+	console.log(uo.table);
 	location.href = '#orderFoodListMgr';
 	//加载退菜原因
 	if(uo.reasons.length <= 0){
@@ -1239,40 +1242,44 @@ $(function(){
 	$('#orderFoodListMgr').on('pageinit', function(){
 		//会员
 		$('#memberRead_a_orderFood').click(function(){
-			seajs.use('./js/popup/member/read', function(readPopup){
-				var memberReadPopup = null;
-				memberReadPopup = readPopup.newInstance({
-					confirm : function(member, discount, pricePlan){
-						Util.LM.show();
-						
-						$.post('../OperateDiscount.do', {
-							dataSource : 'setDiscount',
-							orderId : uo.order.id,
-							memberId : member.id,
-							discountId : discount.id,
-							pricePlan : pricePlan.id
+			if(uo.order == null){
+				Util.msg.tip("账单为空,请刷新后重试");
+			}else{
+				seajs.use('./js/popup/member/read', function(readPopup){
+					var memberReadPopup = null;
+					memberReadPopup = readPopup.newInstance({
+						confirm : function(member, discount, pricePlan){
+							Util.LM.show();
 							
-						}, function(data){
-							Util.LM.hide();
-							if(data.success){
+							$.post('../OperateDiscount.do', {
+								dataSource : 'setDiscount',
+								orderId : uo.order.id,
+								memberId : member.id,
+								discountId : discount.id,
+								pricePlan : pricePlan.id
 								
-								//异步刷新账单
-								initOrderData({order : uo.order});
-								
-								Util.msg.alert({topTip : true, msg : '会员注入成功'});	
-								
-								//关闭会员读取Popup
-								memberReadPopup.close();
-								
-							}else{
-								Util.msg.tip('使用会员失败</br>' + data.msg);					
-							}
-						}, 'json');		
-					}
+							}, function(data){
+								Util.LM.hide();
+								if(data.success){
+									
+									//异步刷新账单
+									initOrderData({order : uo.order});
+									
+									Util.msg.alert({topTip : true, msg : '会员注入成功'});	
+									
+									//关闭会员读取Popup
+									memberReadPopup.close();
+									
+								}else{
+									Util.msg.tip('使用会员失败</br>' + data.msg);					
+								}
+							}, 'json');		
+						}
+					});
+					//打开会员读取Popup
+					memberReadPopup.open();
 				});
-				//打开会员读取Popup
-				memberReadPopup.open();
-			});
+			}
 		});
 		
 		//转台
@@ -1362,7 +1369,10 @@ $(function(){
 		
 		//全单转菜
 		$('#allTrantable_li_tableSelect').click(function(){
-			$('#updateFoodOtherOperateCmp').popup('close');
+			if(uo.order == null){
+				Util.msg.tip("账单为空,请刷新后重试");
+			}else{
+				$('#updateFoodOtherOperateCmp').popup('close');
 			setTimeout(function(){
 				var _selectedTable = null;
 				
@@ -1425,64 +1435,75 @@ $(function(){
 					});
 				});
 			}, 500);
+			}
+			
+			
 		});
 		
 		// 绑定明细
 		$('#detail_a_tableSelect').click(function(){
-			var detailPopup = null;
-			detailPopup = new DetailPopup({
-				table : uo.table,
-				order :  uo.order
-			});
-			detailPopup.open();
+			if(uo.order == null){
+				Util.msg.tip("账单为空,请刷新后重试");
+			}else{
+				var detailPopup = null;
+				detailPopup = new DetailPopup({
+					table : uo.table,
+					order :  uo.order
+				});
+				detailPopup.open();
+			}
 		});
 		
 		
 		//微信店小二补打
 		$('#weixinWaiter_li_tableSelect').click(function(){
-			var url = null;
-			if(window.location.hostname === 'e-tones.net' || window.location.hostname === 'lb.e-tones.net'){
-				url = 'http://wx.' + window.location.hostname + ':' + window.location.port + '/wx-term/WxOperateWaiter.do';
+			if(uo.order == null){
+				Util.msg.tip("账单为空,请刷新后重试");
 			}else{
-				url = window.location.origin + '/wx-term/WxOperateWaiter.do';
-			}
-			
-			Util.LM.show();
-			$.ajax({
-				url : '../OperateRestaurant.do',
-				data : {
-					dataSource : 'getByCond',
-					byId : true
-				},
-				type : 'post',
-				dataType : 'json',
-				success : function(data){
-					$.ajax({
-						type : 'post',
-						url : url,
-						data : {
-							dataSource : 'print',
-							restaurantId : data.root[0].id,
-							orderId : uo.order.id,
-							orientedPrinter : getcookie(document.domain + '_printers')
-						},
-						dataType : 'jsonp',
-						jsonp : 'callback',
-						success : function(data){
-							Util.LM.hide();
-							if(data.success){
-								Util.msg.tip(data.msg);
-							}else{
+				var url = null;
+				if(window.location.hostname === 'e-tones.net' || window.location.hostname === 'lb.e-tones.net'){
+					url = 'http://wx.' + window.location.hostname + ':' + window.location.port + '/wx-term/WxOperateWaiter.do';
+				}else{
+					url = window.location.origin + '/wx-term/WxOperateWaiter.do';
+				}
+				
+				Util.LM.show();
+				$.ajax({
+					url : '../OperateRestaurant.do',
+					data : {
+						dataSource : 'getByCond',
+						byId : true
+					},
+					type : 'post',
+					dataType : 'json',
+					success : function(data){
+						$.ajax({
+							type : 'post',
+							url : url,
+							data : {
+								dataSource : 'print',
+								restaurantId : data.root[0].id,
+								orderId : uo.order.id,
+								orientedPrinter : getcookie(document.domain + '_printers')
+							},
+							dataType : 'jsonp',
+							jsonp : 'callback',
+							success : function(data){
+								Util.LM.hide();
+								if(data.success){
+									Util.msg.tip(data.msg);
+								}else{
+									Util.msg.tip(data.msg);
+								}
+							},
+							error : function(xhr, e){
+								Util.LM.hide();
 								Util.msg.tip(data.msg);
 							}
-						},
-						error : function(xhr, e){
-							Util.LM.hide();
-							Util.msg.tip(data.msg);
-						}
-					});
-				}
-			});
+						});
+					}
+				});
+			}
 		});
 		
 	});
