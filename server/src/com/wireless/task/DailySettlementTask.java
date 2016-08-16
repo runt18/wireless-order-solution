@@ -149,7 +149,7 @@ public class DailySettlementTask extends SchedulerTask{
 			doPost("http://wx.e-tones.net/wx-term/WxRemind.do?dataSource=liveness", "");
 			
 			//Notify wx-term to send the message of expired coupon
-			CouponDao.getExpiredCoupon(WirelessSocketServer.wxServer);
+			CouponDao.calcExpiredCoupon(WirelessSocketServer.wxServer);
 			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
