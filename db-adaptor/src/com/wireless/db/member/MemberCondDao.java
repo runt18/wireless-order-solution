@@ -322,6 +322,7 @@ public class MemberCondDao {
 				memberCond.setRaw(dbCon.rs.getBoolean("raw"));
 			}
 			memberCond.setRecentlyBirthday(dbCon.rs.getInt("recently_birthday"));
+			
 			result.add(memberCond);
 		}
 		dbCon.rs.close();

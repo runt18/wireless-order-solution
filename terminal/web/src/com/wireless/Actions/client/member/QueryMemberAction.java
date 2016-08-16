@@ -550,7 +550,7 @@ public class QueryMemberAction extends DispatchAction {
 				memberCond.setMinConsumeMoney(minConsume);
 				
 				//距离生日天数
-				if(recentlyBirthday != null && !recentlyBirthday.isEmpty()){
+				if(recentlyBirthday != null && !recentlyBirthday.isEmpty() && !recentlyBirthday.equals("-1")){
 					memberCond.setRecentlyBirthday(Integer.parseInt(recentlyBirthday));
 				}
 				

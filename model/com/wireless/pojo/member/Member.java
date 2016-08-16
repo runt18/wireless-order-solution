@@ -1302,7 +1302,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			jm.putInt("ageVal", this.age.val);
 			jm.putString("ageText", this.age.desc);
 		}
-		jm.putLong("birthday", this.birthday);
+		jm.putString("birthday", DateUtil.format(this.birthday, DateUtil.Pattern.DATE_TIME));
 		jm.putString("birthdayFormat", this.birthday != 0 ? DateUtil.format(this.birthday, DateUtil.Pattern.DAY) : "");
 		jm.putString("idCard", this.idCard);
 		jm.putString("weixinCard", this.weixin != null?this.weixin.getCard() + "":"");
