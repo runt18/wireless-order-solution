@@ -71,7 +71,7 @@ $(function(){
 					   		            	var date = '';
 							   		        if(coupons[i].coupon.expiredType == '1'){
 							   		        	//开始结束时间
-							   		        	if(coupons[i].coupon.beginExpired != '' && cuopons[i].coupon.endExpired != ''){
+							   		        	if(coupons[i].coupon.beginExpired != '' && coupons[i].coupon.endExpired != ''){
 							   		        		date = cuopons[i].coupon.beginExpired + '开始<br>' + coupons[i].coupon.endExpired + '结束';
 							   		        	}else if(coupons[i].coupon.beginExpired != '' && coupons[i].coupon.endExpired == ''){
 							   		        		date = coupons[i].coupon.beginExpired + '开始<br>无结束时间';
