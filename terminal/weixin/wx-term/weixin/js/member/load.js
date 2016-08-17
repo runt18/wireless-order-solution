@@ -193,7 +193,7 @@ $(function(){
 			data : {
 				dataSource : 'getByCond',
 				status : 'issued',
-				filter : '1',
+				filter : '0',
 				oid : Util.mp.oid,
 				fid : Util.mp.fid
 			},
