@@ -7,6 +7,10 @@
 	<global-forwards />
 
 	<action-mappings>
+		<action path="/Extra"
+			type="com.wireless.Actions.extra.ExtraAction" scope="request"
+			parameter="dataSource">
+		</action>
 		<action path="/QueryWxRediect"
 			type="com.wireless.Actions.weixin.redirect.QueryWxRediectAction" scope="request"
 			parameter="dataSource">
