@@ -165,7 +165,7 @@ public class MemberDao {
 		private int maxFansAmount;
 		private float minCommissionAmount;
 		private float maxCommissionAmount;
-		private Integer birthday;
+		private Integer recentlyBirthday;
 		
 		public ExtraCond(MemberCond memberCond){
 			setRange(memberCond.getRange());
@@ -191,7 +191,7 @@ public class MemberDao {
 			this.minCommissionAmount = memberCond.getMinCommissionAmount();
 			this.maxCommissionAmount = memberCond.getMaxCommissionAmount();
 			if(memberCond.getRecentlyBirthday() != -1){
-				this.birthday = memberCond.getRecentlyBirthday();
+				this.recentlyBirthday = memberCond.getRecentlyBirthday();
 			}
 			
 		}
@@ -562,8 +562,8 @@ public class MemberDao {
 			}
 			
 			//距离生日
-			if(this.birthday != null){
-				extraCond.append(" AND DATEDIFF(CURDATE(), M.birthday) <= " + this.birthday);
+			if(this.recentlyBirthday != null){
+				extraCond.append(" AND DATEDIFF(CURDATE(), M.birthday) <= " + this.recentlyBirthday);
 			}
 			
 			//性别
