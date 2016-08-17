@@ -13,7 +13,8 @@ public class WxMember {
 		}
 		
 		public InterestBuilder setNickName(String nickName){
-			this.nickName = nickName;
+			//filter the Emoji
+			this.nickName = nickName.replaceAll("[\\ud800\\udc00-\\udbff\\udfff\\ud800-\\udfff]", "*");
 			return this;
 		}
 		

@@ -147,8 +147,8 @@ $(function(){
 		
 		//建立跑马灯   只有在pos端的情况下才创建
 		if(WirelessOrder.systemStatus.isPos()){ 
-			runHorseDiv = new CreateRunHorse();
-			runHorseDiv.open();
+			//runHorseDiv = new CreateRunHorse();
+			//runHorseDiv.open();
 		}
 	
 		//初始化窗口大小

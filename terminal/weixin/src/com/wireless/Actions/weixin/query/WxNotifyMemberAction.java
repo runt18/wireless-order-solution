@@ -80,8 +80,8 @@ public class WxNotifyMemberAction extends DispatchAction{
 				serverName = "wx.e-tones.net"; 
 			}
 			
-			final String url = "http://" + serverName + "/wx-term/weixin/order/sales.html?pid=" + coupon.getPromotion().getId() + 
-							   "&fid=" + wxMember.getSerial() + 
+			final String url = "http://" + serverName + "/wx-term/weixin/html/myCoupon/myCoupon.html?pid=" + coupon.getPromotion().getId() + 
+							   "&m=" + wxMember.getSerial() + 
 							   "&r=" + wxRestaurant.getWeixinSerial() +
 							   "&time=1450689776892";
 			

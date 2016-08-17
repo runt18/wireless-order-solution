@@ -33,7 +33,7 @@ public class MemberCond implements Jsonable{
 		private int maxFansAmount;
 		private float minCommissionAmount;
 		private float maxCommissionAmount;
-		private int recentlyBirthday;
+		private Integer recentlyBirthday;
 		
 		
 		public InsertBuilder(String name){
@@ -85,9 +85,6 @@ public class MemberCond implements Jsonable{
 		}
 		
 		public InsertBuilder setRecentlyBirthday(int birthday){
-			if(birthday <= 0){
-				throw new IllegalArgumentException("距离生日不能小于0");
-			}
 			this.recentlyBirthday = birthday;
 			return this;
 		}
@@ -177,22 +174,19 @@ public class MemberCond implements Jsonable{
 		private Integer maxFansAmount;
 		private Float minCommissionAmount;
 		private Float maxCommissionAmount;
-		private int recentlyBirthday = -1;
+		private Integer recentlyBirthday;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
 		}
 		
 		public UpdateBuilder setRecentlyBirthday(int birthday){
-			if(birthday <= 0){
-				throw new IllegalArgumentException("距离生日不能小于0");
-			}
 			this.recentlyBirthday = birthday;
 			return this;
 		}
 		
 		public boolean isBirthdayChange(){
-			return this.recentlyBirthday > 0;
+			return this.recentlyBirthday != null;
 		}
 		
 		public UpdateBuilder setCommissionRange(float min, float max){
@@ -429,7 +423,7 @@ public class MemberCond implements Jsonable{
 	private float minCommissionAmount;
 	private float maxCommissionAmount;
 	private Boolean isRaw;
-	private int recentlyBirthday;
+	private Integer recentlyBirthday;
 	
 	private MemberCond(UpdateBuilder builder){
 		setId(builder.id);
@@ -456,7 +450,7 @@ public class MemberCond implements Jsonable{
 		if(builder.isRaw != null){
 			setRaw(builder.isRaw);
 		}
-		setRecentlyBirthday(builder.recentlyBirthday);
+		setRecentlyBirthday(builder.recentlyBirthday != null ? builder.recentlyBirthday : -1);
 	}
 	
 	private MemberCond(InsertBuilder builder){
@@ -481,7 +475,7 @@ public class MemberCond implements Jsonable{
 		setMaxFansAmount(builder.maxFansAmount);
 		setMinCommissionAmount(builder.minCommissionAmount);
 		setMaxCommissionAmount(builder.maxCommissionAmount);
-		setRecentlyBirthday(builder.recentlyBirthday);
+		setRecentlyBirthday(builder.recentlyBirthday != null ? builder.recentlyBirthday : -1);
 	}
 	
 	public MemberCond(int id){

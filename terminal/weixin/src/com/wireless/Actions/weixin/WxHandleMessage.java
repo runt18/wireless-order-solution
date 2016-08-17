@@ -194,7 +194,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 	private final String WEIXIN_SCANNING_RESULT;
 	private final String WEIXIN_WAITER;
 	private final String WEIXIN_REPRESENT;
-	private final String WEIXIN_POINTCONSUME;
+	private final String WEIXIN_POINT_CONSUME;
 	private final String WEIXIN_MYCOUPON;
 	
 	private final String WEIXIN_FOOD_ICON;
@@ -266,7 +266,7 @@ public class WxHandleMessage extends HandleMessageAdapter {
 //		this.WEIXIN_WAITER = root + "/weixin/order/waiter.html";
 		this.WEIXIN_WAITER = root + "/weixin/html/waiter/waiter.html";
 		this.WEIXIN_REPRESENT = root + "/weixin/html/representCard/representCard.html";
-		this.WEIXIN_POINTCONSUME = root + "/weixin/html/pointConsume/pointConsume.html";
+		this.WEIXIN_POINT_CONSUME = root + "/weixin/html/pointConsume/pointConsume.html";
 		this.WEIXIN_MYCOUPON = root + "/weixin/html/myCoupon/myCoupon.html";
 		
 		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
@@ -637,7 +637,8 @@ public class WxHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(EventKey.POINT_CONSUME.val)){
 					//积分兑换
-					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("积分兑换", "点击去积分兑换", picUrl, createUrl(msg, WEIXIN_POINTCONSUME))));
+					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("积分兑换", "点击去积分兑换", picUrl, createUrl(msg, WEIXIN_POINT_CONSUME))));
+					
 				}else if(msg.getEventKey().equals(EventKey.MY_COUPON.val)){
 					//我的优惠券
 					session.callback(new Msg4ImageText(msg).addItem(new Data4Item("我的优惠券", "点击去我的优惠券", picUrl, createUrl(msg, WEIXIN_MYCOUPON))));
