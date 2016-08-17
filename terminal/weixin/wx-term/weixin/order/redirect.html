@@ -21,7 +21,7 @@
 				dataType : 'json',
 				success : function(data, status, req){
 					if(data){
-						window.location.href = Util.mp.params.href + '?r=' + Util.mp.params.fid + '&m=' + data.root[0].openId;
+						window.location.href = Util.mp.params.href + '?r=' + Util.mp.params.fid + '&m=' + data.root[0].openId + "&sessionId=" + data.root[0].sessionId;
 					}else{
 						var errorDialog = new WeDialogPopup({
 							leftText : '确定',

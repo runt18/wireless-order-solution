@@ -197,12 +197,16 @@ public class WxOperateInterfaceAction extends DispatchAction{
 		final JObject jObject = new JObject();
 		try {
 			final String openId = org.marker.weixin.oauth2.AccessToken.newInstance(wxRestaurant.getWeixinAppId(), wxRestaurant.getWeixinAppSecret(), code).getOpenId();
+			final HttpSession session = request.getSession();
+			session.setAttribute("oid", openId);
+			session.setAttribute("fid", fid);
 			jObject.setRoot(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("openId", openId);
+					jm.putString("sessionId", session.getId());
 					return jm;
 				}
 
