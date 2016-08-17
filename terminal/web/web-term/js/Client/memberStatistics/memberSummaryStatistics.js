@@ -271,7 +271,9 @@ Ext.onReady(function(){
 	
 	//summaryGrid的数据源
 	var ds = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url : '../../OperateMemberOperation.do'}),
+		proxy : new Ext.data.HttpProxy({
+		url : '../../OperateMemberOperation.do'
+		}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [
 			{name : 'member.name'},
 			{name : 'member.mobile'},

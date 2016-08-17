@@ -383,16 +383,16 @@ public class MemberOperationDao {
 			
 			//日期区间
 			if(operationDate != null){
-				DutyRange range;
+				DutyRange range = operationDate;
 				if(this.calcByDuty){
 					try {
-						range = DutyRangeDao.exec(this.operateStaff, operationDate);
+						DutyRange dutyRange = DutyRangeDao.exec(this.operateStaff, operationDate);
+						if(dutyRange != null){
+							range = dutyRange;
+						}
 					} catch (SQLException e) {
 						e.printStackTrace();
-						range = operationDate;
 					}
-				}else{
-					range = operationDate;
 				}
 				extraCond.append(" AND MO.operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
 			}
