@@ -300,29 +300,6 @@ Ext.onReady(function(){
 					}
 				}]
 		});
-	/*	mcrs_grid = createGridPanel(
-			'mcrs_grid',
-			'',
-			'',
-			'',
-			'../../QueryMemberOperation.do',
-			[
-				[true, false, false, true],
-				['日期', 'operateDateFormat'],
-				['操作类型', 'operateTypeText', 90, 'center'],
-				['会员名称', 'member.name', 60],
-				['实收金额', 'deltaBaseMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-				['账户充额', 'deltaTotalMoney', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-				['剩余金额', 'remainingTotalMoney'],
-				['充值方式', 'chargeTypeText'],
-				['操作人', 'staffName', 90, 'center'],
-			],
-			MemberOperationRecord.getKeys(),
-			[ ['isPaging', true]],
-			GRID_PADDING_LIMIT_20,
-			'',
-			mcrs_mo_tbar
-		);*/
 		
 		mcrs_grid = createGridPanel(
 				'',

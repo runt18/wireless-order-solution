@@ -11,17 +11,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.member.MemberDao;
 import com.wireless.db.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.member.Member;
 import com.wireless.pojo.member.MemberOperation;
 import com.wireless.pojo.member.MemberOperation.OperationCate;
 import com.wireless.pojo.member.MemberOperation.OperationType;
-import com.wireless.pojo.member.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateType;
 import com.wireless.util.DataPaging;
@@ -183,15 +180,6 @@ public class QueryMemberOperationAction extends Action{
 				sum.setOperateSeq(list.get(0).getOperateSeq());
 				sum.setStaffName(list.get(0).getStaffName());
 				for(MemberOperation temp : list){
-					List<Member> members = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setId(temp.getMemberId()), null);
-					
-					if(members.isEmpty()){
-						MemberType delteMT = new MemberType(0);
-						delteMT.setName("已删除会员");
-						temp.getMember().setMemberType(delteMT);
-					}else{
-						temp.setMember(members.get(0));
-					}
 					sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
 					sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
 					sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());
