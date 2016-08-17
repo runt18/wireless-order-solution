@@ -9,6 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MaterialError;
+import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -289,7 +290,11 @@ public class MaterialCateDao {
 	 */
 	public static int deleteByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws BusinessException, SQLException {
 		int amount = 0;
-		for(MaterialCate materialCate : getByCond(staff, extraCond)){
+		for(MaterialCate materialCate : getByCond(dbCon, staff, extraCond)){
+			for(Material material : MaterialDao.getByCond(dbCon, staff, new MaterialDao.ExtraCond().setCate(materialCate.getId()))){
+				MaterialDao.deleteById(dbCon, staff, material.getId());
+			}
+			
 			String sql = " DELETE FROM " + Params.dbName + ".material_cate WHERE cate_id = " + materialCate.getId();
 			if(dbCon.stmt.executeUpdate(sql) != 0){
 				amount ++;
